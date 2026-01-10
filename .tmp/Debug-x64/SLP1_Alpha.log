@@ -1,0 +1,8 @@
+﻿  Main.cpp
+C:\Users\Nicholas\Documents\DIGIPEN\Tri2_Projects\SLP1_Alpha\SLP1_Alpha\Main.cpp(171,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Nicholas\Documents\DIGIPEN\Tri2_Projects\SLP1_Alpha\SLP1_Alpha\Main.cpp(172,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  SLP1_Alpha.vcxproj -> C:\Users\Nicholas\Documents\DIGIPEN\Tri2_Projects\SLP1_Alpha\bin\Debug-x64\SLP1_Alpha.exe
+  Invalid switch - /q`
+  1 File(s) copied
+  1 File(s) copied
+  1 File(s) copied
