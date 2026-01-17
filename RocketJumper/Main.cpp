@@ -32,6 +32,17 @@ namespace renderlogic {
 		AEGfxSetTransform(transform.m);
 
 	}
+
+}
+
+namespace mechanics {
+	void fireProjectile(s32 mouseX, s32 mouseY, objectsquares& player, objectsquares& projectile, f32 velX, s32 velY, s8 active)
+	{
+		if (AEInputCheckCurr(AEVK_LBUTTON) && active)
+		{
+
+		}
+	}
 }
 
 
@@ -51,7 +62,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Initialization of your own variables go here
 	
 	s8 speed = 10;
-	objectsquares objectinfo[2] = { 0 };
+	objectsquares objectinfo[3] = { 0 };
+
+	// PROJECTILE INFO
+	objectsquares objectinfoprojectile;
+	f32 projectileVelX = 0.0f;
+	f32 projectileVelY = 0.0f; 
+	s8  projectileActive = 0;
+
 
 	objectinfo[player].xpos = 0.0f;
 	objectinfo[player].ypos = 0.0f;
@@ -62,6 +80,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	objectinfo[obstacle].ypos = 0.0f;
 	objectinfo[obstacle].xscale = 100.0f;
 	objectinfo[obstacle].yscale = 400.0f;
+
+	// Projectile info
+	objectinfo[projectile].xpos = 50.0f;
+	objectinfo[projectile].ypos = 0.0f;
+	objectinfo[projectile].xscale = 10.0f;
+	objectinfo[projectile].yscale = 10.0f;
 
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
@@ -123,11 +147,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (AEInputCheckCurr(AEVK_S)) {
 			objectinfo[player].ypos -= static_cast<f32>(speed);
 		}
+
+		// GET MOUSE POSITION
+		s32 mouseX, mouseY;
+
+		AEInputGetCursorPosition(&mouseX, &mouseY);
+		printf("X: %.2f, Y: %.2f", (float)mouseX, (float)mouseY);
+
 		// Your own update logic goes here
 
 		if (gamelogic::collision(&objectinfo[player], &objectinfo[obstacle])) {
 			printf("collision");
 		}
+
+		
 
 		// Your own rendering logic goes here
 		AEGfxSetBackgroundColor(0.5f, 0.5f, 0.5f);
@@ -139,13 +172,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetTransparency(1.0f);
 
+		// Obstacle
 		AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
 		renderlogic::Drawsquare(objectinfo[obstacle].xpos, objectinfo[obstacle].ypos, objectinfo[obstacle].xscale, objectinfo[obstacle].yscale);
 		AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
+		// White square
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
 		renderlogic::Drawsquare(objectinfo[player].xpos, objectinfo[player].ypos, objectinfo[player].xscale, objectinfo[player].yscale);
 		AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+
+		// Projectile
+		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
+		renderlogic::Drawsquare(objectinfo[projectile].xpos, objectinfo[projectile].ypos, objectinfo[projectile].xscale, objectinfo[projectile].yscale);
+		AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+
 
 		// Informing the system about the loop's end
 		AESysFrameEnd();

@@ -12,7 +12,8 @@ struct objectsquares {
 
 enum objecttype {
 	player,
-	obstacle
+	obstacle,
+	projectile
 };
 
 namespace gamelogic {
