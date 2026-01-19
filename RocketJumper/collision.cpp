@@ -8,11 +8,11 @@ namespace gamelogic {
 		s8 collisionX;
 		s8 collisionY;
 
-		f32 distanceX = (player->xscale / 2.0f) + (obstacle->xscale / 2.0f);
-		f32 distanceY = (player->yscale / 2.0f) + (obstacle->yscale / 2.0f);
+		f32 distanceX = (player->xScale / 2.0f) + (obstacle->xScale / 2.0f);
+		f32 distanceY = (player->yScale / 2.0f) + (obstacle->yScale / 2.0f);
 
-		if (player->xpos + distanceX >= obstacle->xpos &&
-			obstacle->xpos + distanceX >= player->xpos)
+		if (player->xPos + distanceX >= obstacle->xPos &&
+			obstacle->xPos + distanceX >= player->xPos)
 		{
 			collisionX = 1;
 		}
@@ -20,8 +20,8 @@ namespace gamelogic {
 			collisionX = 0;
 		}
 		// collision y-axis?
-		if (player->ypos + distanceY >= obstacle->ypos &&
-			obstacle->ypos + distanceY >= player->ypos)
+		if (player->yPos + distanceY >= obstacle->yPos &&
+			obstacle->yPos + distanceY >= player->yPos)
 
 		{
 			collisionY = 1;

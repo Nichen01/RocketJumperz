@@ -20,23 +20,30 @@ Technology is prohibited.
 
 s8 speed = 10;
 
+
 void Input_Handle() {
+	f32 speed = 10 * (f32)AEFrameRateControllerGetFrameRate();
+	f32 dt = (f32)AEFrameRateControllerGetFrameTime();
+	f32 dx = 0, dy = 0;
+
 	if (AEInputCheckTriggered(AEVK_ESCAPE))
 		next = GS_QUIT;
 
 	if (AEInputCheckCurr(AEVK_D)) {
-		objectinfo[player].xpos += static_cast<f32>(speed);
+		dx += speed * dt;
 	}
 
 	if (AEInputCheckCurr(AEVK_A)) {
-		objectinfo[player].xpos -= static_cast<f32>(speed);
+		dx -= speed * dt;
 	}
 
 	if (AEInputCheckCurr(AEVK_W)) {
-		objectinfo[player].ypos += static_cast<f32>(speed);
+		dy += speed * dt;
 	}
 
 	if (AEInputCheckCurr(AEVK_S)) {
-		objectinfo[player].ypos -= static_cast<f32>(speed);
+		dy -= speed * dt;
 	}
+	objectinfo[player].xPos += dx;
+	objectinfo[player].yPos += dy;
 }
