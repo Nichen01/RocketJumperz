@@ -28,7 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 	// Using custom window procedure
-	AESysInit(hInstance, nCmdShow, 1000, 900, 1, 60, false, NULL);
+	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
 	// Changing the window title
 	AESysSetWindowTitle("My New Demo!");
