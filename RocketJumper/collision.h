@@ -1,5 +1,5 @@
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"#pragma once
+#include "AEEngine.h"
 struct objectsquares {
 	f32 xpos;
 
@@ -19,3 +19,8 @@ enum objecttype {
 namespace gamelogic {
 	s8 collision(objectsquares* player, objectsquares* obstacle);
 }
+
+extern objectsquares objectinfo[2];
+
+extern AEGfxVertexList* pMesh;
+extern AEGfxVertexList* HMesh;

@@ -4,6 +4,9 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include "collision.h"
+#include "Input.h"
+#include "GameStateManager.h"
+#include "GameStateList.h"
 
 
 
@@ -95,19 +98,37 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// reset the system modules
 	AESysReset();
-	AEGfxMeshStart();
 
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+	GSM_Initialize(GS_TEST);
+	while (current != GS_QUIT)
+{
+        if (current != GS_RESTART) {
+            GSM_Update();
+            fpLoad();
+        }
+        else {
+            
+            current = previous;
+            next = previous;
+        }
+        fpInitialize();
+        while(next==current)
+        {
+			AESysFrameStart();
+            Input_Handle();
+            fpUpdate();
+            fpDraw();
+			AESysFrameEnd();
+        }
 
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+        fpFree();
 
-	AEGfxVertexList* pMesh = AEGfxMeshEnd();
+        if (next != GS_RESTART) {
+            fpUnload();
+        }
+        
+        previous = current;
+        current = next;
 
 	AEGfxTriAdd(
 		0.0f, -0.5f, 0xFF000000, 0.0f, 1.0f,
@@ -196,5 +217,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxMeshFree(HMesh);
 	AEGfxMeshFree(pMesh);
 	// free the system
+    }
 	AESysExit();
 }
