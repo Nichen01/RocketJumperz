@@ -18,7 +18,7 @@ Technology is prohibited.
 #include "GameStateManager.h"
 #include "collision.h"
 
-s8 speed = 10;
+
 
 
 void Input_Handle() {
