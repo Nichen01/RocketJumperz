@@ -1,18 +1,17 @@
 // ---------------------------------------------------------------------------
 // includes
-
+#pragma once
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include "collision.h"
 #include "Input.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
+#include "render.h"
 #include "drawWallsLevel1.h" 
 
 // ---------------------------------------------------------------------------
 // main
-
-
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -24,40 +23,52 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-
-
 	// Using custom window procedure
 	int gGameRunning = 1;
 
-	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
-	AESysSetWindowTitle("TeamProjTest");
+	// Changing the window title
+	AESysSetWindowTitle("Rocket Jumperz");
+
+	// reset the system modules
 	AESysReset();
 	printf("Team project test\n");
 
-	initMesh(); // Initializing the meshes for the map
-	loadTextures(); // Loading textures
-	initTransforms(); // Initializing the transforms
+	// Initialize game state manager - change this to switch between levels
+	// Use GS_TEST for Level1 or GS_PROJECTILE_TEST for projectile testing
+	GSM_Initialize(GS_PROJECTILE_TEST);
 
-	while (gGameRunning)
+	while (current != GS_QUIT)
 	{
-		AESysFrameStart();
+		if (current != GS_RESTART) {
+			GSM_Update();
+			fpLoad();
+		}
+		else {
+			current = previous;
+			next = previous;
+		}
 
-		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
-			gGameRunning = 0;
+		fpInitialize();
 
-		AEGfxSetBackgroundColor(0.1f, 0.1f, 0.1f);
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxSetTransparency(1.0f);
+		while (next == current)
+		{
+			AESysFrameStart();
+			Input_Handle();
+			fpUpdate();
+			fpDraw();
+			AESysFrameEnd();
+		}
 
-		drawFloors(); // Draw the map floors within the game loop
-		drawCharacter(); // Draw the character within the game loop
+		fpFree();
 
-		AESysFrameEnd();
+		if (next != GS_RESTART) {
+			fpUnload();
+		}
+
+		previous = current;
+		current = next;
 	}
-	AEGfxMeshFree(textureMesh);
-	unloadTextures();
+
+	// free the system
 	AESysExit();
 }
