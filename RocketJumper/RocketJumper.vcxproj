@@ -26,7 +26,7 @@
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Level1.h" />
-    <ClInclude Include="physicsEngine.hpp" />
+    <ClInclude Include="physicsEngine.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

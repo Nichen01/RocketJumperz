@@ -1,15 +1,15 @@
 #include "drawWallsLevel1.h" 
 
-AEGfxTexture* characterPic = NULL;
-AEGfxTexture* base1 = NULL;
-AEGfxTexture* base2 = NULL;
-AEGfxTexture* base3 = NULL;
-AEGfxTexture* base4 = NULL;
-AEGfxTexture* base5 = NULL;
-AEGfxTexture* base6 = NULL;
-AEGfxTexture* base7 = NULL;
-AEGfxTexture* base8 = NULL;
-AEGfxTexture* base9 = NULL;
+AEGfxTexture* characterPic = nullptr;
+AEGfxTexture* base1 = nullptr;
+AEGfxTexture* base2 = nullptr;
+AEGfxTexture* base3 = nullptr;
+AEGfxTexture* base4 = nullptr;
+AEGfxTexture* base5 = nullptr;
+AEGfxTexture* base6 = nullptr;
+AEGfxTexture* base7 = nullptr;
+AEGfxTexture* base8 = nullptr;
+AEGfxTexture* base9 = nullptr;
 
 AEMtx33 platformTransform1, platformTransform2, platformTransform2_1; 
 AEMtx33 platformTransform3, platformTransform4, platformTransform5, platformTransform5_1, platformTransform6; 
@@ -42,16 +42,16 @@ void loadTextures(void) {
 
 void unloadTextures(void) 
 { 
-	AEGfxTextureUnload(characterPic); 
-	AEGfxTextureUnload(base1);
-	AEGfxTextureUnload(base2);
-	AEGfxTextureUnload(base3);
-	AEGfxTextureUnload(base4); 
-	AEGfxTextureUnload(base5);
-	AEGfxTextureUnload(base6);
-	AEGfxTextureUnload(base7);
-	AEGfxTextureUnload(base8);
-	AEGfxTextureUnload(base9);
+	if (characterPic) AEGfxTextureUnload(characterPic); 
+	if (base1) AEGfxTextureUnload(base1);
+	if (base2) AEGfxTextureUnload(base2);
+	if (base3) AEGfxTextureUnload(base3);
+	if (base4) AEGfxTextureUnload(base4); 
+	if (base5) AEGfxTextureUnload(base5);
+	if (base6) AEGfxTextureUnload(base6);
+	if (base7) AEGfxTextureUnload(base7);
+	if (base8) AEGfxTextureUnload(base8);
+	if (base9) AEGfxTextureUnload(base9);
 }
 
 void initTransforms(void) 
