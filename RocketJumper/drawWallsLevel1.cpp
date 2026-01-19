@@ -1,4 +1,4 @@
-#include "drawWallsLevel1.hpp" 
+#include "drawWallsLevel1.h" 
 
 AEGfxTexture* characterPic = NULL;
 AEGfxTexture* base1 = NULL;
@@ -109,8 +109,8 @@ void initTransforms(void)
 	AEMtx33Concat(&platformTransform9, &translate, &platformTransform9);
 
 	AEMtx33 scaleChar, rotateChar, translateChar; 
-	AEMtx33Scale(&scaleChar, 80.f, 80.f); AEMtx33Rot(&rotateChar, 0);
-	AEMtx33Trans(&translateChar, -400.f, -400.f);
+	AEMtx33Scale(&scaleChar, 400.f, 400.f); AEMtx33Rot(&rotateChar, 0);
+	AEMtx33Trans(&translateChar, -600.f, -200.f);
 	AEMtx33Concat(&transformChar, &rotateChar, &scaleChar);
 	AEMtx33Concat(&transformChar, &translateChar, &transformChar); 
 }
@@ -167,6 +167,6 @@ void drawFloors(void) {
 
 void drawCharacter(void) {
 	AEGfxTextureSet(characterPic, 0, 0);
-	AEGfxSetTransform(charTransform.m);
+	AEGfxSetTransform(transformChar.m);
 	AEGfxMeshDraw(textureMesh, AE_GFX_MDM_TRIANGLES);
 }

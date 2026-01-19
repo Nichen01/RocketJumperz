@@ -7,10 +7,7 @@
 #include "Input.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
-
-
-
-#include "drawWallsLevel1.hpp" 
+#include "drawWallsLevel1.h" 
 
 // ---------------------------------------------------------------------------
 // main
