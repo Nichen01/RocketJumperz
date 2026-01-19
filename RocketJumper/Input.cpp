@@ -18,25 +18,25 @@ Technology is prohibited.
 #include "GameStateManager.h"
 #include "collision.h"
 
-s8 speed = 10;
+f32 speed = 10;
 
 void Input_Handle() {
 	if (AEInputCheckTriggered(AEVK_ESCAPE))
 		next = GS_QUIT;
 
 	if (AEInputCheckCurr(AEVK_D)) {
-		objectinfo[player].xpos += static_cast<f32>(speed);
+		objectinfo[player].xPos += speed;
 	}
 
 	if (AEInputCheckCurr(AEVK_A)) {
-		objectinfo[player].xpos -= static_cast<f32>(speed);
+		objectinfo[player].xPos -= speed;
 	}
 
 	if (AEInputCheckCurr(AEVK_W)) {
-		objectinfo[player].ypos += static_cast<f32>(speed);
+		objectinfo[player].yPos += speed;
 	}
 
 	if (AEInputCheckCurr(AEVK_S)) {
-		objectinfo[player].ypos -= static_cast<f32>(speed);
+		objectinfo[player].yPos -= speed;
 	}
 }

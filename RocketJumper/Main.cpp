@@ -37,14 +37,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 
 	GSM_Initialize(GS_TEST);
-	while (current != GS_QUIT)
-{
+	while (current != GS_QUIT) {
         if (current != GS_RESTART) {
             GSM_Update();
             fpLoad();
         }
-        else {
-            
+        else {  
             current = previous;
             next = previous;
         }
@@ -63,10 +61,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (next != GS_RESTART) {
             fpUnload();
         }
-        
         previous = current;
         current = next;
-
     }
 	AESysExit();
 }
