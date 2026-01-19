@@ -7,8 +7,7 @@
 #include "Input.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
-
-
+#include "drawWallsLevel1.h" 
 
 // ---------------------------------------------------------------------------
 // main
@@ -28,45 +27,37 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 	// Using custom window procedure
+	int gGameRunning = 1;
+
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
-
-	// Changing the window title
-	AESysSetWindowTitle("Rocket Jumperz");
-
-	// reset the system modules
+	AESysSetWindowTitle("TeamProjTest");
 	AESysReset();
+	printf("Team project test\n");
 
-	GSM_Initialize(GS_TEST);
-	while (current != GS_QUIT)
-{
-        if (current != GS_RESTART) {
-            GSM_Update();
-            fpLoad();
-        }
-        else {
-            
-            current = previous;
-            next = previous;
-        }
-        fpInitialize();
-        while(next==current)
-        {
-			AESysFrameStart();
-            Input_Handle();
-            fpUpdate();
-            fpDraw();
-			AESysFrameEnd();
-        }
+	initMesh(); // Initializing the meshes for the map
+	loadTextures(); // Loading textures
+	initTransforms(); // Initializing the transforms
 
-        fpFree();
+	while (gGameRunning)
+	{
+		AESysFrameStart();
 
-        if (next != GS_RESTART) {
-            fpUnload();
-        }
-        
-        previous = current;
-        current = next;
+		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
+			gGameRunning = 0;
 
-    }
+		AEGfxSetBackgroundColor(0.1f, 0.1f, 0.1f);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+
+		drawFloors(); // Draw the map floors within the game loop
+		drawCharacter(); // Draw the character within the game loop
+
+		AESysFrameEnd();
+	}
+	AEGfxMeshFree(textureMesh);
+	unloadTextures();
 	AESysExit();
 }
