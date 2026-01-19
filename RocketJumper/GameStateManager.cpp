@@ -13,11 +13,12 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-
+#pragma once
 #include <iostream>
 #include "GameStateManager.h"
 #include "GameStateList.h"
 #include "Level1.h"
+#include "ProjectileTest.h"
 
 
 int current = 0, previous = 0, next = 0;
@@ -40,6 +41,14 @@ void GSM_Update()
 		fpDraw = Level1_Draw;
 		fpFree = Level1_Free;
 		fpUnload = Level1_Unload;
+		break;
+	case GS_PROJECTILE_TEST:
+		fpLoad = ProjectileTest_Load;
+		fpInitialize = ProjectileTest_Initialize;
+		fpUpdate = ProjectileTest_Update;
+		fpDraw = ProjectileTest_Draw;
+		fpFree = ProjectileTest_Free;
+		fpUnload = ProjectileTest_Unload;
 		break;
 	case GS_RESTART:
 		break;
