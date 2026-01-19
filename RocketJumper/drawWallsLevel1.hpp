@@ -20,7 +20,7 @@ extern AEMtx33 platformTransform1, platformTransform2, platformTransform2_1, pla
 extern AEMtx33 platformTransform4, platformTransform5, platformTransform5_1, platformTransform6;
 extern AEMtx33 platformTransform7, platformTransform8, platformTransform8_1, platformTransform9;
 extern AEMtx33 platformTransform10, platformTransform11, platformTransform11_1, platformTransform12;
-extern AEMtx33 charTransform;
+extern AEMtx33 transformChar;
 
 void initMesh(void);
 void loadTextures(void);

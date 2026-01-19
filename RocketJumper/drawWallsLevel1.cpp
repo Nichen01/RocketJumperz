@@ -15,7 +15,7 @@ AEMtx33 platformTransform1, platformTransform2, platformTransform2_1;
 AEMtx33 platformTransform3, platformTransform4, platformTransform5, platformTransform5_1, platformTransform6; 
 AEMtx33 platformTransform7, platformTransform8, platformTransform8_1, platformTransform9;
 AEMtx33 platformTransform10, platformTransform11, platformTransform11_1, platformTransform12;
-AEMtx33 charTransform;
+AEMtx33 transformChar;
 
 AEGfxVertexList* textureMesh = nullptr;
 
@@ -109,11 +109,10 @@ void initTransforms(void)
 	AEMtx33Concat(&platformTransform9, &translate, &platformTransform9);
 
 	AEMtx33 scaleChar, rotateChar, translateChar; 
-	AEMtx33Scale(&scaleChar, 400.f, 400.f);
-	AEMtx33Rot(&rotateChar, 0);
-	AEMtx33Trans(&translateChar, -600.f, -200.f);
-	AEMtx33Concat(&charTransform, &rotateChar, &scaleChar);
-	AEMtx33Concat(&charTransform, &translateChar, &charTransform); 
+	AEMtx33Scale(&scaleChar, 80.f, 80.f); AEMtx33Rot(&rotateChar, 0);
+	AEMtx33Trans(&translateChar, -400.f, -400.f);
+	AEMtx33Concat(&transformChar, &rotateChar, &scaleChar);
+	AEMtx33Concat(&transformChar, &translateChar, &transformChar); 
 }
 
 void drawFloors(void) {
