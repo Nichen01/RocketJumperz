@@ -19,6 +19,14 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="projectileTest.cpp" />
+    <ClCompile Include="render.cpp" />
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="projectile.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -37,6 +45,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Level1.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="projectile.h" />
+    <ClInclude Include="projectileTest.h" />
+    <ClInclude Include="render.h" />
+    <ClInclude Include="MainMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

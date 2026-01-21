@@ -30,16 +30,16 @@ static AEGfxVertexList* hTestMesh = nullptr;
 void ProjectileTest_Load()
 {
 	// Initialize player
-	testObjects[player].xpos = 0.0f;
-	testObjects[player].ypos = 0.0f;
-	testObjects[player].xscale = 100.0f;
-	testObjects[player].yscale = 100.0f;
+	testObjects[player].xPos = 0.0f;
+	testObjects[player].yPos = 0.0f;
+	testObjects[player].xScale = 100.0f;
+	testObjects[player].yScale = 100.0f;
 
 	// Initialize obstacle
-	testObjects[obstacle].xpos = -400.0f;
-	testObjects[obstacle].ypos = 0.0f;
-	testObjects[obstacle].xscale = 100.0f;
-	testObjects[obstacle].yscale = 400.0f;
+	testObjects[obstacle].xPos = -400.0f;
+	testObjects[obstacle].yPos = 0.0f;
+	testObjects[obstacle].xScale = 100.0f;
+	testObjects[obstacle].yScale = 400.0f;
 
 	// Initialize projectile system
 	projectileSystem::initProjectiles(testProjectiles, MAX_PROJECTILES);
@@ -88,19 +88,19 @@ void ProjectileTest_Update()
 
 	// ========== PLAYER MOVEMENT ==========
 	if (AEInputCheckCurr(AEVK_D)) {
-		testObjects[player].xpos += static_cast<f32>(speed);
+		testObjects[player].xPos += static_cast<f32>(speed);
 	}
 
 	if (AEInputCheckCurr(AEVK_A)) {
-		testObjects[player].xpos -= static_cast<f32>(speed);
+		testObjects[player].xPos -= static_cast<f32>(speed);
 	}
 
 	if (AEInputCheckCurr(AEVK_W)) {
-		testObjects[player].ypos += static_cast<f32>(speed);
+		testObjects[player].yPos += static_cast<f32>(speed);
 	}
 
 	if (AEInputCheckCurr(AEVK_S)) {
-		testObjects[player].ypos -= static_cast<f32>(speed);
+		testObjects[player].yPos -= static_cast<f32>(speed);
 	}
 
 	// Get mouse inputs
@@ -146,14 +146,14 @@ void ProjectileTest_Draw()
 
 	// Render Obstacle (RED)
 	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
-	render::Drawsquare(testObjects[obstacle].xpos, testObjects[obstacle].ypos,
-		testObjects[obstacle].xscale, testObjects[obstacle].yscale);
+	render::Drawsquare(testObjects[obstacle].xPos, testObjects[obstacle].yPos,
+		testObjects[obstacle].xScale, testObjects[obstacle].yScale);
 	AEGfxMeshDraw(pTestMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render Player (WHITE)
 	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-	render::Drawsquare(testObjects[player].xpos, testObjects[player].ypos,
-		testObjects[player].xscale, testObjects[player].yscale);
+	render::Drawsquare(testObjects[player].xPos, testObjects[player].yPos,
+		testObjects[player].xScale, testObjects[player].yScale);
 	AEGfxMeshDraw(pTestMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render all active projectiles (YELLOW)
