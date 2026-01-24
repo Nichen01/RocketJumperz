@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "ProjectileTest.h"
 #include "collision.h"
 #include "projectile.h"
+#include "Movement.h"
 #include "render.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
@@ -34,6 +35,9 @@ void ProjectileTest_Load()
 	testObjects[player].yPos = 0.0f;
 	testObjects[player].xScale = 100.0f;
 	testObjects[player].yScale = 100.0f;
+
+	// Initialize player movement system
+	movement::initPlayerMovement(testObjects[player]);
 
 	// Initialize obstacle
 	testObjects[obstacle].xPos = -400.0f;
@@ -84,9 +88,12 @@ void ProjectileTest_Initialize()
 
 void ProjectileTest_Update()
 {
-	s8 speed = 10;
+	
 
 	// ========== PLAYER MOVEMENT ==========
+	/* OLD WASD MOVEMENT CODE
+	 s8 speed = 10;
+	 
 	if (AEInputCheckCurr(AEVK_D)) {
 		testObjects[player].xPos += static_cast<f32>(speed);
 	}
@@ -102,14 +109,27 @@ void ProjectileTest_Update()
 	if (AEInputCheckCurr(AEVK_S)) {
 		testObjects[player].yPos -= static_cast<f32>(speed);
 	}
+	*/
+	
 
 	// Get mouse inputs
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 
 	// Convert screen coordinates to world coordinates
-	f32 worldMouseX = static_cast<f32>(mouseX) - 800.0f;
-	f32 worldMouseY = 450.0f - static_cast<f32>(mouseY);
+	f32 worldMouseX = static_cast<f32>(mouseX) - 640.0f;
+	f32 worldMouseY = 400.0f - static_cast<f32>(mouseY);
+
+	// ========== JETPACK MOVEMENT SYSTEM ==========
+	// Apply thrust when spacebar is pressed
+	movement::applyThrustTowardMouse(
+		testObjects[player],
+		static_cast<s32>(worldMouseX),
+		static_cast<s32>(worldMouseY)
+	);
+
+	// Update player physics (drag + position)
+	movement::updatePlayerPhysics(testObjects[player]);
 
 	// ========== PROJECTILE SYSTEM UPDATE ==========
 	// Fire projectiles

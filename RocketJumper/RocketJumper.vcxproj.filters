@@ -19,12 +19,19 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="projectileTest.cpp" />
-    <ClCompile Include="render.cpp" />
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="projectile.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="movement.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="projectileTest.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,10 +54,19 @@
     <ClInclude Include="Level1.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="projectile.h" />
-    <ClInclude Include="projectileTest.h" />
-    <ClInclude Include="render.h" />
     <ClInclude Include="MainMenu.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="movement.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="projectile.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="projectileTest.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

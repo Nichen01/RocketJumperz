@@ -9,6 +9,10 @@ struct objectsquares {
 	f32 xScale;
 
 	f32 yScale;
+
+	f32 velocityX;
+	
+	f32 velocityY;
 };
 
 enum objecttype {
