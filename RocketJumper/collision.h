@@ -1,3 +1,4 @@
+#pragma once
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 struct objectsquares {
@@ -8,11 +9,16 @@ struct objectsquares {
 	f32 xScale;
 
 	f32 yScale;
+
+	f32 velocityX;
+	
+	f32 velocityY;
 };
 
 enum objecttype {
 	player,
-	obstacle
+	obstacle,
+	projectile
 };
 
 namespace gamelogic {

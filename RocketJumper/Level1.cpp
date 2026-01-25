@@ -13,15 +13,15 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-
 #include <iostream>
 #include <fstream>
 #include "Level1.h"
 #include "collision.h"
 #include "GameStateManager.h"
+#include "render.h"
 
 namespace renderlogic {
-	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize) {
+	void Drawsquare(f32 xpos, f32 ypos, f32 xsize, f32 ysize) {
 		AEMtx33 scale = { 0 };
 		AEMtx33Scale(&scale, xsize, ysize);
 
@@ -29,7 +29,7 @@ namespace renderlogic {
 		AEMtx33Rot(&rotate, 0.0f);
 
 		AEMtx33 translate = { 0 };
-		AEMtx33Trans(&translate, xPos, yPos);
+		AEMtx33Trans(&translate, xpos, ypos);
 
 		AEMtx33 transform = { 0 };
 		AEMtx33Concat(&transform, &rotate, &scale);
@@ -71,12 +71,12 @@ void Level1_Load()
 }
 void Level1_Initialize()
 {
-	
+
 
 }
 
 void Level1_Update()
-{	
+{
 	if (gamelogic::collision(&objectinfo[player], &objectinfo[obstacle])) {
 		printf("collision");
 	}
@@ -84,7 +84,7 @@ void Level1_Update()
 
 void Level1_Draw()
 {
-	
+
 
 	AEGfxSetBackgroundColor(0.5f, 0.5f, 0.5f);
 
@@ -96,11 +96,11 @@ void Level1_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
-	renderlogic::Drawsquare(objectinfo[obstacle].xPos, objectinfo[obstacle].yPos, objectinfo[obstacle].xScale, objectinfo[obstacle].yScale);
+	render::Drawsquare(objectinfo[obstacle].xPos, objectinfo[obstacle].yPos, objectinfo[obstacle].xScale, objectinfo[obstacle].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
+	render::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
 
@@ -111,5 +111,5 @@ void Level1_Free()
 
 void Level1_Unload()
 {
-	
+
 }
