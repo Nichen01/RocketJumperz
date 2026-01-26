@@ -71,7 +71,7 @@ void Level1_Initialize()
 			}
 		}
 	}
-	map[(2 * 16 + 1)] = 1;
+	map[(4 * 16 + 6)] = 1;
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
