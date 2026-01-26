@@ -2,7 +2,7 @@
 // includes
 
 #include <crtdbg.h> // To check for memory leaks
-#include "drawWallsLevel1.hpp" 
+#include "drawWallsLevel1.h" 
 
 // ---------------------------------------------------------------------------
 // main
@@ -24,9 +24,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
-	initMesh(); // Initializing the meshes for the map
-	loadTextures(); // Loading textures
-	initTransforms(); // Initializing the transforms
+	initMesh1(); // Initializing the meshes for the map
+	loadTextures1(); // Loading textures
+	initTransform1(); // Initializing the transforms
 
 	while (gGameRunning)
 	{
@@ -42,12 +42,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetTransparency(1.0f);
 
-		drawFloors(); // Draw the map floors within the game loop
-		drawCharacter(); // Draw the character within the game loop
+		drawWalls1 (); // Draw the map floors within the game loop
 
 		AESysFrameEnd();
 	}
 	AEGfxMeshFree(textureMesh);
-	unloadTextures();
+	unloadTextures1();
 	AESysExit();
 }

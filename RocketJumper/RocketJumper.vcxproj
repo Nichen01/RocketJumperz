@@ -12,10 +12,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="drawWallsLevel1.cpp" />
+    <ClCompile Include="drawWallsLevel2.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="drawWallsLevel1.hpp" />
+    <ClInclude Include="drawWallsLevel1.h" />
+    <ClInclude Include="drawWallsLevel2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
