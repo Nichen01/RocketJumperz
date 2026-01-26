@@ -13,49 +13,32 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-
 #include <iostream>
-#include <fstream>
 #include "Level1.h"
+#include "draw.h"
 #include "collision.h"
+#include "player.h"
 #include "GameStateManager.h"
 
-namespace renderlogic {
-	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize) {
-		AEMtx33 scale = { 0 };
-		AEMtx33Scale(&scale, xsize, ysize);
 
-		AEMtx33 rotate = { 0 };
-		AEMtx33Rot(&rotate, 0.0f);
 
-		AEMtx33 translate = { 0 };
-		AEMtx33Trans(&translate, xPos, yPos);
 
-		AEMtx33 transform = { 0 };
-		AEMtx33Concat(&transform, &rotate, &scale);
-		AEMtx33Concat(&transform, &translate, &transform);
-
-		AEGfxSetTransform(transform.m);
-
-	}
-}
+s32* map = new s32[144]{ 0 };
+int x = 16;
+int y = 9;
+int s = 100;
 
 objectsquares objectinfo[2] = { 0 };
 
-AEGfxVertexList* pMesh;
-AEGfxVertexList* HMesh;
+AEGfxVertexList* pMesh = 0;
+
 
 void Level1_Load()
 {
-	objectinfo[player].xPos = 0.0f;
-	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 100.0f;
-	objectinfo[player].yScale = 100.0f;
-
-	objectinfo[obstacle].xPos = -400.0f;
-	objectinfo[obstacle].yPos = 0.0f;
-	objectinfo[obstacle].xScale = 100.0f;
-	objectinfo[obstacle].yScale = 400.0f;
+	
+}
+void Level1_Initialize()
+{	
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(
@@ -70,36 +53,47 @@ void Level1_Load()
 
 	pMesh = AEGfxMeshEnd();
 
-	AEGfxTriAdd(
-		0.0f, -0.5f, 0xFF000000, 0.0f, 1.0f,
-		1.0f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		0.0f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+	int x = 0, y = 0;
+	for (y = 0; y < 9; y++) {
+		if (y == 0 || y == 9 - 1) {
+			for (x = 0; x < 16; x++) {
+				map[(y * 16 + x)] = 1;
+			}
+		}
+		else {
+			for (x = 0; x < 16; x++) {
+				if (x == 0 || x == 16 - 1) {
+					map[(y * 16 + x)] = 1;
+				}
+				else {
+					map[(y * 16 + x)] = 0;
+				}
+			}
+		}
+	}
+	map[(2 * 16 + 1)] = 1;
 
-	AEGfxTriAdd(
-		1.0f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		1.0f, 0.5f, 0xFF000000, 1.0f, 0.0f,
-		0.0f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+	objectinfo[player].xPos = 0.0f;
+	objectinfo[player].yPos = 0.0f;
+	objectinfo[player].xScale = 70.0f;
+	objectinfo[player].yScale = 70.0f;
 
-	HMesh = AEGfxMeshEnd();
-}
-void Level1_Initialize()
-{
+	objectinfo[obstacle].xPos = -400.0f;
+	objectinfo[obstacle].yPos = 0.0f;
+	objectinfo[obstacle].xScale = 100.0f;
+	objectinfo[obstacle].yScale = 400.0f;
+
 	
-
 }
 
 void Level1_Update()
-{	
-
-	if (gamelogic::collision(&objectinfo[player], &objectinfo[obstacle])) {
-		printf("collision");
-	}
+{
+	gamelogic::Xcheck(map, x, s);
+	gamelogic::Ycheck(map, x, s);
 }
 
 void Level1_Draw()
 {
-	
-
 	AEGfxSetBackgroundColor(0.5f, 0.5f, 0.5f);
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -109,19 +103,17 @@ void Level1_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
-	renderlogic::Drawsquare(objectinfo[obstacle].xPos, objectinfo[obstacle].yPos, objectinfo[obstacle].xScale, objectinfo[obstacle].yScale);
-	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
 
 void Level1_Free()
 {
-	AEGfxMeshFree(HMesh);
 	AEGfxMeshFree(pMesh);
+	delete[] map;
 }
 
 void Level1_Unload()
