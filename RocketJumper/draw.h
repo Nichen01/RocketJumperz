@@ -7,3 +7,6 @@ namespace renderlogic {
 }
 
 extern AEGfxVertexList* pMesh;
+
+extern AEGfxTexture* characterPic;
+extern AEGfxTexture* base5;

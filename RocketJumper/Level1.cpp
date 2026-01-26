@@ -21,8 +21,6 @@ Technology is prohibited.
 #include "GameStateManager.h"
 
 
-
-
 s32* map = new s32[144]{ 0 };
 int x = 16;
 int y = 9;
@@ -30,7 +28,7 @@ int s = 100;
 
 objectsquares objectinfo[2] = { 0 };
 
-AEGfxVertexList* pMesh = 0;
+
 
 
 void Level1_Load()
@@ -39,17 +37,20 @@ void Level1_Load()
 }
 void Level1_Initialize()
 {	
+	characterPic = AEGfxTextureLoad("Assets/CharacterRight.png");
+	base5 = AEGfxTextureLoad("Assets/Base5.png");
+
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
 	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
 	pMesh = AEGfxMeshEnd();
 
@@ -95,17 +96,15 @@ void Level1_Update()
 void Level1_Draw()
 {
 	AEGfxSetBackgroundColor(0.5f, 0.5f, 0.5f);
-
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxTextureSet(characterPic, 0, 0);
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
@@ -118,5 +117,6 @@ void Level1_Free()
 
 void Level1_Unload()
 {
-	
+	AEGfxTextureUnload(characterPic);
+	AEGfxTextureUnload(base5);
 }
