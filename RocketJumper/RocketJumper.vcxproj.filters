@@ -34,6 +34,12 @@
     <ClCompile Include="render.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="physicsEngine.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="aimingInterface.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -67,6 +73,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="render.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="physicsEngine.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="aimingInterface.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

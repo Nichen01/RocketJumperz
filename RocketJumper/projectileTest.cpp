@@ -12,15 +12,14 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
-
 #include <iostream>
+#include "physicsEngine.h"
 #include "ProjectileTest.h"
 #include "collision.h"
 #include "projectile.h"
 #include "Movement.h"
 #include "render.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
+
 
 // Local variables for projectile test level
 static objectsquares testObjects[3] = { 0 };
@@ -83,6 +82,7 @@ void ProjectileTest_Load()
 
 void ProjectileTest_Initialize()
 {
+	physics::initPhysics();
 	printf("ProjectileTest_Initialize: Ready for testing!\n");
 }
 
@@ -111,15 +111,16 @@ void ProjectileTest_Update()
 	}
 	*/
 	
-
+	physics::physicsInput();
 	// Get mouse inputs
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 
 	// Convert screen coordinates to world coordinates
-	f32 worldMouseX = static_cast<f32>(mouseX) - 640.0f;
-	f32 worldMouseY = 400.0f - static_cast<f32>(mouseY);
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
 
+	physics::updatePhysics(testObjects[player]);
 	// ========== JETPACK MOVEMENT SYSTEM ==========
 	// Apply thrust when spacebar is pressed
 	movement::applyThrustTowardMouse(

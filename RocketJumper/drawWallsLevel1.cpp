@@ -21,8 +21,12 @@ AEGfxVertexList* textureMesh = nullptr;
 
 void initMesh(void) {
 	AEGfxMeshStart(); 
-	AEGfxTriAdd(-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f, 0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f, -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f, 0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f, -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f); 
+	AEGfxTriAdd(-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+				0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+				-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+	AEGfxTriAdd(0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+				0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+				-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f); 
 	textureMesh = AEGfxMeshEnd(); 
 }
 

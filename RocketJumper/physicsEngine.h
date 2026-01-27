@@ -1,3 +1,4 @@
+
 /* Start Header ************************************************************************/
 /*!
 \file		  physicsEngine.h
@@ -12,16 +13,15 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
-#include "Input.h"
+#pragma once
 #include "AEEngine.h"
-#include "GameStateList.h"
-#include "GameStateManager.h"
 #include "collision.h"
 
+
 namespace physics {
-	f32 terminalVelocity=30, gravity=5,absoluteRecoil=5; //maximum speed, strength, recoil strength
-	//KIV additions: variable weight(for gun),variable recoil
-	AEVec2 velocity; //directional velocity
+	void initPhysics();
+	void physicsInput();
+	void updatePhysics(objectsquares &player);
 }
 
 

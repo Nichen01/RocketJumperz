@@ -2,6 +2,8 @@
 #include "AEEngine.h"
 #include <iostream>
 
+extern int screenWidth; extern int screenLength;
+
 void MainMenu_Load();
 
 void MainMenu_Init();

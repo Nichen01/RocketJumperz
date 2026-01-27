@@ -59,8 +59,8 @@ void MainMenu_Update()
     AEInputGetCursorPosition(&mouseX, &mouseY);
 
     // Convert screen coordinates to world coordinates
-    f32 worldMouseX = static_cast<f32>(mouseX) - 640.0f;  // Half of 1280
-    f32 worldMouseY = 400.0f - static_cast<f32>(mouseY);   // Half of 800
+    f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth/2);  // Half of 1280
+    f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);   // Half of 800
 
     // Check if mouse is over Play button
     bool playHovered = isMouseOverButton(playButtonX, playButtonY, buttonWidth, buttonHeight);
@@ -97,8 +97,8 @@ void MainMenu_Draw()
     // Get mouse position for hover detection
     s32 mouseX, mouseY;
     AEInputGetCursorPosition(&mouseX, &mouseY);
-    f32 worldMouseX = static_cast<f32>(mouseX) - 640.0f;
-    f32 worldMouseY = 400.0f - static_cast<f32>(mouseY);
+    f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+    f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
 
     // Check hover states
     bool playHovered = isMouseOverButton(playButtonX, playButtonY, buttonWidth, buttonHeight);
@@ -134,8 +134,8 @@ static bool isMouseOverButton(f32 btnX, f32 btnY, f32 btnWidth, f32 btnHeight)
     s32 mouseX, mouseY;
     AEInputGetCursorPosition(&mouseX, &mouseY);
 
-    f32 worldMouseX = static_cast<f32>(mouseX) - 640.0f;
-    f32 worldMouseY = 400.0f - static_cast<f32>(mouseY);
+    f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+    f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
 
     return (worldMouseX >= btnX - btnWidth / 2.0f &&
         worldMouseX <= btnX + btnWidth / 2.0f &&

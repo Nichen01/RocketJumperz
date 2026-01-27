@@ -13,6 +13,7 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+extern int screenWidth; extern int screenLength;
 
 void ProjectileTest_Load();
 
