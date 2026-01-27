@@ -26,7 +26,7 @@ namespace physics {
 	s32 bulletCount, jetPackCooldown;
 	bool enableGravity;
 	s32 mouseX, mouseY;
-	void physics::initPhysics() {
+	void initPhysics() {
 		playerVelocity.y = 0;
 		playerVelocity.x = 0;
 		terminalVelocity = 10;
@@ -38,7 +38,8 @@ namespace physics {
 	}
 	void physicsInput() {
 		if (AEInputCheckTriggered(AEVK_G)) {
-			enableGravity = 0 ? 1 : 0;
+			enableGravity = (enableGravity) ? 0 : 1;
+			printf("%d",enableGravity);
 		}
 		if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 			AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -48,6 +49,9 @@ namespace physics {
 			playerVelocity.x -= (mouseX / mouseDistance) * absoluteRecoil;
 			playerVelocity.y += (mouseY / mouseDistance) * absoluteRecoil;
 			bulletCount -= 1;
+		}
+		if (AEInputCheckTriggered(AEVK_R)) {
+			initPhysics();
 		}
 	}
 	void updatePhysics(objectsquares &player) {
