@@ -32,8 +32,6 @@ namespace physics {
 		terminalVelocity = 10;
 		gravity = 0.1;
 		absoluteRecoil = 10;
-		bulletCount = 90;
-		jetPackCooldown = 10;
 		enableGravity = 1;
 	}
 	void physicsInput() {
@@ -49,9 +47,6 @@ namespace physics {
 			playerVelocity.x -= (mouseX / mouseDistance) * absoluteRecoil;
 			playerVelocity.y += (mouseY / mouseDistance) * absoluteRecoil;
 			bulletCount -= 1;
-		}
-		if (AEInputCheckTriggered(AEVK_R)) {
-			initPhysics();
 		}
 	}
 	void updatePhysics(objectsquares &player) {

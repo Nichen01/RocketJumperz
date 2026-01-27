@@ -120,14 +120,10 @@ void ProjectileTest_Update()
 	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
 	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
 
-	physics::updatePhysics(testObjects[player]);
+	//physics::updatePhysics(testObjects[player]);
 	// ========== JETPACK MOVEMENT SYSTEM ==========
 	// Apply thrust when spacebar is pressed
-	movement::applyThrustTowardMouse(
-		testObjects[player],
-		static_cast<s32>(worldMouseX),
-		static_cast<s32>(worldMouseY)
-	);
+	movement::physicsInput(testObjects[player]);
 
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(testObjects[player]);
