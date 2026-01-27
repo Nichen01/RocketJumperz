@@ -20,8 +20,8 @@ namespace movement {
 
     void getMouse(objectsquares &player) {
         AEInputGetCursorPosition(&mouseX,&mouseY);
-        mouseX -= ((screenWidth / 2) - player.xPos - player.velocityX);
-        mouseY -= ((screenLength / 2) - player.yPos - player.velocityY);
+        mouseX -= ((screenWidth / 2) + player.xPos + player.velocityX);
+        mouseY = ((screenLength / 2) - mouseY - player.yPos - player.velocityY);
         mouseDistance = sqrtf(mouseX * mouseX + mouseY * mouseY);
         // Normalize direction vector (only if distance > 0 to avoid division by zero)
         if (mouseDistance > 0.0f)
@@ -47,7 +47,7 @@ namespace movement {
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX -= directionVector.x * THRUST_POWER;
+            player.velocityX += directionVector.x * THRUST_POWER;
             player.velocityY += directionVector.y * THRUST_POWER;
             printf("Jetpack fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             jetPackCooldown += 2;
@@ -57,7 +57,7 @@ namespace movement {
             // Calculate direction vector from player to mouse
             getMouse(player);
             player.velocityX -= directionVector.x * ABSOLUTE_RECOIL;
-            player.velocityY += directionVector.y * ABSOLUTE_RECOIL;
+            player.velocityY -= directionVector.y * ABSOLUTE_RECOIL;
             printf("Bullet fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             bulletCount -= 1;
         }
@@ -65,9 +65,14 @@ namespace movement {
 
     void updatePlayerPhysics(objectsquares& player)
     {
+        if (enableGravity) {
+            player.velocityY -= GRAVITY;
+        }
         // Apply drag to velocities (exponential decay)
-        player.velocityX *= DRAG_COEFFICIENT;
-        player.velocityY *= DRAG_COEFFICIENT;
+        if (enableDrag) {
+            player.velocityX *= DRAG_COEFFICIENT;
+            player.velocityY *= DRAG_COEFFICIENT;
+        }
 
         // Stop completely if velocity becomes negligible (prevents infinite drift)
         if (fabsf(player.velocityX) < MIN_VELOCITY)
@@ -77,6 +82,13 @@ namespace movement {
         if (fabsf(player.velocityY) < MIN_VELOCITY)
         {
             player.velocityY = 0.0f;
+        }
+
+        //Max Speed
+        mouseDistance = static_cast<f32>(sqrt(player.velocityY * player.velocityY + player.velocityX + player.velocityX));
+        if (mouseDistance > TERMINAL_VELOCITY) {
+            player.velocityX = player.velocityX / mouseDistance * TERMINAL_VELOCITY;
+            player.velocityY = player.velocityY / mouseDistance * TERMINAL_VELOCITY;
         }
 
         // Update position based on current velocity
