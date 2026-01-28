@@ -18,6 +18,8 @@ struct objectsquares {
 	int BL;
 
 	f32 speed;
+	f32 velocityX;
+	f32 velocityY;
 
 	f32 dx;
 	f32 dy;

@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "collision.h"
 #include "player.h"
 #include "GameStateManager.h"
+#include "drawWallsLevel2.h"
 
 
 s32* map = new s32[144]{ 0 };
