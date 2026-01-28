@@ -7,10 +7,10 @@ namespace projectileSystem {
     {
         for (int i = 0; i < maxCount; i++)
         {
-            projectiles[i].shape.xpos = 0.0f;
-            projectiles[i].shape.ypos = 0.0f;
-            projectiles[i].shape.xscale = 10.0f;
-            projectiles[i].shape.yscale = 10.0f;
+            projectiles[i].shape.xPos = 0.0f;
+            projectiles[i].shape.yPos = 0.0f;
+            projectiles[i].shape.xScale = 10.0f;
+            projectiles[i].shape.yScale = 10.0f;
             projectiles[i].velocityX = 0.0f;
             projectiles[i].velocityY = 0.0f;
             projectiles[i].isActive = 0;
@@ -37,12 +37,12 @@ namespace projectileSystem {
             if (foundSlot != -1)
             {
                 // Set projectile starting position to player position
-                projectiles[foundSlot].shape.xpos = player.xpos;
-                projectiles[foundSlot].shape.ypos = player.ypos;
+                projectiles[foundSlot].shape.xPos = player.xPos;
+                projectiles[foundSlot].shape.yPos = player.yPos;
 
                 // Calculate direction from player to mouse
-                f32 dx = static_cast<f32>(worldMouseX) - player.xpos;
-                f32 dy = static_cast<f32>(worldMouseY) - player.ypos;
+                f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
+                f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
 
                 // Normalize direction vector
                 f32 length = sqrtf(dx * dx + dy * dy);
@@ -77,12 +77,12 @@ namespace projectileSystem {
             if (projectiles[i].isActive == 1)
             {
                 // Move projectile
-                projectiles[i].shape.xpos += projectiles[i].velocityX;
-                projectiles[i].shape.ypos += projectiles[i].velocityY;
+                projectiles[i].shape.xPos += projectiles[i].velocityX;
+                projectiles[i].shape.yPos += projectiles[i].velocityY;
 
                 // Check if projectile is off-screen
-                if (projectiles[i].shape.xpos > 800.0f || projectiles[i].shape.xpos < -800.0f ||
-                    projectiles[i].shape.ypos > 450.0f || projectiles[i].shape.ypos < -450.0f)
+                if (projectiles[i].shape.xPos > 800.0f || projectiles[i].shape.xPos < -800.0f ||
+                    projectiles[i].shape.yPos > 450.0f || projectiles[i].shape.yPos < -450.0f)
                 {
                     projectiles[i].isActive = 0;  // Deactivate projectile
                     printf("Projectile %d went off-screen\n", i);
@@ -103,13 +103,13 @@ namespace projectileSystem {
 
                 // Set up transformation matrix
                 AEMtx33 scale = { 0 };
-                AEMtx33Scale(&scale, projectiles[i].shape.xscale, projectiles[i].shape.yscale);
+                AEMtx33Scale(&scale, projectiles[i].shape.xScale, projectiles[i].shape.yScale);
 
                 AEMtx33 rotate = { 0 };
                 AEMtx33Rot(&rotate, 0.0f);
 
                 AEMtx33 translate = { 0 };
-                AEMtx33Trans(&translate, projectiles[i].shape.xpos, projectiles[i].shape.ypos);
+                AEMtx33Trans(&translate, projectiles[i].shape.xPos, projectiles[i].shape.yPos);
 
                 AEMtx33 transform = { 0 };
                 AEMtx33Concat(&transform, &rotate, &scale);

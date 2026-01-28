@@ -13,7 +13,6 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-
 #include <iostream>
 #include <fstream>
 #include "Level1.h"
@@ -97,11 +96,11 @@ void Level1_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
-	render::Drawsquare(objectinfo[obstacle].xpos, objectinfo[obstacle].ypos, objectinfo[obstacle].xscale, objectinfo[obstacle].yscale);
+	render::Drawsquare(objectinfo[obstacle].xPos, objectinfo[obstacle].yPos, objectinfo[obstacle].xScale, objectinfo[obstacle].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-	render::Drawsquare(objectinfo[player].xpos, objectinfo[player].ypos, objectinfo[player].xscale, objectinfo[player].yscale);
+	render::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
 

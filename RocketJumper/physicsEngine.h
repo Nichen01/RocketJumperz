@@ -1,11 +1,11 @@
-#pragma once
+
 /* Start Header ************************************************************************/
 /*!
-\file		  ProjectileTest.h
-\author       Ivan Chong, i.chong, 2503476
-\par          i.chong@digipen.edu
+\file		  physicsEngine.h
+\author       Jeremiah He Shuo, jeremiahshuo.he,2400702
+\par          jeremiahshuo.he@digipen.edu
 \date         January, 19, 2026
-\brief        Contain declarations for Projectile Test Level functions
+\brief        Contains declarations for game physics systems
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -13,16 +13,15 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
-extern int screenWidth; extern int screenLength;
+#pragma once
+#include "AEEngine.h"
+#include "collision.h"
 
-void ProjectileTest_Load();
 
-void ProjectileTest_Initialize();
+namespace physics {
+	void initPhysics();
+	void physicsInput();
+	void updatePhysics(objectsquares &player);
+}
 
-void ProjectileTest_Update();
 
-void ProjectileTest_Draw();
-
-void ProjectileTest_Free();
-
-void ProjectileTest_Unload();

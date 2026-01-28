@@ -12,14 +12,13 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
-
 #include <iostream>
 #include "ProjectileTest.h"
 #include "collision.h"
 #include "projectile.h"
+#include "Movement.h"
 #include "render.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
+
 
 // Local variables for projectile test level
 static objectsquares testObjects[3] = { 0 };
@@ -30,16 +29,19 @@ static AEGfxVertexList* hTestMesh = nullptr;
 void ProjectileTest_Load()
 {
 	// Initialize player
-	testObjects[player].xpos = 0.0f;
-	testObjects[player].ypos = 0.0f;
-	testObjects[player].xscale = 100.0f;
-	testObjects[player].yscale = 100.0f;
+	testObjects[player].xPos = 0.0f;
+	testObjects[player].yPos = 0.0f;
+	testObjects[player].xScale = 100.0f;
+	testObjects[player].yScale = 100.0f;
+
+	// Initialize player movement system
+	movement::initPlayerMovement(testObjects[player]);
 
 	// Initialize obstacle
-	testObjects[obstacle].xpos = -400.0f;
-	testObjects[obstacle].ypos = 0.0f;
-	testObjects[obstacle].xscale = 100.0f;
-	testObjects[obstacle].yscale = 400.0f;
+	testObjects[obstacle].xPos = -400.0f;
+	testObjects[obstacle].yPos = 0.0f;
+	testObjects[obstacle].xScale = 100.0f;
+	testObjects[obstacle].yScale = 400.0f;
 
 	// Initialize projectile system
 	projectileSystem::initProjectiles(testProjectiles, MAX_PROJECTILES);
@@ -84,32 +86,43 @@ void ProjectileTest_Initialize()
 
 void ProjectileTest_Update()
 {
-	s8 speed = 10;
+	
 
 	// ========== PLAYER MOVEMENT ==========
+	/* OLD WASD MOVEMENT CODE
+	 s8 speed = 10;
+	 
 	if (AEInputCheckCurr(AEVK_D)) {
-		testObjects[player].xpos += static_cast<f32>(speed);
+		testObjects[player].xPos += static_cast<f32>(speed);
 	}
 
 	if (AEInputCheckCurr(AEVK_A)) {
-		testObjects[player].xpos -= static_cast<f32>(speed);
+		testObjects[player].xPos -= static_cast<f32>(speed);
 	}
 
 	if (AEInputCheckCurr(AEVK_W)) {
-		testObjects[player].ypos += static_cast<f32>(speed);
+		testObjects[player].yPos += static_cast<f32>(speed);
 	}
 
 	if (AEInputCheckCurr(AEVK_S)) {
-		testObjects[player].ypos -= static_cast<f32>(speed);
+		testObjects[player].yPos -= static_cast<f32>(speed);
 	}
-
+	*/
+	
 	// Get mouse inputs
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 
 	// Convert screen coordinates to world coordinates
-	f32 worldMouseX = static_cast<f32>(mouseX) - 800.0f;
-	f32 worldMouseY = 450.0f - static_cast<f32>(mouseY);
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	// ========== JETPACK MOVEMENT SYSTEM ==========
+	// Apply thrust when spacebar is pressed
+	movement::physicsInput(testObjects[player]);
+
+	// Update player physics (drag + position)
+	movement::updatePlayerPhysics(testObjects[player]);
 
 	// ========== PROJECTILE SYSTEM UPDATE ==========
 	// Fire projectiles
@@ -146,14 +159,14 @@ void ProjectileTest_Draw()
 
 	// Render Obstacle (RED)
 	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
-	render::Drawsquare(testObjects[obstacle].xpos, testObjects[obstacle].ypos,
-		testObjects[obstacle].xscale, testObjects[obstacle].yscale);
+	render::Drawsquare(testObjects[obstacle].xPos, testObjects[obstacle].yPos,
+		testObjects[obstacle].xScale, testObjects[obstacle].yScale);
 	AEGfxMeshDraw(pTestMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render Player (WHITE)
 	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-	render::Drawsquare(testObjects[player].xpos, testObjects[player].ypos,
-		testObjects[player].xscale, testObjects[player].yscale);
+	render::Drawsquare(testObjects[player].xPos, testObjects[player].yPos,
+		testObjects[player].xScale, testObjects[player].yScale);
 	AEGfxMeshDraw(pTestMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render all active projectiles (YELLOW)

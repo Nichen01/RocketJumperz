@@ -1,5 +1,4 @@
-#ifndef DRAWWALLSLEVEL1_H
-#define DRAWWALLSLEVEL1_H
+#pragma once
 
 #include "AEEngine.h"
 
@@ -29,4 +28,3 @@ void initTransforms(void);
 void drawFloors(void);
 void drawCharacter(void);
 
-#endif // DRAWWALLSLEVEL1_H

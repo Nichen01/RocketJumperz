@@ -3,6 +3,7 @@
 #include "collision.h"
 
 
+
 namespace gamelogic {
 	s8 collision(objectsquares* player, objectsquares* obstacle) {
 		s8 collisionX;

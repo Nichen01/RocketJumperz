@@ -12,7 +12,7 @@
 
 // ---------------------------------------------------------------------------
 // main
-
+int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -22,6 +22,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	if (AESysInit(hInstance, nCmdShow, screenWidth, screenLength, 1, 60, true, NULL) == 0)
+	{
+		return 0;
+	}
 
 	// Using custom window procedure
 	int gGameRunning = 1;
@@ -33,9 +38,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
-	// Initialize game state manager - change this to switch between levels
-	// Use GS_TEST for Level1 or GS_PROJECTILE_TEST for projectile testing
-	GSM_Initialize(GS_PROJECTILE_TEST);
+	
+	GSM_Initialize(GS_MAINMENU);
 
 	while (current != GS_QUIT)
 	{
@@ -44,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			fpLoad();
 		}
 		else {
-			current = previous;
+			current = previous;	
 			next = previous;
 		}
 

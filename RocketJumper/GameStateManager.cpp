@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "GameStateList.h"
 #include "Level1.h"
 #include "ProjectileTest.h"
+#include "MainMenu.h"
 
 
 int current = 0, previous = 0, next = 0;
@@ -49,6 +50,14 @@ void GSM_Update()
 		fpDraw = ProjectileTest_Draw;
 		fpFree = ProjectileTest_Free;
 		fpUnload = ProjectileTest_Unload;
+		break;
+	case GS_MAINMENU:
+		fpLoad = MainMenu_Load;
+		fpInitialize = MainMenu_Init;
+		fpUpdate = MainMenu_Update;
+		fpDraw = MainMenu_Draw;
+		fpFree = MainMenu_Free;
+		fpUnload = MainMenu_Unload;
 		break;
 	case GS_RESTART:
 		break;
