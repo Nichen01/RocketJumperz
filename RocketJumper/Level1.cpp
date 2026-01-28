@@ -14,102 +14,109 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include <iostream>
-#include <fstream>
 #include "Level1.h"
+#include "draw.h"
 #include "collision.h"
+#include "player.h"
 #include "GameStateManager.h"
-#include "render.h"
 
-namespace renderlogic {
-	void Drawsquare(f32 xpos, f32 ypos, f32 xsize, f32 ysize) {
-		AEMtx33 scale = { 0 };
-		AEMtx33Scale(&scale, xsize, ysize);
 
-		AEMtx33 rotate = { 0 };
-		AEMtx33Rot(&rotate, 0.0f);
-
-		AEMtx33 translate = { 0 };
-		AEMtx33Trans(&translate, xpos, ypos);
-
-		AEMtx33 transform = { 0 };
-		AEMtx33Concat(&transform, &rotate, &scale);
-		AEMtx33Concat(&transform, &translate, &transform);
-
-		AEGfxSetTransform(transform.m);
-
-	}
-}
+s32* map = new s32[144]{ 0 };
+int x = 16;
+int y = 9;
+int s = 100;
 
 objectsquares objectinfo[2] = { 0 };
 
-AEGfxVertexList* pMesh;
+
+
 
 void Level1_Load()
 {
+	
+}
+void Level1_Initialize()
+{	
+	characterPictest = AEGfxTextureLoad("Assets/CharacterRight.png");
+	base5test = AEGfxTextureLoad("Assets/Base5.png");
+
+	AEGfxMeshStart();
+
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	AEGfxTriAdd(
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	pMesh = AEGfxMeshEnd();
+
+	int x = 0, y = 0;
+	for (y = 0; y < 9; y++) {
+		if (y == 0 || y == 9 - 1) {
+			for (x = 0; x < 16; x++) {
+				map[(y * 16 + x)] = 1;
+			}
+		}
+		else {
+			for (x = 0; x < 16; x++) {
+				if (x == 0 || x == 16 - 1) {
+					map[(y * 16 + x)] = 1;
+				}
+				else {
+					map[(y * 16 + x)] = 0;
+				}
+			}
+		}
+	}
+	map[(4 * 16 + 6)] = 1;
+
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 100.0f;
-	objectinfo[player].yScale = 100.0f;
+	objectinfo[player].xScale = 70.0f;
+	objectinfo[player].yScale = 70.0f;
 
 	objectinfo[obstacle].xPos = -400.0f;
 	objectinfo[obstacle].yPos = 0.0f;
 	objectinfo[obstacle].xScale = 100.0f;
 	objectinfo[obstacle].yScale = 400.0f;
-	AEGfxMeshStart();
 
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
-	pMesh = AEGfxMeshEnd();
-}
-void Level1_Initialize()
-{
-
-
+	
 }
 
 void Level1_Update()
 {
-	if (gamelogic::collision(&objectinfo[player], &objectinfo[obstacle])) {
-		printf("collision");
-	}
+	gamelogic::Xcheck(map, x, s);
+	gamelogic::Ycheck(map, x, s);
 }
 
 void Level1_Draw()
 {
-
-
 	AEGfxSetBackgroundColor(0.5f, 0.5f, 0.5f);
-
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
-	render::Drawsquare(objectinfo[obstacle].xPos, objectinfo[obstacle].yPos, objectinfo[obstacle].xScale, objectinfo[obstacle].yScale);
-	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-	render::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
+	AEGfxTextureSet(characterPictest, 0, 0);
+	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
 
 void Level1_Free()
 {
 	AEGfxMeshFree(pMesh);
+	delete[] map;
 }
 
 void Level1_Unload()
 {
-
+	AEGfxTextureUnload(characterPictest);
+	AEGfxTextureUnload(base5test);
 }

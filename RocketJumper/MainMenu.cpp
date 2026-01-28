@@ -78,7 +78,7 @@ void MainMenu_Update()
         }
         else if (quitHovered)
         {
-            next = GS_QUIT;
+            next = GS_TEST;
             printf("Quit button clicked!\n");
         }
     }

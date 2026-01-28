@@ -16,27 +16,32 @@ Technology is prohibited.
 #include "AEEngine.h"
 #include "GameStateList.h"
 #include "GameStateManager.h"
-#include "collision.h"
+#include "player.h"
 
-f32 speed = 10;
 
 void Input_Handle() {
+	f32 dt = (f32)AEFrameRateControllerGetFrameTime();
+	objectinfo[player].speed = 10 * (f32)AEFrameRateControllerGetFrameRate();
+	objectinfo[player].dx = 0;
+	objectinfo[player].dy = 0;
+
 	if (AEInputCheckTriggered(AEVK_ESCAPE))
 		next = GS_QUIT;
 
 	if (AEInputCheckCurr(AEVK_D)) {
-		objectinfo[player].xPos += speed;
+		objectinfo[player].dx += objectinfo[player].speed * dt;
 	}
 
 	if (AEInputCheckCurr(AEVK_A)) {
-		objectinfo[player].xPos -= speed;
+		objectinfo[player].dx -= objectinfo[player].speed * dt;
 	}
 
 	if (AEInputCheckCurr(AEVK_W)) {
-		objectinfo[player].yPos += speed;
+		objectinfo[player].dy += objectinfo[player].speed * dt;
 	}
 
 	if (AEInputCheckCurr(AEVK_S)) {
-		objectinfo[player].yPos -= speed;
+		objectinfo[player].dy -= objectinfo[player].speed * dt;
 	}
+
 }

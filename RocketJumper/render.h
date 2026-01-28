@@ -2,5 +2,5 @@
 #include "AEEngine.h"
 
 namespace render {
-	void Drawsquare(f32 xpos, f32 ypos, f32 xsize, f32 ysize);
+	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
 }
