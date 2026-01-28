@@ -37,8 +37,8 @@ void Level1_Load()
 }
 void Level1_Initialize()
 {	
-	characterPictest = AEGfxTextureLoad("Assets/CharacterRight.png");
-	base5test = AEGfxTextureLoad("Assets/Base5.png");
+	characterPic = AEGfxTextureLoad("Assets/CharacterRight.png");
+	base5 = AEGfxTextureLoad("Assets/Base5.png");
 
 	AEGfxMeshStart();
 
@@ -104,7 +104,7 @@ void Level1_Draw()
 
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	AEGfxTextureSet(characterPictest, 0, 0);
+	AEGfxTextureSet(characterPic, 0, 0);
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
@@ -117,6 +117,6 @@ void Level1_Free()
 
 void Level1_Unload()
 {
-	AEGfxTextureUnload(characterPictest);
-	AEGfxTextureUnload(base5test);
+	AEGfxTextureUnload(characterPic);
+	AEGfxTextureUnload(base5);
 }
