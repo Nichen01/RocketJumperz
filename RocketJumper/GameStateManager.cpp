@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "mapEditor.h"
 #include "GameStateManager.h"
+#include "MainMenu.h"
+#include "projectileTest.h"
 
 // Tracks current, previous and next game states
 int current = 0, previous = 0, next = 0;

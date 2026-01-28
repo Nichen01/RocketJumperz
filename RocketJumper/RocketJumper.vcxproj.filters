@@ -4,21 +4,6 @@
     <ClCompile Include="collision.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="drawWallsLevel1.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="GameStateManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Level1.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -41,32 +26,32 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-		<Filter>Source</Filter>
-	</ClCompile>
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="mapEditor.cpp">
-		<Filter>Source</Filter>
-	</ClCompile>
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="System.cpp">
-		<Filter>Source</Filter>
-	</ClCompile>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="drawWallsLevel2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStateManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="drawWallsLevel1.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="GameStateList.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="GameStateManager.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Level1.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="MainMenu.h">
@@ -89,16 +74,31 @@
     </ClInclude>
     <ClInclude Include="aimingInterface.h">
       <Filter>Header</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="pch.h">
-		<Filter>Header</Filter>
-	</ClInclude>
+      <Filter>Header</Filter>
+    </ClInclude>
     <ClInclude Include="mapEditor.h">
-		<Filter>Header</Filter>
-	</ClInclude>
+      <Filter>Header</Filter>
+    </ClInclude>
     <ClInclude Include="System.h">
-		<Filter>Header</Filter>
-	</ClInclude>
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="drawWallsLevel2.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateList.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateManager.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
