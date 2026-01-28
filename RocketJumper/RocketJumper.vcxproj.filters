@@ -40,13 +40,15 @@
     <ClCompile Include="aimingInterface.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="GameStateManager.cpp" />
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="mapEditor.cpp" />
-    <ClCompile Include="System.cpp" />
+    <ClCompile Include="pch.cpp">
+		<Filter>Source</Filter>
+	</ClCompile>
+    <ClCompile Include="mapEditor.cpp">
+		<Filter>Source</Filter>
+	</ClCompile>
+    <ClCompile Include="System.cpp">
+		<Filter>Source</Filter>
+	</ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -87,13 +89,16 @@
     </ClInclude>
     <ClInclude Include="aimingInterface.h">
       <Filter>Header</Filter>
-    <ClInclude Include="GameStateList.h" />
-    <ClInclude Include="GameStateManager.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="mapEditor.h" />
-    <ClInclude Include="System.h" />
-    </ClInclude>
+	</ClInclude>
+    <ClInclude Include="pch.h">
+		<Filter>Header</Filter>
+	</ClInclude>
+    <ClInclude Include="mapEditor.h">
+		<Filter>Header</Filter>
+	</ClInclude>
+    <ClInclude Include="System.h">
+		<Filter>Header</Filter>
+	</ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
