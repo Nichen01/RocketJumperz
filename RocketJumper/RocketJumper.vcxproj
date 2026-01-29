@@ -14,7 +14,8 @@
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="mapEditor.cpp" />
+    <ClCompile Include="mapEditor_Level1.cpp" />
+    <ClCompile Include="mapEditor_Level2.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="System.cpp" />
   </ItemGroup>
@@ -22,7 +23,8 @@
     <ClInclude Include="GameStateList.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="mapEditor.h" />
+    <ClInclude Include="mapEditor_Level1.h" />
+    <ClInclude Include="mapEditor_Level2.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="System.h" />
   </ItemGroup>
