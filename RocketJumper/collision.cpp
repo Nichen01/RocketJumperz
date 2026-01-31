@@ -35,7 +35,7 @@ namespace gamelogic {
 	}
 
 	void Xcheck(int map[],int x,int s) {
-		objectinfo[player].xPos += objectinfo[player].dx;
+		objectinfo[player].xPos += objectinfo[player].velocityX;
 
 		calcCorners(map, x, &objectinfo[player]);
 
@@ -44,18 +44,18 @@ namespace gamelogic {
 		int boolBR = (objectinfo[player].BR == 1);
 		int boolBL = (objectinfo[player].BL == 1);
 
-		if (objectinfo[player].dx > 0 && (boolTR || boolBR)) {
+		if (objectinfo[player].velocityX > 0 && (boolTR || boolBR)) {
 			objectinfo[player].xPos = ((float)((objectinfo[player].rightX * s) - (objectinfo[player].xScale / 2.0) - 0.001f - 800.0f));
-			objectinfo[player].dx = 0;
+			objectinfo[player].velocityX = 0;
 		}
 
-		if (objectinfo[player].dx < 0 && (boolTL || boolBL)) {
+		if (objectinfo[player].velocityX < 0 && (boolTL || boolBL)) {
 			objectinfo[player].xPos = ((float)(((objectinfo[player].rightX) * s) + (objectinfo[player].xScale / 2.0) + 0.001f - 800.0f));
-			objectinfo[player].dx = 0;
+			objectinfo[player].velocityX = 0;
 		}
 	}
 	void Ycheck(int map[], int x, int s) {
-		objectinfo[player].yPos += objectinfo[player].dy;
+		objectinfo[player].yPos += objectinfo[player].velocityY;
 
 		calcCorners(map, x, &objectinfo[player]);
 
@@ -64,15 +64,15 @@ namespace gamelogic {
 		int boolBR = (objectinfo[player].BR == 1);
 		int boolBL = (objectinfo[player].BL == 1);
 
-		if (objectinfo[player].dy < 0 && (boolBL || boolBR)) {
+		if (objectinfo[player].velocityY < 0 && (boolBL || boolBR)) {
 			objectinfo[player].yPos = 450.0f - ((float)((objectinfo[player].bottomY * s) - (objectinfo[player].yScale / 2.0) - 0.001f));
-			objectinfo[player].dx = 0;
+			objectinfo[player].velocityY = 0;
 
 		}
 
-		if (objectinfo[player].dy > 0 && (boolTL || boolTR)) {
+		if (objectinfo[player].velocityY > 0 && (boolTL || boolTR)) {
 			objectinfo[player].yPos = 450.0f - ((float)((objectinfo[player].bottomY * s) + (objectinfo[player].yScale / 2.0) + 0.001f));
-			objectinfo[player].dy = 0;
+			objectinfo[player].velocityY = 0;
 
 		}
 	}

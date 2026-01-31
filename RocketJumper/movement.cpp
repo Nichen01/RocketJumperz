@@ -92,7 +92,7 @@ namespace movement {
         }
 
         // Update position based on current velocity
-        player.xPos += player.velocityX;
-        player.yPos += player.velocityY;
+        //player.xPos += player.velocityX;
+       // player.yPos += player.velocityY;
     }
 }

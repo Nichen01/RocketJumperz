@@ -114,8 +114,7 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
-	gamelogic::Xcheck(map, x, s);
-	gamelogic::Ycheck(map, x, s);
+	
 
 
 	//=============== GET MOUSE INPUTS (To be made into helper function) =====================//
@@ -148,6 +147,9 @@ void Level1_Update()
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+
+	gamelogic::Xcheck(map, x, s);
+	gamelogic::Ycheck(map, x, s);
 }
 
 void Level1_Draw()
