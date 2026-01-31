@@ -91,9 +91,14 @@ namespace projectileSystem {
         }
     }
 
-    // RENDER ALL ACTIVE PROJECTILES
+    //======================RENDER ALL ACTIVE PROJECTILES====================================//
     void renderProjectiles(Projectile projectiles[], s32 maxCount, AEGfxVertexList* mesh)
     {
+        if (!mesh)
+        {
+            printf("MESH IS NULL!");
+            return;
+        }
         for (int i = 0; i < maxCount; i++)
         {
             if (projectiles[i].isActive == 1)

@@ -19,16 +19,10 @@
     <ClCompile Include="render.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="physicsEngine.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="aimingInterface.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="mapEditor.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="System.cpp">
@@ -47,6 +41,15 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Level1.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="draw.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="drawWallsLevel1.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,16 +72,10 @@
     <ClInclude Include="render.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="physicsEngine.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="aimingInterface.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="mapEditor.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="System.h">
@@ -97,6 +94,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Level1.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="drawWallsLevel1.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

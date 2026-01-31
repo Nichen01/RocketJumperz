@@ -28,6 +28,8 @@ static AEGfxVertexList* hTestMesh = nullptr;
 
 void ProjectileTest_Load()
 {
+
+	//-----INIT PLAYER DATA-------//
 	// Initialize player
 	testObjects[player].xPos = 0.0f;
 	testObjects[player].yPos = 0.0f;
@@ -37,33 +39,34 @@ void ProjectileTest_Load()
 	// Initialize player movement system
 	movement::initPlayerMovement(testObjects[player]);
 
+
+	//-------INIT OBSTACLE DATA---------
 	// Initialize obstacle
 	testObjects[obstacle].xPos = -400.0f;
 	testObjects[obstacle].yPos = 0.0f;
 	testObjects[obstacle].xScale = 100.0f;
 	testObjects[obstacle].yScale = 400.0f;
 
+
+	//------INIT PROJECTILE SYSTEM--------
 	// Initialize projectile system
 	projectileSystem::initProjectiles(testProjectiles, MAX_PROJECTILES);
 
-	// Create square mesh
-	AEGfxMeshStart();
 
+	//-------------CREATE SQUARE MESH-------------------
+	AEGfxMeshStart();
 	AEGfxTriAdd(
 		-0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
 		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
 		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
 	AEGfxTriAdd(
 		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
 		0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
 	pTestMesh = AEGfxMeshEnd();
 
-	// Create half-mesh (if needed)
+	//=============CREATE HALF MESH(if needed)=============//
 	AEGfxMeshStart();
-
 	AEGfxTriAdd(
 		0.0f, -0.5f, 0xFF000000, 0.0f, 1.0f,
 		1.0f, -0.5f, 0xFF000000, 1.0f, 1.0f,
@@ -73,8 +76,8 @@ void ProjectileTest_Load()
 		1.0f, -0.5f, 0xFF000000, 1.0f, 1.0f,
 		1.0f, 0.5f, 0xFF000000, 1.0f, 0.0f,
 		0.0f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
 	hTestMesh = AEGfxMeshEnd();
+	//=====================================================//
 
 	printf("ProjectileTest_Load: Projectile test level loaded!\n");
 }
@@ -108,31 +111,36 @@ void ProjectileTest_Update()
 		testObjects[player].yPos -= static_cast<f32>(speed);
 	}
 	*/
-	
-	// Get mouse inputs
+
+	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 
 	// Convert screen coordinates to world coordinates
 	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
 	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+	//====================================================//
 
-	// ========== JETPACK MOVEMENT SYSTEM ==========
-	// Apply thrust when spacebar is pressed
+
+
+	//========== JETPACK MOVEMENT SYSTEM ===============//
+	//Apply thrust when spacebar is pressed
 	movement::physicsInput(testObjects[player]);
+	//==================================================//
 
+	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(testObjects[player]);
+	//===================================================//
 
-	// ========== PROJECTILE SYSTEM UPDATE ==========
-	// Fire projectiles
+	// ========== PROJECTILE SYSTEM UPDATE =============//
 	projectileSystem::fireProjectiles(
 		static_cast<s32>(worldMouseX),
 		static_cast<s32>(worldMouseY),
 		testObjects[player],
 		testProjectiles,
-		MAX_PROJECTILES
-	);
+		MAX_PROJECTILES);
+	//==================================================//
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(testProjectiles, MAX_PROJECTILES);
@@ -149,11 +157,8 @@ void ProjectileTest_Update()
 void ProjectileTest_Draw()
 {
 	AEGfxSetBackgroundColor(0.5f, 0.5f, 0.5f);
-
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
