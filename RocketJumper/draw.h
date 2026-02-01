@@ -6,7 +6,7 @@ namespace renderlogic {
 	void drawmap_Wall_floor(int map[], int mapX, int mapY, int mapS);
 }
 
+// Declare these as extern - they will be defined in Level1.cpp
 extern AEGfxVertexList* pMesh;
-
 extern AEGfxTexture* characterPictest;
 extern AEGfxTexture* base5test;

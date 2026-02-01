@@ -119,17 +119,29 @@ namespace MenuHelpers {
     }
 
     void drawTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID) {
-        if (fontID < 0) return; // Font not loaded
+        if (fontID < 0) {
+            printf("FONT IS NOT LOADED."); return;
+        }
 
         // Get text dimensions
         f32 textWidth, textHeight;
         AEGfxGetPrintSize(fontID, text, scale, &textWidth, &textHeight);
 
-        // Convert world coordinates to screen coordinates for text rendering
+        // Convert world coordinates to screen coordinates
         f32 screenX = x + (screenWidth / 2.0f);
         f32 screenY = (screenLength / 2.0f) - y;
 
-        // Draw centered text - use calculated screen positions with centering offset
+        // --- CRITICAL FIXES ---
+
+        // 1. [NEW] Switch back to TEXTURE mode so the font image can be read
+        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+        // 2. Reset color modifiers (as discussed previously)
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+        // -----------------------
+
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxPrint(fontID, text, screenX - textWidth / 2.0f, screenY - textHeight / 2.0f,
             scale, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -138,7 +150,7 @@ namespace MenuHelpers {
 
 // ==================== INITIALIZATION FUNCTIONS ========================================================================
 void MainMenu_Load() {
-    // Create button mesh (rounded rectangle)
+    // Create button mesh 
     AEGfxMeshStart();
 
     AEGfxTriAdd(
@@ -177,6 +189,7 @@ void MainMenu_Load() {
     // Load font 
     menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 48);
     if (menuFont < 0) {
+        menuFont = AEGfxCreateFont("Arial.ttf", 48);
         printf("(UI) Warning: MenuFont.ttf not found. Text will not render.\n");
     }
 

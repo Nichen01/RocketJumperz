@@ -27,7 +27,8 @@ struct objectsquares {
 
 enum objecttype {
 	player,
-	obstacle
+	obstacle,
+	enemy
 };
 
 
