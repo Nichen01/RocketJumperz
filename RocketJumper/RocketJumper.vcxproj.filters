@@ -52,6 +52,9 @@
     <ClCompile Include="drawWallsLevel1.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="enemies.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -100,6 +103,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="drawWallsLevel1.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="draw.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="enemies.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
