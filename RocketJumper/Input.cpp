@@ -20,6 +20,7 @@ Technology is prohibited.
 
 
 void Input_Handle() {
+	/*
 	f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 	objectinfo[player].speed = 10 * (f32)AEFrameRateControllerGetFrameRate();
 	objectinfo[player].dx = 0;
@@ -43,5 +44,5 @@ void Input_Handle() {
 	if (AEInputCheckCurr(AEVK_S)) {
 		objectinfo[player].dy -= objectinfo[player].speed * dt;
 	}
-
+	*/
 }

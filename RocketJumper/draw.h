@@ -8,5 +8,5 @@ namespace renderlogic {
 
 extern AEGfxVertexList* pMesh;
 
-extern AEGfxTexture* characterPic;
-extern AEGfxTexture* base5;
+extern AEGfxTexture* characterPictest;
+extern AEGfxTexture* base5test;

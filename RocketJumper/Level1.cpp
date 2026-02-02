@@ -19,6 +19,10 @@ Technology is prohibited.
 #include "collision.h"
 #include "player.h"
 #include "GameStateManager.h"
+#include "drawWallsLevel2.h"
+#include "projectile.h"
+#include "Movement.h"
+#include "render.h"
 
 
 s32* map = new s32[144]{ 0 };
@@ -27,6 +31,10 @@ int y = 9;
 int s = 100;
 
 objectsquares objectinfo[2] = { 0 };
+
+// Local variables for projectile test level
+static Projectile Projectiles[MAX_PROJECTILES];
+static AEGfxVertexList* pTestMesh = nullptr;
 
 
 
@@ -40,8 +48,13 @@ void Level1_Initialize()
 	characterPic = AEGfxTextureLoad("Assets/CharacterRight.png");
 	base5 = AEGfxTextureLoad("Assets/Base5.png");
 
-	AEGfxMeshStart();
+	// Initialize player movement system
+	movement::initPlayerMovement(objectinfo[player]);
 
+	// Added after obstacle initialization:
+	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
+
+	AEGfxMeshStart();
 	AEGfxTriAdd(
 		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
 		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
@@ -51,8 +64,20 @@ void Level1_Initialize()
 		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
 	pMesh = AEGfxMeshEnd();
+
+	//=============CREATE SQUARE MESH==================//
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+	AEGfxTriAdd(
+		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+	pTestMesh = AEGfxMeshEnd();
+	//==================================================//
 
 	int x = 0, y = 0;
 	for (y = 0; y < 9; y++) {
@@ -89,6 +114,40 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
+	
+
+
+	//=============== GET MOUSE INPUTS (To be made into helper function) =====================//
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	// Convert screen coordinates to world coordinates
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+	
+
+	//========== JETPACK MOVEMENT SYSTEM ===============//
+	//Apply thrust when spacebar is pressed
+	movement::physicsInput(objectinfo[player]);
+	
+
+	//===========  APPLY PHYSICS(DRAG)===================//
+	// Update player physics (drag + position)
+	movement::updatePlayerPhysics(objectinfo[player]);
+	//===================================================//
+
+	// ========== PROJECTILE SYSTEM UPDATE =============//
+	projectileSystem::fireProjectiles(
+		static_cast<s32>(worldMouseX),
+		static_cast<s32>(worldMouseY),
+		objectinfo[player],
+		Projectiles,
+		MAX_PROJECTILES);
+	//==================================================//
+
+	// Update all active projectiles
+	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+
 	gamelogic::Xcheck(map, x, s);
 	gamelogic::Ycheck(map, x, s);
 }
@@ -107,12 +166,20 @@ void Level1_Draw()
 	AEGfxTextureSet(characterPic, 0, 0);
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+
+	// Render all active projectiles (YELLOW)
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, pTestMesh);
 }
 
 void Level1_Free()
 {
 	AEGfxMeshFree(pMesh);
 	delete[] map;
+
+	if (pTestMesh) {
+		AEGfxMeshFree(pTestMesh);
+		pTestMesh = nullptr;
+	}
 }
 
 void Level1_Unload()

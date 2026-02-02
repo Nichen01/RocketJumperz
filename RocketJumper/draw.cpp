@@ -1,8 +1,8 @@
 #include "draw.h"
 #include "AEGraphics.h"
 
-extern AEGfxTexture* characterPic = NULL;
-extern AEGfxTexture* base5 = NULL;
+extern AEGfxTexture* characterPictest = NULL;
+extern AEGfxTexture* base5test = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
 namespace renderlogic {
@@ -37,7 +37,7 @@ namespace renderlogic {
 				case 0: //playable area
 					break;
 				case 1: //wall
-					AEGfxTextureSet(base5, 0, 0);
+					AEGfxTextureSet(base5test, 0, 0);
 					renderlogic::Drawsquare(((float)xo + mapS / 2)-800.0f, 450.0f-((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 					break;
