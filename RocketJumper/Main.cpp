@@ -8,7 +8,6 @@
 #include "GameStateManager.h"
 #include "GameStateList.h"
 #include "render.h"
-#include "mapEditor.h" 
 
 // ---------------------------------------------------------------------------
 // main

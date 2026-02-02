@@ -4,8 +4,7 @@
 
 namespace gamelogic {
 	s8 collision(objectsquares* player, objectsquares* obstacle);
-	void Xcheck(int map[], int x, int s);
-	void Ycheck(int map[], int x, int s);
+	void  OBJ_to_map(int map[], int x, int s, objectsquares* object);
 }
 
 

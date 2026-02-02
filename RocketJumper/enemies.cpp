@@ -71,8 +71,8 @@ namespace enemySystem {
         enemies[foundSlot].shape.xPos = xPos;
         enemies[foundSlot].shape.yPos = yPos;
         enemies[foundSlot].type = type;
-        enemies[foundSlot].velocityX = 0.0f;
-        enemies[foundSlot].velocityY = 0.0f;
+        enemies[foundSlot].shape.velocityX = 0.0f;
+        enemies[foundSlot].shape.velocityY = 0.0f;
         enemies[foundSlot].attackCooldown = 0.0f;
         enemies[foundSlot].hasLineOfSight = 0;
         enemies[foundSlot].isActive = 1;
@@ -173,12 +173,12 @@ namespace enemySystem {
                     // Move towards player if not in attack range
                     if (distanceToPlayer > enemies[i].attackRange)
                     {
-                        enemies[i].velocityX = dx * enemies[i].moveSpeed;
-                        enemies[i].velocityY = dy * enemies[i].moveSpeed;
+                        enemies[i].shape.velocityX = dx * enemies[i].moveSpeed;
+                        enemies[i].shape.velocityY = dy * enemies[i].moveSpeed;
 
                         // Apply movement
-                        enemies[i].shape.xPos += enemies[i].velocityX;
-                        enemies[i].shape.yPos += enemies[i].velocityY;
+                        //enemies[i].shape.xPos += enemies[i].velocityX;
+                        //enemies[i].shape.yPos += enemies[i].velocityY;
                     }
                     else
                     {
@@ -198,27 +198,27 @@ namespace enemySystem {
                     if (distanceToPlayer < optimalDistance)
                     {
                         // opp direction * speed = move away
-                        enemies[i].velocityX = -dx * enemies[i].moveSpeed;
-                        enemies[i].velocityY = -dy * enemies[i].moveSpeed;
+                        enemies[i].shape.velocityX = -dx * enemies[i].moveSpeed;
+                        enemies[i].shape.velocityY = -dy * enemies[i].moveSpeed;
 
-                        enemies[i].shape.xPos += enemies[i].velocityX;
-                        enemies[i].shape.yPos += enemies[i].velocityY;
+                        //enemies[i].shape.xPos += enemies[i].velocityX;
+                        //enemies[i].shape.yPos += enemies[i].velocityY;
                     }
                     // Too far,  move closer
                     else if (distanceToPlayer > enemies[i].attackRange)
                     {
                         // direction * move speed = move towards
-                        enemies[i].velocityX = dx * enemies[i].moveSpeed;
-                        enemies[i].velocityY = dy * enemies[i].moveSpeed;
+                        enemies[i].shape.velocityX = dx * enemies[i].moveSpeed;
+                        enemies[i].shape.velocityY = dy * enemies[i].moveSpeed;
 
-                        enemies[i].shape.xPos += enemies[i].velocityX;
-                        enemies[i].shape.yPos += enemies[i].velocityY;
+                        //enemies[i].shape.xPos += enemies[i].velocityX;
+                        //enemies[i].shape.yPos += enemies[i].velocityY;
                     }
                     else
                     {
                         // In range, stop
-                        enemies[i].velocityX = 0.0f;
-                        enemies[i].velocityY = 0.0f;
+                        //enemies[i].velocityX = 0.0f;
+                        //enemies[i].velocityY = 0.0f;
                     }
 
                     // If in range and cooldown is ready = shoot at player

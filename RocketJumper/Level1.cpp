@@ -19,7 +19,6 @@ Technology is prohibited.
 #include "collision.h"
 #include "player.h"
 #include "GameStateManager.h"
-#include "drawWallsLevel2.h"
 #include "projectile.h"
 #include "Movement.h"
 #include "render.h"
@@ -191,9 +190,7 @@ void Level1_Update()
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
 
-	gamelogic::Xcheck(map, x, s);
-	gamelogic::Ycheck(map, x, s);
-
+	
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
@@ -207,6 +204,10 @@ void Level1_Update()
 
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,

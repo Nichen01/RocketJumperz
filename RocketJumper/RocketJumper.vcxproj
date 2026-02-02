@@ -14,8 +14,6 @@
     <ClCompile Include="aimingInterface.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="draw.cpp" />
-    <ClCompile Include="drawWallsLevel1.cpp" />
-    <ClCompile Include="drawWallsLevel2.cpp" />
     <ClCompile Include="enemies.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="Input.cpp" />
