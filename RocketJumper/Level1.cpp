@@ -36,17 +36,14 @@ objectsquares objectinfo[2] = { 0 };
 static Projectile Projectiles[MAX_PROJECTILES];
 static AEGfxVertexList* pTestMesh = nullptr;
 
-
-
-
 void Level1_Load()
 {
 	
 }
 void Level1_Initialize()
 {	
-	characterPic = AEGfxTextureLoad("Assets/CharacterRight.png");
-	base5 = AEGfxTextureLoad("Assets/Base5.png");
+	characterPictest = AEGfxTextureLoad("Assets/CharacterRight.png");
+	base5test = AEGfxTextureLoad("Assets/Base5.png");
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -114,8 +111,6 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
-	
-
 
 	//=============== GET MOUSE INPUTS (To be made into helper function) =====================//
 	s32 mouseX, mouseY;
@@ -163,7 +158,7 @@ void Level1_Draw()
 
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	AEGfxTextureSet(characterPic, 0, 0);
+	AEGfxTextureSet(characterPictest, 0, 0);
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
