@@ -25,12 +25,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="System.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="drawWallsLevel2.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="player.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -40,16 +34,10 @@
     <ClCompile Include="GameStateManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Level1.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="draw.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="drawWallsLevel1.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="enemies.cpp">
@@ -81,9 +69,6 @@
     <ClInclude Include="pch.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="System.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="drawWallsLevel2.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -94,9 +79,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="GameStateManager.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Level1.h">

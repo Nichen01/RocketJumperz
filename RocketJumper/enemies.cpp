@@ -184,8 +184,8 @@ namespace enemySystem {
                     {
                         
                         // Stop moving when in attack range
-                        enemies[i].shape.velocityX = 0.0f;
-                        enemies[i].shape.velocityY = 0.0f;
+                        //enemies[i].shape.velocityX = 0.0f;
+                        //enemies[i].shape.velocityY = 0.0f;
                     }
                 }
                 // === RANGED ENEMY BEHAVIOR === //
