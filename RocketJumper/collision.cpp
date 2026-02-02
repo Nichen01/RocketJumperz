@@ -34,10 +34,10 @@ namespace gamelogic {
 		}
 	}
 
-	void OBJ_to_map(int map[],int x,int s , objectsquares * object) {
+	void OBJ_to_map(int map[],int x,int s, objectsquares* object) {
 		object->xPos += object->velocityX;
 
-		calcCorners(map, x, &objectinfo[player]);
+		calcCorners(map, x, object);
 
 		int boolTR = (object->TR == 1);
 		int boolTL = (object->TL == 1);
@@ -56,7 +56,7 @@ namespace gamelogic {
 
 		object->yPos += object->velocityY;
 
-		calcCorners(map, x, &objectinfo[player]);
+		calcCorners(map, x, object);
 
 		boolTR = (object->TR == 1);
 		boolTL = (object->TL == 1);
@@ -75,4 +75,5 @@ namespace gamelogic {
 
 		}
 	}
+	
 }

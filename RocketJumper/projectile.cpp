@@ -11,8 +11,8 @@ namespace projectileSystem {
             projectiles[i].shape.yPos = 0.0f;
             projectiles[i].shape.xScale = 10.0f;
             projectiles[i].shape.yScale = 10.0f;
-            projectiles[i].velocityX = 0.0f;
-            projectiles[i].velocityY = 0.0f;
+            projectiles[i].shape.velocityX = 0.0f;
+            projectiles[i].shape.velocityY = 0.0f;
             projectiles[i].isActive = 0;
         }
     }
@@ -54,8 +54,8 @@ namespace projectileSystem {
 
                 // Set velocity
                 f32 speed = 15.0f;
-                projectiles[foundSlot].velocityX = dx * speed;
-                projectiles[foundSlot].velocityY = dy * speed;
+                projectiles[foundSlot].shape.velocityX = dx * speed;
+                projectiles[foundSlot].shape.velocityY = dy * speed;
 
                 // Activate projectile
                 projectiles[foundSlot].isActive = 1;
@@ -77,8 +77,8 @@ namespace projectileSystem {
             if (projectiles[i].isActive == 1)
             {
                 // Move projectile
-                projectiles[i].shape.xPos += projectiles[i].velocityX;
-                projectiles[i].shape.yPos += projectiles[i].velocityY;
+                projectiles[i].shape.xPos += projectiles[i].shape.velocityX;
+                projectiles[i].shape.yPos += projectiles[i].shape.velocityY;
 
                 // Check if projectile is off-screen
                 if (projectiles[i].shape.xPos > 800.0f || projectiles[i].shape.xPos < -800.0f ||

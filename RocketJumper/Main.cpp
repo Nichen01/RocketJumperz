@@ -4,11 +4,9 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include "collision.h"
-#include "Input.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
 #include "render.h"
-
 
 // ---------------------------------------------------------------------------
 // main
@@ -57,7 +55,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		while (next == current)
 		{
 			AESysFrameStart();
-			Input_Handle();
 			fpUpdate();
 			fpDraw();
 			AESysFrameEnd();

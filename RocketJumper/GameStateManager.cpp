@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "mapEditor.h"
+#include "mapEditor_Level1.h"
+#include "mapEditor_Level2.h"
 #include "GameStateManager.h"
 #include "MainMenu.h"
 #include "projectileTest.h"
@@ -18,10 +19,10 @@ void GSM_Initialize(int startingState)
 
 // Updates the Game State Manager and assigns function pointers based on current state
 void GSM_Update()
-{	
+{
 	switch (current)
 	{
-	case GS_LEVEL1:		
+	case GS_LEVEL1:
 		fpLoad = Level1_Load;
 		fpInitialize = Level1_Initialize;
 		fpUpdate = Level1_Update;
