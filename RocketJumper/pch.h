@@ -5,5 +5,6 @@
 #include "AEEngine.h"
 #include <fstream>
 #include <string>
+#include <iostream>
 
 #endif //PCH_H
