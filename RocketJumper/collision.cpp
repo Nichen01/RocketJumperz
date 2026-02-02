@@ -34,45 +34,44 @@ namespace gamelogic {
 		}
 	}
 
-	void Xcheck(int map[],int x,int s) {
-		objectinfo[player].xPos += objectinfo[player].velocityX;
+	void OBJ_to_map(int map[],int x,int s , objectsquares * object) {
+		object->xPos += object->velocityX;
 
 		calcCorners(map, x, &objectinfo[player]);
 
-		int boolTR = (objectinfo[player].TR == 1);
-		int boolTL = (objectinfo[player].TL == 1);
-		int boolBR = (objectinfo[player].BR == 1);
-		int boolBL = (objectinfo[player].BL == 1);
+		int boolTR = (object->TR == 1);
+		int boolTL = (object->TL == 1);
+		int boolBR = (object->BR == 1);
+		int boolBL = (object->BL == 1);
 
-		if (objectinfo[player].velocityX > 0 && (boolTR || boolBR)) {
-			objectinfo[player].xPos = ((float)((objectinfo[player].rightX * s) - (objectinfo[player].xScale / 2.0) - 0.001f - 800.0f));
-			objectinfo[player].velocityX = 0;
+		if (object->velocityX > 0 && (boolTR || boolBR)) {
+			object->xPos = ((float)((object->rightX * s) - (object->xScale / 2.0) - 0.001f - 800.0f));
+			object->velocityX = 0;
 		}
 
-		if (objectinfo[player].velocityX < 0 && (boolTL || boolBL)) {
-			objectinfo[player].xPos = ((float)(((objectinfo[player].rightX) * s) + (objectinfo[player].xScale / 2.0) + 0.001f - 800.0f));
-			objectinfo[player].velocityX = 0;
+		if (object->velocityX < 0 && (boolTL || boolBL)) {
+			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
+			object->velocityX = 0;
 		}
-	}
-	void Ycheck(int map[], int x, int s) {
-		objectinfo[player].yPos += objectinfo[player].velocityY;
+
+		object->yPos += object->velocityY;
 
 		calcCorners(map, x, &objectinfo[player]);
 
-		int boolTR = (objectinfo[player].TR == 1);
-		int boolTL = (objectinfo[player].TL == 1);
-		int boolBR = (objectinfo[player].BR == 1);
-		int boolBL = (objectinfo[player].BL == 1);
+		boolTR = (object->TR == 1);
+		boolTL = (object->TL == 1);
+		boolBR = (object->BR == 1);
+		boolBL = (object->BL == 1);
 
-		if (objectinfo[player].velocityY < 0 && (boolBL || boolBR)) {
-			objectinfo[player].yPos = 450.0f - ((float)((objectinfo[player].bottomY * s) - (objectinfo[player].yScale / 2.0) - 0.001f));
-			objectinfo[player].velocityY = 0;
+		if (object->velocityY < 0 && (boolBL || boolBR)) {
+			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
+			object->velocityY = 0;
 
 		}
 
-		if (objectinfo[player].velocityY > 0 && (boolTL || boolTR)) {
-			objectinfo[player].yPos = 450.0f - ((float)((objectinfo[player].bottomY * s) + (objectinfo[player].yScale / 2.0) + 0.001f));
-			objectinfo[player].velocityY = 0;
+		if (object->velocityY > 0 && (boolTL || boolTR)) {
+			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
+			object->velocityY = 0;
 
 		}
 	}

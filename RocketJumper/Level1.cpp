@@ -148,8 +148,8 @@ void Level1_Update()
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
 
-	gamelogic::Xcheck(map, x, s);
-	gamelogic::Ycheck(map, x, s);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
+	
 }
 
 void Level1_Draw()
