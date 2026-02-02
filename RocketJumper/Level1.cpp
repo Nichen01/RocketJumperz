@@ -19,7 +19,6 @@ Technology is prohibited.
 #include "collision.h"
 #include "player.h"
 #include "GameStateManager.h"
-#include "drawWallsLevel2.h"
 #include "projectile.h"
 #include "Movement.h"
 #include "render.h"
@@ -143,8 +142,37 @@ void Level1_Update()
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
 
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
 	
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
+	//gamelogic::OBJ_to_map(map, x, s, &(enemies[0].shape));
+
+
+	//============= UPDATE ENEMIES ===================/
+	// Get delta time for enemy AI
+	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Update enemies
+	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
+		objectinfo[player],
+		enemyProjectiles, MAX_PROJECTILES,
+		dt, LaserBlast, soundEffects);
+
+	// Update enemy projectiles
+	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+
+	// Check player projectiles hitting enemies
+	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
+		Projectiles, MAX_PROJECTILES);
+
+	// Check enemies damaging player
+	f32 damageTaken = enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
+		objectinfo[player], Punch, soundEffects);
+	if (damageTaken > 0.0f) {
+		playerHealth -= damageTaken;
+		printf("Player Health: %.1f\n", playerHealth);
+	}
+
+
 }
 
 void Level1_Draw()
