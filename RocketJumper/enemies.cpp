@@ -33,8 +33,8 @@ namespace enemySystem {
             enemies[i].shape.xScale = 70.0f;  // Default enemy size
             enemies[i].shape.yScale = 70.0f;
             enemies[i].type = ENEMY_MELEE;
-            enemies[i].velocityX = 0.0f;
-            enemies[i].velocityY = 0.0f;
+            enemies[i].shape.velocityX = 0.0f;
+            enemies[i].shape.velocityY = 0.0f;
             enemies[i].health = 0.0f;
             enemies[i].attackCooldown = 0.0f;
             enemies[i].detectionRange = 0.0f;
@@ -184,8 +184,8 @@ namespace enemySystem {
                     {
                         
                         // Stop moving when in attack range
-                        enemies[i].velocityX = 0.0f;
-                        enemies[i].velocityY = 0.0f;
+                        enemies[i].shape.velocityX = 0.0f;
+                        enemies[i].shape.velocityY = 0.0f;
                     }
                 }
                 // === RANGED ENEMY BEHAVIOR === //
@@ -240,8 +240,8 @@ namespace enemySystem {
                                 enemyProjectiles[p].shape.yScale = 10.0f;
 
                                 f32 projectileSpeed = 8.0f;
-                                enemyProjectiles[p].velocityX = dx * projectileSpeed;
-                                enemyProjectiles[p].velocityY = dy * projectileSpeed;
+                                enemyProjectiles[p].shape.velocityX = dx * projectileSpeed;
+                                enemyProjectiles[p].shape.velocityY = dy * projectileSpeed;
                                 enemyProjectiles[p].isActive = 1;
 
                                 // Reset cooldown back up
@@ -261,8 +261,8 @@ namespace enemySystem {
             else
             {
                 enemies[i].hasLineOfSight = 0;
-                enemies[i].velocityX = 0.0f;
-                enemies[i].velocityY = 0.0f;
+                enemies[i].shape.velocityX = 0.0f;
+                enemies[i].shape.velocityY = 0.0f;
             }
 
             // Check if enemy is dead

@@ -3,7 +3,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  enemy.h
-\author       AI Assistant
+\author       Nicholas Chen (c.chen)
 \date         January, 31, 2026
 \brief        Enemy system with melee and ranged enemy types
 
