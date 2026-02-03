@@ -58,7 +58,7 @@ AEAudioGroup soundEffects;
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level1_Load()
-{/*
+{
 	// Load the music file once when the level loads
 	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
 
@@ -69,12 +69,12 @@ void Level1_Load()
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
-*/
+
 }
 
 void Level1_Initialize()
 {
-	//AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
 
 	// Load textures - these are defined in draw.cpp
