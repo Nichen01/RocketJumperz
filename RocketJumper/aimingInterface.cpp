@@ -1,5 +1,5 @@
 #include "aimingInterface.h"
-namespace aiming {
+/*namespace aiming {
 	f32 angle;
 	void loadAiming() {
 		aimingInterface = AEGfxTextureLoad("Assets/aim.png");
@@ -28,4 +28,4 @@ namespace aiming {
 	void unloadAiming() {
 		if (aimingInterface) AEGfxTextureUnload(aimingInterface);
 	}
-}
+}*/
