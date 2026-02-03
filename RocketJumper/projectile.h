@@ -8,9 +8,7 @@
 // Projectile structure containing all data for a single projectile
 struct Projectile
 {
-    objectsquares shape;    // position and size info (from collision.h)
-    f32 velocityX;          
-    f32 velocityY;          
+    objectsquares shape;    // position and size info (from collision.h)         
     s8 isActive;           
 };
 
