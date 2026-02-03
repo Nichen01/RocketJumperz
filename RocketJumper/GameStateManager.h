@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/\
 
 #pragma once
+#include "GameStateList.h"
 
 typedef void(*FP)(void);
 

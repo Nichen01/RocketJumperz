@@ -15,7 +15,7 @@ Technology is prohibited.
 
 #include "enemies.h"
 #include "collision.h"
-#include "render.h"
+#include "draw.h"
 #include <cmath>
 
 namespace enemySystem {
@@ -327,7 +327,7 @@ namespace enemySystem {
                 }
 
                 // Draw enemy
-                render::Drawsquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
+                renderlogic::Drawsquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
                     enemies[i].shape.xScale, enemies[i].shape.yScale);
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
             }
