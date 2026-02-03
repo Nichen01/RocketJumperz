@@ -120,6 +120,7 @@ void Level2_Initialize()
 	pTestMesh = AEGfxMeshEnd();
 
 	// Create map with walls on borders and one obstacle in middle
+	// row*16+column
 	// 1 for obstacle, 0 for playable area
 	int mapX = 0, mapY = 0;
 	for (mapY = 0; mapY < 9; mapY++) {
@@ -140,6 +141,7 @@ void Level2_Initialize()
 		}
 	}
 	map[(4 * 16 + 6)] = 1;
+	map[(1 * 16 + 14)] = 10;
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
@@ -300,11 +302,11 @@ void Level2_Free()
 		pTestMesh = nullptr;
 	}
 
-	delete[] map;
 }
 
 void Level2_Unload()
 {
+	//if (map) delete[] map;
 	if (characterPictest) AEGfxTextureUnload(characterPictest);
 	if (base5test) AEGfxTextureUnload(base5test);
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);

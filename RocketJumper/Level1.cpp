@@ -135,6 +135,7 @@ void Level1_Initialize()
 		}
 	}
 	map[(4 * 16 + 6)] = 1;
+	map[(1 * 16 + 1)] = 10;
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
@@ -289,12 +290,11 @@ void Level1_Free()
 		AEGfxMeshFree(pTestMesh);
 		pTestMesh = nullptr;
 	}
-
-	delete[] map;
 }
 
 void Level1_Unload()
 {
+	//if (map) delete[] map;
 	if (characterPictest) AEGfxTextureUnload(characterPictest);
 	if (base5test) AEGfxTextureUnload(base5test);
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);

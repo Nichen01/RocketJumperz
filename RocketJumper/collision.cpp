@@ -1,6 +1,5 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
-#include "player.h"
 #include "collision.h"
 
 namespace gamelogic {
@@ -39,40 +38,53 @@ namespace gamelogic {
 
 		calcCorners(map, x, object);
 
-		int boolTR = (object->TR == 1);
+		/*int boolTR = (object->TR == 1);
 		int boolTL = (object->TL == 1);
 		int boolBR = (object->BR == 1);
-		int boolBL = (object->BL == 1);
+		int boolBL = (object->BL == 1);*/
+		int boolTR = object->TR;
+		int boolTL = object->TL;
+		int boolBR = object->BR;
+		int boolBL = object->BL;
 
-		if (object->velocityX > 0 && (boolTR || boolBR)) {
+		if (object->velocityX > 0 && (boolTR==1 || boolBR==1)) {
 			object->xPos = ((float)((object->rightX * s) - (object->xScale / 2.0) - 0.001f - 800.0f));
 			object->velocityX = 0;
 		}
 
-		if (object->velocityX < 0 && (boolTL || boolBL)) {
+		if (object->velocityX < 0 && (boolTL==1 || boolBL==1)) {
 			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
 			object->velocityX = 0;
+		}
+
+		if ((object->velocityX < 0 && (boolTL == 10 || boolBL == 10))||
+			(object->velocityX > 0 && (boolTR == 10 || boolBR == 10))){
+			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
 		}
 
 		object->yPos += object->velocityY;
 
 		calcCorners(map, x, object);
 
-		boolTR = (object->TR == 1);
-		boolTL = (object->TL == 1);
-		boolBR = (object->BR == 1);
-		boolBL = (object->BL == 1);
+		boolTR = object->TR;
+		boolTL = object->TL;
+		boolBR = object->BR;
+		boolBL = object->BL;
 
-		if (object->velocityY < 0 && (boolBL || boolBR)) {
+		if (object->velocityY < 0 && (boolBL==1 || boolBR==1)) {
 			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
 			object->velocityY = 0;
 
 		}
 
-		if (object->velocityY > 0 && (boolTL || boolTR)) {
+		if (object->velocityY > 0 && (boolTL==1 || boolTR==1)) {
 			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
 			object->velocityY = 0;
 
+		}
+		if ((object->velocityY < 0 && (boolBL == 10 || boolBR == 10)) ||
+			(object->velocityY > 0 && (boolTL == 10 || boolTR == 10))) {
+			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
 		}
 	}
 	
