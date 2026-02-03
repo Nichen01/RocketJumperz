@@ -260,10 +260,11 @@ void Level1_Draw()
 	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
-	// Render enemy projectiles (red color)
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);  // Red for enemy projectiles
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, pTestMesh);
+	// Render enemy projectiles with plasma texture
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, pTestMesh);
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -272,10 +273,11 @@ void Level1_Draw()
 		objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
-	// Render all active projectiles (YELLOW)
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetColorToAdd(1.0f, 1.0f, 0.0f, 1.0f);  // Yellow
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, pTestMesh);
+	// Render player projectiles with plasma texture
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
 }
 
 void Level1_Free()

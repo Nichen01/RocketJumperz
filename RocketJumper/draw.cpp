@@ -3,6 +3,7 @@
 
 extern AEGfxTexture* characterPictest = NULL;
 extern AEGfxTexture* base5test = NULL;
+extern AEGfxTexture* plasma = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
 namespace renderlogic {

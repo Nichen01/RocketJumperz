@@ -32,7 +32,7 @@ static int s = 100;
 
 static objectsquares objectinfo[2] = { 0 };
 
-// Local variables for projectile test level
+
 static Projectile Projectiles[MAX_PROJECTILES];
 static AEGfxVertexList* pTestMesh = nullptr;
 
@@ -79,13 +79,10 @@ void Level2_Initialize()
 {
 	AEAudioPlay(L2, bgm, 0.5f, 1.f, -1);
 
-	//s8 font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-
-	// Load textures - these are defined in draw.cpp
+	// Load textures, defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
-
-
+	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -168,7 +165,7 @@ void Level2_Initialize()
 
 void Level2_Update()
 {
-	/*
+	
 	//====== AUDIO CONTROLS ======
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
@@ -182,7 +179,7 @@ void Level2_Update()
 			bgVolume = 0.f;
 		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
-	*/
+	
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -271,9 +268,10 @@ void Level2_Draw()
 		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles (red color)
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);  // Red for enemy projectiles
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, pTestMesh);
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);  // Changed from COLOR to TEXTURE
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, pTestMesh);
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -283,9 +281,10 @@ void Level2_Draw()
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render all active projectiles (YELLOW)
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetColorToAdd(1.0f, 1.0f, 0.0f, 1.0f);  // Yellow
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, pTestMesh);
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
 }
 
 void Level2_Free()
@@ -299,6 +298,8 @@ void Level2_Free()
 		AEGfxMeshFree(pTestMesh);
 		pTestMesh = nullptr;
 	}
+
+
 
 	delete[] map;
 }
