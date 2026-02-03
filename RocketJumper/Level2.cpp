@@ -14,7 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include <iostream>
-#include "Level1.h"
+#include "Level2.h"
 #include "draw.h"
 #include "collision.h"
 #include "player.h"
@@ -44,43 +44,48 @@ static AEGfxTexture* rangedEnemyTexture = nullptr;
 static f32 playerHealth = 100.0f;
 
 //==== sound and volume
-static f32 bgVolume = 1.f;
 
-static AEAudio L1;
-static  AEAudio LaserBlast;
-static  AEAudio Punch;
-static  AEAudioGroup bgm;
-static  AEAudioGroup soundEffects;
+static f32 bgVolume = 1.f;
+static f32 bgmPitch = 1.f;
+
+static AEAudio L2;
+static AEAudio LaserBlast;
+static AEAudio Punch;
+static AEAudioGroup bgm;
+static AEAudioGroup soundEffects;
+
 
 
 
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
-void Level1_Load()
+void Level2_Load()
 {
+	
 	// Load the music file once when the level loads
-	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
+	L2 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
 	// Create the audio group
 	bgm = AEAudioCreateGroup();
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
+	soundEffects = AEAudioCreateGroup();   
+	
 
 }
 
-void Level1_Initialize()
+void Level2_Initialize()
 {
-	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(L2, bgm, 0.5f, 1.f, -1);
 
-	s8 font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	//s8 font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 
-	
+
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -156,12 +161,14 @@ void Level1_Initialize()
 	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -200.0f, 100.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, 50.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, 300.0f, -200.0f);
 }
 
-void Level1_Update()
+void Level2_Update()
 {
+	/*
 	//====== AUDIO CONTROLS ======
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
@@ -175,6 +182,7 @@ void Level1_Update()
 			bgVolume = 0.f;
 		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
+	*/
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -187,7 +195,7 @@ void Level1_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
+	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
 	}
 
@@ -207,7 +215,7 @@ void Level1_Update()
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
 
-	
+
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
@@ -222,7 +230,7 @@ void Level1_Update()
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	
+
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
@@ -231,17 +239,19 @@ void Level1_Update()
 	// Check enemies damaging player
 	f32 damageTaken = enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
 		objectinfo[player], Punch, soundEffects);
+
 	if (damageTaken > 0.0f) {
 		playerHealth -= damageTaken;
 		printf("Player Health: %.1f\n", playerHealth);
 	}
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[2].shape);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
 
 }
 
-void Level1_Draw()
+void Level2_Draw()
 {
 	AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
 
@@ -278,7 +288,7 @@ void Level1_Draw()
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, pTestMesh);
 }
 
-void Level1_Free()
+void Level2_Free()
 {
 	if (pMesh) {
 		AEGfxMeshFree(pMesh);
@@ -293,14 +303,14 @@ void Level1_Free()
 	delete[] map;
 }
 
-void Level1_Unload()
+void Level2_Unload()
 {
 	if (characterPictest) AEGfxTextureUnload(characterPictest);
 	if (base5test) AEGfxTextureUnload(base5test);
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
 	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
 
-	AEAudioUnloadAudio(L1);
+	AEAudioUnloadAudio(L2);
 	AEAudioUnloadAudio(LaserBlast);
 	AEAudioUnloadAudioGroup(bgm);
 }
