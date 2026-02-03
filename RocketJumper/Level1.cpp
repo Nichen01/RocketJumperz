@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "collision.h"
 #include "player.h"
 #include "GameStateManager.h"
+#include "GameStateList.h"
 #include "projectile.h"
 #include "Movement.h"
 #include "render.h"
@@ -175,6 +176,10 @@ void Level1_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo[player]);
 
+	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
+		next = GS_QUIT;
+	}
+
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo[player]);
@@ -250,6 +255,7 @@ void Level1_Draw()
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, pTestMesh);
 
 	//====== PLAYER RENDER =========//
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxTextureSet(characterPictest, 0, 0);
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos,
 		objectinfo[player].xScale, objectinfo[player].yScale);
