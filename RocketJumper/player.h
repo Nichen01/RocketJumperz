@@ -32,6 +32,6 @@ enum objecttype {
 };
 
 
-void calcCorners(int map[], int mapX, objectsquares* player1);
+
 
 extern objectsquares objectinfo[2];
