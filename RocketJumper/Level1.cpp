@@ -77,7 +77,7 @@ void Level1_Initialize()
 
 
 	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/CharacterRight.png");
+	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 
 	
