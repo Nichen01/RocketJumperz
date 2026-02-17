@@ -58,6 +58,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			fpUpdate();
 			fpDraw();
 			AESysFrameEnd();
+			g_dt = AEFrameRateControllerGetFrameTime();
+
+			//hack
+			g_dt = g_fixedDT;
+
+			g_appTime += g_dt;
 		}
 
 		fpFree();
