@@ -1,15 +1,16 @@
 // ---------------------------------------------------------------------------
 // includes
-
+#pragma once
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
-#include "Input.h"
+#include "collision.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
+#include "render.h"
 
 // ---------------------------------------------------------------------------
 // main
-
+int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR    lpCmdLine,
@@ -20,48 +21,55 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
+	if (AESysInit(hInstance, nCmdShow, screenWidth, screenLength, 1, 60, true, NULL) == 0)
+	{
+		return 0;
+	}
 
+	// Using custom window procedure
+	int gGameRunning = 1;
 
-    // Using custom window procedure
-    AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
+	// Changing the window title
+	AESysSetWindowTitle("Rocket Jumperz");
 
-    // Changing the window title
-    AESysSetWindowTitle("My New Demo!");
+	// reset the system modules
+	AESysReset();
+	printf("Team project test\n");
 
-    // reset the system modules
-    AESysReset();
+	
+	GSM_Initialize(GS_LEVEL1);
 
-    GSM_Initialize(GS_LEVEL1);
-    while (current != GS_QUIT)
-    {
-        if (current != GS_RESTART) {
-            GSM_Update();
-            fpLoad();
-        }
-        else {
+	while (current != GS_QUIT)
+	{
+		if (current != GS_RESTART) {
+			GSM_Update();
+			fpLoad();
+		}
+		else {
+			current = previous;	
+			next = previous;
+		}
 
-            current = previous;
-            next = previous;
-        }
-        fpInitialize();
-        while (next == current)
-        {
-            AESysFrameStart();
-            //Input_Handle();
-            fpUpdate();
-            fpDraw();
-            AESysFrameEnd();
-        }
+		fpInitialize();
 
-        fpFree();
+		while (next == current)
+		{
+			AESysFrameStart();
+			fpUpdate();
+			fpDraw();
+			AESysFrameEnd();
+		}
 
-        if (next != GS_RESTART) {
-            fpUnload();
-        }
+		fpFree();
 
-        previous = current;
-        current = next;
+		if (next != GS_RESTART) {
+			fpUnload();
+		}
 
-    }
-    AESysExit();
+		previous = current;
+		current = next;
+	}
+
+	// free the system
+	AESysExit();
 }

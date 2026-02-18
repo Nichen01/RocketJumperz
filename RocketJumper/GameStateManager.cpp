@@ -2,6 +2,8 @@
 #include "mapEditor_Level1.h"
 #include "mapEditor_Level2.h"
 #include "GameStateManager.h"
+#include "MainMenu.h"
+#include "projectileTest.h"
 
 // Tracks current, previous and next game states
 int current = 0, previous = 0, next = 0;
@@ -28,6 +30,23 @@ void GSM_Update()
 		fpFree = Level1_Free;
 		fpUnload = Level1_Unload;
 		break;
+	case GS_PROJECTILE_TEST:
+		fpLoad = ProjectileTest_Load;
+		fpInitialize = ProjectileTest_Initialize;
+		fpUpdate = ProjectileTest_Update;
+		fpDraw = ProjectileTest_Draw;
+		fpFree = ProjectileTest_Free;
+		fpUnload = ProjectileTest_Unload;
+		break;
+	case GS_MAINMENU:
+		fpLoad = MainMenu_Load;
+		fpInitialize = MainMenu_Init;
+		fpUpdate = MainMenu_Update;
+		fpDraw = MainMenu_Draw;
+		fpFree = MainMenu_Free;
+		fpUnload = MainMenu_Unload;
+		break;
+	/*
 	case GS_LEVEL2:
 		fpLoad = Level2_Load;
 		fpInitialize = Level2_Initialize;
@@ -36,6 +55,7 @@ void GSM_Update()
 		fpFree = Level2_Free;
 		fpUnload = Level2_Unload;
 		break;
+	*/
 	case GS_RESTART:break;
 	case GS_QUIT:break;
 	default: break;
