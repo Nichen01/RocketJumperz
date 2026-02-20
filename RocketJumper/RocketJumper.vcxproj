@@ -28,7 +28,6 @@
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\CSD1130\CSD1130_a_c.joraye_3_1\Source Files\A3_P1\binaryMap.h" />
     <ClInclude Include="aimingInterface.h" />
     <ClInclude Include="binaryMap.h" />
     <ClInclude Include="collision.h" />

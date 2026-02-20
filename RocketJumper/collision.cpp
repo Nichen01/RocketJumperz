@@ -2,6 +2,7 @@
 #include "AEEngine.h"
 #include "player.h"
 #include "collision.h"
+#include "binaryMap.h"
 f64					g_fixedDT = 0.01667;
 
 // stores the game loop time that you must use in all your physics calculations
@@ -174,10 +175,10 @@ namespace gamelogic {
 	
 	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[])
 	{
-		int COLLISION_LEFT = 0x00000001;	//0001
-		int COLLISION_RIGHT = 0x00000002;	//0010
-		int COLLISION_TOP = 0x00000004;	//0100
-		int COLLISION_BOTTOM = 0x00000008;	//1000
+		//int COLLISION_LEFT = 0x00000001;	//0001
+		//int COLLISION_RIGHT = 0x00000002;	//0010
+		//int COLLISION_TOP = 0x00000004;	//0100
+		//int COLLISION_BOTTOM = 0x00000008;	//1000
 
 		float x1, y1, x2, y2;
 		object->flag = 0;

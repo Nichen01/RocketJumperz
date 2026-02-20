@@ -96,9 +96,6 @@
     <ClInclude Include="enemies.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\CSD1130\CSD1130_a_c.joraye_3_1\Source Files\A3_P1\binaryMap.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="binaryMap.h">
       <Filter>Header</Filter>
     </ClInclude>

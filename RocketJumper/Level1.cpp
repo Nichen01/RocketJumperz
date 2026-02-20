@@ -23,6 +23,7 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
+#include "binaryMap.h"
 
 s32* map = new s32[144]{ 0 };
 int x = 16;
@@ -52,9 +53,6 @@ AEAudio Punch;
 AEAudioGroup bgm;
 AEAudioGroup soundEffects;
 
-
-
-
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level1_Load()
@@ -79,8 +77,9 @@ void Level1_Initialize()
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
-
-	
+	platformTex1 = AEGfxTextureLoad("Assets/Base1.png");
+	platformTex2 = AEGfxTextureLoad("Assets/Base2.png");
+	platformTex3 = AEGfxTextureLoad("Assets/Base3.png");
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -114,28 +113,19 @@ void Level1_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	// Create map with walls on borders and one obstacle in middle
-	// 1 for obstacle, 0 for playable area
-	int mapX = 0, mapY = 0;
-	for (mapY = 0; mapY < 9; mapY++) {
-		if (mapY == 0 || mapY == 9 - 1) {
-			for (mapX = 0; mapX < 16; mapX++) {
-				map[(mapY * 16 + mapX)] = 1;
-			}
-		}
-		else {
-			for (mapX = 0; mapX < 16; mapX++) {
-				if (mapX == 0 || mapX == 16 - 1) {
-					map[(mapY * 16 + mapX)] = 1;
-				}
-				else {
-					map[(mapY * 16 + mapX)] = 0;
-				}
-			}
+	if (!ImportMapDataFromFile("Assets/Level1_Map.txt")) {
+		printf("Could not import file");
+		return;
+	}
+
+	int mapX = BINARY_MAP_WIDTH;
+	int mapY = BINARY_MAP_HEIGHT;
+
+	for (int row{}; row < mapY; ++row) {
+		for (int col{}; col < mapX; col++) {
+			map[row * x + col] = MapData[row][col];
 		}
 	}
-	map[(4 * 16 + 6)] = 1;
-
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
@@ -274,12 +264,18 @@ void Level1_Free()
 	}
 
 	delete[] map;
+	map = nullptr;
+
+	FreeMapData();
 }
 
 void Level1_Unload()
 {
 	if (characterPictest) AEGfxTextureUnload(characterPictest);
 	if (base5test) AEGfxTextureUnload(base5test);
+	if (platformTex1) AEGfxTextureUnload(platformTex1);
+	if (platformTex2) AEGfxTextureUnload(platformTex2);
+	if (platformTex3) AEGfxTextureUnload(platformTex3);
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
 	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
 
