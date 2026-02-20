@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aimingInterface.cpp" />
+    <ClCompile Include="binaryMap.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="enemies.cpp" />
@@ -19,6 +20,8 @@
     <ClCompile Include="Level1.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="mapEditor_Level1.cpp" />
+    <ClCompile Include="mapEditor_Level2.cpp" />
     <ClCompile Include="movement.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="player.cpp" />
@@ -28,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aimingInterface.h" />
+    <ClInclude Include="binaryMap.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="draw.h" />
     <ClInclude Include="enemies.h" />
@@ -35,6 +39,8 @@
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Level1.h" />
     <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="mapEditor_Level1.h" />
+    <ClInclude Include="mapEditor_Level2.h" />
     <ClInclude Include="movement.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="player.h" />
