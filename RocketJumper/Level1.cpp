@@ -23,10 +23,11 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
+#include "binaryMap.h"
 
-s32* map = new s32[144]{ 0 };
-int x = 16;
-int y = 9;
+s32* map = nullptr;
+int x = 0;
+int y = 0;
 int s = 100;
 
 objectsquares objectinfo[2] = { 0 };
@@ -117,30 +118,52 @@ void Level1_Initialize()
 
 	// Create map with walls on borders and one obstacle in middle
 	// 1 for obstacle, 0 for playable area
-	int mapX = 0, mapY = 0;
-	for (mapY = 0; mapY < 9; mapY++) {
-		if (mapY == 0 || mapY == 9 - 1) {
-			for (mapX = 0; mapX < 16; mapX++) {
-				map[(mapY * 16 + mapX)] = 1;
-			}
-		}
-		else {
-			for (mapX = 0; mapX < 16; mapX++) {
-				if (mapX == 0 || mapX == 16 - 1) {
-					map[(mapY * 16 + mapX)] = 1;
-				}
-				else {
-					map[(mapY * 16 + mapX)] = 0;
-				}
-			}
+	//int mapX = 0, mapY = 0;
+	//for (mapY = 0; mapY < 9; mapY++) {
+	//	if (mapY == 0 || mapY == 9 - 1) {
+	//		for (mapX = 0; mapX < 16; mapX++) {
+	//			map[(mapY * 16 + mapX)] = 1;
+	//		}
+	//	}
+	//	else {
+	//		for (mapX = 0; mapX < 16; mapX++) {
+	//			if (mapX == 0 || mapX == 16 - 1) {
+	//				map[(mapY * 16 + mapX)] = 1;
+	//			}
+	//			else {
+	//				map[(mapY * 16 + mapX)] = 0;
+	//			}
+	//		}
+	//	}
+	//}
+	//map[(4 * 16 + 6)] = 1;
+
+	// Load map data from file
+	if (!ImportMapDataFromFile("Level1_Map.txt"))
+	{
+		printf("Could not import Level_Map.txt file\n");
+		return;
+	}
+
+	// Update local dimensions
+	x = BINARY_MAP_WIDTH;
+	y = BINARY_MAP_HEIGHT;
+
+	// Copy MapData into the flat map[] array for renderlogic
+	map = new s32[x * y];
+	for (int row = 0; row < y; ++row)
+	{
+		for (int col = 0; col < x; ++col)
+		{
+			map[row * x + col] = MapData[row][col];
 		}
 	}
-	map[(4 * 16 + 6)] = 1;
 
-	objectinfo[player].xPos = 0.0f;
-	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 70.0f;
-	objectinfo[player].yScale = 70.0f;
+
+	//objectinfo[player].xPos = 0.0f;
+	//objectinfo[player].yPos = 0.0f;
+	//objectinfo[player].xScale = 70.0f;
+	//objectinfo[player].yScale = 70.0f;
 
 	objectinfo[obstacle].xPos = -400.0f;
 	objectinfo[obstacle].yPos = 0.0f;
@@ -274,6 +297,8 @@ void Level1_Free()
 	}
 
 	delete[] map;
+	map = nullptr;
+	FreeMapData();
 }
 
 void Level1_Unload()

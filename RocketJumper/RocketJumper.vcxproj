@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aimingInterface.cpp" />
+    <ClCompile Include="binaryMap.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="enemies.cpp" />
@@ -27,7 +28,9 @@
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\CSD1130\CSD1130_a_c.joraye_3_1\Source Files\A3_P1\binaryMap.h" />
     <ClInclude Include="aimingInterface.h" />
+    <ClInclude Include="binaryMap.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="draw.h" />
     <ClInclude Include="drawWallsLevel1.h" />

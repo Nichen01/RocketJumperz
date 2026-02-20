@@ -43,6 +43,9 @@
     <ClCompile Include="enemies.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="binaryMap.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -91,6 +94,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="enemies.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\CSD1130\CSD1130_a_c.joraye_3_1\Source Files\A3_P1\binaryMap.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="binaryMap.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
