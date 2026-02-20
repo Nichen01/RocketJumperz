@@ -26,6 +26,7 @@ Technology is prohibited.
 #include "binaryMap.h"
 
 s32* map = nullptr;
+int mapX, mapY;
 int x = 0;
 int y = 0;
 int s = 100;
@@ -146,8 +147,8 @@ void Level1_Initialize()
 	}
 
 	// Update local dimensions
-	x = BINARY_MAP_WIDTH;
-	y = BINARY_MAP_HEIGHT;
+	mapX = BINARY_MAP_WIDTH;
+	mapY = BINARY_MAP_HEIGHT;
 
 	// Copy MapData into the flat map[] array for renderlogic
 	map = new s32[x * y];
@@ -160,10 +161,10 @@ void Level1_Initialize()
 	}
 
 
-	//objectinfo[player].xPos = 0.0f;
-	//objectinfo[player].yPos = 0.0f;
-	//objectinfo[player].xScale = 70.0f;
-	//objectinfo[player].yScale = 70.0f;
+	objectinfo[player].xPos = 0.0f;
+	objectinfo[player].yPos = 0.0f;
+	objectinfo[player].xScale = 70.0f;
+	objectinfo[player].yScale = 70.0f;
 
 	objectinfo[obstacle].xPos = -400.0f;
 	objectinfo[obstacle].yPos = 0.0f;
