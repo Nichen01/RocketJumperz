@@ -10,6 +10,11 @@ f64					g_dt = 0.0;
 // stores to total application time until the current loop
 f64					g_appTime = 0.0;
 
+int COLLISION_LEFT = 0x00000001;	//0001
+int COLLISION_RIGHT = 0x00000002;	//0010
+int COLLISION_TOP = 0x00000004;	//0100
+int COLLISION_BOTTOM = 0x00000008;	//1000
+
 namespace {
 	
 
@@ -129,55 +134,8 @@ namespace gamelogic {
 				player->yPos + (player->yScale / 2.0f) > obstacle->yPos - (obstacle->yScale / 2.0f)));
 		
 	}
-
-	void OBJ_to_map(int map[],int x,int s, objectsquares* object,int index) {
-		object->xPos += object->velocityX;
-
-		calcCorners(map, x, object);
-
-		int boolTR = (object->TR == index);
-		int boolTL = (object->TL == index);
-		int boolBR = (object->BR == index);
-		int boolBL = (object->BL == index);
-
-		if (object->velocityX > 0 && (boolTR || boolBR)) {
-			object->xPos = ((float)((object->rightX * s) - (object->xScale / 2.0) - 0.001f - 800.0f));
-			object->velocityX = 0;
-		}
-
-		if (object->velocityX < 0 && (boolTL || boolBL)) {
-			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
-			object->velocityX = 0;
-		}
-
-		object->yPos += object->velocityY;
-
-		calcCorners(map, x, object);
-
-		boolTR = (object->TR == index);
-		boolTL = (object->TL == index);
-		boolBR = (object->BR == index);
-		boolBL = (object->BL == index);
-
-		if (object->velocityY < 0 && (boolBL || boolBR)) {
-			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
-			object->velocityY = 0;
-
-		}
-
-		if (object->velocityY > 0 && (boolTL || boolTR)) {
-			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
-			object->velocityY = 0;
-
-		}
-	}
-	
 	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[])
 	{
-		int COLLISION_LEFT = 0x00000001;	//0001
-		int COLLISION_RIGHT = 0x00000002;	//0010
-		int COLLISION_TOP = 0x00000004;	//0100
-		int COLLISION_BOTTOM = 0x00000008;	//1000
 
 		float x1, y1, x2, y2;
 		object->flag = 0;
@@ -224,4 +182,47 @@ namespace gamelogic {
 			object->flag = object->flag | COLLISION_BOTTOM;
 		}
 	}
+	void OBJ_to_map(int map[],int x,int s, objectsquares* object,int index) {
+		object->xPos += object->velocityX;
+
+		calcCorners(map, x, object);
+
+		int boolTR = (object->TR == index);
+		int boolTL = (object->TL == index);
+		int boolBR = (object->BR == index);
+		int boolBL = (object->BL == index);
+
+		if (object->velocityX > 0 && (boolTR || boolBR)) {
+			object->xPos = ((float)((object->rightX * s) - (object->xScale / 2.0) - 0.001f - 800.0f));
+			object->velocityX = 0;
+		}
+
+		if (object->velocityX < 0 && (boolTL || boolBL)) {
+			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
+			object->velocityX = 0;
+		}
+
+		object->yPos += object->velocityY;
+
+		calcCorners(map, x, object);
+
+		boolTR = (object->TR == index);
+		boolTL = (object->TL == index);
+		boolBR = (object->BR == index);
+		boolBL = (object->BL == index);
+
+		if (object->velocityY < 0 && (boolBL || boolBR)) {
+			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
+			object->velocityY = 0;
+
+		}
+
+		if (object->velocityY > 0 && (boolTL || boolTR)) {
+			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
+			object->velocityY = 0;
+
+		}
+	}
+	
+	
 }
