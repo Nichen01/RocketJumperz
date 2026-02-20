@@ -23,12 +23,10 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
-#include "binaryMap.h"
 
-s32* map = nullptr;
-int mapX, mapY;
-int x = 0;
-int y = 0;
+s32* map = new s32[144]{ 0 };
+int x = 16;
+int y = 9;
 int s = 100;
 
 objectsquares objectinfo[2] = { 0 };
@@ -71,7 +69,6 @@ void Level1_Load()
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
-
 }
 
 void Level1_Initialize()
@@ -80,7 +77,7 @@ void Level1_Initialize()
 
 
 	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/CharacterRight.png");
+	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 
 	
@@ -119,46 +116,25 @@ void Level1_Initialize()
 
 	// Create map with walls on borders and one obstacle in middle
 	// 1 for obstacle, 0 for playable area
-	//int mapX = 0, mapY = 0;
-	//for (mapY = 0; mapY < 9; mapY++) {
-	//	if (mapY == 0 || mapY == 9 - 1) {
-	//		for (mapX = 0; mapX < 16; mapX++) {
-	//			map[(mapY * 16 + mapX)] = 1;
-	//		}
-	//	}
-	//	else {
-	//		for (mapX = 0; mapX < 16; mapX++) {
-	//			if (mapX == 0 || mapX == 16 - 1) {
-	//				map[(mapY * 16 + mapX)] = 1;
-	//			}
-	//			else {
-	//				map[(mapY * 16 + mapX)] = 0;
-	//			}
-	//		}
-	//	}
-	//}
-	//map[(4 * 16 + 6)] = 1;
-
-	// Load map data from file
-	if (!ImportMapDataFromFile("Level1_Map.txt"))
-	{
-		printf("Could not import Level_Map.txt file\n");
-		return;
-	}
-
-	// Update local dimensions
-	mapX = BINARY_MAP_WIDTH;
-	mapY = BINARY_MAP_HEIGHT;
-
-	// Copy MapData into the flat map[] array for renderlogic
-	map = new s32[x * y];
-	for (int row = 0; row < y; ++row)
-	{
-		for (int col = 0; col < x; ++col)
-		{
-			map[row * x + col] = MapData[row][col];
+	int mapX = 0, mapY = 0;
+	for (mapY = 0; mapY < 9; mapY++) {
+		if (mapY == 0 || mapY == 9 - 1) {
+			for (mapX = 0; mapX < 16; mapX++) {
+				map[(mapY * 16 + mapX)] = 1;
+			}
+		}
+		else {
+			for (mapX = 0; mapX < 16; mapX++) {
+				if (mapX == 0 || mapX == 16 - 1) {
+					map[(mapY * 16 + mapX)] = 1;
+				}
+				else {
+					map[(mapY * 16 + mapX)] = 0;
+				}
+			}
 		}
 	}
+	map[(4 * 16 + 6)] = 1;
 
 
 	objectinfo[player].xPos = 0.0f;
@@ -243,9 +219,9 @@ void Level1_Update()
 		playerHealth -= damageTaken;
 		printf("Player Health: %.1f\n", playerHealth);
 	}
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape,1);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape,1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player],1);
 
 }
 
@@ -298,8 +274,6 @@ void Level1_Free()
 	}
 
 	delete[] map;
-	map = nullptr;
-	FreeMapData();
 }
 
 void Level1_Unload()
