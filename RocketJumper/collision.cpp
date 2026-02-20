@@ -17,7 +17,7 @@ int COLLISION_BOTTOM = 0x00000008;	//1000
 
 namespace {
 	
-
+	//Calculate corners of player object(will be removed)
 	void calcCorners(int map[], int mapX, objectsquares* player1) {
 
 		//determines coordinates in 2D array
@@ -34,7 +34,7 @@ namespace {
 		player1->BR = map[player1->bottomY * mapX + player1->rightX];
 		player1->BL = map[player1->bottomY * mapX + player1->leftX];
 	}
-
+	//create bounding box of object
 	void boundingbox(objectsquares* object) {
 		object->BBminx = (object->xScale * -(1.0f / 2.0f)) + object->xPos;
 		object->BBminy = (object->yScale * -(1.0f / 2.0f)) + object->yPos;
@@ -47,6 +47,7 @@ namespace {
 namespace gamelogic {
 	float tFirst = 0.0f;
 	float tLast = 0.0f;
+	//dynamic collision
 	s8 dynamic_collision(objectsquares* A, objectsquares* B) {
 		tFirst = 0.0f;
 		tLast = (float)g_dt;
@@ -126,6 +127,7 @@ namespace gamelogic {
 
 		return true;
 	}
+	//static collision
 	s8 collision(objectsquares* player, objectsquares* obstacle) {
 
 		return (player->xPos - (player->xScale / 2.0f) < obstacle->xPos + (obstacle->xScale / 2.0f) &&
@@ -134,6 +136,7 @@ namespace gamelogic {
 				player->yPos + (player->yScale / 2.0f) > obstacle->yPos - (obstacle->yScale / 2.0f)));
 		
 	}
+	//hotspot check and binary map collision
 	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[])
 	{
 
