@@ -25,10 +25,10 @@ Technology is prohibited.
 #include "render.h"
 #include "enemies.h"
 
-static s32* map = new s32[144]{ 0 };
-static int x = 16;
-static int y = 9;
-static int s = 100;
+s32* map = nullptr;
+int x = 32;
+int y = 18;
+int s = 50;
 
 static objectsquares objectinfo[2] = { 0 };
 
@@ -114,32 +114,27 @@ void Level1_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	// Create map with walls on borders and one obstacle in middle
-	// 1 for obstacle, 0 for playable area
-	int mapX = 0, mapY = 0;
-	for (mapY = 0; mapY < 9; mapY++) {
-		if (mapY == 0 || mapY == 9 - 1) {
-			for (mapX = 0; mapX < 16; mapX++) {
-				map[(mapY * 16 + mapX)] = 1;
-			}
-		}
-		else {
-			for (mapX = 0; mapX < 16; mapX++) {
-				if (mapX == 0 || mapX == 16 - 1) {
-					map[(mapY * 16 + mapX)] = 1;
-				}
-				else {
-					map[(mapY * 16 + mapX)] = 0;
-				}
-			}
+	if (!ImportMapDataFromFile("Assets/Level1_Map.txt")) {
+		printf("Could not import file");
+		return;
+	}
+
+	x = BINARY_MAP_WIDTH;
+	y = BINARY_MAP_HEIGHT;
+
+	map = new s32[x * y]{ 0 };
+
+	for (int row{}; row < y; ++row) {
+		for (int col{}; col < x; col++) {
+			map[row * x + col] = MapData[row][col];
 		}
 	}
 	map[(4 * 16 + 6)] = 1;
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 70.0f;
-	objectinfo[player].yScale = 70.0f;
+	objectinfo[player].xScale = 35.0f;
+	objectinfo[player].yScale = 35.0f;
 
 	objectinfo[obstacle].xPos = -400.0f;
 	objectinfo[obstacle].yPos = 0.0f;
@@ -292,7 +287,12 @@ void Level1_Free()
 		pTestMesh = nullptr;
 	}
 
-	delete[] map;
+	if (map) {
+		delete[] map;
+		map = nullptr;
+	}
+
+	FreeMapData();
 }
 
 void Level1_Unload()
