@@ -1,10 +1,10 @@
 /* Start Header ************************************************************************/
 /*!
-\file		  Level1.cpp
+\file		  Level1.h
 \author       Ivan Chong, i.chong, 2503476
 \par          i.chong@digipen.edu
 \date         January, 16, 2026
-\brief        Contain functions called by GameStateManager.cpp
+\brief        Contain declarations for Variables and functions in GameStateManager.cpp
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -14,7 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include <iostream>
-#include "Level1.h"
+#include "Level2.h"
 #include "draw.h"
 #include "collision.h"
 #include "player.h"
@@ -55,7 +55,7 @@ static AEAudioGroup soundEffects;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
-void Level1_Load()
+void Level2_Load()
 {
 	// Load the music file once when the level loads
 	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
@@ -69,7 +69,7 @@ void Level1_Load()
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 }
 
-void Level1_Initialize()
+void Level2_Initialize()
 {
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
@@ -110,7 +110,7 @@ void Level1_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	if (!ImportMapDataFromFile("Assets/Level1_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Level2_Map.txt")) {
 		printf("Could not import file");
 		return;
 	}
@@ -150,7 +150,7 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 }
 
-void Level1_Update()
+void Level2_Update()
 {
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
@@ -180,7 +180,7 @@ void Level1_Update()
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
 
-	
+
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
@@ -195,7 +195,7 @@ void Level1_Update()
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	
+
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
@@ -208,13 +208,13 @@ void Level1_Update()
 		playerHealth -= damageTaken;
 		printf("Player Health: %.1f\n", playerHealth);
 	}
-	gamelogic::OBJ_to_map(map, mapX, s, &enemies[0].shape,1);
-	gamelogic::OBJ_to_map(map, mapX, s, &enemies[1].shape,1);
-	gamelogic::OBJ_to_map(map, mapX, s, &objectinfo[player],1);
+	gamelogic::OBJ_to_map(map, mapX, s, &enemies[0].shape, 1);
+	gamelogic::OBJ_to_map(map, mapX, s, &enemies[1].shape, 1);
+	gamelogic::OBJ_to_map(map, mapX, s, &objectinfo[player], 1);
 
 }
 
-void Level1_Draw()
+void Level2_Draw()
 {
 	AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
 
@@ -250,7 +250,7 @@ void Level1_Draw()
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, pTestMesh);
 }
 
-void Level1_Free()
+void Level2_Free()
 {
 	if (pMesh) {
 		AEGfxMeshFree(pMesh);
@@ -268,7 +268,7 @@ void Level1_Free()
 	FreeMapData();
 }
 
-void Level1_Unload()
+void Level2_Unload()
 {
 	if (characterPictest) AEGfxTextureUnload(characterPictest);
 	if (base5test) AEGfxTextureUnload(base5test);
