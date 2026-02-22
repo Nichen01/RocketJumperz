@@ -5,6 +5,10 @@
 #include "MainMenu.h"
 #include "projectileTest.h"
 
+// Checking where to spawn character
+bool firstTimeLevel1 = true;
+bool firstTimeLevel2 = true;
+
 // Tracks current, previous and next game states
 int current = 0, previous = 0, next = 0;
 

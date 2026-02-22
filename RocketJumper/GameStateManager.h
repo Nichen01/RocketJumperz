@@ -13,6 +13,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/\
 
 #pragma once
+extern bool firstTimeLevel1;
+extern bool firstTimeLevel2;
 
 typedef void(*FP)(void);
 

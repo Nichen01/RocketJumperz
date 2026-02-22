@@ -151,8 +151,7 @@ namespace gamelogic {
 			object->velocityX = 0;
 		}
 
-		if ((object->velocityY < 0 && (boolBL == 10 || boolBR == 10)) ||
-			(object->velocityY > 0 && (boolTL == 10 || boolTR == 10))) {
+		if (object->TR == 10 || object->TL == 10 || object->BR == 10 || object->BL == 10) {
 			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
 		}
 
@@ -177,8 +176,7 @@ namespace gamelogic {
 
 		}
 
-		if ((object->velocityY < 0 && (boolBL == 10 || boolBR == 10)) ||
-			(object->velocityY > 0 && (boolTL == 10 || boolTR == 10))) {
+		if (object->TR == 10 || object->TL == 10 || object->BR == 10 || object->BL == 10) {
 			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
 		}
 	}

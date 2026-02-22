@@ -126,15 +126,28 @@ void Level1_Initialize()
 		}
 	}
 
-	objectinfo[player].xPos = 0.0f;
-	objectinfo[player].yPos = 0.0f;
+	//objectinfo[player].xPos = 0.0f;
+	//objectinfo[player].yPos = 0.0f;
+	//objectinfo[player].xScale = 70.0f;
+	//objectinfo[player].yScale = 70.0f;
+
+	//objectinfo[obstacle].xPos = -400.0f;
+	//objectinfo[obstacle].yPos = 0.0f;
+	//objectinfo[obstacle].xScale = 100.0f;
+	//objectinfo[obstacle].yScale = 400.0f;
+
+	if (firstTimeLevel1) {
+		objectinfo[player].xPos = 0.0f;
+		objectinfo[player].yPos = 0.0f;
+		firstTimeLevel1 = false;
+	}
+	else {
+		objectinfo[player].xPos = 600.f;
+		objectinfo[player].yPos = -300.f;
+	}
+
 	objectinfo[player].xScale = 70.0f;
 	objectinfo[player].yScale = 70.0f;
-
-	objectinfo[obstacle].xPos = -400.0f;
-	objectinfo[obstacle].yPos = 0.0f;
-	objectinfo[obstacle].xScale = 100.0f;
-	objectinfo[obstacle].yScale = 400.0f;
 
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
