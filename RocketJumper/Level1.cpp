@@ -77,9 +77,6 @@ void Level1_Initialize()
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
-	platformTex1 = AEGfxTextureLoad("Assets/Base1.png");
-	platformTex2 = AEGfxTextureLoad("Assets/Base2.png");
-	platformTex3 = AEGfxTextureLoad("Assets/Base3.png");
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);

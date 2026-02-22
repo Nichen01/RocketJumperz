@@ -10,6 +10,3 @@ namespace renderlogic {
 extern AEGfxVertexList* pMesh;
 extern AEGfxTexture* characterPictest;
 extern AEGfxTexture* base5test;
-extern AEGfxTexture* platformTex1;
-extern AEGfxTexture* platformTex2;
-extern AEGfxTexture* platformTex3;

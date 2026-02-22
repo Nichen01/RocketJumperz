@@ -1,6 +1,9 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include "player.h"
+#include "GameStateList.h"
+#include "GameStateManager.h"
+
 extern f64					g_fixedDT;
 extern f64					g_dt;
 extern f64					g_appTime;
