@@ -13,7 +13,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <iostream>
+#include <cmath>
 #include "Level1.h"
 #include "draw.h"
 #include "collision.h"
@@ -25,6 +25,7 @@ Technology is prohibited.
 #include "render.h"
 #include "enemies.h"
 #include "binaryMap.h"
+#include "animation.h"
 
 s32* map = nullptr;
 int x = 32;
@@ -53,6 +54,27 @@ static  AEAudio Punch;
 static  AEAudioGroup bgm;
 static  AEAudioGroup soundEffects;
 
+// DoorOpen.jpg is 224x32 with 32x32 frames = 7 frames
+// ---------------------------------------------------------------------------
+// 
+//
+// DoorOpen.jpg: 224 x 32 pixels, single row of 7 frames (32x32 each)
+// ---------------------------------------------------------------------------
+static constexpr int  DOOR_FRAME_COUNT = 7;
+static constexpr f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
+static constexpr f32  DOOR_WORLD_X = 200.0f;  // adjust to match your map
+static constexpr f32  DOOR_WORLD_Y = 50.0f;
+static constexpr f32  DOOR_WIDTH = 50.0f;   // matches tile size s
+static constexpr f32  DOOR_HEIGHT = 50.0f;
+static constexpr f32  DOOR_TRIGGER_RADIUS = 150.0f;  // px from door centre
+
+static SpriteAnimation  doorAnim;
+static AEGfxVertexList* doorMesh = nullptr;
+static AEGfxTexture* doorTexture = nullptr;
+static bool             doorIsOpen = false; // tracks fully-open state
+
+// ---------------------------------------------------------------------------
+
 
 
 
@@ -67,7 +89,7 @@ void Level1_Load()
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
+	soundEffects = AEAudioCreateGroup();  
 
 }
 
@@ -156,6 +178,17 @@ void Level1_Initialize()
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
+
+	// DOOR 
+	animSystem::buildMesh(&doorMesh, DOOR_FRAME_COUNT);
+	doorTexture = AEGfxTextureLoad("Assets/DoorOpen.png");
+	if (!doorTexture)
+		printf("DOOR TEXTURE NOT FOUND!\n");
+	else
+		printf("DOOR OK\n");
+
+	animSystem::init(doorAnim, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
+	doorIsOpen = false;
 }
 
 void Level1_Update()
@@ -237,6 +270,29 @@ void Level1_Update()
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
 
+	// -----------------------------------------------------------------------
+	// Door animation  —  hardcoded proximity check, same logic as tutorial
+	// -----------------------------------------------------------------------
+	f32 dx = objectinfo[player].xPos - DOOR_WORLD_X;
+	f32 dy = objectinfo[player].yPos - DOOR_WORLD_Y;
+	f32 dist = sqrtf(dx * dx + dy * dy);
+	bool playerNear = (dist <= DOOR_TRIGGER_RADIUS);
+
+	// Trigger open: player just entered range and door is fully closed
+	if (playerNear && !doorIsOpen && doorAnim.playMode != ANIM_PLAY_ONCE)
+		animSystem::play(doorAnim, ANIM_PLAY_ONCE);
+
+	// Trigger close: player just left range and door is fully open
+	if (!playerNear && doorIsOpen && doorAnim.playMode != ANIM_PLAY_REVERSE)
+		animSystem::play(doorAnim, ANIM_PLAY_REVERSE);
+
+	animSystem::update(doorAnim, dt);
+
+	// justFinished is true for one frame when a one-shot completes
+	if (doorAnim.justFinished)
+		doorIsOpen = (doorAnim.currentFrame == DOOR_FRAME_COUNT - 1);
+	// -----------------------------------------------------------------------
+
 }
 
 void Level1_Draw()
@@ -250,11 +306,19 @@ void Level1_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-	// Draw map walls and floor
+	// ===== RENDER WALLS ======= // 
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
+	// Render doors
+	// 2. Door  —  UV offset selects the current frame from the strip
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
+	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
+	AEGfxTextureSet(doorTexture, animSystem::getUOffset(doorAnim), 0.f);
+	renderlogic::Drawsquare(DOOR_WORLD_X, DOOR_WORLD_Y, DOOR_WIDTH, DOOR_HEIGHT);
+	AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
+
 	// ==== ENEMIES RENDER =======//
-	// Render enemies
 	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
@@ -295,6 +359,11 @@ void Level1_Free()
 		map = nullptr;
 	}
 
+	if (doorMesh) {
+		AEGfxMeshFree(doorMesh);  
+		doorMesh = nullptr; 
+	}
+
 	FreeMapData();
 }
 
@@ -304,6 +373,7 @@ void Level1_Unload()
 	if (base5test) AEGfxTextureUnload(base5test);
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
 	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
+	if (doorTexture) { AEGfxTextureUnload(doorTexture); doorTexture = nullptr; }
 
 	AEAudioUnloadAudio(L1);
 	AEAudioUnloadAudio(LaserBlast);

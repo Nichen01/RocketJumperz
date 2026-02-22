@@ -43,6 +43,11 @@
     <ClCompile Include="enemies.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="binaryMap.cpp" />
+    <ClCompile Include="Level2.cpp" />
+    <ClCompile Include="animation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -91,6 +96,11 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="enemies.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="binaryMap.h" />
+    <ClInclude Include="level2.h" />
+    <ClInclude Include="animation.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
