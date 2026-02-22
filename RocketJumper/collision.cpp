@@ -151,6 +151,11 @@ namespace gamelogic {
 			object->velocityX = 0;
 		}
 
+		if ((object->velocityY < 0 && (boolBL == 10 || boolBR == 10)) ||
+			(object->velocityY > 0 && (boolTL == 10 || boolTR == 10))) {
+			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
+		}
+
 		object->yPos += object->velocityY;
 
 		calcCorners(map, x, object);
@@ -170,6 +175,11 @@ namespace gamelogic {
 			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
 			object->velocityY = 0;
 
+		}
+
+		if ((object->velocityY < 0 && (boolBL == 10 || boolBR == 10)) ||
+			(object->velocityY > 0 && (boolTL == 10 || boolTR == 10))) {
+			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
 		}
 	}
 	
