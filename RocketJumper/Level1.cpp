@@ -275,9 +275,6 @@ void Level1_Unload()
 {
 	if (characterPictest) AEGfxTextureUnload(characterPictest);
 	if (base5test) AEGfxTextureUnload(base5test);
-	if (platformTex1) AEGfxTextureUnload(platformTex1);
-	if (platformTex2) AEGfxTextureUnload(platformTex2);
-	if (platformTex3) AEGfxTextureUnload(platformTex3);
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
 	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
 

@@ -3,9 +3,6 @@
 
 extern AEGfxTexture* characterPictest = NULL;
 extern AEGfxTexture* base5test = NULL;
-extern AEGfxTexture* platformTex1 = NULL;
-extern AEGfxTexture* platformTex2 = NULL;
-extern AEGfxTexture* platformTex3 = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
 namespace renderlogic {
@@ -42,6 +39,11 @@ namespace renderlogic {
 				case 1: //wall
 					AEGfxTextureSet(base5test, 0, 0);
 					renderlogic::Drawsquare(((float)xo + mapS / 2)-800.0f, 450.0f-((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+					break;
+				case 10: // goal, green
+					AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
+					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 					break;
 				default://defaults to playable area
