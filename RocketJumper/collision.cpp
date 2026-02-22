@@ -2,8 +2,6 @@
 #include "AEEngine.h"
 #include "player.h"
 #include "collision.h"
-<<<<<<< Updated upstream
-=======
 #include "binaryMap.h"
 f64					g_fixedDT = 0.01667;
 
@@ -41,7 +39,7 @@ namespace {
 		object->BBmaxy = (object->yScale * (1.0f / 2.0f)) + object->yPos;
 	}
 }
->>>>>>> Stashed changes
+
 
 namespace gamelogic {
 	s8 collision(objectsquares* player, objectsquares* obstacle) {
@@ -93,7 +91,7 @@ namespace gamelogic {
 			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
 			object->velocityX = 0;
 		}
-
+		
 		object->yPos += object->velocityY;
 
 		calcCorners(map, x, s, object);
@@ -116,8 +114,7 @@ namespace gamelogic {
 		}
 	}
 	
-<<<<<<< Updated upstream
-=======
+
 	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[])
 	{
 		//int COLLISION_LEFT = 0x00000001;	//0001
@@ -170,5 +167,4 @@ namespace gamelogic {
 			object->flag = object->flag | COLLISION_BOTTOM;
 		}
 	}
->>>>>>> Stashed changes
 }

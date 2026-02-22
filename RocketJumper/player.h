@@ -8,6 +8,14 @@ struct objectsquares {
 	f32 xScale;
 	f32 yScale;
 
+	f32 BBminx;
+	f32 BBminy;
+
+	f32 BBmaxx;
+	f32 BBmaxy;
+
+	u8 flag;
+
 	int leftX;
 	int rightX;
 	int topY;
@@ -32,6 +40,6 @@ enum objecttype {
 };
 
 
-void calcCorners(int map[], int mapX, objectsquares* player1);
+
 
 extern objectsquares objectinfo[2];

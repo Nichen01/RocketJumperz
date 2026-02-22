@@ -24,6 +24,7 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
+#include "binaryMap.h"
 
 s32* map = nullptr;
 int x = 32;
@@ -79,6 +80,8 @@ void Level1_Initialize()
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
+	plasma = AEGfxTextureLoad("Assets/plasma.png");
+
 
 	
 
