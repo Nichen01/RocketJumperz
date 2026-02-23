@@ -10,6 +10,8 @@ f64					g_dt = 0.0;
 // stores to total application time until the current loop
 f64					g_appTime = 0.0;
 
+f32         BOUNDING_RECT_SIZE = 1.0f;
+
 int COLLISION_LEFT = 0x00000001;	//0001
 int COLLISION_RIGHT = 0x00000002;	//0010
 int COLLISION_TOP = 0x00000004;	//0100
@@ -36,11 +38,12 @@ namespace {
 	}
 	//create bounding box of object
 	void boundingbox(objectsquares* object) {
-		object->BBminx = (object->xScale * -(1.0f / 2.0f)) + object->xPos;
-		object->BBminy = (object->yScale * -(1.0f / 2.0f)) + object->yPos;
 
-		object->BBmaxx = (object->xScale * (1.0f / 2.0f)) + object->xPos;
-		object->BBmaxy = (object->yScale * (1.0f / 2.0f)) + object->yPos;
+		AEVec2Scale(&object->boundingBox.min, &object->scale, -(BOUNDING_RECT_SIZE / 2.0f)); //multiply scale by -(BOUNDING_RECT_SIZE / 2.0f) and set into pInst->boundingBox.min
+		AEVec2Add(&object->boundingBox.min, &object->boundingBox.min, &object->posPrev);      //add pInst->posPrev to pInst->boundingBox.min
+
+		AEVec2Scale(&object->boundingBox.max, &object->scale, (BOUNDING_RECT_SIZE / 2.0f));  //multiply scale by (BOUNDING_RECT_SIZE / 2.0f) and put into pInst->boundingBox.max
+		AEVec2Add(&object->boundingBox.max, &object->boundingBox.max, &object->posPrev);
 	}
 }
 
@@ -53,33 +56,33 @@ namespace gamelogic {
 		tLast = (float)g_dt;
 		float Vb = (B->velocityX) - (A->velocityX);
 		if (Vb < 0) {
-			if (A->BBminx > B->BBmaxx) {
+			if (A->boundingBox.min.x > B->boundingBox.max.x) {
 				return false;
 			}
-			if (A->BBmaxx < B->BBminx) {
-				tFirst = tFirst > ((A->BBmaxx - B->BBminx) / Vb) ? tFirst : (A->BBmaxx - B->BBminx) / Vb;
+			if (A->boundingBox.max.x < B->boundingBox.min.x) {
+				tFirst = tFirst > ((A->boundingBox.max.x - B->boundingBox.min.x) / Vb) ? tFirst : (A->boundingBox.max.x - B->boundingBox.min.x) / Vb;
 			}
-			if (A->BBminx < B->BBmaxx) {
-				tLast = tLast < ((A->BBminx - B->BBmaxx) / Vb) ? tLast : (A->BBminx - B->BBmaxx) / Vb;
+			if (A->boundingBox.min.x < B->boundingBox.max.x) {
+				tLast = tLast < ((A->boundingBox.min.x - B->boundingBox.max.x) / Vb) ? tLast : (A->boundingBox.min.x - B->boundingBox.max.x) / Vb;
 
 			}
 		}
 		else if (Vb > 0) {
-			if (A->BBminx > B->BBmaxx) {
-				tFirst = tFirst > ((A->BBminx - B->BBmaxx) / Vb) ? tFirst : (A->BBminx - B->BBmaxx) / Vb;
+			if (A->boundingBox.min.x > B->boundingBox.max.x) {
+				tFirst = tFirst > ((A->boundingBox.min.x - B->boundingBox.max.x) / Vb) ? tFirst : (A->boundingBox.min.x - B->boundingBox.max.x) / Vb;
 			}
-			if (A->BBmaxx > B->BBminx) {
-				tLast = tLast < ((A->BBmaxx - B->BBminx) / Vb) ? tLast : (A->BBmaxx - B->BBminx) / Vb;
+			if (A->boundingBox.max.x > B->boundingBox.min.x) {
+				tLast = tLast < ((A->boundingBox.max.x - B->boundingBox.min.x) / Vb) ? tLast : (A->boundingBox.max.x - B->boundingBox.min.x) / Vb;
 			}
-			if (A->BBmaxx < B->BBminx) {
+			if (A->boundingBox.max.x < B->boundingBox.min.x) {
 				return false;
 			}
 		}
 		else {
-			if (A->BBmaxx < B->BBminx) {
+			if (A->boundingBox.max.x < B->boundingBox.min.x) {
 				return false;
 			}
-			else if (A->BBminx > B->BBmaxx) {
+			else if (A->boundingBox.min.x > B->boundingBox.max.x) {
 				return false;
 			}
 		}
@@ -91,32 +94,32 @@ namespace gamelogic {
 		Vb = (B->velocityY) - (A->velocityY);
 
 		if (Vb < 0) {
-			if (A->BBminy > B->BBmaxy) {
+			if (A->boundingBox.min.y > B->boundingBox.max.y) {
 				return false;
 			}
-			if (A->BBmaxy < B->BBminy) {
-				tFirst = tFirst > ((A->BBmaxy - B->BBminy) / Vb) ? tFirst : (A->BBmaxy - B->BBminy) / Vb;
+			if (A->boundingBox.max.y < B->boundingBox.min.y) {
+				tFirst = tFirst > ((A->boundingBox.max.y - B->boundingBox.min.y) / Vb) ? tFirst : (A->boundingBox.max.y - B->boundingBox.min.y) / Vb;
 			}
-			if (A->BBminy < B->BBmaxy) {
-				tLast = tLast < ((A->BBminy - B->BBmaxy) / Vb) ? tLast : (A->BBminy - B->BBmaxy) / Vb;
+			if (A->boundingBox.min.y < B->boundingBox.max.y) {
+				tLast = tLast < ((A->boundingBox.min.y - B->boundingBox.max.y) / Vb) ? tLast : (A->boundingBox.min.y - B->boundingBox.max.y) / Vb;
 			}
 		}
 		else if (Vb > 0) {
-			if (A->BBminy > B->BBmaxy) {
-				tFirst = tFirst > ((A->BBminy - B->BBmaxy) / Vb) ? tFirst : (A->BBminy - B->BBmaxy) / Vb;
+			if (A->boundingBox.min.y > B->boundingBox.max.y) {
+				tFirst = tFirst > ((A->boundingBox.min.y - B->boundingBox.max.y) / Vb) ? tFirst : (A->boundingBox.min.y - B->boundingBox.max.y) / Vb;
 			}
-			if (A->BBmaxy > B->BBminy) {
-				tLast = tLast < ((A->BBmaxy - B->BBminy) / Vb) ? tLast : (A->BBmaxy - B->BBminy) / Vb;
+			if (A->boundingBox.max.y > B->boundingBox.min.y) {
+				tLast = tLast < ((A->boundingBox.max.y - B->boundingBox.min.y) / Vb) ? tLast : (A->boundingBox.max.y - B->boundingBox.min.y) / Vb;
 			}
-			if (A->BBmaxy < B->BBminy) {
+			if (A->boundingBox.max.y < B->boundingBox.min.y) {
 				return false;
 			}
 		}
 		else {
-			if (A->BBmaxy < B->BBminy) {
+			if (A->boundingBox.max.y < B->boundingBox.min.y) {
 				return false;
 			}
-			else if (A->BBminy > B->BBmaxy) {
+			else if (A->boundingBox.min.y > B->boundingBox.max.y) {
 				return false;
 			}
 		}
@@ -128,6 +131,15 @@ namespace gamelogic {
 		return true;
 	}
 	//static collision
+	s8 static_collision(objectsquares* player, objectsquares* obstacle) {
+
+		return (player->xPos - (player->xScale / 2.0f) < obstacle->xPos + (obstacle->xScale / 2.0f) &&
+			player->xPos + (player->xScale / 2.0f) > obstacle->xPos - (obstacle->xScale / 2.0f) &&
+			(player->yPos - (player->yScale / 2.0f) < obstacle->yPos + (obstacle->yScale / 2.0f) &&
+				player->yPos + (player->yScale / 2.0f) > obstacle->yPos - (obstacle->yScale / 2.0f)));
+
+	}
+
 	s8 collision(objectsquares* player, objectsquares* obstacle) {
 
 		return (player->xPos - (player->xScale / 2.0f) < obstacle->xPos + (obstacle->xScale / 2.0f) &&
