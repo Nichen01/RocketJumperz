@@ -26,9 +26,9 @@ Technology is prohibited.
 #include "binaryMap.h"
 
 s32* map = new s32[144]{ 0 };
-int x = 16;
-int y = 9;
-int s = 100;
+int mapX;
+int mapY;
+int mapS;
 
 objectsquares objectinfo[2] = { 0 };
 
@@ -118,12 +118,13 @@ void Level1_Initialize()
 		return;
 	}
 
-	int mapX = BINARY_MAP_WIDTH;
-	int mapY = BINARY_MAP_HEIGHT;
+	mapX = BINARY_MAP_WIDTH;
+	mapY = BINARY_MAP_HEIGHT;
+	mapS = 100;
 
 	for (int row{}; row < mapY; ++row) {
 		for (int col{}; col < mapX; col++) {
-			map[row * x + col] = MapData[row][col];
+			map[row * mapS + col] = MapData[row][col];
 		}
 	}
 
@@ -209,9 +210,9 @@ void Level1_Update()
 		playerHealth -= damageTaken;
 		printf("Player Health: %.1f\n", playerHealth);
 	}
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape,1);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape,1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player],1);
+	gamelogic::OBJ_to_map(map, mapX, mapS, &enemies[0].shape,1);
+	gamelogic::OBJ_to_map(map, mapX, mapS, &enemies[1].shape,1);
+	gamelogic::OBJ_to_map(map, mapX, mapS, &objectinfo[player],1);
 
 }
 
@@ -227,7 +228,7 @@ void Level1_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	// Draw map walls and floor
-	renderlogic::drawmap_Wall_floor(map, x, y, s);
+	renderlogic::drawmap_Wall_floor(map, mapX, mapY, mapS);
 
 	// ==== ENEMIES RENDER =======//
 	// Render enemies
