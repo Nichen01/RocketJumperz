@@ -113,7 +113,7 @@ void Level1_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	if (!ImportMapDataFromFile("Assets/Level1_Map.txt")) {
+	if (!ImportMapDataFromFile("Level1_Map.txt")) {
 		printf("Could not import file");
 		return;
 	}
