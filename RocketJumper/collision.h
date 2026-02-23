@@ -5,6 +5,12 @@ extern f64					g_fixedDT;
 extern f64					g_dt;
 extern f64					g_appTime;
 
+struct BB
+{
+	AEVec2	min;
+	AEVec2	max;
+};
+
 extern int	COLLISION_LEFT;	//0001
 extern int	COLLISION_RIGHT;	//0010
 extern int	COLLISION_TOP;	//0100

@@ -185,6 +185,7 @@ namespace gamelogic {
 			object->flag = object->flag | COLLISION_BOTTOM;
 		}
 	}
+
 	void OBJ_to_map(int map[],int x,int s, objectsquares* object,int index) {
 		object->xPos += object->velocityX;
 

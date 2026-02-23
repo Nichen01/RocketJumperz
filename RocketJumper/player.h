@@ -1,5 +1,6 @@
 #pragma once
-#include "AEEngine.h"
+
+
 
 struct objectsquares {
 	f32 xPos;
@@ -16,6 +17,14 @@ struct objectsquares {
 
 	u8 flag;
 
+	AEVec2				scale;		
+	AEVec2				posCurr;	
+
+	AEVec2				posPrev;	
+
+	AEVec2				velCurr;	
+	BB					boundingBox;
+	
 	int leftX;
 	int rightX;
 	int topY;
@@ -38,8 +47,5 @@ enum objecttype {
 	obstacle,
 	enemy
 };
-
-
-
 
 extern objectsquares objectinfo[2];
