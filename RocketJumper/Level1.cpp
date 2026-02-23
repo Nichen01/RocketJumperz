@@ -25,7 +25,7 @@ Technology is prohibited.
 #include "enemies.h"
 #include "binaryMap.h"
 
-s32* map = new s32[144]{ 0 };
+s32* map;
 int mapX;
 int mapY;
 int mapS;
@@ -120,11 +120,12 @@ void Level1_Initialize()
 
 	mapX = BINARY_MAP_WIDTH;
 	mapY = BINARY_MAP_HEIGHT;
-	mapS = 100;
+	mapS = (int)AEGfxGetWindowWidth()/ mapX;
 
+	map = new s32[mapX* mapY]{ 0 };
 	for (int row{}; row < mapY; ++row) {
 		for (int col{}; col < mapX; col++) {
-			map[row * mapS + col] = MapData[row][col];
+			map[row * mapX + col] = MapData[row][col];
 		}
 	}
 
