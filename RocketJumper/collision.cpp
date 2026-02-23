@@ -2,7 +2,6 @@
 #include "AEEngine.h"
 #include "player.h"
 #include "collision.h"
-#include "binaryMap.h"
 f64					g_fixedDT = 0.01667;
 
 // stores the game loop time that you must use in all your physics calculations
@@ -11,9 +10,14 @@ f64					g_dt = 0.0;
 // stores to total application time until the current loop
 f64					g_appTime = 0.0;
 
+int COLLISION_LEFT = 0x00000001;	//0001
+int COLLISION_RIGHT = 0x00000002;	//0010
+int COLLISION_TOP = 0x00000004;	//0100
+int COLLISION_BOTTOM = 0x00000008;	//1000
+
 namespace {
 	
-
+	//Calculate corners of player object(will be removed)
 	void calcCorners(int map[], int mapX, objectsquares* player1) {
 
 		//determines coordinates in 2D array
@@ -30,7 +34,7 @@ namespace {
 		player1->BR = map[player1->bottomY * mapX + player1->rightX];
 		player1->BL = map[player1->bottomY * mapX + player1->leftX];
 	}
-
+	//create bounding box of object
 	void boundingbox(objectsquares* object) {
 		object->BBminx = (object->xScale * -(1.0f / 2.0f)) + object->xPos;
 		object->BBminy = (object->yScale * -(1.0f / 2.0f)) + object->yPos;
@@ -43,6 +47,7 @@ namespace {
 namespace gamelogic {
 	float tFirst = 0.0f;
 	float tLast = 0.0f;
+	//dynamic collision
 	s8 dynamic_collision(objectsquares* A, objectsquares* B) {
 		tFirst = 0.0f;
 		tLast = (float)g_dt;
@@ -122,6 +127,7 @@ namespace gamelogic {
 
 		return true;
 	}
+	//static collision
 	s8 collision(objectsquares* player, objectsquares* obstacle) {
 
 		return (player->xPos - (player->xScale / 2.0f) < obstacle->xPos + (obstacle->xScale / 2.0f) &&
@@ -130,63 +136,9 @@ namespace gamelogic {
 				player->yPos + (player->yScale / 2.0f) > obstacle->yPos - (obstacle->yScale / 2.0f)));
 		
 	}
-
-	void OBJ_to_map(int map[],int x,int s, objectsquares* object,int index) {
-		object->xPos += object->velocityX;
-
-		calcCorners(map, x, object);
-
-		int boolTR = (object->TR == index);
-		int boolTL = (object->TL == index);
-		int boolBR = (object->BR == index);
-		int boolBL = (object->BL == index);
-
-		if (object->velocityX > 0 && (boolTR || boolBR)) {
-			object->xPos = ((float)((object->rightX * s) - (object->xScale / 2.0) - 0.001f - 800.0f));
-			object->velocityX = 0;
-		}
-
-		if (object->velocityX < 0 && (boolTL || boolBL)) {
-			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
-			object->velocityX = 0;
-		}
-
-		if (object->TR == 10 || object->TL == 10 || object->BR == 10 || object->BL == 10) {
-			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
-		}
-
-		object->yPos += object->velocityY;
-
-		calcCorners(map, x, object);
-
-		boolTR = (object->TR == index);
-		boolTL = (object->TL == index);
-		boolBR = (object->BR == index);
-		boolBL = (object->BL == index);
-
-		if (object->velocityY < 0 && (boolBL || boolBR)) {
-			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
-			object->velocityY = 0;
-
-		}
-
-		if (object->velocityY > 0 && (boolTL || boolTR)) {
-			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
-			object->velocityY = 0;
-
-		}
-
-		if (object->TR == 10 || object->TL == 10 || object->BR == 10 || object->BL == 10) {
-			next = (next == GS_LEVEL1) ? GS_LEVEL2 : GS_LEVEL1;
-		}
-	}
-	
+	//hotspot check and binary map collision
 	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[])
 	{
-		//int COLLISION_LEFT = 0x00000001;	//0001
-		//int COLLISION_RIGHT = 0x00000002;	//0010
-		//int COLLISION_TOP = 0x00000004;	//0100
-		//int COLLISION_BOTTOM = 0x00000008;	//1000
 
 		float x1, y1, x2, y2;
 		object->flag = 0;
@@ -233,4 +185,47 @@ namespace gamelogic {
 			object->flag = object->flag | COLLISION_BOTTOM;
 		}
 	}
+	void OBJ_to_map(int map[],int x,int s, objectsquares* object,int index) {
+		object->xPos += object->velocityX;
+
+		calcCorners(map, x, object);
+
+		int boolTR = (object->TR == index);
+		int boolTL = (object->TL == index);
+		int boolBR = (object->BR == index);
+		int boolBL = (object->BL == index);
+
+		if (object->velocityX > 0 && (boolTR || boolBR)) {
+			object->xPos = ((float)((object->rightX * s) - (object->xScale / 2.0) - 0.001f - 800.0f));
+			object->velocityX = 0;
+		}
+
+		if (object->velocityX < 0 && (boolTL || boolBL)) {
+			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
+			object->velocityX = 0;
+		}
+
+		object->yPos += object->velocityY;
+
+		calcCorners(map, x, object);
+
+		boolTR = (object->TR == index);
+		boolTL = (object->TL == index);
+		boolBR = (object->BR == index);
+		boolBL = (object->BL == index);
+
+		if (object->velocityY < 0 && (boolBL || boolBR)) {
+			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
+			object->velocityY = 0;
+
+		}
+
+		if (object->velocityY > 0 && (boolTL || boolTR)) {
+			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
+			object->velocityY = 0;
+
+		}
+	}
+	
+	
 }

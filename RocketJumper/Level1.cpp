@@ -67,6 +67,7 @@ void Level1_Load()
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
+
 }
 
 void Level1_Initialize()
@@ -75,8 +76,10 @@ void Level1_Initialize()
 
 
 	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
+	characterPictest = AEGfxTextureLoad("Assets/CharacterRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
+
+	
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);

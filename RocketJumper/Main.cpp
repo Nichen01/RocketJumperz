@@ -28,7 +28,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Using custom window procedure
 	int gGameRunning = 1;
-	bool pause = false;
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -55,31 +54,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		while (next == current)
 		{
-			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
-				next = GS_QUIT;
-
-			if (AEInputCheckTriggered(AEVK_TAB)) {
-				if (pause) {
-					pause = false;
-				}
-				else {
-					pause = true;
-				}
-			}
-
 			AESysFrameStart();
-			if (pause == false) {
-				fpUpdate();
-			}
+			fpUpdate();
 			fpDraw();
 			AESysFrameEnd();
-
-			g_dt = AEFrameRateControllerGetFrameTime();
-
-			//hack
-			g_dt = g_fixedDT;
-
-			g_appTime += g_dt;
 		}
 
 		fpFree();

@@ -21,16 +21,6 @@ Technology is prohibited.
 #include <string.h>
 
 
-// ----------------------------------------------------------------------------
-//
-// collision flags - used for bitwise operations
-//
-// ----------------------------------------------------------------------------
-const int	COLLISION_LEFT		= 0x00000001;	//0001
-const int	COLLISION_RIGHT		= 0x00000002;	//0010
-const int	COLLISION_TOP		= 0x00000004;	//0100
-const int	COLLISION_BOTTOM	= 0x00000008;	//1000
-
 
 // ----------------------------------------------------------------------------
 //
@@ -59,8 +49,6 @@ enum TYPE_OBJECT
 
 
 int		GetCellValue(int X, int Y);
-int		CheckInstanceBinaryMapCollision(float PosX, float PosY, 
-										float scaleX, float scaleY);
 void	SnapToCell(float *Coordinate);
 int		ImportMapDataFromFile(const char *FileName);
 void	FreeMapData(void);
