@@ -17,6 +17,7 @@
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="enemies.cpp" />
+    <ClCompile Include="gameover.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="Level1.cpp" />
     <ClCompile Include="Level2.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="drawWallsLevel1.h" />
     <ClInclude Include="drawWallsLevel2.h" />
     <ClInclude Include="enemies.h" />
+    <ClInclude Include="gameover.h" />
     <ClInclude Include="GameStateList.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Level1.h" />

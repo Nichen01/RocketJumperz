@@ -49,14 +49,14 @@ namespace enemySystem {
     constexpr f32 MELEE_MOVE_SPEED = 4.0f;
     constexpr f32 MELEE_HEALTH = 50.0f;
     constexpr f32 MELEE_ATTACK_COOLDOWN = 1.0f;  // Seconds between attacks
-    constexpr f32 MELEE_DAMAGE = 10.0f;
+    constexpr f32 MELEE_DAMAGE = 30.0f;
 
     constexpr f32 RANGED_DETECTION_RANGE = 800.0f;
     constexpr f32 RANGED_ATTACK_RANGE = 800.0f;
     constexpr f32 RANGED_MOVE_SPEED = 1.5f;
     constexpr f32 RANGED_HEALTH = 30.0f;
     constexpr f32 RANGED_ATTACK_COOLDOWN = 2.0f;  // Seconds between shots
-    constexpr f32 RANGED_DAMAGE = 5.0f;
+    constexpr f32 RANGED_DAMAGE = 30.0f;
 
     // Initialize all enemies to inactive state
     void initEnemies(Enemy enemies[], s32 maxCount);

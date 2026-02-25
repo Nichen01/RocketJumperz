@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "enemies.h"
 #include "collision.h"
 #include "render.h"
+#include "player.h"
 #include <cmath>
 
 namespace enemySystem {
@@ -411,5 +412,24 @@ namespace enemySystem {
                 }
             }
         }
+    }
+
+    // CHECKS WHETHER ENEMY PROJECTILE HIT PLAYER
+    f32 checkEnemyPlayerProjectileCollision(Projectile enemyprojectiles[], s32 maxProjectiles, objectsquares& player)
+    {
+        f32 totalDamage = 0.0f;
+        for (int i{}; i < maxProjectiles; ++i)
+        {
+            if (enemyprojectiles[i].isActive = 1)
+            {
+                if (gamelogic::collision(&enemyprojectiles[i].shape, &player))
+                {
+                    totalDamage += RANGED_DAMAGE;
+                    enemyprojectiles[i].isActive = 0;
+                    printf("PLAYER HIT by enemy projectile, DAMAGE: %f", RANGED_DAMAGE);
+                }
+            }
+        }
+        return totalDamage;
     }
 }

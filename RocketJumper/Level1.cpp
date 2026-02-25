@@ -28,8 +28,8 @@ Technology is prohibited.
 #include "animation.h"
 
 s32* map = nullptr;
-int x = 32;
-int y = 18;
+int x;
+int y;
 int s = 50;
 
 static objectsquares objectinfo[2] = { 0 };
@@ -104,9 +104,6 @@ void Level1_Initialize()
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
-
-	
-
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
 
@@ -154,12 +151,11 @@ void Level1_Initialize()
 			map[row * x + col] = MapData[row][col];
 		}
 	}
-	map[(4 * 16 + 6)] = 1;
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 35.0f;
-	objectinfo[player].yScale = 35.0f;
+	objectinfo[player].xScale = 60.0f;
+	objectinfo[player].yScale = 60.0f;
 
 	objectinfo[obstacle].xPos = -400.0f;
 	objectinfo[obstacle].yPos = 0.0f;
