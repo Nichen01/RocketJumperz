@@ -149,7 +149,7 @@ namespace gamelogic {
 		
 	}
 	//hotspot check and binary map collision
-	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[])
+	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index)
 	{
 
 		float x1, y1, x2, y2;
@@ -162,7 +162,7 @@ namespace gamelogic {
 		x2 = object->xPos + object->xScale / 2;
 		y2 = object->yPos - object->yScale / 4;
 
-		if (map[(int)(y1 * 16 + x1)] == 1 || map[(int)(y2 * 16 + x2)] == 1) {
+		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_RIGHT;
 		}
 
@@ -173,7 +173,7 @@ namespace gamelogic {
 		x2 = object->xPos - object->xScale / 2;
 		y2 = object->yPos + object->yScale / 4;
 
-		if (map[(int)(y1 * 16 + x1)] == 1 || map[(int)(y2 * 16 + x2)] == 1) {
+		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_LEFT;
 		}
 		//top
@@ -183,7 +183,7 @@ namespace gamelogic {
 		x2 = object->xPos + object->xScale / 4;
 		y2 = object->yPos + object->yScale / 2;
 
-		if (map[(int)(y1 * 16 + x1)] == 1 || map[(int)(y2 * 16 + x2)] == 1) {
+		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_TOP;
 		}
 		//bottom
@@ -193,7 +193,7 @@ namespace gamelogic {
 		x2 = object->xPos + object->xScale / 4;
 		y2 = object->yPos - object->yScale / 2;
 
-		if (map[(int)(y1 * 16 + x1)] == 1 || map[(int)(y2 * 16 + x2)] == 1) {
+		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_BOTTOM;
 		}
 	}

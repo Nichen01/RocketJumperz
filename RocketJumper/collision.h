@@ -20,6 +20,8 @@ namespace gamelogic {
 	
 	s8 dynamic_collision(objectsquares* player, objectsquares* obstacle);
 	s8 collision(objectsquares* player, objectsquares* obstacle);
+	s8 static_collision(objectsquares* player, objectsquares* obstacle);
+	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index);
 	void  OBJ_to_map(int map[], int x, int s, objectsquares* object,int index);
 }
 
