@@ -2,10 +2,8 @@
 // includes
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include "collision.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
+#include "Main.h"
 #include "render.h"
 
 // ---------------------------------------------------------------------------

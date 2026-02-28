@@ -1,6 +1,11 @@
 #pragma once
+#include "AEEngine.h"
 
-
+struct BB
+{
+	AEVec2	min;
+	AEVec2	max;
+};
 
 struct objectsquares {
 	f32 xPos;
@@ -8,12 +13,6 @@ struct objectsquares {
 
 	f32 xScale;
 	f32 yScale;
-
-	f32 BBminx;
-	f32 BBminy;
-
-	f32 BBmaxx;
-	f32 BBmaxy;
 
 	u8 flag;
 
@@ -23,7 +22,7 @@ struct objectsquares {
 	AEVec2				posPrev;	
 
 	AEVec2				velCurr;	
-	BB					boundingBox;
+	BB				boundingBox;
 	
 	int leftX;
 	int rightX;

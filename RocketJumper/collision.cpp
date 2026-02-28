@@ -1,6 +1,4 @@
-#include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
-#include "player.h"
+#include "main.h"
 #include "collision.h"
 f64					g_fixedDT = 0.01667;
 
@@ -37,7 +35,7 @@ namespace {
 		player1->BL = map[player1->bottomY * mapX + player1->leftX];
 	}
 	//create bounding box of object
-	void boundingbox(objectsquares* object) {
+	void Obj_boundingbox(objectsquares* object) {
 
 		AEVec2Scale(&object->boundingBox.min, &object->scale, -(BOUNDING_RECT_SIZE / 2.0f)); //multiply scale by -(BOUNDING_RECT_SIZE / 2.0f) and set into pInst->boundingBox.min
 		AEVec2Add(&object->boundingBox.min, &object->boundingBox.min, &object->posPrev);      //add pInst->posPrev to pInst->boundingBox.min
