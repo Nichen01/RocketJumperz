@@ -241,10 +241,10 @@ void Level2_Update()
 		playerHealth -= damageTaken;
 		printf("Player Health: %.1f\n", playerHealth);
 	}
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[2].shape);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[2].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
 }
 

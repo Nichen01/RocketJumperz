@@ -262,12 +262,12 @@ void Level1_Update()
 		playerHealth -= damageTaken;
 		printf("Player Health: %.1f\n", playerHealth);
 	}
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
 	// -----------------------------------------------------------------------
-	// Door animation  —  hardcoded proximity check, same logic as tutorial
+	// Door animation  ï¿½  hardcoded proximity check, same logic as tutorial
 	// -----------------------------------------------------------------------
 	f32 dx = objectinfo[player].xPos - DOOR_WORLD_X;
 	f32 dy = objectinfo[player].yPos - DOOR_WORLD_Y;
@@ -306,7 +306,7 @@ void Level1_Draw()
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
 	// Render doors
-	// 2. Door  —  UV offset selects the current frame from the strip
+	// 2. Door  ï¿½  UV offset selects the current frame from the strip
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
 	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
