@@ -40,6 +40,9 @@ struct Enemy {
     f32 moveSpeed;           // How fast enemy moves
     s8 isActive;             // Is this enemy slot active?
     s8 hasLineOfSight;       // Can enemy see player?
+
+    s32 currentFrame;        // current frame index
+    f32 frameTimer;          // timer for frame switching
 };
 
 namespace enemySystem {

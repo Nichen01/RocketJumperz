@@ -17,4 +17,5 @@ namespace render {
 
 		AEGfxSetTransform(transform.m);
 	}
+
 }
