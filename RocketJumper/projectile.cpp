@@ -77,8 +77,8 @@ namespace projectileSystem {
             if (projectiles[i].isActive == 1)
             {
                 // Move projectile
-                projectiles[i].shape.xPos += projectiles[i].shape.velocityX;
-                projectiles[i].shape.yPos += projectiles[i].shape.velocityY;
+                projectiles[i].shape.xPos -= projectiles[i].shape.velocityX;
+                projectiles[i].shape.yPos -= projectiles[i].shape.velocityY;
 
                 // Check if projectile is off-screen
                 if (projectiles[i].shape.xPos > 800.0f || projectiles[i].shape.xPos < -800.0f ||
