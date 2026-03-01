@@ -9,6 +9,23 @@ extern AEGfxTexture* platformTex3 = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
 namespace renderlogic {
+	void loadmesh() {
+		//=============CREATE TEXTURED MESH FOR WALLS==================//
+	// This mesh is used by draw.cpp for rendering walls
+		AEGfxMeshStart();
+		AEGfxTriAdd(
+			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+		AEGfxTriAdd(
+			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+		pMesh = AEGfxMeshEnd();
+
+	}
+
 	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize) {
 		AEMtx33 scale = { 0 };
 		AEMtx33Scale(&scale, xsize, ysize);

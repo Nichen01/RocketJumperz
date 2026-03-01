@@ -74,20 +74,7 @@ void Level1_Initialize()
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
-	//=============CREATE TEXTURED MESH FOR WALLS==================//
-	// This mesh is used by draw.cpp for rendering walls
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pMesh = AEGfxMeshEnd();
-
+	renderlogic::loadmesh();
 	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
 	AEGfxMeshStart();
 	AEGfxTriAdd(
