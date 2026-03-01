@@ -49,15 +49,11 @@ static f32 playerHealth = 100.0f;
 static f32 bgVolume = 1.f;
 
 static AEAudio L1;
-static  AEAudio LaserBlast;
-static  AEAudio Punch;
-static  AEAudioGroup bgm;
-static  AEAudioGroup soundEffects;
+static AEAudio LaserBlast;
+static AEAudio Punch;
+static AEAudioGroup bgm;
+static AEAudioGroup soundEffects;
 
-// DoorOpen.jpg is 224x32 with 32x32 frames = 7 frames
-// ---------------------------------------------------------------------------
-// 
-//
 // DoorOpen.jpg: 224 x 32 pixels, single row of 7 frames (32x32 each)
 // ---------------------------------------------------------------------------
 static constexpr int  DOOR_FRAME_COUNT = 7;
@@ -75,24 +71,6 @@ static bool             doorIsOpen = false; // tracks fully-open state
 
 // ---------------------------------------------------------------------------
 
-// Local variables for projectile test level
-static Projectile Projectiles[MAX_PROJECTILES];
-static AEGfxVertexList* pTestMesh = nullptr;
-
-// ENEMY DATA
-static Enemy enemies[MAX_ENEMIES];
-static Projectile enemyProjectiles[MAX_PROJECTILES];
-static AEGfxTexture* meleeEnemyTexture = nullptr;
-static AEGfxTexture* rangedEnemyTexture = nullptr;
-static f32 playerHealth = 100.0f;
-
-
-f32 bgm_volume = 1.f;
-f32 bgm_pitch = 1.f;
-
-
-// Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
-
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level1_Load()
@@ -104,8 +82,7 @@ void Level1_Load()
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();  
-
+	soundEffects = AEAudioCreateGroup();
 }
 
 void Level1_Initialize()
@@ -113,6 +90,8 @@ void Level1_Initialize()
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
 	s8 font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	// Suppress unused variable warning
+	(void)font;
 
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
@@ -190,7 +169,7 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
-	// DOOR 
+	// DOOR
 	animSystem::buildMesh(&doorMesh, DOOR_FRAME_COUNT);
 	doorTexture = AEGfxTextureLoad("Assets/DoorOpen.png");
 	if (!doorTexture)
@@ -249,8 +228,6 @@ void Level1_Update()
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
 
-	
-
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
@@ -263,8 +240,6 @@ void Level1_Update()
 
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
-
-	
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
@@ -282,7 +257,7 @@ void Level1_Update()
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
 	// -----------------------------------------------------------------------
-	// Door animation  �  hardcoded proximity check, same logic as tutorial
+	// Door animation -- hardcoded proximity check, same logic as tutorial
 	// -----------------------------------------------------------------------
 	f32 dx = objectinfo[player].xPos - DOOR_WORLD_X;
 	f32 dy = objectinfo[player].yPos - DOOR_WORLD_Y;
@@ -317,11 +292,11 @@ void Level1_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-	// ===== RENDER WALLS ======= // 
+	// ===== RENDER WALLS ======= //
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
 	// Render doors
-	// 2. Door  �  UV offset selects the current frame from the strip
+	// Door -- UV offset selects the current frame from the strip
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
 	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
@@ -371,8 +346,8 @@ void Level1_Free()
 	}
 
 	if (doorMesh) {
-		AEGfxMeshFree(doorMesh);  
-		doorMesh = nullptr; 
+		AEGfxMeshFree(doorMesh);
+		doorMesh = nullptr;
 	}
 
 	FreeMapData();

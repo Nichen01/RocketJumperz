@@ -6,9 +6,6 @@
 #include "Main.h"
 #include "render.h"
 #include "sound.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
-#include "render.h"
 
 // ---------------------------------------------------------------------------
 // main
@@ -30,6 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Using custom window procedure
 	int gGameRunning = 1;
+	(void)gGameRunning; // suppress unused variable warning
 	bool pause = false;
 
 	// Changing the window title
@@ -39,8 +37,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
-	
-	GSM_Initialize(GS_MAINMENU);
+
+	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
 	{
@@ -49,7 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			fpLoad();
 		}
 		else {
-			current = previous;	
+			current = previous;
 			next = previous;
 		}
 
@@ -80,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			if(pause){
 				audio::audiolevel(0.2f);
 			}
-			
+
 			AESysFrameEnd();
 
 			g_dt = AEFrameRateControllerGetFrameTime();
@@ -103,4 +101,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// free the system
 	AESysExit();
+
+	return 0;
 }

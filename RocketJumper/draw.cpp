@@ -1,12 +1,13 @@
 #include "draw.h"
 #include "AEGraphics.h"
 
-extern AEGfxTexture* characterPictest = NULL;
-extern AEGfxTexture* base5test = NULL;
-extern AEGfxTexture* platformTex1 = NULL;
-extern AEGfxTexture* platformTex2 = NULL;
-extern AEGfxTexture* platformTex3 = NULL;
-extern AEGfxTexture* plasma = NULL;
+// Global texture pointers -- declared extern in draw.h, defined here
+AEGfxTexture* characterPictest = NULL;
+AEGfxTexture* base5test = NULL;
+AEGfxTexture* platformTex1 = NULL;
+AEGfxTexture* platformTex2 = NULL;
+AEGfxTexture* platformTex3 = NULL;
+AEGfxTexture* plasma = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
 namespace renderlogic {

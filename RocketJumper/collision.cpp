@@ -1,6 +1,7 @@
 #include "main.h"
 #include "collision.h"
 #include "binaryMap.h"
+
 f64					g_fixedDT = 0.01667;
 
 // stores the game loop time that you must use in all your physics calculations
@@ -11,48 +12,49 @@ f64					g_appTime = 0.0;
 
 f32         BOUNDING_RECT_SIZE = 1.0f;
 
-int COLLISION_LEFT = 0x00000001;	//0001
-int COLLISION_RIGHT = 0x00000002;	//0010
-int COLLISION_TOP = 0x00000004;	//0100
-int COLLISION_BOTTOM = 0x00000008;	//1000
-
 namespace {
-	
-	//Calculate corners of player object(will be removed)
-	void calcCorners(int map[], int mapX, objectsquares* player1) {
+	// Calculate corners of player object relative to the tilemap.
+	// mapX = number of tile columns, mapS = tile size in pixels.
+	void calcCorners(int map[], int mapX, int mapS, objectsquares* player1) {
 
-		//determines coordinates in 2D array
+		// Determines coordinates in 2D array
+		player1->leftX = (int)((player1->xPos - (player1->xScale / 2.0)) + 800) / mapS;
+		player1->rightX = (int)((player1->xPos + (player1->xScale / 2.0)) + 800) / mapS;
+		player1->topY = -((int)((player1->yPos + (player1->yScale / 2.0)) - 450) / mapS);
+		player1->bottomY = -((int)((player1->yPos - (player1->yScale / 2.0)) - 450) / mapS);
 
-		player1->leftX = (int)((player1->xPos - (player1->xScale / 2.0)) + 800) / 100;
-		player1->rightX = (int)((player1->xPos + (player1->xScale / 2.0)) + 800) / 100;
-		player1->topY = -((int)((player1->yPos + (player1->yScale / 2.0)) - 450) / 100);
-		player1->bottomY = -((int)((player1->yPos - (player1->yScale / 2.0)) - 450) / 100);
-
-
-		//determine data in corners, top bottom left right
+		// Determine data in corners: top-right, top-left, bottom-right, bottom-left
 		player1->TR = map[player1->topY * mapX + player1->rightX];
 		player1->TL = map[player1->topY * mapX + player1->leftX];
 		player1->BR = map[player1->bottomY * mapX + player1->rightX];
 		player1->BL = map[player1->bottomY * mapX + player1->leftX];
 	}
-	//create bounding box of object
-	void Obj_boundingbox(objectsquares* object) {
-
-		AEVec2Scale(&object->boundingBox.min, &object->scale, -(BOUNDING_RECT_SIZE / 2.0f)); //multiply scale by -(BOUNDING_RECT_SIZE / 2.0f) and set into pInst->boundingBox.min
-		AEVec2Add(&object->boundingBox.min, &object->boundingBox.min, &object->posPrev);      //add pInst->posPrev to pInst->boundingBox.min
-
-		AEVec2Scale(&object->boundingBox.max, &object->scale, (BOUNDING_RECT_SIZE / 2.0f));  //multiply scale by (BOUNDING_RECT_SIZE / 2.0f) and put into pInst->boundingBox.max
-		AEVec2Add(&object->boundingBox.max, &object->boundingBox.max, &object->posPrev);
-	}
 }
 
 namespace gamelogic {
+
+	// Create bounding box using AEVec2-based BB struct (Ivan's approach)
+	void Obj_boundingbox(objectsquares* object) {
+		AEVec2Scale(&object->boundingBox.min, &object->scale, -(BOUNDING_RECT_SIZE / 2.0f));
+		AEVec2Add(&object->boundingBox.min, &object->boundingBox.min, &object->posPrev);
+
+		AEVec2Scale(&object->boundingBox.max, &object->scale, (BOUNDING_RECT_SIZE / 2.0f));
+		AEVec2Add(&object->boundingBox.max, &object->boundingBox.max, &object->posPrev);
+	}
+
+	// Namespace-level variables used by dynamic_collision for swept-AABB timing
 	float tFirst = 0.0f;
 	float tLast = 0.0f;
-	//dynamic collision
+
+	// Swept-AABB dynamic collision between two moving objects.
+	// Checks if objects A and B will overlap at any point during the current
+	// frame, accounting for both objects' velocities.
+	// Returns 1 (true) if collision occurs, 0 (false) otherwise.
 	s8 dynamic_collision(objectsquares* A, objectsquares* B) {
 		tFirst = 0.0f;
 		tLast = (float)g_dt;
+
+		// --- X-axis interval check ---
 		float Vb = (B->velocityX) - (A->velocityX);
 		if (Vb < 0) {
 			if (A->boundingBox.min.x > B->boundingBox.max.x) {
@@ -63,7 +65,6 @@ namespace gamelogic {
 			}
 			if (A->boundingBox.min.x < B->boundingBox.max.x) {
 				tLast = tLast < ((A->boundingBox.min.x - B->boundingBox.max.x) / Vb) ? tLast : (A->boundingBox.min.x - B->boundingBox.max.x) / Vb;
-
 			}
 		}
 		else if (Vb > 0) {
@@ -78,6 +79,7 @@ namespace gamelogic {
 			}
 		}
 		else {
+			// No relative X velocity -- objects must already overlap on X
 			if (A->boundingBox.max.x < B->boundingBox.min.x) {
 				return false;
 			}
@@ -90,6 +92,7 @@ namespace gamelogic {
 			return false;
 		}
 
+		// --- Y-axis interval check ---
 		Vb = (B->velocityY) - (A->velocityY);
 
 		if (Vb < 0) {
@@ -115,6 +118,7 @@ namespace gamelogic {
 			}
 		}
 		else {
+			// No relative Y velocity -- objects must already overlap on Y
 			if (A->boundingBox.max.y < B->boundingBox.min.y) {
 				return false;
 			}
@@ -129,32 +133,32 @@ namespace gamelogic {
 
 		return true;
 	}
-	//static collision
+
+	// Static AABB collision (compact version)
 	s8 static_collision(objectsquares* player, objectsquares* obstacle) {
-
 		return (player->xPos - (player->xScale / 2.0f) < obstacle->xPos + (obstacle->xScale / 2.0f) &&
 			player->xPos + (player->xScale / 2.0f) > obstacle->xPos - (obstacle->xScale / 2.0f) &&
 			(player->yPos - (player->yScale / 2.0f) < obstacle->yPos + (obstacle->yScale / 2.0f) &&
 				player->yPos + (player->yScale / 2.0f) > obstacle->yPos - (obstacle->yScale / 2.0f)));
-
 	}
 
+	// Static AABB collision (original version kept for compatibility)
 	s8 collision(objectsquares* player, objectsquares* obstacle) {
-
 		return (player->xPos - (player->xScale / 2.0f) < obstacle->xPos + (obstacle->xScale / 2.0f) &&
 			player->xPos + (player->xScale / 2.0f) > obstacle->xPos - (obstacle->xScale / 2.0f) &&
 			(player->yPos - (player->yScale / 2.0f) < obstacle->yPos + (obstacle->yScale / 2.0f) &&
 				player->yPos + (player->yScale / 2.0f) > obstacle->yPos - (obstacle->yScale / 2.0f)));
-		
 	}
-	//hotspot check and binary map collision
+
+	// Hotspot check and binary map collision.
+	// mapX = number of tile columns. index = tile value to treat as solid.
+	// Collision flags (COLLISION_LEFT, etc.) are defined in binaryMap.h.
 	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index)
 	{
-
 		float x1, y1, x2, y2;
 		object->flag = 0;
 
-		//right
+		// right
 		x1 = object->xPos + object->xScale / 2;
 		y1 = object->yPos + object->yScale / 4;
 
@@ -165,7 +169,7 @@ namespace gamelogic {
 			object->flag = object->flag | COLLISION_RIGHT;
 		}
 
-		//left
+		// left
 		x1 = object->xPos - object->xScale / 2;
 		y1 = object->yPos - object->yScale / 4;
 
@@ -175,7 +179,8 @@ namespace gamelogic {
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_LEFT;
 		}
-		//top
+
+		// top
 		x1 = object->xPos - object->xScale / 4;
 		y1 = object->yPos + object->yScale / 2;
 
@@ -185,7 +190,8 @@ namespace gamelogic {
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_TOP;
 		}
-		//bottom
+
+		// bottom
 		x1 = object->xPos - object->xScale / 4;
 		y1 = object->yPos - object->yScale / 2;
 
@@ -197,10 +203,13 @@ namespace gamelogic {
 		}
 	}
 
-	void OBJ_to_map(int map[],int x,int s, objectsquares* object,int index) {
+	// Resolve object-to-tilemap collision. 'index' specifies which tile value
+	// counts as solid (e.g., pass 1 for standard walls).
+	// Uses our parameterized mapS via calcCorners (not hardcoded tile size).
+	void OBJ_to_map(int map[], int x, int s, objectsquares* object, int index) {
 		object->xPos += object->velocityX;
 
-		calcCorners(map, x, object);
+		calcCorners(map, x, s, object);
 
 		int boolTR = (object->TR == index);
 		int boolTL = (object->TL == index);
@@ -219,7 +228,7 @@ namespace gamelogic {
 
 		object->yPos += object->velocityY;
 
-		calcCorners(map, x, object);
+		calcCorners(map, x, s, object);
 
 		boolTR = (object->TR == index);
 		boolTL = (object->TL == index);
@@ -229,45 +238,11 @@ namespace gamelogic {
 		if (object->velocityY < 0 && (boolBL || boolBR)) {
 			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
 			object->velocityY = 0;
-
-		x2 = object->xPos + object->xScale / 2;
-		y2 = object->yPos - object->yScale / 4;
-
-		if (map[(int)(y1 * 32 + x1)] == 1 || map[(int)(y2 * 32 + x2)] == 1) {
-			object->flag = object->flag | COLLISION_RIGHT;
 		}
 
 		if (object->velocityY > 0 && (boolTL || boolTR)) {
 			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
 			object->velocityY = 0;
-
-		x2 = object->xPos - object->xScale / 2;
-		y2 = object->yPos + object->yScale / 4;
-
-		if (map[(int)(y1 * 32 + x1)] == 1 || map[(int)(y2 * 32 + x2)] == 1) {
-			object->flag = object->flag | COLLISION_LEFT;
-		}
-		//top
-		x1 = object->xPos - object->xScale / 4;
-		y1 = object->yPos + object->yScale / 2;
-
-		x2 = object->xPos + object->xScale / 4;
-		y2 = object->yPos + object->yScale / 2;
-
-		if (map[(int)(y1 * 32 + x1)] == 1 || map[(int)(y2 * 32 + x2)] == 1) {
-			object->flag = object->flag | COLLISION_TOP;
-		}
-		//bottom
-		x1 = object->xPos - object->xScale / 4;
-		y1 = object->yPos - object->yScale / 2;
-
-		x2 = object->xPos + object->xScale / 4;
-		y2 = object->yPos - object->yScale / 2;
-
-		if (map[(int)(y1 * 32 + x1)] == 1 || map[(int)(y2 * 32 + x2)] == 1) {
-			object->flag = object->flag | COLLISION_BOTTOM;
 		}
 	}
-	
-	
 }

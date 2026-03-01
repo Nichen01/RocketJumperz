@@ -20,9 +20,8 @@ Technology is prohibited.
 #include <cmath>
 
 namespace enemySystem {
-    // Audio
-    AEAudio LaserBlaster = AEAudioLoadSound("Assets/ore.mp3");
-    AEAudioGroup se = AEAudioCreateGroup();
+    // Note: Audio resources are loaded and managed by Level files, not here.
+    // They are passed in as parameters to updateEnemies().
 
     // Initialize all enemies to inactive state
     void initEnemies(Enemy enemies[], s32 maxCount)
@@ -420,7 +419,7 @@ namespace enemySystem {
         f32 totalDamage = 0.0f;
         for (int i{}; i < maxProjectiles; ++i)
         {
-            if (enemyprojectiles[i].isActive = 1)
+            if (enemyprojectiles[i].isActive == 1)
             {
                 if (gamelogic::collision(&enemyprojectiles[i].shape, &player))
                 {
