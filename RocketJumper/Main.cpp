@@ -5,6 +5,7 @@
 #include "collision.h"
 #include "Main.h"
 #include "render.h"
+#include "sound.h"
 
 // ---------------------------------------------------------------------------
 // main
@@ -66,10 +67,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			}
 
 			AESysFrameStart();
-			if (pause == false) {
+			if (!pause) {
+				audio::audiolevel(1.0f);
 				fpUpdate();
 			}
+
 			fpDraw();
+
+			if(pause){
+				audio::audiolevel(0.2f);
+			}
+			
 			AESysFrameEnd();
 
 			g_dt = AEFrameRateControllerGetFrameTime();

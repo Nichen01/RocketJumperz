@@ -19,4 +19,11 @@ namespace audio {
 		Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 		soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 	}
+	void audiolevel( f32 level) {
+		AEAudioSetGroupVolume(bgm, level);
+	}
+	void unloadsound() {
+		AEAudioUnloadAudio(Level);
+		AEAudioUnloadAudioGroup(bgm);
+	}
 }

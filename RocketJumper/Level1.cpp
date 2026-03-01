@@ -268,6 +268,5 @@ void Level1_Unload()
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
 	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
 
-	AEAudioUnloadAudio(Level);
-	AEAudioUnloadAudioGroup(bgm);
+	audio::unloadsound();
 }
