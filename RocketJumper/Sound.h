@@ -1,4 +1,6 @@
 #pragma once
+#ifndef SOUND_H_
+#define SOUND_H_
 #include "AEEngine.h"
 
 extern AEAudio Level;
@@ -12,3 +14,5 @@ namespace audio {
 	void unloadsound();
 	void audiolevel(f32 level);
 }
+
+#endif

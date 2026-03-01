@@ -1,4 +1,7 @@
 #pragma once
+#ifndef PROJECTILE_H_
+#define PROJECTILE_H_
+
 #include "AEEngine.h"
 #include "collision.h"  
 
@@ -34,3 +37,5 @@ namespace projectileSystem {
     void checkProjectileCollisions(Projectile projectiles[], s32 maxCount,
         objectsquares& obstacle);
 }
+
+#endif

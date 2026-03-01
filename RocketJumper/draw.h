@@ -1,4 +1,7 @@
+#ifndef DRAW_H_
+#define DRAW_H_
 #pragma once
+
 #include "AEEngine.h"
 
 namespace renderlogic {
@@ -13,3 +16,5 @@ extern AEGfxTexture* base5test;
 extern AEGfxTexture* platformTex1;
 extern AEGfxTexture* platformTex2;
 extern AEGfxTexture* platformTex3;
+
+#endif

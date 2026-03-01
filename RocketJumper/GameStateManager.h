@@ -11,7 +11,8 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/\
-
+#ifndef GSMAN_H_
+#define GSMAN_H_
 #pragma once
 
 typedef void(*FP)(void);
@@ -22,3 +23,5 @@ extern FP fpLoad, fpInitialize, fpUpdate, fpDraw, fpFree, fpUnload;
 
 void GSM_Initialize(int startingState);
 void GSM_Update();
+
+#endif

@@ -13,6 +13,8 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+#ifndef ENEMY_H_
+#define ENEMY_H_
 
 #include "AEEngine.h"
 #include "player.h"
@@ -94,3 +96,5 @@ namespace enemySystem {
     s8 hasLineOfSight(Enemy& enemy, objectsquares& player,
         int map[], int mapX, int mapY, int mapS);
 }
+
+#endif

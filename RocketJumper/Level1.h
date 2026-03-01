@@ -13,6 +13,8 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+#ifndef LEVEL1_H_
+#define LEVEL1_H_
 
 void Level1_Load();
 
@@ -25,3 +27,5 @@ void Level1_Draw();
 void Level1_Free();
 
 void Level1_Unload();
+
+#endif

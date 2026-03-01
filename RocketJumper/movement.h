@@ -1,5 +1,6 @@
 #pragma once
-
+#ifndef MOVE_H_
+#define MOVE_H_
 
 #include "AEEngine.h"
 #include "collision.h"
@@ -23,3 +24,5 @@ namespace movement {
     // Update player velocity with drag and position
     void updatePlayerPhysics(objectsquares& player);
 }
+
+#endif

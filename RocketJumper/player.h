@@ -1,4 +1,7 @@
 #pragma once
+#ifndef PLAYER_H_
+#define PLAYER_H_
+
 #include "AEEngine.h"
 
 struct BB
@@ -48,3 +51,5 @@ enum objecttype {
 };
 
 extern objectsquares objectinfo[2];
+
+#endif
