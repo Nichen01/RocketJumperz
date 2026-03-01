@@ -312,19 +312,19 @@ namespace enemySystem {
                     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
                     AEGfxTextureSet(texture, 0, 0);
                 }
-                else
-                {
-                    // Fallback to colored squares if no texture
-                    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-                    if (enemies[i].type == ENEMY_MELEE)
-                    {
-                        AEGfxSetColorToAdd(1.0f, 0.3f, 0.3f, 1.0f);  // Red for melee
-                    }
-                    else
-                    {
-                        AEGfxSetColorToAdd(0.3f, 0.3f, 1.0f, 1.0f);  // Blue for ranged
-                    }
-                }
+                //else
+                //{
+                //    // Fallback to colored squares if no texture
+                //    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+                //    if (enemies[i].type == ENEMY_MELEE)
+                //    {
+                //        AEGfxSetColorToAdd(1.0f, 0.3f, 0.3f, 1.0f);  // Red for melee
+                //    }
+                //    else
+                //    {
+                //        AEGfxSetColorToAdd(0.3f, 0.3f, 1.0f, 1.0f);  // Blue for ranged
+                //    }
+                //}
 
                 // Draw enemy
                 render::Drawsquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
