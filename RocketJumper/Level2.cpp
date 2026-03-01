@@ -110,7 +110,7 @@ void Level2_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	if (!ImportMapDataFromFile("Assets/Level2_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
 		printf("Could not import file");
 		return;
 	}
@@ -133,7 +133,7 @@ void Level2_Initialize()
 	}
 	else {
 		objectinfo[player].xPos = -600.f;
-		objectinfo[player].yPos = -300.f;
+		objectinfo[player].yPos = - 300.f;
 	}
 
 	objectinfo[player].xScale = 70.0f;

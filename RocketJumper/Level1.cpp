@@ -13,17 +13,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <iostream>
 #include "Level1.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
-#include "GameStateManager.h"
-#include "projectile.h"
-#include "Movement.h"
-#include "render.h"
-#include "enemies.h"
-#include "binaryMap.h"
 
 static s32* map = nullptr;
 static int mapX{};
@@ -146,7 +136,7 @@ void Level1_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	if (!ImportMapDataFromFile("Assets/Level1_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
 		return;
 	}

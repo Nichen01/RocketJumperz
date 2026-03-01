@@ -237,11 +237,11 @@ void UpdateMainMenu() {
 
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
-        if (playButton.isHovered) {
-            next = GS_PROJECTILE_TEST;  // Change to test file if needed
-            printf("Play button clicked - Starting game!\n");
-        }
-        else if (instructionsButton.isHovered) {
+        //if (playButton.isHovered) {
+        //    next = GS_PROJECTILE_TEST;  // Change to test file if needed
+        //    printf("Play button clicked - Starting game!\n");
+        //}
+        /*else */if (instructionsButton.isHovered) {
             currentMenuState = MENU_INSTRUCTIONS;
             printf("Instructions button clicked!\n");
         }

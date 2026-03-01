@@ -19,7 +19,7 @@ Technology is prohibited.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "pch.h"
 
 
 // ----------------------------------------------------------------------------
@@ -53,5 +53,6 @@ void	SnapToCell(float *Coordinate);
 int		ImportMapDataFromFile(const char *FileName);
 void	FreeMapData(void);
 void	PrintRetrievedInformation(void);
+int		ExportMapDataToFile(const char* FileName);
 
 #endif // BINARY_MAP_H_

@@ -178,3 +178,23 @@ void SnapToCell(float* Coordinate)
 	int index = static_cast<int>(*Coordinate);
 	*Coordinate = index + 0.5f;
 }
+
+int ExportMapDataToFile(const char* FileName)
+{
+	std::ofstream ofs(FileName, std::ios::out);
+	if (!ofs) return 0;
+
+	ofs << BINARY_MAP_WIDTH << std::endl;
+	ofs << BINARY_MAP_HEIGHT << std::endl;
+
+	for (s32 i{}; i < BINARY_MAP_HEIGHT; i++) {
+		for (s32 j{}; j < BINARY_MAP_WIDTH; j++) {
+			ofs << MapData[i][j];
+			if (j < BINARY_MAP_WIDTH - 1) ofs << " ";
+		}
+		ofs << std::endl;
+	}
+	ofs.close();
+	std::cout << "Map succesfully exported to " << FileName << std::endl;
+	return 1;
+}

@@ -46,6 +46,12 @@
     <ClCompile Include="binaryMap.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="levelEditor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Level2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -72,9 +78,6 @@
     <ClInclude Include="pch.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="drawWallsLevel2.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="player.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -87,9 +90,6 @@
     <ClInclude Include="Level1.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="drawWallsLevel1.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="draw.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -97,6 +97,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="binaryMap.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="levelEditor.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Level2.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

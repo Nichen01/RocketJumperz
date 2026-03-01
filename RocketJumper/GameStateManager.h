@@ -11,7 +11,12 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/\
-
+#include "pch.h"
+#include "mapEditor_Level1.h"
+#include "mapEditor_Level2.h"
+#include "MainMenu.h"
+#include "projectileTest.h"
+#include "levelEditor.h"
 #pragma once
 extern bool firstTimeLevel1;
 extern bool firstTimeLevel2;
