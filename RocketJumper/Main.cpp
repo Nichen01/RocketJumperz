@@ -2,8 +2,10 @@
 // includes
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include "collision.h"
+#include "Main.h"
+#include "render.h"
+#include "sound.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
 #include "render.h"
@@ -28,6 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Using custom window procedure
 	int gGameRunning = 1;
+	bool pause = false;
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -54,10 +57,38 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		while (next == current)
 		{
+			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
+				next = GS_QUIT;
+
+			if (AEInputCheckTriggered(AEVK_TAB)) {
+				if (pause) {
+					pause = false;
+				}
+				else {
+					pause = true;
+				}
+			}
+
 			AESysFrameStart();
-			fpUpdate();
+			if (!pause) {
+				audio::audiolevel(1.0f);
+				fpUpdate();
+			}
+
 			fpDraw();
+
+			if(pause){
+				audio::audiolevel(0.2f);
+			}
+			
 			AESysFrameEnd();
+
+			g_dt = AEFrameRateControllerGetFrameTime();
+
+			//hack
+			g_dt = g_fixedDT;
+
+			g_appTime += g_dt;
 		}
 
 		fpFree();

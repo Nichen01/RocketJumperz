@@ -131,7 +131,7 @@ void FreeMapData(void)
 
 // ----------------------------------------------------------------------------
 //
-//	This function prints out the content of the 2D array “MapData”
+//	This function prints out the content of the 2D array ï¿½MapDataï¿½
 //	You must print to the console, the same information you are reading from "Exported.txt" file
 //	Follow exactly the same format of the file, including the print of the width and the height
 //	Add spaces and end lines at convenient places

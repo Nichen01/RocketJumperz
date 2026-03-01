@@ -3,6 +3,9 @@
 
 extern AEGfxTexture* characterPictest = NULL;
 extern AEGfxTexture* base5test = NULL;
+extern AEGfxTexture* platformTex1 = NULL;
+extern AEGfxTexture* platformTex2 = NULL;
+extern AEGfxTexture* platformTex3 = NULL;
 extern AEGfxTexture* plasma = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
@@ -42,7 +45,6 @@ namespace renderlogic {
 					renderlogic::Drawsquare(((float)xo + mapS / 2)-800.0f, 450.0f-((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 					break;
-
 				default://defaults to playable area
 					break;
 				}

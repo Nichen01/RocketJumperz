@@ -75,8 +75,23 @@ static bool             doorIsOpen = false; // tracks fully-open state
 
 // ---------------------------------------------------------------------------
 
+// Local variables for projectile test level
+static Projectile Projectiles[MAX_PROJECTILES];
+static AEGfxVertexList* pTestMesh = nullptr;
+
+// ENEMY DATA
+static Enemy enemies[MAX_ENEMIES];
+static Projectile enemyProjectiles[MAX_PROJECTILES];
+static AEGfxTexture* meleeEnemyTexture = nullptr;
+static AEGfxTexture* rangedEnemyTexture = nullptr;
+static f32 playerHealth = 100.0f;
 
 
+f32 bgm_volume = 1.f;
+f32 bgm_pitch = 1.f;
+
+
+// Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
