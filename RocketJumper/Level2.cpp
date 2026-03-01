@@ -14,6 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include <iostream>
+#include <cstdio>
 #include "Level2.h"
 #include "draw.h"
 #include "collision.h"
@@ -41,7 +42,9 @@ static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
-static f32 playerHealth = 100.0f;
+
+// Font for HUD text (must be destroyed in Unload to avoid leak)
+static s8 font = -1;
 
 //==== sound and volume
 
@@ -78,6 +81,9 @@ void Level2_Load()
 void Level2_Initialize()
 {
 	AEAudioPlay(L2, bgm, 0.5f, 1.f, -1);
+
+	// Create font for HUD text (stored so we can destroy it in Unload)
+	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Load textures, defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
@@ -146,6 +152,9 @@ void Level2_Initialize()
 	objectinfo[player].yPos = 0.0f;
 	objectinfo[player].xScale = 70.0f;
 	objectinfo[player].yScale = 70.0f;
+
+	// Initialize player health to 100 HP with no invincibility active
+	InitPlayerHealth(objectinfo[player]);
 
 	objectinfo[obstacle].xPos = -400.0f;
 	objectinfo[obstacle].yPos = 0.0f;
@@ -233,18 +242,20 @@ void Level2_Update()
 
 
 
+	// Tick down the player's invincibility timer each frame
+	UpdatePlayerInvincibility(objectinfo[player], dt);
+
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
 		Projectiles, MAX_PROJECTILES);
 
-	// Check enemies damaging player
-	f32 damageTaken = enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
+	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
+	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
 		objectinfo[player], Punch, soundEffects);
 
-	if (damageTaken > 0.0f) {
-		playerHealth -= damageTaken;
-		printf("Player Health: %.1f\n", playerHealth);
-	}
+	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
+	enemySystem::checkEnemyPlayerProjectileCollision(
+		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[2].shape, 1);
@@ -289,6 +300,20 @@ void Level2_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
+
+	// ====== HUD: Player Health Display ======
+	if (font >= 0)
+	{
+		char healthText[32];
+		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo[player].health);
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+		AEGfxPrint(font, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+	}
 }
 
 void Level2_Free()
@@ -319,6 +344,9 @@ void Level2_Unload()
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
+
+	// Destroy the font created in Initialize
+	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
 	AEAudioUnloadAudio(L2);

@@ -1,7 +1,6 @@
-#pragma once
 /* Start Header ************************************************************************/
 /*!
-\file		  enemy.h
+\file		  enemies.cpp
 \author	      Nicholas Chen (c.chen)
 \date         January, 31, 2026
 \brief        Enemy system with melee and ranged enemy types
@@ -356,14 +355,18 @@ namespace enemySystem {
                 // Check collision using existing collision system
                 if (gamelogic::collision(&player, &enemies[i].shape))
                 {
-                    // Only deal damage if cooldown is ready
+                    // Only deal damage if enemy attack cooldown is ready
                     if (enemies[i].attackCooldown <= 0.0f)
                     {
-                        // Play the sound passed in from Level 1
-                        AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
-                        totalDamage += MELEE_DAMAGE; 
-                        enemies[i].attackCooldown = MELEE_ATTACK_COOLDOWN; // Reset cooldown
-                        printf("Player hit by melee enemy %d! Damage: %.1f\n", i, MELEE_DAMAGE);
+                        // Try to apply damage through the central health system.
+                        // PlayerTakeDamage checks the player's invincibility timer.
+                        int meleeDmg = static_cast<int>(MELEE_DAMAGE);
+                        if (PlayerTakeDamage(player, meleeDmg))
+                        {
+                            AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
+                            totalDamage += MELEE_DAMAGE;
+                            enemies[i].attackCooldown = MELEE_ATTACK_COOLDOWN;
+                        }
                     }
                 }
             }
@@ -413,7 +416,8 @@ namespace enemySystem {
         }
     }
 
-    // CHECKS WHETHER ENEMY PROJECTILE HIT PLAYER
+    // Checks whether any enemy projectile has hit the player.
+    // Uses PlayerTakeDamage so invincibility timer is respected.
     f32 checkEnemyPlayerProjectileCollision(Projectile enemyprojectiles[], s32 maxProjectiles, objectsquares& player)
     {
         f32 totalDamage = 0.0f;
@@ -423,9 +427,13 @@ namespace enemySystem {
             {
                 if (gamelogic::collision(&enemyprojectiles[i].shape, &player))
                 {
-                    totalDamage += RANGED_DAMAGE;
+                    int rangedDmg = static_cast<int>(RANGED_DAMAGE);
+                    if (PlayerTakeDamage(player, rangedDmg))
+                    {
+                        totalDamage += RANGED_DAMAGE;
+                    }
+                    // Destroy the projectile on contact regardless of invincibility
                     enemyprojectiles[i].isActive = 0;
-                    printf("PLAYER HIT by enemy projectile, DAMAGE: %f", RANGED_DAMAGE);
                 }
             }
         }

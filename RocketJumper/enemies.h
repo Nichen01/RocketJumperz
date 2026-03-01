@@ -49,7 +49,7 @@ namespace enemySystem {
     constexpr f32 MELEE_MOVE_SPEED = 4.0f;
     constexpr f32 MELEE_HEALTH = 50.0f;
     constexpr f32 MELEE_ATTACK_COOLDOWN = 1.0f;  // Seconds between attacks
-    constexpr f32 MELEE_DAMAGE = 30.0f;
+    constexpr f32 MELEE_DAMAGE = 15.0f;
 
     constexpr f32 RANGED_DETECTION_RANGE = 800.0f;
     constexpr f32 RANGED_ATTACK_RANGE = 800.0f;
@@ -86,6 +86,10 @@ namespace enemySystem {
     // Check if player projectiles hit any enemies
     void checkProjectileEnemyCollision(Enemy enemies[], s32 maxCount,
         Projectile projectiles[], s32 maxProjectiles);
+
+    // Check if enemy projectiles hit the player. Returns total damage dealt.
+    f32 checkEnemyPlayerProjectileCollision(Projectile enemyProjectiles[],
+        s32 maxProjectiles, objectsquares& player);
 
     // Helper: Calculate distance between two points
     f32 getDistance(f32 x1, f32 y1, f32 x2, f32 y2);

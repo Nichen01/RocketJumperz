@@ -14,6 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include <cmath>
+#include <cstdio>
 #include "Level1.h"
 #include "draw.h"
 #include "collision.h"
@@ -43,7 +44,6 @@ static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
-static f32 playerHealth = 100.0f;
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
@@ -153,6 +153,9 @@ void Level1_Initialize()
 	objectinfo[player].xScale = 60.0f;
 	objectinfo[player].yScale = 60.0f;
 
+	// Initialize player health to 100 HP with no invincibility active
+	InitPlayerHealth(objectinfo[player]);
+
 	objectinfo[obstacle].xPos = -400.0f;
 	objectinfo[obstacle].yPos = 0.0f;
 	objectinfo[obstacle].xScale = 100.0f;
@@ -243,17 +246,20 @@ void Level1_Update()
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
+	// Tick down the player's invincibility timer each frame
+	UpdatePlayerInvincibility(objectinfo[player], dt);
+
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
 		Projectiles, MAX_PROJECTILES);
 
-	// Check enemies damaging player
-	f32 damageTaken = enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
+	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
+	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
 		objectinfo[player], Punch, soundEffects);
-	if (damageTaken > 0.0f) {
-		playerHealth -= damageTaken;
-		printf("Player Health: %.1f\n", playerHealth);
-	}
+
+	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
+	enemySystem::checkEnemyPlayerProjectileCollision(
+		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
@@ -328,6 +334,24 @@ void Level1_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
+
+	// ====== HUD: Player Health Display ======
+	// Drawn last so it appears on top of all world geometry.
+	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
+	if (font >= 0)
+	{
+		char healthText[32];
+		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo[player].health);
+
+		// Prepare render state for font (font uses a glyph texture atlas)
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+		// Print at top-left corner of the screen (white text)
+		AEGfxPrint(font, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+	}
 }
 
 void Level1_Free()
