@@ -54,6 +54,9 @@ static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
+// Font resource (must be destroyed in Unload to avoid leak)
+static s8 font = -1;
+
 // DoorOpen.jpg: 224 x 32 pixels, single row of 7 frames (32x32 each)
 // ---------------------------------------------------------------------------
 static constexpr int  DOOR_FRAME_COUNT = 7;
@@ -89,9 +92,8 @@ void Level1_Initialize()
 {
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
-	s8 font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	// Suppress unused variable warning
-	(void)font;
+	// Create font for gameover text (stored so we can destroy it in Unload)
+	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
@@ -330,6 +332,7 @@ void Level1_Draw()
 
 void Level1_Free()
 {
+	// FREE MESHES AND MAP
 	if (pMesh) {
 		AEGfxMeshFree(pMesh);
 		pMesh = nullptr;
@@ -355,13 +358,21 @@ void Level1_Free()
 
 void Level1_Unload()
 {
-	if (characterPictest) AEGfxTextureUnload(characterPictest);
-	if (base5test) AEGfxTextureUnload(base5test);
-	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
-	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
+	// Unload ALL textures that were loaded in Initialize
+	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
+	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
+	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
+	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
+	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTexture) { AEGfxTextureUnload(doorTexture); doorTexture = nullptr; }
 
+	// Destroy the font created in Initialize
+	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
+
+	// Unload ALL audio resources that were loaded in Load
 	AEAudioUnloadAudio(L1);
 	AEAudioUnloadAudio(LaserBlast);
+	AEAudioUnloadAudio(Punch);
 	AEAudioUnloadAudioGroup(bgm);
+	AEAudioUnloadAudioGroup(soundEffects);
 }

@@ -25,7 +25,7 @@ Technology is prohibited.
 #include "render.h"
 #include "enemies.h"
 
-static s32* map = new s32[144]{ 0 };
+static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
 static int s = 100;
@@ -115,6 +115,10 @@ void Level2_Initialize()
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
+
+	// Allocate map array here (not at file scope) so it only exists
+	// while Level2 is active. Level2_Free() handles deallocation.
+	map = new s32[x * y]{ 0 };
 
 	// Create map with walls on borders and one obstacle in middle
 	// 1 for obstacle, 0 for playable area
@@ -301,17 +305,25 @@ void Level2_Free()
 
 
 
-	delete[] map;
+	if (map) {
+		delete[] map;
+		map = nullptr;
+	}
 }
 
 void Level2_Unload()
 {
-	if (characterPictest) AEGfxTextureUnload(characterPictest);
-	if (base5test) AEGfxTextureUnload(base5test);
-	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
-	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
+	// Unload ALL textures that were loaded in Initialize
+	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
+	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
+	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
+	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
+	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 
+	// Unload ALL audio resources that were loaded in Load
 	AEAudioUnloadAudio(L2);
 	AEAudioUnloadAudio(LaserBlast);
+	AEAudioUnloadAudio(Punch);
 	AEAudioUnloadAudioGroup(bgm);
+	AEAudioUnloadAudioGroup(soundEffects);
 }
