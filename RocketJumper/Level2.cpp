@@ -75,7 +75,8 @@ void Level2_Load()
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();   
 	
-
+	// Load platform assets
+	render::drawPlatform();
 }
 
 void Level2_Initialize()
@@ -342,6 +343,12 @@ void Level2_Unload()
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
+	if (platform0) { AEGfxTextureUnload(platform0); platform0 = nullptr; }
+	if (platform1) { AEGfxTextureUnload(platform1); platform1 = nullptr; }
+	if (platform2) { AEGfxTextureUnload(platform2); platform2 = nullptr; }
+	if (platform3) { AEGfxTextureUnload(platform3); platform3 = nullptr; }
+	if (platform4) { AEGfxTextureUnload(platform4); platform4 = nullptr; }
+	if (platform5) { AEGfxTextureUnload(platform5); platform5 = nullptr; }
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 

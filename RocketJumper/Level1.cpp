@@ -122,6 +122,14 @@ void Level1_Load()
 	mushroomIdleTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle6.png");
 	mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
 	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");
+
+	// Load platform assets
+	render::drawPlatform();
+
+	// Load textures - these are defined in draw.cpp
+	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
+	base5test = AEGfxTextureLoad("Assets/Base5.png");
+	plasma = AEGfxTextureLoad("Assets/plasma.png");
 }
 
 void Level1_Initialize()
@@ -131,10 +139,7 @@ void Level1_Initialize()
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
-	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	base5test = AEGfxTextureLoad("Assets/Base5.png");
-	plasma = AEGfxTextureLoad("Assets/plasma.png");
+
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -155,6 +160,18 @@ void Level1_Initialize()
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pMesh = AEGfxMeshEnd();
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	AEGfxTriAdd(
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+	platformMesh = AEGfxMeshEnd();
 
 	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
 	AEGfxMeshStart();
@@ -402,6 +419,11 @@ void Level1_Free()
 	}
 
 	if (pTestMesh) {
+		AEGfxMeshFree(pTestMesh);
+		pTestMesh = nullptr;
+	}
+
+	if (platformMesh) {
 		AEGfxMeshFree(pTestMesh);
 		pTestMesh = nullptr;
 	}
