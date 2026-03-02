@@ -43,13 +43,9 @@
     <ClCompile Include="enemies.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="binaryMap.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="levelEditor.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Level2.cpp">
+    <ClCompile Include="binaryMap.cpp" />
+    <ClCompile Include="Level2.cpp" />
+    <ClCompile Include="animation.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,6 +74,9 @@
     <ClInclude Include="pch.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="drawWallsLevel2.h">
+      <Filter>Header</Filter>
+    </ClInclude>
     <ClInclude Include="player.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -90,19 +89,18 @@
     <ClInclude Include="Level1.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="drawWallsLevel1.h">
+      <Filter>Header</Filter>
+    </ClInclude>
     <ClInclude Include="draw.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="enemies.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="binaryMap.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="levelEditor.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Level2.h">
+    <ClInclude Include="binaryMap.h" />
+    <ClInclude Include="level2.h" />
+    <ClInclude Include="animation.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -123,27 +123,31 @@ namespace MenuHelpers {
             printf("FONT IS NOT LOADED."); return;
         }
 
-        // Get text dimensions
+        // Get text dimensions in normalized units (0 to 2 range per AE docs)
         f32 textWidth, textHeight;
         AEGfxGetPrintSize(fontID, text, scale, &textWidth, &textHeight);
 
-        // Convert world coordinates to screen coordinates
-        f32 screenX = x + (screenWidth / 2.0f);
-        f32 screenY = (screenLength / 2.0f) - y;
+        // Convert world coordinates to normalized coordinates for AEGfxPrint.
+        // AEGfxPrint uses [-1, 1] range where (-1,-1) = bottom-left, (1,1) = top-right.
+        // Our world coords have (0,0) = center, so dividing by half-screen gives normalized.
+        f32 halfW = screenWidth / 2.0f;
+        f32 halfH = screenLength / 2.0f;
+        f32 normalizedX = x / halfW;
+        f32 normalizedY = y / halfH;
 
-        // --- CRITICAL FIXES ---
+        // Center the text by offsetting half the text dimensions
+        f32 printX = normalizedX - textWidth / 2.0f;
+        f32 printY = normalizedY - textHeight / 2.0f;
 
-        // 1. [NEW] Switch back to TEXTURE mode so the font image can be read
+        // Switch to TEXTURE mode so the font glyph atlas can be sampled
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
-        // 2. Reset color modifiers (as discussed previously)
+        // Reset color modifiers so the font renders with its own colors
         AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
         AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 
-        // -----------------------
-
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-        AEGfxPrint(fontID, text, screenX - textWidth / 2.0f, screenY - textHeight / 2.0f,
+        AEGfxPrint(fontID, text, printX, printY,
             scale, 1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
@@ -198,10 +202,19 @@ void MainMenu_Load() {
 
 void MainMenu_Init() {
     // Initialize Main Menu buttons
-    playButton = { 0.0f, 150.0f, 300.0f, 80.0f, 1.0f, 1.0f, "PLAY", false };
-    instructionsButton = { 0.0f, 30.0f, 300.0f, 80.0f, 1.0f, 1.0f, "INSTRUCTIONS", false };
-    creditsButton = { 0.0f, -90.0f, 300.0f, 80.0f, 1.0f, 1.0f, "CREDITS", false };
-    quitButton = { 0.0f, -210.0f, 300.0f, 80.0f, 1.0f, 1.0f, "QUIT", false };
+    /*params: f32 x;
+    f32 y;
+    f32 width;
+    f32 height;
+    f32 scale;           // For hover animation
+    f32 targetScale;     // Target scale for smooth transitions
+    const char* text;
+    bool isHovered;
+    */ 
+    playButton = { 0.0f, 50.0f, 375.0f, 80.0f, 1.0f, 1.0f, "PLAY", false };
+    instructionsButton = { 0.0f, -70.0f, 375.0f, 80.0f, 1.0f, 1.0f, "INSTRUCTIONS", false };
+    creditsButton = { 0.0f, -190.0f, 375.0f, 80.0f, 1.0f, 1.0f, "CREDITS", false };
+    quitButton = { 0.0f, -310.0f, 375.0f, 80.0f, 1.0f, 1.0f, "QUIT", false };
 
     // Initialize back button (used in sub-menus)
     backButton = { 0.0f, -350.0f, 250.0f, 70.0f, 1.0f, 1.0f, "BACK", false };
@@ -237,11 +250,11 @@ void UpdateMainMenu() {
 
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
-        //if (playButton.isHovered) {
-        //    next = GS_PROJECTILE_TEST;  // Change to test file if needed
-        //    printf("Play button clicked - Starting game!\n");
-        //}
-        /*else */if (instructionsButton.isHovered) {
+        if (playButton.isHovered) {
+            next = GS_LEVEL1;  // Change to test file if needed
+            printf("Play button clicked - Starting game!\n");
+        }
+        else if (instructionsButton.isHovered) {
             currentMenuState = MENU_INSTRUCTIONS;
             printf("Instructions button clicked!\n");
         }

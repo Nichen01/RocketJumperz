@@ -2,11 +2,10 @@
 // includes
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include "collision.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
+#include "Main.h"
 #include "render.h"
+#include "sound.h"
 
 // ---------------------------------------------------------------------------
 // main
@@ -28,6 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Using custom window procedure
 	int gGameRunning = 1;
+	(void)gGameRunning; // suppress unused variable warning
+	bool pause = false;
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -36,8 +37,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
-	
-	GSM_Initialize(GS_LEVELEDITOR);
+
+	GSM_Initialize(GS_MAINMENU);
 
 	while (current != GS_QUIT)
 	{
@@ -46,7 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			fpLoad();
 		}
 		else {
-			current = previous;	
+			current = previous;
 			next = previous;
 		}
 
@@ -54,10 +55,38 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		while (next == current)
 		{
+			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
+				next = GS_QUIT;
+
+			if (AEInputCheckTriggered(AEVK_TAB)) {
+				if (pause) {
+					pause = false;
+				}
+				else {
+					pause = true;
+				}
+			}
+
 			AESysFrameStart();
-			fpUpdate();
+			if (!pause) {
+				audio::audiolevel(1.0f);
+				fpUpdate();
+			}
+
 			fpDraw();
+
+			if(pause){
+				audio::audiolevel(0.2f);
+			}
+
 			AESysFrameEnd();
+
+			g_dt = AEFrameRateControllerGetFrameTime();
+
+			//hack
+			g_dt = g_fixedDT;
+
+			g_appTime += g_dt;
 		}
 
 		fpFree();
@@ -72,4 +101,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// free the system
 	AESysExit();
+
+	return 0;
 }
