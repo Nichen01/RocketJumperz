@@ -16,6 +16,15 @@ Technology is prohibited.
 
 namespace animSystem
 {
+    /*!*************************************************************************
+     * animSystem::init
+     * @brief Initializes sprite animation details for entity
+     *
+     * @param SpriteAnimation&    Access struct containing anim data
+     * @param int totalFrames     Total number of animation frames needed
+     * @param f32 frameDelay      Amount of time spent showing ONE frame
+     * @return                    void
+     ***************************************************************************/
     void init(SpriteAnimation& anim,
         int          totalFrames,
         f32          frameDelay,
@@ -32,14 +41,26 @@ namespace animSystem
         anim.justFinished = 0;
     }
 
+    /*!*************************************************************************
+     * animSystem::update
+     * @brief Function to update and play the animation
+     *
+     * @param SpriteAnimation&    Access struct containing anim data
+     * @param f32 deltaTime       Time elapsed between the previous frame and current frame
+     * @return                    void
+     ***************************************************************************/
     void update(SpriteAnimation& anim, f32 deltaTime)
     {
-        anim.justFinished = 0;  // clear the one-frame pulse from last update
+        // To check if animation finished in the previous frame, yes = 1, no = 0
+        anim.justFinished = 0;  
+        // if animation is paused or idle, no need to calculate timers.
+        if (!anim.isPlaying || anim.playMode == ANIM_IDLE) return; 
 
-        if (!anim.isPlaying || anim.playMode == ANIM_IDLE) return;
-
+        //Increment the time elapsed
         anim.frameTimer += deltaTime;
+        //while the frame isn't as much as the frameDelay, do nothing
         if (anim.frameTimer < anim.frameDelay) return;
+        //
         anim.frameTimer -= anim.frameDelay;
 
         switch (anim.playMode)
