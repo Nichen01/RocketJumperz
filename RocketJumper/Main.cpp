@@ -27,8 +27,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Using custom window procedure
 	int gGameRunning = 1;
-	(void)gGameRunning; // suppress unused variable warning
 	bool pause = false;
+	s8 pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	f32 width, height;
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -37,7 +38,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
-
+	
 	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
@@ -47,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			fpLoad();
 		}
 		else {
-			current = previous;
+			current = previous;	
 			next = previous;
 		}
 
@@ -76,9 +77,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			fpDraw();
 
 			if(pause){
+				AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
+				AEGfxPrint(pausefont, "PAUSE", -width / 2, height, 1, 1, 1, 1, 1);
 				audio::audiolevel(0.2f);
 			}
-
+			
 			AESysFrameEnd();
 
 			g_dt = AEFrameRateControllerGetFrameTime();
@@ -100,7 +103,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// free the system
+	AEGfxDestroyFont(pausefont);
 	AESysExit();
-
-	return 0;
 }
