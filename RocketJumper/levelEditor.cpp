@@ -53,7 +53,7 @@ void levelEditor_Draw() {
 	float worldMouseY = AEGfxGetWindowHeight() / 2.f - static_cast<f32>(mouseY);
 
 	// display level in a grid system
-    const float tileSize = 90.f;
+    const float tileSize = 70.f;
 	const float gap = 3.f;
     for (s32 row = 0; row < BINARY_MAP_HEIGHT; ++row) {
         for (s32 col = 0; col < BINARY_MAP_WIDTH; ++col) {
