@@ -29,7 +29,7 @@ Technology is prohibited.
 static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
-static int s = 100;
+static int s = 80;
 
 static objectsquares objectinfo[2] = { 0 };
 

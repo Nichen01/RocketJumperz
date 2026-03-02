@@ -31,7 +31,7 @@ Technology is prohibited.
 s32* map = nullptr;
 int x;
 int y;
-int s = 50;
+int s = 80;
 
 static objectsquares objectinfo[2] = { 0 };
 
