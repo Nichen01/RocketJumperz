@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "binaryMap.h"
 #include <iostream>
 #include <fstream>
+#include <AEEngine.h>
 
 //The number of horizontal elements
 int BINARY_MAP_WIDTH;
@@ -213,7 +214,7 @@ void SnapToCell(float* Coordinate)
 //	y2 = PosY - scaleY/4	To go down 1/4 of the height
 //
 // ----------------------------------------------------------------------------
-int CheckInstanceBinaryMapCollision(float PosX, float PosY,	float scaleX, float scaleY)
+int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY)
 {
 	int Flag = 0;
 	float r_x1, r_y1, r_x2, r_y2;
@@ -260,6 +261,8 @@ int CheckInstanceBinaryMapCollision(float PosX, float PosY,	float scaleX, float 
 		Flag += COLLISION_BOTTOM;
 	}
 	return Flag;
+}
+
 int ExportMapDataToFile(const char* FileName)
 {
 	std::ofstream ofs(FileName, std::ios::out);
@@ -278,4 +281,5 @@ int ExportMapDataToFile(const char* FileName)
 	ofs.close();
 	std::cout << "Map succesfully exported to " << FileName << std::endl;
 	return 1;
+
 }

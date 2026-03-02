@@ -45,6 +45,11 @@ static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
 
+
+static AEGfxTexture* mushroomDieTexture[9] = { nullptr };
+static AEGfxTexture* mushroomHitTexture[5] = { nullptr };
+static AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
+
 //==== sound and volume
 static f32 bgVolume = 1.f;
 

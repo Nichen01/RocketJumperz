@@ -6,10 +6,7 @@ extern f64					g_fixedDT;
 extern f64					g_dt;
 extern f64					g_appTime;
 
-extern int	COLLISION_LEFT;	//0001
-extern int	COLLISION_RIGHT;	//0010
-extern int	COLLISION_TOP;	//0100
-extern int	COLLISION_BOTTOM;	//1000
+
 
 // Time variables used by physics calculations (defined in collision.cpp)
 extern f64 g_fixedDT;
