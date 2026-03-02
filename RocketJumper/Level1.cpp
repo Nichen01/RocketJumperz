@@ -13,17 +13,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <iostream>
 #include "Level1.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
-#include "GameStateManager.h"
-#include "projectile.h"
-#include "Movement.h"
-#include "render.h"
-#include "enemies.h"
-#include "binaryMap.h"
 
 static s32* map = nullptr;
 static int mapX{};
@@ -53,6 +43,10 @@ static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
+static AEGfxTexture* mushroomDieTexture[9];
+static AEGfxTexture* mushroomHitTexture[5];
+static AEGfxTexture* mushroomIdleTexture[9];
+
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level1_Load()
@@ -68,6 +62,35 @@ void Level1_Load()
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
+
+	// Loading of assets for mushroomDie
+	mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
+	mushroomDieTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie1.png");
+	mushroomDieTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie2.png");
+	mushroomDieTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie3.png");
+	mushroomDieTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie4.png");
+	mushroomDieTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie5.png");
+	mushroomDieTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie6.png");
+	mushroomDieTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie7.png");
+	mushroomDieTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie8.png");
+
+	// Loading of assets for mushroomHit
+	mushroomHitTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit0.png");
+	mushroomHitTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit1.png");
+	mushroomHitTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit2.png");
+	mushroomHitTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit3.png");
+	mushroomHitTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit4.png");
+
+	// Loading of assets for mushroomIdle
+	mushroomIdleTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle0.png");
+	mushroomIdleTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle1.png");
+	mushroomIdleTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle2.png");
+	mushroomIdleTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle3.png");
+	mushroomIdleTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle4.png");
+	mushroomIdleTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle5.png");
+	mushroomIdleTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle6.png");
+	mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
+	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");
 }
 
 void Level1_Initialize()
@@ -113,7 +136,7 @@ void Level1_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	if (!ImportMapDataFromFile("Assets/Level1_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
 		return;
 	}
@@ -128,16 +151,6 @@ void Level1_Initialize()
 			map[row * mapX + col] = MapData[row][col];
 		}
 	}
-
-	//objectinfo[player].xPos = 0.0f;
-	//objectinfo[player].yPos = 0.0f;
-	//objectinfo[player].xScale = 70.0f;
-	//objectinfo[player].yScale = 70.0f;
-
-	//objectinfo[obstacle].xPos = -400.0f;
-	//objectinfo[obstacle].yPos = 0.0f;
-	//objectinfo[obstacle].xScale = 100.0f;
-	//objectinfo[obstacle].yScale = 400.0f;
 
 	if (firstTimeLevel1) {
 		objectinfo[player].xPos = 0.0f;
@@ -228,6 +241,14 @@ void Level1_Update()
 	gamelogic::OBJ_to_map(map, mapX, s, &enemies[1].shape,1);
 	gamelogic::OBJ_to_map(map, mapX, s, &objectinfo[player],1);
 
+	static float frameTimer{ 0.0f };
+	frameTimer += dt;
+	if (frameTimer >= 0.1f) {
+		static int currentFrame{};
+		currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
+		meleeEnemyTexture = mushroomIdleTexture[currentFrame];
+		frameTimer = 0.0f;
+	}
 }
 
 void Level1_Draw()
