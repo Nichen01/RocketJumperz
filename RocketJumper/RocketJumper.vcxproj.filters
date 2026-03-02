@@ -28,9 +28,37 @@
     <ClCompile Include="enemies.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="binaryMap.cpp" />
-    <ClCompile Include="Level2.cpp" />
     <ClCompile Include="animation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="aimingInterface.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="binaryMap.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="gameover.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Level2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="levelEditor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="projectileTest.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,9 +90,37 @@
     <ClInclude Include="enemies.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="binaryMap.h" />
-    <ClInclude Include="level2.h" />
     <ClInclude Include="animation.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="aimingInterface.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="binaryMap.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="gameover.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="level2.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="projectileTest.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

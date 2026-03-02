@@ -23,6 +23,7 @@
     <ClCompile Include="Level2.cpp" />
     <ClCompile Include="levelEditor.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="movement.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="projectile.cpp" />
@@ -43,6 +44,7 @@
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Level1.h" />
     <ClInclude Include="level2.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="movement.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="projectile.h" />
