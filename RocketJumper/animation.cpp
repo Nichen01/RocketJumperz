@@ -3,7 +3,7 @@
 \file         animation.cpp
 \author       Nicholas Chen
 \date         February, 22, 2026
-\brief        Implementation of the general-purpose sprite animation system.
+\brief        Implementation of the modular sprite animation system.
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -91,7 +91,7 @@ namespace animSystem
             anim.currentFrame = (anim.currentFrame + 1) % anim.totalFrames;
             break;
 
-        case ANIM_PING_PONG:
+        case ANIM_OSC:
             anim.currentFrame += anim.pingPongDir;
             if (anim.currentFrame >= anim.totalFrames - 1)
             {
