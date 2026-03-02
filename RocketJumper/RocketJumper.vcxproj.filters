@@ -4,25 +4,10 @@
     <ClCompile Include="collision.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenu.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="projectile.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="movement.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="projectileTest.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="render.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="aimingInterface.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="player.cpp">
@@ -43,13 +28,37 @@
     <ClCompile Include="enemies.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="animation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="aimingInterface.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="binaryMap.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="gameover.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Level2.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="levelEditor.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Level2.cpp">
+    <ClCompile Include="pch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="projectileTest.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,25 +66,10 @@
     <ClInclude Include="collision.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="MainMenu.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="movement.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="projectile.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="projectileTest.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="render.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="aimingInterface.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
@@ -96,13 +90,37 @@
     <ClInclude Include="enemies.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="animation.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="aimingInterface.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Header</Filter>
+    </ClInclude>
     <ClInclude Include="binaryMap.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="levelEditor.h">
+    <ClInclude Include="gameover.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Level2.h">
+    <ClInclude Include="level2.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="projectileTest.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

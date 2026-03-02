@@ -27,7 +27,7 @@ namespace projectileSystem {
     void UpdateProjectiles(Projectile projectiles[], s32 maxCount);
 
     // Render all active projectiles to screen
-    void renderProjectiles(Projectile projectiles[], s32 maxCount,
+    void renderProjectiles(Projectile projectiles[], s32 maxCount, AEGfxTexture* texture,
         AEGfxVertexList* mesh);
 
     // Check if any projectiles hit the obstacle

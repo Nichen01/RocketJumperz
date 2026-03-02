@@ -1,7 +1,7 @@
 #pragma once
 /* Start Header ************************************************************************/
 /*!
-\file		  Level1.h
+\file		  Level2.h
 \author       Ivan Chong, i.chong, 2503476
 \par          i.chong@digipen.edu
 \date         January, 16, 2026
@@ -13,6 +13,7 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+extern int screenWidth; extern int screenLength;
 
 void Level2_Load();
 

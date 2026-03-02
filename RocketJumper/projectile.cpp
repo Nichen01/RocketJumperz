@@ -77,8 +77,8 @@ namespace projectileSystem {
             if (projectiles[i].isActive == 1)
             {
                 // Move projectile
-                projectiles[i].shape.xPos += projectiles[i].shape.velocityX;
-                projectiles[i].shape.yPos += projectiles[i].shape.velocityY;
+                projectiles[i].shape.xPos -= projectiles[i].shape.velocityX;
+                projectiles[i].shape.yPos -= projectiles[i].shape.velocityY;
 
                 // Check if projectile is off-screen
                 if (projectiles[i].shape.xPos > 800.0f || projectiles[i].shape.xPos < -800.0f ||
@@ -92,20 +92,24 @@ namespace projectileSystem {
     }
 
     //======================RENDER ALL ACTIVE PROJECTILES====================================//
-    void renderProjectiles(Projectile projectiles[], s32 maxCount, AEGfxVertexList* mesh)
+    void renderProjectiles(Projectile projectiles[], s32 maxCount, AEGfxTexture* texture, AEGfxVertexList* mesh)
     {
         if (!mesh)
         {
-            printf("MESH IS NULL!");
+            printf("MESH IS NULL!\n");
             return;
         }
+
+        if (!texture)
+        {
+            printf("TEXTURE IS NULL!\n");
+            
+        }
+
         for (int i = 0; i < maxCount; i++)
         {
             if (projectiles[i].isActive == 1)
             {
-                // Set projectile color (yellow for visibility)
-                AEGfxSetColorToAdd(1.0f, 1.0f, 0.0f, 1.0f);
-
                 // Set up transformation matrix
                 AEMtx33 scale = { 0 };
                 AEMtx33Scale(&scale, projectiles[i].shape.xScale, projectiles[i].shape.yScale);
@@ -121,6 +125,12 @@ namespace projectileSystem {
                 AEMtx33Concat(&transform, &translate, &transform);
 
                 AEGfxSetTransform(transform.m);
+
+                // Set texture if provided
+                if (texture)
+                {
+                    AEGfxTextureSet(texture, 0.0f, 0.0f);
+                }
 
                 // Draw the projectile
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);

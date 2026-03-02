@@ -175,7 +175,7 @@ void ProjectileTest_Draw()
 	AEGfxMeshDraw(pTestMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render all active projectiles (YELLOW)
-	projectileSystem::renderProjectiles(testProjectiles, MAX_PROJECTILES, pTestMesh);
+	//projectileSystem::renderProjectiles(testProjectiles, MAX_PROJECTILES, plasma, pTestMesh);
 }
 
 void ProjectileTest_Free()

@@ -20,9 +20,9 @@ namespace movement {
 
     void getMouse(objectsquares &player) {
         AEInputGetCursorPosition(&mouseX,&mouseY);
-        mouseX -= ((screenWidth / 2) + player.xPos + player.velocityX);
-        mouseY = ((screenLength / 2) - mouseY - player.yPos - player.velocityY);
-        mouseDistance = sqrtf(mouseX * mouseX + mouseY * mouseY);
+        mouseX -= static_cast<s32>((screenWidth / 2) + player.xPos + player.velocityX);
+        mouseY = static_cast<s32>((screenLength / 2) - mouseY - player.yPos - player.velocityY);
+        mouseDistance = sqrtf(static_cast<f32>(mouseX * mouseX + mouseY * mouseY));
         // Normalize direction vector (only if distance > 0 to avoid division by zero)
         if (mouseDistance > 0.0f)
         {
@@ -47,8 +47,8 @@ namespace movement {
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX += directionVector.x * THRUST_POWER;
-            player.velocityY += directionVector.y * THRUST_POWER;
+            player.velocityX += directionVector.x * THRUST_POWER * static_cast<f32>(screenLength)/screenWidth;
+            player.velocityY += directionVector.y * THRUST_POWER * static_cast<f32>(screenWidth) / screenLength;
             printf("Jetpack fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             jetPackCooldown += 2;
             }
@@ -56,8 +56,8 @@ namespace movement {
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX -= directionVector.x * ABSOLUTE_RECOIL;
-            player.velocityY -= directionVector.y * ABSOLUTE_RECOIL;
+            player.velocityX += directionVector.x * ABSOLUTE_RECOIL * static_cast<f32>(screenLength) / screenWidth;
+            player.velocityY += directionVector.y * ABSOLUTE_RECOIL * static_cast<f32>(screenWidth) / screenLength;
             printf("Bullet fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             bulletCount -= 1;
         }
