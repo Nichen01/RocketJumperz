@@ -47,8 +47,8 @@ namespace movement {
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX += directionVector.x * THRUST_POWER;
-            player.velocityY += directionVector.y * THRUST_POWER;
+            player.velocityX += directionVector.x * THRUST_POWER * static_cast<f32>(screenLength)/screenWidth;
+            player.velocityY += directionVector.y * THRUST_POWER * static_cast<f32>(screenWidth) / screenLength;
             printf("Jetpack fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             jetPackCooldown += 2;
             }
@@ -56,8 +56,8 @@ namespace movement {
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX -= directionVector.x * ABSOLUTE_RECOIL;
-            player.velocityY -= directionVector.y * ABSOLUTE_RECOIL;
+            player.velocityX += directionVector.x * ABSOLUTE_RECOIL * static_cast<f32>(screenLength) / screenWidth;
+            player.velocityY += directionVector.y * ABSOLUTE_RECOIL * static_cast<f32>(screenWidth) / screenLength;
             printf("Bullet fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             bulletCount -= 1;
         }
