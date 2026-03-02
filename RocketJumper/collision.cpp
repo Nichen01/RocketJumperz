@@ -12,6 +12,11 @@ f64					g_appTime = 0.0;
 
 f32         BOUNDING_RECT_SIZE = 1.0f;
 
+int COLLISION_LEFT = 0x00000001;	//0001
+int COLLISION_RIGHT = 0x00000002;	//0010
+int COLLISION_TOP = 0x00000004;	//0100
+int COLLISION_BOTTOM = 0x00000008;	//1000
+
 namespace {
 	// Calculate corners of player object relative to the tilemap.
 	// mapX = number of tile columns, mapS = tile size in pixels.

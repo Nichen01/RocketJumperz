@@ -13,8 +13,11 @@ extern f64 g_fixedDT;
 extern f64 g_dt;
 extern f64 g_appTime;
 
-// Note: COLLISION_LEFT/RIGHT/TOP/BOTTOM flags are defined in binaryMap.h
-// Do NOT redeclare them here to avoid duplicate symbol errors.
+
+extern int	COLLISION_LEFT;	//0001
+extern int	COLLISION_RIGHT;	//0010
+extern int	COLLISION_TOP;	//0100
+extern int	COLLISION_BOTTOM;	//1000
 
 namespace gamelogic {
 	// Update bounding box for an object using AEVec2-based BB struct
