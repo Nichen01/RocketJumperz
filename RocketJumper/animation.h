@@ -31,7 +31,7 @@ enum AnimPlayMode
     ANIM_PLAY_ONCE,     // Play forward to last frame, then stop
     ANIM_PLAY_REVERSE,  // Play backward to frame 0, then stop
     ANIM_LOOP,          // Play forward, loop back to frame 0
-    ANIM_PING_PONG,     // Play forward then backward, repeat
+    ANIM_OSC,     // Play forward then backward, repeat
     ANIM_IDLE           // Do not advance frames
 };
 

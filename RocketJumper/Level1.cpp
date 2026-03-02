@@ -265,7 +265,7 @@ void Level1_Update()
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
 	// -----------------------------------------------------------------------
-	// Door animation -- hardcoded proximity check, same logic as tutorial
+	// Door animation -- hardcoded proximity check
 	// -----------------------------------------------------------------------
 	f32 dx = objectinfo[player].xPos - DOOR_WORLD_X;
 	f32 dy = objectinfo[player].yPos - DOOR_WORLD_Y;
