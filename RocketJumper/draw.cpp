@@ -7,12 +7,16 @@ AEGfxTexture* base5test = NULL;
 AEGfxTexture* plasma = NULL;
 
 // Different types of platforms
-AEGfxTexture* platform0 = NULL;
 AEGfxTexture* platform1 = NULL;
 AEGfxTexture* platform2 = NULL;
 AEGfxTexture* platform3 = NULL;
 AEGfxTexture* platform4 = NULL;
 AEGfxTexture* platform5 = NULL;
+AEGfxTexture* platform6 = NULL;
+AEGfxTexture* platform7 = NULL;
+AEGfxTexture* platform8 = NULL;
+AEGfxTexture* platform9 = NULL;
+AEGfxTexture* glass = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
 AEGfxVertexList * platformMesh = nullptr;
@@ -46,15 +50,7 @@ namespace renderlogic {
 				
 				switch (map[(y * mapX + x)]) {
 				case 0: //air
-					break;
-				case 10: // platform0
-					AEGfxTextureSet(platform0, 0, 0);
-					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-					renderlogic::Drawsquare(((float)xo + mapS / 2)-800.0f, 450.0f-((float)yo + mapS / 2), (float)mapS, (float)mapS);
-					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
-					break;
-				case 1: // platform0
-					AEGfxTextureSet(platform0, 0, 0);
+					AEGfxTextureSet(glass, 0, 0);
 					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
@@ -62,7 +58,7 @@ namespace renderlogic {
 				case 11: // platform1
 					AEGfxTextureSet(platform1, 0, 0);
 					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					renderlogic::Drawsquare(((float)xo + mapS / 2)-800.0f, 450.0f-((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					break;
 				case 12: // platform2
@@ -89,10 +85,34 @@ namespace renderlogic {
 					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					break;
-				case 100: // goal, green
-					AEGfxTextureSet(platform0, 0, 0);
+				case 16: // platform6
+					AEGfxTextureSet(platform6, 0, 0);
+					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					break;
+				case 17: // platform7
+					AEGfxTextureSet(platform7, 0, 0);
+					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					break;
+				case 18: // platform8
+					AEGfxTextureSet(platform8, 0, 0);
+					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					break;
+				case 19: // platform9
+					AEGfxTextureSet(platform9, 0, 0);
+					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					break;
+				case 100: // door tile 
+					AEGfxTextureSet(doorTex, animSystem::getUOffset(doorAnim), 0.f); 
+					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS); 
+					AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES); 
 					break;
 				default://defaults to playable area
 					break;

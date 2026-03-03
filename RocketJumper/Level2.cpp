@@ -31,7 +31,7 @@ static int x = 16;
 static int y = 9;
 static int s = 80;
 
-static objectsquares objectinfo[2] = { 0 };
+//objectsquares objectinfo[2] = { 0 };
 
 
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -56,9 +56,6 @@ static AEAudio LaserBlast;
 static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
-
-
-
 
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
@@ -343,12 +340,7 @@ void Level2_Unload()
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-	if (platform0) { AEGfxTextureUnload(platform0); platform0 = nullptr; }
-	if (platform1) { AEGfxTextureUnload(platform1); platform1 = nullptr; }
-	if (platform2) { AEGfxTextureUnload(platform2); platform2 = nullptr; }
-	if (platform3) { AEGfxTextureUnload(platform3); platform3 = nullptr; }
-	if (platform4) { AEGfxTextureUnload(platform4); platform4 = nullptr; }
-	if (platform5) { AEGfxTextureUnload(platform5); platform5 = nullptr; }
+	render::unloadPlatform();
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 

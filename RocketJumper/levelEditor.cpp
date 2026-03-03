@@ -7,6 +7,7 @@ static AEGfxVertexList* levelTileMesh = nullptr;
 static s8 buttonFont;
 int level{ 1 };
 
+
 void levelEditor_Load() {
 
 	button = AEGfxTextureLoad("Assets/UI/Button.png");
@@ -15,6 +16,7 @@ void levelEditor_Load() {
 	switch (level) {
 	case 1:
 		ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
+		std::cout << "File 1 read";
 		break;
 	case 2:
 		ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
@@ -38,6 +40,10 @@ void levelEditor_Initialize() {
 
 void levelEditor_Update() {
 
+	if (AEInputCheckTriggered(AEVK_1)) level = 1;
+	else if (AEInputCheckTriggered(AEVK_2)) level = 2;
+
+
 }
 
 void levelEditor_Draw() {
@@ -53,12 +59,12 @@ void levelEditor_Draw() {
 	float worldMouseY = AEGfxGetWindowHeight() / 2.f - static_cast<f32>(mouseY);
 
 	// display level in a grid system
-    const float tileSize = 90.f;
+    const float tileSize = 65.f;
 	const float gap = 3.f;
     for (s32 row = 0; row < BINARY_MAP_HEIGHT; ++row) {
         for (s32 col = 0; col < BINARY_MAP_WIDTH; ++col) {
 
-			float xPos = -col * tileSize + 590.f;
+			float xPos = -col * tileSize + 480.f;
 			float yPos = -row * tileSize + 410.f;
 			float halfSize = (tileSize - gap) / 2.f;
 
@@ -77,7 +83,7 @@ void levelEditor_Draw() {
 					}
 				}
 			}
-			else if (MapData[row][col] == 1) AEGfxSetColorToMultiply(0.2f, 0.2f, 0.2f, 1.0f);
+			else if (MapData[row][col] == 11) AEGfxSetColorToMultiply(0.2f, 0.2f, 0.2f, 1.0f);
 			else AEGfxSetColorToMultiply(0.8f, 0.8f, 0.8f, 1.0f);
 
             AEMtx33 scl, rot, transl, transf;

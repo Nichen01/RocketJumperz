@@ -13,6 +13,9 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+
+#include "render.h"
+
 extern int screenWidth; extern int screenLength;
 
 void Level2_Load();

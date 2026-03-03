@@ -46,8 +46,8 @@ int** BinaryCollisionArray;
 //
 //	Example:
 //
-//	Width 5
-//	Height 5
+//	5 (Width)
+//	5 (Height)
 //	1 1 1 1 1
 //	1 1 1 3 1
 //	1 4 2 0 1
@@ -102,6 +102,11 @@ int ImportMapDataFromFile(const char* FileName)
 			ifs >> value;
 			MapData[i][j] = value;
 			BinaryCollisionArray[i][j] = (value >= 1) ? 1 : 0;
+			if (value == 100) {
+				doorX = (j * 80) + 80 / 2 - 800.0f;
+				doorY = 450.0f - ((i * 80) + 80 / 2);
+			}
+
 		}
 	}
 	ifs.close();
