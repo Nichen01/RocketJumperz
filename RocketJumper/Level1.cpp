@@ -90,7 +90,7 @@ void Level1_Load()
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();
+	//soundEffects = AEAudioCreateGroup();
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
 

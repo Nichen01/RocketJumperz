@@ -28,7 +28,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	int gGameRunning = 1;
 	bool pause = false;
-	s8 pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	s8 pausefont = -1; 
+	//MenuButton playButton;
+	//MenuButton quitButton;
 	f32 width, height;
 
 	// Changing the window title
@@ -46,6 +48,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (current != GS_RESTART) {
 			GSM_Update();
 			fpLoad();
+			if (current != GS_MAINMENU) {
+				pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+			}
 		}
 		else {
 			current = previous;	
@@ -56,34 +61,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		while (next == current)
 		{
-			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
-				next = GS_QUIT;
-
-			if (AEInputCheckTriggered(AEVK_TAB)) {
-				if (pause) {
-					pause = false;
-				}
-				else {
-					pause = true;
-				}
-			}
-
 			AESysFrameStart();
-			if (!pause) {
-				audio::audiolevel(1.0f);
-				fpUpdate();
+
+			if (current != GS_MAINMENU) {
+				if (AEInputCheckTriggered(AEVK_TAB)) {
+					if (pause) {
+						pause = false;
+					}
+					else {
+						pause = true;
+					}
+				}
+
+				if (!pause) {
+					//audio::audiolevel(1.0f);
+					fpUpdate();
+				}
+
+				fpDraw();
+
+				if (pause) {
+					AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
+					AEGfxPrint(pausefont, "PAUSE", -width / 2, height, 1, 1, 1, 1, 1);
+					//audio::audiolevel(0.2f);
+				}
 			}
-
-			fpDraw();
-
-			if(pause){
-				AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
-				AEGfxPrint(pausefont, "PAUSE", -width / 2, height, 1, 1, 1, 1, 1);
-				audio::audiolevel(0.2f);
+			else {
+				fpUpdate();
+				fpDraw();
 			}
 			
+			
 			AESysFrameEnd();
-
+			if (AESysDoesWindowExist() == false){
+				next = GS_QUIT;
+			}
 			g_dt = AEFrameRateControllerGetFrameTime();
 
 			//hack
