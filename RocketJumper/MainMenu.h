@@ -13,9 +13,6 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#ifndef MAINMENU_H_
-#define MAINMENU_H_
-
 #include "AEEngine.h"
 #include <iostream>
 
@@ -56,5 +53,3 @@ namespace MenuHelpers {
     void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID);
     void drawTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
 }
-
-#endif

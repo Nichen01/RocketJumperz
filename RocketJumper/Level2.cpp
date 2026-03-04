@@ -13,9 +13,9 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <cmath>
+#include <iostream>
 #include <cstdio>
-#include "Level1.h"
+#include "Level2.h"
 #include "draw.h"
 #include "collision.h"
 #include "player.h"
@@ -25,17 +25,15 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
-#include "binaryMap.h"
-#include "animation.h"
 
-s32* map = nullptr;
-int x;
-int y;
-int s = 50;
+static s32* map = nullptr;
+static int x = 16;
+static int y = 9;
+static int s = 100;
 
 static objectsquares objectinfo[2] = { 0 };
 
-// Local variables for projectile test level
+
 static Projectile Projectiles[MAX_PROJECTILES];
 static AEGfxVertexList* pTestMesh = nullptr;
 
@@ -45,93 +43,49 @@ static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
 
-
-static AEGfxTexture* mushroomDieTexture[9] = { nullptr };
-static AEGfxTexture* mushroomHitTexture[5] = { nullptr };
-static AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
+// Font for HUD text (must be destroyed in Unload to avoid leak)
+static s8 font = -1;
 
 //==== sound and volume
-static f32 bgVolume = 1.f;
 
-static AEAudio L1;
+static f32 bgVolume = 1.f;
+static f32 bgmPitch = 1.f;
+
+static AEAudio L2;
 static AEAudio LaserBlast;
 static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
-// Font resource (must be destroyed in Unload to avoid leak)
-static s8 font = -1;
 
-// DoorOpen.jpg: 224 x 32 pixels, single row of 7 frames (32x32 each)
-// ---------------------------------------------------------------------------
-static constexpr int  DOOR_FRAME_COUNT = 7;
-static constexpr f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
-static constexpr f32  DOOR_WORLD_X = 200.0f;  // adjust to match your map
-static constexpr f32  DOOR_WORLD_Y = 50.0f;
-static constexpr f32  DOOR_WIDTH = 50.0f;   // matches tile size s
-static constexpr f32  DOOR_HEIGHT = 50.0f;
-static constexpr f32  DOOR_TRIGGER_RADIUS = 150.0f;  // px from door centre
 
-static SpriteAnimation  doorAnim;
-static AEGfxVertexList* doorMesh = nullptr;
-static AEGfxTexture* doorTexture = nullptr;
-static bool             doorIsOpen = false; // tracks fully-open state
 
-// ---------------------------------------------------------------------------
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
-void Level1_Load()
+void Level2_Load()
 {
+	
 	// Load the music file once when the level loads
-	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
+	L2 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
 	// Create the audio group
 	bgm = AEAudioCreateGroup();
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();
-	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
+	soundEffects = AEAudioCreateGroup();   
+	
 
-
-	// Loading of assets for mushroomDie
-	mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
-	mushroomDieTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie1.png");
-	mushroomDieTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie2.png");
-	mushroomDieTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie3.png");
-	mushroomDieTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie4.png");
-	mushroomDieTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie5.png");
-	mushroomDieTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie6.png");
-	mushroomDieTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie7.png");
-	mushroomDieTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie8.png");
-
-	// Loading of assets for mushroomHit
-	mushroomHitTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit0.png");
-	mushroomHitTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit1.png");
-	mushroomHitTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit2.png");
-	mushroomHitTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit3.png");
-	mushroomHitTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit4.png");
-
-	// Loading of assets for mushroomIdle
-	mushroomIdleTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle0.png");
-	mushroomIdleTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle1.png");
-	mushroomIdleTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle2.png");
-	mushroomIdleTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle3.png");
-	mushroomIdleTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle4.png");
-	mushroomIdleTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle5.png");
-	mushroomIdleTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle6.png");
-	mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
-	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");
 }
 
-void Level1_Initialize()
+void Level2_Initialize()
 {
-	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(L2, bgm, 0.5f, 1.f, -1);
 
-	// Create font for gameover text (stored so we can destroy it in Unload)
+	// Create font for HUD text (stored so we can destroy it in Unload)
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
-	// Load textures - these are defined in draw.cpp
+	// Load textures, defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
@@ -168,29 +122,44 @@ void Level1_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
-		printf("Could not import file");
-		return;
-	}
-
-	x = BINARY_MAP_WIDTH;
-	y = BINARY_MAP_HEIGHT;
-
+	// Allocate map array here (not at file scope) so it only exists
+	// while Level2 is active. Level2_Free() handles deallocation.
 	map = new s32[x * y]{ 0 };
 
-	for (int row{}; row < y; ++row) {
-		for (int col{}; col < x; col++) {
-			map[row * x + col] = MapData[row][col];
+	// Create map with walls on borders and one obstacle in middle
+	// 1 for obstacle, 0 for playable area
+	int mapX = 0, mapY = 0;
+	for (mapY = 0; mapY < 9; mapY++) {
+		if (mapY == 0 || mapY == 9 - 1) {
+			for (mapX = 0; mapX < 16; mapX++) {
+				map[(mapY * 16 + mapX)] = 1;
+			}
+		}
+		else {
+			for (mapX = 0; mapX < 16; mapX++) {
+				if (mapX == 0 || mapX == 16 - 1) {
+					map[(mapY * 16 + mapX)] = 1;
+				}
+				else {
+					map[(mapY * 16 + mapX)] = 0;
+				}
+			}
 		}
 	}
+	map[(4 * 16 + 6)] = 1;
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 60.0f;
-	objectinfo[player].yScale = 60.0f;
+	objectinfo[player].xScale = 70.0f;
+	objectinfo[player].yScale = 70.0f;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo[player]);
+
+	objectinfo[obstacle].xPos = -400.0f;
+	objectinfo[obstacle].yPos = 0.0f;
+	objectinfo[obstacle].xScale = 100.0f;
+	objectinfo[obstacle].yScale = 400.0f;
 
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
@@ -202,23 +171,14 @@ void Level1_Initialize()
 	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
-
-	// DOOR
-	animSystem::buildMesh(&doorMesh, DOOR_FRAME_COUNT);
-	doorTexture = AEGfxTextureLoad("Assets/DoorOpen.png");
-	if (!doorTexture)
-		printf("DOOR TEXTURE NOT FOUND!\n");
-	else
-		printf("DOOR OK\n");
-
-	animSystem::init(doorAnim, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
-	doorIsOpen = false;
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -200.0f, 100.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, 50.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, 300.0f, -200.0f);
 }
 
-void Level1_Update()
+void Level2_Update()
 {
+	
 	//====== AUDIO CONTROLS ======
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
@@ -232,6 +192,7 @@ void Level1_Update()
 			bgVolume = 0.f;
 		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
+	
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -244,7 +205,7 @@ void Level1_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
+	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
 	}
 
@@ -264,6 +225,8 @@ void Level1_Update()
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
 
+
+
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
@@ -276,6 +239,8 @@ void Level1_Update()
 
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+
+
 
 	// Tick down the player's invincibility timer each frame
 	UpdatePlayerInvincibility(objectinfo[player], dt);
@@ -293,42 +258,12 @@ void Level1_Update()
 		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[2].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
-	// -----------------------------------------------------------------------
-	// Door animation -- hardcoded proximity check
-	// -----------------------------------------------------------------------
-	f32 dx = objectinfo[player].xPos - DOOR_WORLD_X;
-	f32 dy = objectinfo[player].yPos - DOOR_WORLD_Y;
-	f32 dist = sqrtf(dx * dx + dy * dy);
-	bool playerNear = (dist <= DOOR_TRIGGER_RADIUS);
-
-	// Trigger open: player just entered range and door is fully closed
-	if (playerNear && !doorIsOpen && doorAnim.playMode != ANIM_PLAY_ONCE)
-		animSystem::play(doorAnim, ANIM_PLAY_ONCE);
-
-	// Trigger close: player just left range and door is fully open
-	if (!playerNear && doorIsOpen && doorAnim.playMode != ANIM_PLAY_REVERSE)
-		animSystem::play(doorAnim, ANIM_PLAY_REVERSE);
-
-	animSystem::update(doorAnim, dt);
-
-	// justFinished is true for one frame when a one-shot completes
-	if (doorAnim.justFinished)
-		doorIsOpen = (doorAnim.currentFrame == DOOR_FRAME_COUNT - 1);
-	// -----------------------------------------------------------------------
-
-	static float frameTimer{ 0.0f };
-	frameTimer += dt;
-	if (frameTimer >= 0.1f) {
-		static int currentFrame{};
-		currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
-		meleeEnemyTexture = mushroomIdleTexture[currentFrame];
-		frameTimer = 0.0f;
-	}
 }
 
-void Level1_Draw()
+void Level2_Draw()
 {
 	AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
 
@@ -339,24 +274,16 @@ void Level1_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-	// ===== RENDER WALLS ======= //
+	// Draw map walls and floor
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	// Render doors
-	// Door -- UV offset selects the current frame from the strip
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
-	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
-	AEGfxTextureSet(doorTexture, animSystem::getUOffset(doorAnim), 0.f);
-	renderlogic::Drawsquare(DOOR_WORLD_X, DOOR_WORLD_Y, DOOR_WIDTH, DOOR_HEIGHT);
-	AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
-
 	// ==== ENEMIES RENDER =======//
+	// Render enemies
 	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
-	// Render enemy projectiles with plasma texture
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	// Render enemy projectiles (red color)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);  // Changed from COLOR to TEXTURE
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, pTestMesh);
@@ -368,34 +295,29 @@ void Level1_Draw()
 		objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
-	// Render player projectiles with plasma texture
+	// Render all active projectiles (YELLOW)
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
 
 	// ====== HUD: Player Health Display ======
-	// Drawn last so it appears on top of all world geometry.
-	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
 	if (font >= 0)
 	{
 		char healthText[32];
 		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo[player].health);
 
-		// Prepare render state for font (font uses a glyph texture atlas)
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
-		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(font, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 }
 
-void Level1_Free()
+void Level2_Free()
 {
-	// FREE MESHES AND MAP
 	if (pMesh) {
 		AEGfxMeshFree(pMesh);
 		pMesh = nullptr;
@@ -406,20 +328,15 @@ void Level1_Free()
 		pTestMesh = nullptr;
 	}
 
+
+
 	if (map) {
 		delete[] map;
 		map = nullptr;
 	}
-
-	if (doorMesh) {
-		AEGfxMeshFree(doorMesh);
-		doorMesh = nullptr;
-	}
-
-	FreeMapData();
 }
 
-void Level1_Unload()
+void Level2_Unload()
 {
 	// Unload ALL textures that were loaded in Initialize
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
@@ -427,13 +344,12 @@ void Level1_Unload()
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-	if (doorTexture) { AEGfxTextureUnload(doorTexture); doorTexture = nullptr; }
 
 	// Destroy the font created in Initialize
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
-	AEAudioUnloadAudio(L1);
+	AEAudioUnloadAudio(L2);
 	AEAudioUnloadAudio(LaserBlast);
 	AEAudioUnloadAudio(Punch);
 	AEAudioUnloadAudioGroup(bgm);

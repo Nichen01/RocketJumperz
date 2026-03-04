@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 /* Start Header ************************************************************************/
 /*!
 \file		  enemy.h
@@ -13,8 +12,6 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
-#ifndef ENEMY_H_
-#define ENEMY_H_
 
 #include "AEEngine.h"
 #include "player.h"
@@ -42,23 +39,26 @@ struct Enemy {
     f32 moveSpeed;           // How fast enemy moves
     s8 isActive;             // Is this enemy slot active?
     s8 hasLineOfSight;       // Can enemy see player?
+
+    s32 currentFrame;        // current frame index
+    f32 frameTimer;          // timer for frame switching
 };
 
 namespace enemySystem {
     // Constants for enemy behavior
-    constexpr f32 MELEE_DETECTION_RANGE = 400.0f;
+    constexpr f32 MELEE_DETECTION_RANGE = 900.0f;
     constexpr f32 MELEE_ATTACK_RANGE = 50.0f;
-    constexpr f32 MELEE_MOVE_SPEED = 2.0f;
+    constexpr f32 MELEE_MOVE_SPEED = 4.0f;
     constexpr f32 MELEE_HEALTH = 50.0f;
     constexpr f32 MELEE_ATTACK_COOLDOWN = 1.0f;  // Seconds between attacks
-    constexpr f32 MELEE_DAMAGE = 10.0f;
+    constexpr f32 MELEE_DAMAGE = 15.0f;
 
-    constexpr f32 RANGED_DETECTION_RANGE = 600.0f;
-    constexpr f32 RANGED_ATTACK_RANGE = 500.0f;
+    constexpr f32 RANGED_DETECTION_RANGE = 800.0f;
+    constexpr f32 RANGED_ATTACK_RANGE = 800.0f;
     constexpr f32 RANGED_MOVE_SPEED = 1.5f;
     constexpr f32 RANGED_HEALTH = 30.0f;
     constexpr f32 RANGED_ATTACK_COOLDOWN = 2.0f;  // Seconds between shots
-    constexpr f32 RANGED_DAMAGE = 5.0f;
+    constexpr f32 RANGED_DAMAGE = 30.0f;
 
     // Initialize all enemies to inactive state
     void initEnemies(Enemy enemies[], s32 maxCount);
@@ -89,6 +89,10 @@ namespace enemySystem {
     void checkProjectileEnemyCollision(Enemy enemies[], s32 maxCount,
         Projectile projectiles[], s32 maxProjectiles);
 
+    // Check if enemy projectiles hit the player. Returns total damage dealt.
+    f32 checkEnemyPlayerProjectileCollision(Projectile enemyProjectiles[],
+        s32 maxProjectiles, objectsquares& player);
+
     // Helper: Calculate distance between two points
     f32 getDistance(f32 x1, f32 y1, f32 x2, f32 y2);
 
@@ -96,5 +100,3 @@ namespace enemySystem {
     s8 hasLineOfSight(Enemy& enemy, objectsquares& player,
         int map[], int mapX, int mapY, int mapS);
 }
-
-#endif

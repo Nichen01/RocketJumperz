@@ -11,9 +11,15 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/\
-#ifndef GSMAN_H_
-#define GSMAN_H_
+#include "pch.h"
+#include "mapEditor_Level1.h"
+#include "mapEditor_Level2.h"
+#include "MainMenu.h"
+#include "projectileTest.h"
+#include "levelEditor.h"
 #pragma once
+extern bool firstTimeLevel1;
+extern bool firstTimeLevel2;
 
 typedef void(*FP)(void);
 
@@ -23,5 +29,3 @@ extern FP fpLoad, fpInitialize, fpUpdate, fpDraw, fpFree, fpUnload;
 
 void GSM_Initialize(int startingState);
 void GSM_Update();
-
-#endif

@@ -21,8 +21,6 @@ Technology is prohibited.
 #include <string.h>
 
 
-
-
 // ----------------------------------------------------------------------------
 //
 // externs
@@ -50,11 +48,10 @@ enum TYPE_OBJECT
 
 
 int		GetCellValue(int X, int Y);
-int		CheckInstanceBinaryMapCollision(float PosX, float PosY, 
-										float scaleX, float scaleY);
 void	SnapToCell(float *Coordinate);
 int		ImportMapDataFromFile(const char *FileName);
 void	FreeMapData(void);
 void	PrintRetrievedInformation(void);
+int		ExportMapDataToFile(const char* FileName);
 
 #endif // BINARY_MAP_H_

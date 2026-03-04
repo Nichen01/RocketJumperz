@@ -1,9 +1,8 @@
-#include "pch.h"
-#include "mapEditor_Level1.h"
-#include "mapEditor_Level2.h"
 #include "GameStateManager.h"
-#include "MainMenu.h"
-#include "projectileTest.h"
+
+// Checking where to spawn character
+bool firstTimeLevel1 = true;
+bool firstTimeLevel2 = true;
 
 // Tracks current, previous and next game states
 int current = 0, previous = 0, next = 0;
@@ -46,7 +45,7 @@ void GSM_Update()
 		fpFree = MainMenu_Free;
 		fpUnload = MainMenu_Unload;
 		break;
-	/*
+	
 	case GS_LEVEL2:
 		fpLoad = Level2_Load;
 		fpInitialize = Level2_Initialize;
@@ -55,9 +54,17 @@ void GSM_Update()
 		fpFree = Level2_Free;
 		fpUnload = Level2_Unload;
 		break;
-	*/
-	case GS_RESTART:break;
-	case GS_QUIT:break;
+	case GS_LEVELEDITOR:
+		fpLoad = levelEditor_Load;
+		fpInitialize = levelEditor_Initialize;
+		fpUpdate = levelEditor_Update;
+		fpDraw = levelEditor_Draw;
+		fpFree = levelEditor_Free;
+		fpUnload = levelEditor_Unload;
+	case GS_RESTART:
+		break;
+	case GS_QUIT:
+		break;
 	default: break;
 	}
 }

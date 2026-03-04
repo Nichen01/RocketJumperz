@@ -1,7 +1,7 @@
 #pragma once
 /* Start Header ************************************************************************/
 /*!
-\file		  Level1.h
+\file		  Level2.h
 \author       Ivan Chong, i.chong, 2503476
 \par          i.chong@digipen.edu
 \date         January, 16, 2026
@@ -13,25 +13,16 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
-#include "pch.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
-#include "GameStateManager.h"
-#include "projectile.h"
-#include "Movement.h"
-#include "render.h"
-#include "enemies.h"
-#include "binaryMap.h"
+extern int screenWidth; extern int screenLength;
 
-void Level1_Load();
+void Level2_Load();
 
-void Level1_Initialize();
+void Level2_Initialize();
 
-void Level1_Update();
+void Level2_Update();
 
-void Level1_Draw();
+void Level2_Draw();
 
-void Level1_Free();
+void Level2_Free();
 
-void Level1_Unload();
+void Level2_Unload();
