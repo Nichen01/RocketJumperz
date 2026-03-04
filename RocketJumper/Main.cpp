@@ -50,13 +50,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		else {
 			current = previous;	
 			next = previous;
+			printf("GS restarted\n");
 		}
 
 		fpInitialize();
 
 		while (next == current)
 		{
-			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
+			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE)|| AEInputCheckTriggered(AEVK_Q))
 				next = GS_QUIT;
 
 			if (AEInputCheckTriggered(AEVK_TAB)) {
@@ -96,9 +97,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (next != GS_RESTART) {
 			fpUnload();
+			previous = current;
 		}
 
-		previous = current;
 		current = next;
 	}
 
