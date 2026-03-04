@@ -290,13 +290,18 @@ void Level1_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
+
 	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);*/
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, 1);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, 1);
-	gamelogic::Collision_movement(&objectinfo[player], map, x, 1);
+	objectinfo[player].xPos += objectinfo[player].velocityX;
+	objectinfo[player].yPos += objectinfo[player].velocityY;
+
+	/*gamelogic::Collision_movement(&enemies[0].shape, map, x,s, 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x,s, 1);*/
+	gamelogic::Collision_movement(&objectinfo[player], map, x,s, 1);
+
 	// -----------------------------------------------------------------------
 	// Door animation -- hardcoded proximity check
 	// -----------------------------------------------------------------------
