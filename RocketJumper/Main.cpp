@@ -74,7 +74,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				}
 
 				if (!pause) {
-					//audio::audiolevel(1.0f);
+					audio::audiolevel(1.0f);
 					fpUpdate();
 				}
 
@@ -83,7 +83,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				if (pause) {
 					AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
 					AEGfxPrint(pausefont, "PAUSE", -width / 2, height, 1, 1, 1, 1, 1);
-					//audio::audiolevel(0.2f);
+					audio::audiolevel(0.2f);
 				}
 			}
 			else {
