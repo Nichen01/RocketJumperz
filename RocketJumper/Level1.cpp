@@ -103,7 +103,7 @@ void Level1_Load()
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 	// Load enemy textures (create these assets or use placeholder)
-	meleeEnemyTexture = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie.png");
+	meleeEnemyTexture = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
 	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
 
 
@@ -214,8 +214,8 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
 	//MUSHROOM ANIM TEST
-	animSystem::buildMesh(&meleeEnemyMesh, 3, 3);
-	animSystem::init(meleeAnim, 3, 3, 9, 0.1f, ANIM_LOOP, 0);
+	animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
+	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
 	animSystem::buildMesh(&doorMesh, 1, 7);
