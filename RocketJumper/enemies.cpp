@@ -285,10 +285,13 @@ namespace enemySystem {
      * @return VOID
      ***************************************************************************/
     // Render all active enemies
-    void renderEnemies(Enemy enemies[], s32 maxCount,
+    void renderEnemies(Enemy enemies[], 
+        s32 maxCount,
         AEGfxVertexList* mesh,
         AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture)
+        AEGfxTexture* rangedTexture, 
+        f32 meleeUOffset,
+        f32 meleeVoffset)
     {
         for (int i = 0; i < maxCount; i++)
         {
@@ -296,9 +299,13 @@ namespace enemySystem {
             {
                 // Choose texture based on enemy type and if the texture is not NULL
                 AEGfxTexture* texture = nullptr;
+                f32 uOffset = 0.0f;
+                f32 vOffset = 0.0f;
                 if (enemies[i].type == ENEMY_MELEE)
                 {
                     texture = meleeTexture;
+                    uOffset = meleeUOffset;
+                    vOffset = meleeVoffset;
                 }
                 else if (enemies[i].type == ENEMY_RANGED)
                 {
@@ -309,21 +316,14 @@ namespace enemySystem {
                 if (texture)
                 {
                     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-                    AEGfxTextureSet(texture, 0, 0);
+                    AEGfxTextureSet(texture, uOffset, vOffset);
                 }
-                //else
-                //{
-                //    // Fallback to colored squares if no texture
-                //    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-                //    if (enemies[i].type == ENEMY_MELEE)
-                //    {
-                //        AEGfxSetColorToAdd(1.0f, 0.3f, 0.3f, 1.0f);  // Red for melee
-                //    }
-                //    else
-                //    {
-                //        AEGfxSetColorToAdd(0.3f, 0.3f, 1.0f, 1.0f);  // Blue for ranged
-                //    }
-                //}
+                else {
+                    // NEW: If texture is missing, clear the bound texture so it doesn't steal the door's!
+                    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+                    AEGfxTextureSet(nullptr, 0.0f, 0.0f);
+                    AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f); // Make it bright red so it's obvious
+                }
 
                 // Draw enemy
                 render::Drawsquare(enemies[i].shape.xPos, enemies[i].shape.yPos,

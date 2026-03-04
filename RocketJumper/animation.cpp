@@ -17,11 +17,15 @@ Technology is prohibited.
 namespace animSystem
 {
     void init(SpriteAnimation& anim,
+        int          cols,
+        int          rows,
         int          totalFrames,
         f32          frameDelay,
         AnimPlayMode mode,
         int          startFrame)
     {
+        anim.rows = rows;
+        anim.cols = cols;
         anim.totalFrames = totalFrames;
         anim.frameDelay = frameDelay;
         anim.playMode = mode;
@@ -123,25 +127,35 @@ namespace animSystem
 
     f32 getUOffset(const SpriteAnimation& anim)
     {
-        return static_cast<f32>(anim.currentFrame) /
-            static_cast<f32>(anim.totalFrames);
+        // get the number of frames in the row by checking the columns
+        int col = anim.currentFrame % anim.cols;
+        return static_cast<f32>(col) /
+            static_cast<f32>(anim.cols);
     }
 
-    void buildMesh(AEGfxVertexList** outMesh, int totalFrames)
+    f32 getVOffset(const SpriteAnimation& anim)
     {
-        if (!outMesh || totalFrames <= 0) return;
+        int row = anim.currentFrame / anim.cols;
+        return static_cast<f32>(row) /
+            static_cast<f32>(anim.rows);
+    }
+
+    void buildMesh(AEGfxVertexList** outMesh, int rows, int cols)
+    {
+        if (!outMesh || cols <= 0 || rows <= 0) return;
 
         // UVs span exactly one frame: [0.0, 1/totalFrames]
         // AEGfxTextureSet's UV offset then slides this window to the right frame.
-        f32 uMax = 1.f / static_cast<f32>(totalFrames);
+        f32 uMax = 1.f / static_cast<f32>(cols);
+        f32 vMax = 1.f / static_cast<f32>(rows);
 
         AEGfxMeshStart();
         AEGfxTriAdd(
-            -0.5f, -0.5f, 0xFFFFFFFF, 0.f, 1.f,
-            0.5f, -0.5f, 0xFFFFFFFF, uMax, 1.f,
+            -0.5f, -0.5f, 0xFFFFFFFF, 0.f, vMax,
+            0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
             -0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.f);
         AEGfxTriAdd(
-            0.5f, -0.5f, 0xFFFFFFFF, uMax, 1.f,
+            0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
             0.5f, 0.5f, 0xFFFFFFFF, uMax, 0.f,
             -0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.f);
         *outMesh = AEGfxMeshEnd();

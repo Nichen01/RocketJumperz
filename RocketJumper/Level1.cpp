@@ -45,10 +45,15 @@ static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
 
+//NEW MESH FOR MUSHROOM
+static AEGfxVertexList* meleeEnemyMesh = nullptr;
+static SpriteAnimation meleeAnim;
 
+/*
 static AEGfxTexture* mushroomDieTexture[9] = { nullptr };
 static AEGfxTexture* mushroomHitTexture[5] = { nullptr };
 static AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
+*/
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
@@ -98,7 +103,7 @@ void Level1_Load()
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 	// Load enemy textures (create these assets or use placeholder)
-	meleeEnemyTexture = AEGfxTextureLoad("Assets/MeleeEnemy.png");
+	meleeEnemyTexture = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie.png");
 	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
 
 
@@ -208,8 +213,12 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
+	//MUSHROOM ANIM TEST
+	animSystem::buildMesh(&meleeEnemyMesh, 3, 3);
+	animSystem::init(meleeAnim, 3, 3, 9, 0.1f, ANIM_LOOP, 0);
+
 	// DOOR
-	animSystem::buildMesh(&doorMesh, DOOR_FRAME_COUNT);
+	animSystem::buildMesh(&doorMesh, 1, 7);
 	
 	if (!doorTexture)
 		printf("DOOR TEXTURE NOT FOUND!\n");
@@ -321,16 +330,21 @@ void Level1_Update()
 		doorIsOpen = (doorAnim.currentFrame == DOOR_FRAME_COUNT - 1);
 	// -----------------------------------------------------------------------
 
+	// MUSHROOM ANIMATION
+	animSystem::update(meleeAnim, dt);
+
 	//need fix animation
-	
-	//static float frameTimer{ 0.0f };
-	//frameTimer += dt;
-	//if (frameTimer >= 0.1f) {
-	//	static int currentFrame{};
-	//	currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
-	//	meleeEnemyTexture = mushroomIdleTexture[currentFrame];
-	//	frameTimer = 0.0f;
-	//}
+	/*
+	static float frameTimer{ 0.0f };
+	frameTimer += dt;
+	if (frameTimer >= 0.1f) {
+		static int currentFrame{};
+		currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
+		meleeEnemyTexture = mushroomIdleTexture[currentFrame];
+		frameTimer = 0.0f;
+	}
+	*/
+
 }
 
 void Level1_Draw()
@@ -357,8 +371,13 @@ void Level1_Draw()
 	AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
-		meleeEnemyTexture, rangedEnemyTexture);
+	enemySystem::renderEnemies(enemies, 
+		MAX_ENEMIES, 
+		meleeEnemyMesh,
+		meleeEnemyTexture, 
+		rangedEnemyTexture,
+		animSystem::getUOffset(meleeAnim),
+		animSystem::getVOffset(meleeAnim));
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -416,6 +435,10 @@ void Level1_Free()
 		map = nullptr;
 	}
 
+	if (meleeEnemyMesh) { 
+		AEGfxMeshFree(meleeEnemyMesh);
+		meleeEnemyMesh = nullptr; }
+
 	if (doorMesh) {
 		AEGfxMeshFree(doorMesh);
 		doorMesh = nullptr;
@@ -433,13 +456,15 @@ void Level1_Unload()
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTexture) { AEGfxTextureUnload(doorTexture); doorTexture = nullptr; }
-
+	
+	/*
 	for (int i{}; i < 9; ++i) {
 		if (mushroomDieTexture[i]) { AEGfxTextureUnload(mushroomDieTexture[i]); mushroomDieTexture[i] = nullptr; }
 	}
 	for (int i{}; i < 5; ++i) {
 		if (mushroomHitTexture[i]) { AEGfxTextureUnload(mushroomHitTexture[i]); mushroomHitTexture[i] = nullptr; }
 	}
+	*/
 	
 	// Destroy the font created in Initialize
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
