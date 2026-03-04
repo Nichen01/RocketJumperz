@@ -90,30 +90,40 @@ void Level1_Load()
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();
+	//soundEffects = AEAudioCreateGroup();
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
+	// Load textures - these are defined in draw.cpp
+	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
+	base5test = AEGfxTextureLoad("Assets/Base5.png");
+	plasma = AEGfxTextureLoad("Assets/plasma.png");
+	// Load enemy textures (create these assets or use placeholder)
+	meleeEnemyTexture = AEGfxTextureLoad("Assets/MeleeEnemy.png");
+	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
+
+
+	doorTexture = AEGfxTextureLoad("Assets/DoorOpen.png");
 
 	// Loading of assets for mushroomDie
-	mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
-	mushroomDieTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie1.png");
-	mushroomDieTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie2.png");
-	mushroomDieTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie3.png");
-	mushroomDieTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie4.png");
-	mushroomDieTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie5.png");
-	mushroomDieTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie6.png");
-	mushroomDieTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie7.png");
-	mushroomDieTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie8.png");
+	//mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
+	//mushroomDieTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie1.png");
+	//mushroomDieTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie2.png");
+	//mushroomDieTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie3.png");
+	//mushroomDieTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie4.png");
+	//mushroomDieTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie5.png");
+	//mushroomDieTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie6.png");
+	//mushroomDieTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie7.png");
+	//mushroomDieTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie8.png");
 
-	// Loading of assets for mushroomHit
-	mushroomHitTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit0.png");
-	mushroomHitTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit1.png");
-	mushroomHitTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit2.png");
-	mushroomHitTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit3.png");
-	mushroomHitTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit4.png");
+	//// Loading of assets for mushroomHit
+	//mushroomHitTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit0.png");
+	//mushroomHitTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit1.png");
+	//mushroomHitTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit2.png");
+	//mushroomHitTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit3.png");
+	//mushroomHitTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit4.png");
 
-	// Loading of assets for mushroomIdle
-	mushroomIdleTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle0.png");
+	//// Loading of assets for mushroomIdle
+	/*mushroomIdleTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle0.png");
 	mushroomIdleTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle1.png");
 	mushroomIdleTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle2.png");
 	mushroomIdleTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle3.png");
@@ -121,7 +131,7 @@ void Level1_Load()
 	mushroomIdleTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle5.png");
 	mushroomIdleTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle6.png");
 	mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
-	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");
+	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");*/
 }
 
 void Level1_Initialize()
@@ -130,11 +140,6 @@ void Level1_Initialize()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-
-	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	base5test = AEGfxTextureLoad("Assets/Base5.png");
-	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -197,9 +202,7 @@ void Level1_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	// Load enemy textures (create these assets or use placeholder)
-	meleeEnemyTexture = AEGfxTextureLoad("Assets/MeleeEnemy.png");
-	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
+
 
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
@@ -207,7 +210,7 @@ void Level1_Initialize()
 
 	// DOOR
 	animSystem::buildMesh(&doorMesh, DOOR_FRAME_COUNT);
-	doorTexture = AEGfxTextureLoad("Assets/DoorOpen.png");
+	
 	if (!doorTexture)
 		printf("DOOR TEXTURE NOT FOUND!\n");
 	else
@@ -318,14 +321,16 @@ void Level1_Update()
 		doorIsOpen = (doorAnim.currentFrame == DOOR_FRAME_COUNT - 1);
 	// -----------------------------------------------------------------------
 
-	static float frameTimer{ 0.0f };
-	frameTimer += dt;
-	if (frameTimer >= 0.1f) {
-		static int currentFrame{};
-		currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
-		meleeEnemyTexture = mushroomIdleTexture[currentFrame];
-		frameTimer = 0.0f;
-	}
+	//need fix animation
+	
+	//static float frameTimer{ 0.0f };
+	//frameTimer += dt;
+	//if (frameTimer >= 0.1f) {
+	//	static int currentFrame{};
+	//	currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
+	//	meleeEnemyTexture = mushroomIdleTexture[currentFrame];
+	//	frameTimer = 0.0f;
+	//}
 }
 
 void Level1_Draw()
@@ -429,6 +434,13 @@ void Level1_Unload()
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTexture) { AEGfxTextureUnload(doorTexture); doorTexture = nullptr; }
 
+	for (int i{}; i < 9; ++i) {
+		if (mushroomDieTexture[i]) { AEGfxTextureUnload(mushroomDieTexture[i]); mushroomDieTexture[i] = nullptr; }
+	}
+	for (int i{}; i < 5; ++i) {
+		if (mushroomHitTexture[i]) { AEGfxTextureUnload(mushroomHitTexture[i]); mushroomHitTexture[i] = nullptr; }
+	}
+	
 	// Destroy the font created in Initialize
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 

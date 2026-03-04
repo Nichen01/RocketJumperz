@@ -55,9 +55,6 @@
     <ClCompile Include="render.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -94,9 +91,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="aimingInterface.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="render.h">

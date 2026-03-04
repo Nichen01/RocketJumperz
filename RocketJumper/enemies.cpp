@@ -296,11 +296,11 @@ namespace enemySystem {
             {
                 // Choose texture based on enemy type and if the texture is not NULL
                 AEGfxTexture* texture = nullptr;
-                if (enemies[i].type == ENEMY_MELEE && meleeTexture)
+                if (enemies[i].type == ENEMY_MELEE)
                 {
                     texture = meleeTexture;
                 }
-                else if (enemies[i].type == ENEMY_RANGED && rangedTexture)
+                else if (enemies[i].type == ENEMY_RANGED)
                 {
                     texture = rangedTexture;
                 }

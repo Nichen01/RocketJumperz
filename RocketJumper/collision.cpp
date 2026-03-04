@@ -164,44 +164,44 @@ namespace gamelogic {
 		object->flag = 0;
 
 		// right
-		x1 = object->xPos + object->xScale / 2;
-		y1 = object->yPos + object->yScale / 4;
+		x1 = object->xPos + object->xScale / 2.f;
+		y1 = object->yPos + object->yScale / 4.f;
 
-		x2 = object->xPos + object->xScale / 2;
-		y2 = object->yPos - object->yScale / 4;
+		x2 = object->xPos + object->xScale / 2.f;
+		y2 = object->yPos - object->yScale / 4.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_RIGHT;
 		}
 
 		// left
-		x1 = object->xPos - object->xScale / 2;
-		y1 = object->yPos - object->yScale / 4;
+		x1 = object->xPos - object->xScale / 2.f;
+		y1 = object->yPos - object->yScale / 4.f;
 
-		x2 = object->xPos - object->xScale / 2;
-		y2 = object->yPos + object->yScale / 4;
+		x2 = object->xPos - object->xScale / 2.f;
+		y2 = object->yPos + object->yScale / 4.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_LEFT;
 		}
 
 		// top
-		x1 = object->xPos - object->xScale / 4;
-		y1 = object->yPos + object->yScale / 2;
+		x1 = object->xPos - object->xScale / 4.f;
+		y1 = object->yPos + object->yScale / 2.f;
 
-		x2 = object->xPos + object->xScale / 4;
-		y2 = object->yPos + object->yScale / 2;
+		x2 = object->xPos + object->xScale / 4.f;
+		y2 = object->yPos + object->yScale / 2.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_TOP;
 		}
 
 		// bottom
-		x1 = object->xPos - object->xScale / 4;
-		y1 = object->yPos - object->yScale / 2;
+		x1 = object->xPos - object->xScale / 4.f;
+		y1 = object->yPos - object->yScale / 2.f;
 
-		x2 = object->xPos + object->xScale / 4;
-		y2 = object->yPos - object->yScale / 2;
+		x2 = object->xPos + object->xScale / 4.f;
+		y2 = object->yPos - object->yScale / 2.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
 			object->flag = object->flag | COLLISION_BOTTOM;

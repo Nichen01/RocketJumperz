@@ -24,6 +24,9 @@ namespace audio {
 	}
 	void unloadsound() {
 		AEAudioUnloadAudio(Level);
+		AEAudioUnloadAudio(LaserBlast);
+		AEAudioUnloadAudio(Punch);
 		AEAudioUnloadAudioGroup(bgm);
+		AEAudioUnloadAudioGroup(soundEffects);
 	}
 }
