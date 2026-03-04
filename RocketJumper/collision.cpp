@@ -158,10 +158,10 @@ namespace gamelogic {
 	// Hotspot check and binary map collision.
 	// mapX = number of tile columns. index = tile value to treat as solid.
 	// Collision flags (COLLISION_LEFT, etc.) are defined in binaryMap.h.
-	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index)
+	int CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index)
 	{
 		float x1, y1, x2, y2;
-		object->flag = 0;
+		int flag = 0;
 
 		// right
 		x1 = object->xPos + object->xScale / 2.f;
@@ -171,7 +171,7 @@ namespace gamelogic {
 		y2 = object->yPos - object->yScale / 4.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_RIGHT;
+			flag = flag | COLLISION_RIGHT;
 		}
 
 		// left
@@ -182,7 +182,7 @@ namespace gamelogic {
 		y2 = object->yPos + object->yScale / 4.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_LEFT;
+			flag = flag | COLLISION_LEFT;
 		}
 
 		// top
@@ -193,7 +193,7 @@ namespace gamelogic {
 		y2 = object->yPos + object->yScale / 2.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_TOP;
+			flag = flag | COLLISION_TOP;
 		}
 
 		// bottom
@@ -204,7 +204,32 @@ namespace gamelogic {
 		y2 = object->yPos - object->yScale / 2.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_BOTTOM;
+			flag = flag | COLLISION_BOTTOM;
+		}
+
+		return flag;
+	}
+
+	void Collision_movement(objectsquares* object, int map[], int mapX, int index) {
+		if (CheckInstanceBinaryMapCollision(object, map, mapX, index) & COLLISION_BOTTOM) {
+			object->xPos = object->xPos;
+			SnapToCell(&object->posCurr.y);
+			object->velocityY = 0;
+		}
+		if (CheckInstanceBinaryMapCollision(object, map, mapX, index) & COLLISION_TOP) {
+			object->xPos = object->xPos;
+			SnapToCell(&object->yPos);
+			object->velocityY = 0;
+		}
+		if (CheckInstanceBinaryMapCollision(object, map, mapX, index) & COLLISION_LEFT) {
+			object->yPos = object->yPos;
+			SnapToCell(&object->xPos);
+			object->velocityY = 0;
+		}
+		if (CheckInstanceBinaryMapCollision(object, map, mapX, index) & COLLISION_RIGHT) {
+			object->yPos = object->yPos;
+			SnapToCell(&object->xPos);
+			object->velocityY = 0;
 		}
 	}
 
