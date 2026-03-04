@@ -15,7 +15,6 @@ Technology is prohibited.
 
 #include <iostream>
 #include <cstdio>
-#include "Level2.h"
 #include "draw.h"
 #include "collision.h"
 #include "player.h"
@@ -279,7 +278,7 @@ void Level2_Draw()
 
 	// ==== ENEMIES RENDER =======//
 	// Render enemies
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh, pTestMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles (red color)

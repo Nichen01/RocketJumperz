@@ -225,7 +225,7 @@ void Level1_Initialize()
 	else
 		printf("DOOR OK\n");
 
-	animSystem::init(doorAnim, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
+	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
 }
 
@@ -371,10 +371,11 @@ void Level1_Draw()
 	AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, 
-		MAX_ENEMIES, 
+	enemySystem::renderEnemies(enemies,
+		MAX_ENEMIES,
 		meleeEnemyMesh,
-		meleeEnemyTexture, 
+		pTestMesh,
+		meleeEnemyTexture,
 		rangedEnemyTexture,
 		animSystem::getUOffset(meleeAnim),
 		animSystem::getVOffset(meleeAnim));
@@ -457,14 +458,6 @@ void Level1_Unload()
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTexture) { AEGfxTextureUnload(doorTexture); doorTexture = nullptr; }
 	
-	/*
-	for (int i{}; i < 9; ++i) {
-		if (mushroomDieTexture[i]) { AEGfxTextureUnload(mushroomDieTexture[i]); mushroomDieTexture[i] = nullptr; }
-	}
-	for (int i{}; i < 5; ++i) {
-		if (mushroomHitTexture[i]) { AEGfxTextureUnload(mushroomHitTexture[i]); mushroomHitTexture[i] = nullptr; }
-	}
-	*/
 	
 	// Destroy the font created in Initialize
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }

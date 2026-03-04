@@ -75,12 +75,13 @@ namespace enemySystem {
         f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup);
 
     // Render all active enemies
-    void renderEnemies(Enemy enemies[], 
+    void renderEnemies(Enemy enemies[],
         s32 maxCount,
-        AEGfxVertexList* mesh,
+        AEGfxVertexList* meleeMesh,
+        AEGfxVertexList* rangedMesh,
         AEGfxTexture* meleeTexture,
         AEGfxTexture* rangedTexture,
-        f32 meleeUOffset = 0.0f, 
+        f32 meleeUOffset = 0.0f,
         f32 meleeVoffset = 0.0f);
 
     // Check if player collided with any melee enemies

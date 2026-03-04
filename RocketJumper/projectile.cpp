@@ -40,9 +40,9 @@ namespace projectileSystem {
                 projectiles[foundSlot].shape.xPos = player.xPos;
                 projectiles[foundSlot].shape.yPos = player.yPos;
 
-                // Calculate direction from player to mouse
-                f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
-                f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
+                // Calculate direction AWAY from mouse (rocket-jumper: fire opposite to aim)
+                f32 dx = player.xPos - static_cast<f32>(worldMouseX);
+                f32 dy = player.yPos - static_cast<f32>(worldMouseY);
 
                 // Normalize direction vector
                 f32 length = sqrtf(dx * dx + dy * dy);
@@ -77,8 +77,8 @@ namespace projectileSystem {
             if (projectiles[i].isActive == 1)
             {
                 // Move projectile
-                projectiles[i].shape.xPos -= projectiles[i].shape.velocityX;
-                projectiles[i].shape.yPos -= projectiles[i].shape.velocityY;
+                projectiles[i].shape.xPos += projectiles[i].shape.velocityX;
+                projectiles[i].shape.yPos += projectiles[i].shape.velocityY;
 
                 // Check if projectile is off-screen
                 if (projectiles[i].shape.xPos > 800.0f || projectiles[i].shape.xPos < -800.0f ||

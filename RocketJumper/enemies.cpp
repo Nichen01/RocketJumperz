@@ -285,11 +285,12 @@ namespace enemySystem {
      * @return VOID
      ***************************************************************************/
     // Render all active enemies
-    void renderEnemies(Enemy enemies[], 
+    void renderEnemies(Enemy enemies[],
         s32 maxCount,
-        AEGfxVertexList* mesh,
+        AEGfxVertexList* meleeMesh,
+        AEGfxVertexList* rangedMesh,
         AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture, 
+        AEGfxTexture* rangedTexture,
         f32 meleeUOffset,
         f32 meleeVoffset)
     {
@@ -297,20 +298,25 @@ namespace enemySystem {
         {
             if (enemies[i].isActive == 1)
             {
-                // Choose texture based on enemy type and if the texture is not NULL
+                // Choose texture, mesh, and UV offsets based on enemy type
                 AEGfxTexture* texture = nullptr;
+                AEGfxVertexList* mesh = nullptr;
                 f32 uOffset = 0.0f;
                 f32 vOffset = 0.0f;
                 if (enemies[i].type == ENEMY_MELEE)
                 {
                     texture = meleeTexture;
+                    mesh = meleeMesh;
                     uOffset = meleeUOffset;
                     vOffset = meleeVoffset;
                 }
                 else if (enemies[i].type == ENEMY_RANGED)
                 {
                     texture = rangedTexture;
+                    mesh = rangedMesh;
                 }
+
+                if (!mesh) continue;
 
                 // Texture available ==> set render mode and texture set
                 if (texture)
@@ -319,10 +325,9 @@ namespace enemySystem {
                     AEGfxTextureSet(texture, uOffset, vOffset);
                 }
                 else {
-                    // NEW: If texture is missing, clear the bound texture so it doesn't steal the door's!
                     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
                     AEGfxTextureSet(nullptr, 0.0f, 0.0f);
-                    AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f); // Make it bright red so it's obvious
+                    AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
                 }
 
                 // Draw enemy
