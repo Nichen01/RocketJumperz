@@ -108,9 +108,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (next != GS_RESTART) {
 			fpUnload();
+			previous = current;
 		}
 
-		previous = current;
 		current = next;
 	}
 
