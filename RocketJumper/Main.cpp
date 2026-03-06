@@ -26,7 +26,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// Using custom window procedure
-	int gGameRunning = 1;
+	//int gGameRunning = 1;
 	bool pause = false;
 	s8 pausefont = -1; 
 	//MenuButton playButton;
@@ -117,4 +117,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// free the system
 	AEGfxDestroyFont(pausefont);
 	AESysExit();
+	return 0;
 }
