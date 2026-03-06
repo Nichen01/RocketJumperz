@@ -18,7 +18,7 @@ namespace movement {
         enableGravity = enableDrag = 1;
     }
 
-    void getMouse(objectsquares &player) {
+    AEVec2 getMouse(objectsquares &player) {
         AEInputGetCursorPosition(&mouseX,&mouseY);
         mouseX -= ((screenWidth / 2) + player.xPos + player.velocityX);
         mouseY = ((screenLength / 2) - mouseY - player.yPos - player.velocityY);
@@ -29,6 +29,7 @@ namespace movement {
             directionVector.x = mouseX / mouseDistance;
             directionVector.y = mouseY / mouseDistance;
         }
+        return directionVector;
     }
 
     void physicsInput(objectsquares& player)

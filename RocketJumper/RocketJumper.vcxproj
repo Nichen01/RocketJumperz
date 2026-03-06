@@ -25,7 +25,6 @@
     <ClCompile Include="projectile.cpp" />
     <ClCompile Include="projectileTest.cpp" />
     <ClCompile Include="render.cpp" />
-    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aimingInterface.h" />
@@ -42,7 +41,6 @@
     <ClInclude Include="projectile.h" />
     <ClInclude Include="projectileTest.h" />
     <ClInclude Include="render.h" />
-    <ClInclude Include="pch.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

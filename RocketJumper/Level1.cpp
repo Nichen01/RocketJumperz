@@ -24,6 +24,7 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
+#include "aimingInterface.h"
 
 static s32* map = new s32[144]{ 0 };
 static int x = 16;
@@ -67,6 +68,7 @@ void Level1_Load()
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
+	aiming::loadAiming();
 
 }
 
@@ -195,6 +197,7 @@ void Level1_Update()
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo[player]);
+	aiming::updateAiming(objectinfo[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -272,6 +275,7 @@ void Level1_Draw()
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos,
 		objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	aiming::drawAiming();
 
 	// Render all active projectiles (YELLOW)
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -303,4 +307,5 @@ void Level1_Unload()
 	AEAudioUnloadAudio(L1);
 	AEAudioUnloadAudio(LaserBlast);
 	AEAudioUnloadAudioGroup(bgm);
+	aiming::unloadAiming();
 }

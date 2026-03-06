@@ -22,9 +22,6 @@
     <ClCompile Include="aimingInterface.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="player.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -41,6 +38,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="enemies.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Level2.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,12 +66,6 @@
     <ClInclude Include="aimingInterface.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="drawWallsLevel2.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="player.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -84,13 +78,13 @@
     <ClInclude Include="Level1.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="drawWallsLevel1.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="draw.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="enemies.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="level2.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
