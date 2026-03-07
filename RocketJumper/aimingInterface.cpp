@@ -4,7 +4,7 @@ namespace aiming {
 	AEMtx33 aimTransform = { 0 };
 	AEGfxTexture* aimingInterface = nullptr;
 	void loadAiming() {
-		aimingInterface = AEGfxTextureLoad("Assets/alien1.png");
+		aimingInterface = AEGfxTextureLoad("Assets/aim.png");
 		if (!aimingInterface)  printf("\ntexture failed\n"); 
 	}
 	void updateAiming(objectsquares& player) {
