@@ -14,6 +14,7 @@ namespace aiming {
 		AEMtx33 rotate = { 0 };
 		//angle = movement::getMouse(player).y/ movement::getMouse(player).x;
 		angle = static_cast<f32>(atan2(movement::getMouse(player).y , movement::getMouse(player).x));
+		angle += 5*PI / 4;
 		printf("\nangle:%f\n", angle);
 		AEMtx33Rot(&rotate, angle);
 
