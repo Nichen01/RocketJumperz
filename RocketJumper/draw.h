@@ -12,9 +12,6 @@ extern AEGfxVertexList* pMesh;
 extern AEGfxVertexList* platformMesh;
 extern AEGfxTexture* characterPictest;
 extern AEGfxTexture* base5test;
-extern AEGfxTexture* platformTex1;
-extern AEGfxTexture* platformTex2;
-extern AEGfxTexture* platformTex3;
 extern AEGfxTexture* plasma;
 
 // DoorOpen.jpg: 224 x 32 pixels, single row of 7 frames (32x32 each)

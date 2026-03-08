@@ -39,8 +39,8 @@ namespace renderlogic {
 		AEGfxSetTransform(transform.m);
 
 	}
-	void drawmap_Wall_floor(int map[], int mapX, int mapY, int mapS) {
-		int x, y, xo, yo;
+	void drawmap_Wall_floor(int /*map*/[], int /*mapX*/, int /*mapY*/, int mapS) {
+		int xo, yo;
 		//iterate and print map in 2D map array
 		for (s32 row = 0; row < BINARY_MAP_HEIGHT; row++) {	  // check for row
 			for (s32 col = 0; col < BINARY_MAP_WIDTH; col++) { // check for column

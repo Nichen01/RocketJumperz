@@ -28,10 +28,10 @@ Technology is prohibited.
 #include "binaryMap.h"
 #include "animation.h"
 
-s32* map = nullptr;
-int x;
-int y;
-int s = 80;
+static s32* map = nullptr;
+static int x;
+static int y;
+static int s = 80;
 
 objectsquares objectinfo[2] = { 0 };
 
@@ -67,8 +67,8 @@ static AEAudioGroup soundEffects;
 f32 doorX, doorY;
 s32  DOOR_FRAME_COUNT = 7;
 f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
-f32  DOOR_WIDTH = s;   // matches tile size s
-f32  DOOR_HEIGHT = s;
+f32  DOOR_WIDTH = static_cast<f32>(s);   // matches tile size s
+f32  DOOR_HEIGHT = static_cast<f32>(s);
 f32  DOOR_TRIGGER_RADIUS = 150.0f;  // px from door centre
 SpriteAnimation  doorAnim;
 AEGfxVertexList* doorMesh;
@@ -92,6 +92,9 @@ void Level1_Load()
 	//soundEffects = AEAudioCreateGroup();
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
+	// Load platform tile textures
+	render::drawPlatform();
+
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
@@ -101,7 +104,7 @@ void Level1_Load()
 	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
 
 
-	doorTexture = AEGfxTextureLoad("Assets/DoorOpen.png");
+	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
 
 	// Loading of assets for mushroomDie
 	//mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
@@ -196,12 +199,12 @@ void Level1_Initialize()
 
 	for (int row{}; row < y; ++row) {
 		for (int col{}; col < x; col++) {
-			map[row * x + col] = MapData[row][col];
+			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
 
 	objectinfo[player].xPos = 0.0f;
-	objectinfo[player].yPos = 0.0f;
+	objectinfo[player].yPos = 100.0f;
 	objectinfo[player].xScale = 60.0f;
 	objectinfo[player].yScale = 60.0f;
 
@@ -226,7 +229,7 @@ void Level1_Initialize()
 	// DOOR
 	animSystem::buildMesh(&doorMesh, 1, 7);
 	
-	if (!doorTexture)
+	if (!doorTex)
 		printf("DOOR TEXTURE NOT FOUND!\n");
 	else
 		printf("DOOR OK\n");
@@ -368,8 +371,14 @@ void Level1_Draw()
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
-		meleeEnemyTexture, rangedEnemyTexture);
+	enemySystem::renderEnemies(enemies,
+		MAX_ENEMIES,
+		meleeEnemyMesh,
+		pTestMesh,
+		meleeEnemyTexture,
+		rangedEnemyTexture,
+		animSystem::getUOffset(meleeAnim),
+		animSystem::getVOffset(meleeAnim));
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -424,7 +433,7 @@ void Level1_Free()
 
 	if (platformMesh) {
 		AEGfxMeshFree(platformMesh);
-		pTestMesh = nullptr;
+		platformMesh = nullptr;
 	}
 
 	if (map) {

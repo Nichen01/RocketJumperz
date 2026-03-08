@@ -25,6 +25,8 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
+#include "binaryMap.h"
+#include "animation.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -36,12 +38,14 @@ static int s = 80;
 
 static Projectile Projectiles[MAX_PROJECTILES];
 static AEGfxVertexList* pTestMesh = nullptr;
+static AEGfxVertexList* meleeEnemyMesh = nullptr;
 
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
+static AEGfxTexture* doorTexture = nullptr;
 
 // Font for HUD text (must be destroyed in Unload to avoid leak)
 static s8 font = -1;
@@ -56,6 +60,9 @@ static AEAudio LaserBlast;
 static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
+
+//ANIMATION
+SpriteAnimation meleeAnim;
 
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
@@ -277,8 +284,14 @@ void Level2_Draw()
 
 	// ==== ENEMIES RENDER =======//
 	// Render enemies
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
-		meleeEnemyTexture, rangedEnemyTexture);
+	enemySystem::renderEnemies(enemies,
+		MAX_ENEMIES,
+		meleeEnemyMesh,
+		pTestMesh,
+		meleeEnemyTexture,
+		rangedEnemyTexture,
+		animSystem::getUOffset(meleeAnim),
+		animSystem::getVOffset(meleeAnim));
 
 	// Render enemy projectiles (red color)
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);  // Changed from COLOR to TEXTURE
