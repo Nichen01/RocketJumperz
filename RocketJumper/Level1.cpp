@@ -346,12 +346,6 @@ void Level1_Draw()
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	// Render doors
-	// Door -- UV offset selects the current frame from the strip
-	AEGfxTextureSet(doorTex, animSystem::getUOffset(doorAnim), 0.f);
-	renderlogic::Drawsquare(doorX, doorY, DOOR_WIDTH, DOOR_HEIGHT);
-	AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
-
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
 		meleeEnemyTexture, rangedEnemyTexture);

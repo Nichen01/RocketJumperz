@@ -102,7 +102,7 @@ int ImportMapDataFromFile(const char* FileName)
 			ifs >> value;
 			MapData[i][j] = value;
 			BinaryCollisionArray[i][j] = (value >= 1) ? 1 : 0;
-			if (value == 100) {
+			if (value == 21) {
 				doorX = (j * 80) + 80 / 2 - 800.0f;
 				doorY = 450.0f - ((i * 80) + 80 / 2);
 			}
