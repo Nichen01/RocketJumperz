@@ -15,6 +15,7 @@ Technology is prohibited.
 
 #include <iostream>
 #include <cstdio>
+#include "Level2.h"
 #include "draw.h"
 #include "collision.h"
 #include "player.h"
@@ -28,9 +29,9 @@ Technology is prohibited.
 static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
-static int s = 100;
+static int s = 80;
 
-static objectsquares objectinfo[2] = { 0 };
+//objectsquares objectinfo[2] = { 0 };
 
 
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -57,9 +58,6 @@ static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
 
-
-
-
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level2_Load()
@@ -74,7 +72,8 @@ void Level2_Load()
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();   
 	
-
+	// Load platform assets
+	render::drawPlatform();
 }
 
 void Level2_Initialize()
@@ -278,7 +277,7 @@ void Level2_Draw()
 
 	// ==== ENEMIES RENDER =======//
 	// Render enemies
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh, pTestMesh,
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles (red color)
@@ -341,6 +340,7 @@ void Level2_Unload()
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
+	render::unloadPlatform();
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 

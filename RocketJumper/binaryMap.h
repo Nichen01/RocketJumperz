@@ -16,9 +16,8 @@ Technology is prohibited.
 #ifndef BINARY_MAP_H_
 #define BINARY_MAP_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "pch.h"
+#include "draw.h"
 
 
 // ----------------------------------------------------------------------------

@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "MainMenu.h"
 #include "projectileTest.h"
 #include "levelEditor.h"
+#include "GameStateList.h"
 #pragma once
 extern bool firstTimeLevel1;
 extern bool firstTimeLevel2;

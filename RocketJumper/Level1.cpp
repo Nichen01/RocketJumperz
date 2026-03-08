@@ -31,9 +31,9 @@ Technology is prohibited.
 s32* map = nullptr;
 int x;
 int y;
-int s = 50;
+int s = 80;
 
-static objectsquares objectinfo[2] = { 0 };
+objectsquares objectinfo[2] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -64,25 +64,19 @@ static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
+f32 doorX, doorY;
+s32  DOOR_FRAME_COUNT = 7;
+f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
+f32  DOOR_WIDTH = s;   // matches tile size s
+f32  DOOR_HEIGHT = s;
+f32  DOOR_TRIGGER_RADIUS = 150.0f;  // px from door centre
+SpriteAnimation  doorAnim;
+AEGfxVertexList* doorMesh;
+bool doorIsOpen = false; // tracks fully-open state
+AEGfxTexture* doorTex;
+
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 font = -1;
-
-// DoorOpen.jpg: 224 x 32 pixels, single row of 7 frames (32x32 each)
-// ---------------------------------------------------------------------------
-static constexpr int  DOOR_FRAME_COUNT = 7;
-static constexpr f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
-static constexpr f32  DOOR_WORLD_X = 200.0f;  // adjust to match your map
-static constexpr f32  DOOR_WORLD_Y = 50.0f;
-static constexpr f32  DOOR_WIDTH = 50.0f;   // matches tile size s
-static constexpr f32  DOOR_HEIGHT = 50.0f;
-static constexpr f32  DOOR_TRIGGER_RADIUS = 150.0f;  // px from door centre
-
-static SpriteAnimation  doorAnim;
-static AEGfxVertexList* doorMesh = nullptr;
-static AEGfxTexture* doorTexture = nullptr;
-static bool             doorIsOpen = false; // tracks fully-open state
-
-// ---------------------------------------------------------------------------
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -165,6 +159,18 @@ void Level1_Initialize()
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pMesh = AEGfxMeshEnd();
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	AEGfxTriAdd(
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+	platformMesh = AEGfxMeshEnd();
 
 	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
 	AEGfxMeshStart();
@@ -310,8 +316,8 @@ void Level1_Update()
 	// -----------------------------------------------------------------------
 	// Door animation -- hardcoded proximity check
 	// -----------------------------------------------------------------------
-	f32 dx = objectinfo[player].xPos - DOOR_WORLD_X;
-	f32 dy = objectinfo[player].yPos - DOOR_WORLD_Y;
+	f32 dx = objectinfo[player].xPos - doorX;
+	f32 dy = objectinfo[player].yPos - doorY;
 	f32 dist = sqrtf(dx * dx + dy * dy);
 	bool playerNear = (dist <= DOOR_TRIGGER_RADIUS);
 
@@ -361,24 +367,9 @@ void Level1_Draw()
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawmap_Wall_floor(map, x, y, s);
 
-	// Render doors
-	// Door -- UV offset selects the current frame from the strip
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
-	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
-	AEGfxTextureSet(doorTexture, animSystem::getUOffset(doorAnim), 0.f);
-	renderlogic::Drawsquare(DOOR_WORLD_X, DOOR_WORLD_Y, DOOR_WIDTH, DOOR_HEIGHT);
-	AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
-
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies,
-		MAX_ENEMIES,
-		meleeEnemyMesh,
-		pTestMesh,
-		meleeEnemyTexture,
-		rangedEnemyTexture,
-		animSystem::getUOffset(meleeAnim),
-		animSystem::getVOffset(meleeAnim));
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
+		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -431,6 +422,11 @@ void Level1_Free()
 		pTestMesh = nullptr;
 	}
 
+	if (platformMesh) {
+		AEGfxMeshFree(platformMesh);
+		pTestMesh = nullptr;
+	}
+
 	if (map) {
 		delete[] map;
 		map = nullptr;
@@ -454,11 +450,11 @@ void Level1_Unload()
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
+	render::unloadPlatform();
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-	if (doorTexture) { AEGfxTextureUnload(doorTexture); doorTexture = nullptr; }
-	
-	
+	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
+
 	// Destroy the font created in Initialize
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
