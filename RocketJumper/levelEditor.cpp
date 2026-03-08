@@ -3,7 +3,6 @@
 #include "GameStateManager.h"
 
 // GLOBAL VARIABLES
-static AEGfxTexture* button;
 static AEGfxTexture* door;
 static AEGfxVertexList* levelTileMesh = nullptr;
 static AEGfxTexture* tileTextures[9];
@@ -17,9 +16,10 @@ static std::vector<TileAction> actionHistory;
 
 void levelEditor_Load() {
 
-	button = AEGfxTextureLoad("Assets/UI/Button.png");
 	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
 	door = AEGfxTextureLoad("Assets/Platform/staticDoor.jng");
+
+
 
 	tileTextures[0] = AEGfxTextureLoad("Assets/Platform/platform1.png");
 	tileTextures[1] = AEGfxTextureLoad("Assets/Platform/platform2.png");
@@ -96,25 +96,25 @@ void levelEditor_Draw() {
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f); // full white so texture shows correctly
 
 
-	// text legends
-	for (s32 i{}; i < 7; i++) {
-		AEMtx33 scl, rot, transl, transf;
-		AEMtx33Scale(&scl, 30.f, 30.f);
-		AEMtx33Rot(&rot, 0);
-		AEMtx33Trans(&transl, 500.f, static_cast<f32>(500.f + 30 * i));
+	//// text legends
+	//for (s32 i{}; i < 7; i++) {
+	//	AEMtx33 scl, rot, transl, transf;
+	//	AEMtx33Scale(&scl, 30.f, 30.f);
+	//	AEMtx33Rot(&rot, 0);
+	//	AEMtx33Trans(&transl, 500.f, static_cast<f32>(500.f + 30 * i));
 
-		AEMtx33Concat(&transf, &rot, &scl);
-		AEMtx33Concat(&transf, &transl, &transf);
+	//	AEMtx33Concat(&transf, &rot, &scl);
+	//	AEMtx33Concat(&transf, &transl, &transf);
 
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxTextureSet(door, 0, 0);
+	//	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	//	AEGfxTextureSet(door, 0, 0);
 
-		AEGfxSetTransform(transf.m);
-		AEGfxMeshDraw(levelTileMesh, AE_GFX_MDM_TRIANGLES);
+	//	AEGfxSetTransform(transf.m);
+	//	AEGfxMeshDraw(levelTileMesh, AE_GFX_MDM_TRIANGLES);
 
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	//	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	}
+	//}
 
 	// getting mouse coordinates
 	s32 mouseX, mouseY;
@@ -301,6 +301,5 @@ void levelEditor_Free() {
 }
 
 void levelEditor_Unload() {
-	if (button) AEGfxTextureUnload(button);
 	AEGfxDestroyFont(font);
 }
