@@ -18,7 +18,7 @@ Technology is prohibited.
 
 #include "pch.h"
 #include "Draw.h"
-
+#include "DoorSystem.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -49,7 +49,7 @@ enum TYPE_OBJECT
 
 int		GetCellValue(int X, int Y);
 void	SnapToCell(float *Coordinate);
-int		ImportMapDataFromFile(const char *FileName);
+int		ImportMapDataFromFile(const char *FileName, int);
 void	FreeMapData(void);
 void	PrintRetrievedInformation(void);
 int		ExportMapDataToFile(const char* FileName);

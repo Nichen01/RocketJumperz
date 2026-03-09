@@ -16,27 +16,21 @@ Technology is prohibited.
 #include "pch.h"
 #include "Level1.h"
 
-s32* map = nullptr;
-int x;
-int y;
-int s = 80;
+static s32* map = nullptr;
+static int x = 16;
+static int y = 9;
+static int s = 80;
 
 objectsquares objectinfo1[2] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
-static AEGfxVertexList* pTestMesh = nullptr;
 
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
-
-
-static AEGfxTexture* mushroomDieTexture[9] = { nullptr };
-static AEGfxTexture* mushroomHitTexture[5] = { nullptr };
-static AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
@@ -62,43 +56,12 @@ void Level1_Load()
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();
-	soundEffects = AEAudioCreateGroup();
-
-	// Loading of assets for mushroomDie
-	mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
-	mushroomDieTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie1.png");
-	mushroomDieTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie2.png");
-	mushroomDieTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie3.png");
-	mushroomDieTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie4.png");
-	mushroomDieTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie5.png");
-	mushroomDieTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie6.png");
-	mushroomDieTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie7.png");
-	mushroomDieTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie8.png");
-
-	// Loading of assets for mushroomHit
-	mushroomHitTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit0.png");
-	mushroomHitTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit1.png");
-	mushroomHitTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit2.png");
-	mushroomHitTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit3.png");
-	mushroomHitTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit4.png");
-
-	// Loading of assets for mushroomIdle
-	mushroomIdleTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle0.png");
-	mushroomIdleTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle1.png");
-	mushroomIdleTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle2.png");
-	mushroomIdleTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle3.png");
-	mushroomIdleTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle4.png");
-	mushroomIdleTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle5.png");
-	mushroomIdleTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle6.png");
-	mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
-	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");
 
 	// Load platform assets
-	render::drawPlatform();
+	load::platform();
 
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
 }
@@ -118,34 +81,13 @@ void Level1_Initialize()
 
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pMesh = AEGfxMeshEnd();
+	init::enemy();
+	init::platform();
+	init::player();
+	init::projectile();
 
-	renderlogic::initPlatformMesh();
-
-
-	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pTestMesh = AEGfxMeshEnd();
-
-	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt", 1)) {
 		printf("Could not import file");
 		return;
 	}
@@ -311,22 +253,22 @@ void Level1_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	// ===== RENDER WALLS ======= //
-	renderlogic::drawmap_Wall_floor(map, x, y, s);
+	renderlogic::drawMapWallFloor(map, x, y, s);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, pTestMesh);
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxTextureSet(characterPictest, 0, 0);
-	renderlogic::Drawsquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
+	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
 		objectinfo1[player].xScale, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
@@ -334,7 +276,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
 	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.
@@ -353,36 +295,22 @@ void Level1_Draw()
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
-		renderlogic::drawTileArray();
 	}
+	renderlogic::drawTileArray();
 }
 
 void Level1_Free()
 {
 	// FREE MESHES AND MAP
-	if (pMesh) {
-		AEGfxMeshFree(pMesh);
-		pMesh = nullptr;
-	}
-
-	if (pTestMesh) {
-		AEGfxMeshFree(pTestMesh);
-		pTestMesh = nullptr;
-	}
-
-	if (platformMesh) {
-		AEGfxMeshFree(platformMesh);
-		pTestMesh = nullptr;
-	}
+	freeAsset::platform();
+	freeAsset::door();
+	freeAsset::enemy();
+	freeAsset::player();
+	freeAsset::projectile();
 
 	if (map) {
 		delete[] map;
 		map = nullptr;
-	}
-
-	if (doorMesh) {
-		AEGfxMeshFree(doorMesh);
-		doorMesh = nullptr;
 	}
 
 	FreeMapData();
@@ -392,9 +320,10 @@ void Level1_Unload()
 {
 	// Unload ALL textures that were loaded in Initialize
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
-	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-	render::unloadPlatform();
+
+	unload::platform();
+
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }

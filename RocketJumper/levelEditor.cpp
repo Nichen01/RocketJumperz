@@ -25,7 +25,9 @@ static u32 doorID{};
 static int promptRow = -1;
 static int promptCol = -1;
 
-void levelEditor_Load() {
+static char strBuffer[100];
+
+void LevelEditor_Load() {
 
 	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
 
@@ -42,6 +44,8 @@ void levelEditor_Load() {
 	button2 = AEGfxTextureLoad("Assets/UI/2Button.png");
 	button3 = AEGfxTextureLoad("Assets/UI/3Button.png");
 	button4 = AEGfxTextureLoad("Assets/UI/4Button.png");
+	if (ctrl1) printf("Success to load ctrl1.png\n");
+
 
 	tileTextures[0] = AEGfxTextureLoad("Assets/Platform/platform1.png");
 	tileTextures[1] = AEGfxTextureLoad("Assets/Platform/platform2.png");
@@ -56,7 +60,7 @@ void levelEditor_Load() {
 
 }
 
-void levelEditor_Initialize() {
+void LevelEditor_Initialize() {
 
 	AEGfxMeshStart();
 	AEGfxTriAdd(
@@ -84,17 +88,17 @@ void levelEditor_Initialize() {
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	switch (level) {
 	case 1:
-		ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
+		ImportMapDataFromFile("Assets/Map/Level1_Map.txt", 1);
 		std::cout << "File 1 read";
 		break;
 	case 2:
-		ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
+		ImportMapDataFromFile("Assets/Map/Level2_Map.txt", 2);
 		std::cout << "File 2 read";
 		break;
 	}
 }
 
-void levelEditor_Update() {
+void LevelEditor_Update() {
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
 		level = 1;
 		next = GS_RESTART;
@@ -219,7 +223,7 @@ void levelEditor_Update() {
 	}
 }
 
-void levelEditor_Draw() {
+void LevelEditor_Draw() {
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
     AEGfxSetBlendMode(AE_GFX_BM_NONE);
@@ -363,13 +367,11 @@ void levelEditor_Draw() {
 	AEGfxSetTransform(tileTransf.m);
 	AEGfxMeshDraw(levelTileMesh, AE_GFX_MDM_TRIANGLES);
 
-	char strBuffer[100];
 	memset(strBuffer, 0, 100 * sizeof(char));
-
+	f32 tileTextWidth, tileTextHeight;
+	AEGfxGetPrintSize(font, strBuffer, 0.15f, &tileTextWidth, &tileTextHeight);
 	// to print the text below the asset
 	switch (currentTileIndex) {
-		f32 tileTextWidth, tileTextHeight;
-		AEGfxGetPrintSize(font, strBuffer, 0.15f, &tileTextWidth, &tileTextHeight);
 	case 0:
 		sprintf_s(strBuffer, "Platform: Top Left Corner");
 		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
@@ -562,13 +564,11 @@ void levelEditor_Draw() {
 		AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, doorPromptAlpha);
 
 		// draw rectangle behind text
-		renderlogic::Drawsquare(boxX * AEGfxGetWindowWidth() / 2.0f,
+		renderlogic::drawSquare(boxX * AEGfxGetWindowWidth() / 2.0f,
 			boxY * AEGfxGetWindowHeight() / 2.0f,
 			boxWidth, boxHeight);
 		AEGfxMeshDraw(levelTileMesh, AE_GFX_MDM_TRIANGLES);
 
-		// now draw the text on top
-		char strBuffer[100];
 		memset(strBuffer, 0, sizeof(strBuffer));
 		f32 doorTextWidth, doorTextHeight;
 		AEGfxGetPrintSize(font, strBuffer, 0.2f, &doorTextWidth, &doorTextHeight);
@@ -577,15 +577,16 @@ void levelEditor_Draw() {
 
 }
 
-void levelEditor_Free() {
+void LevelEditor_Free() {
 
 	if (levelTileMesh) {
 		AEGfxMeshFree(levelTileMesh);
+		std::cout << "UI MESH UNLOADED" << std::endl;
 		levelTileMesh = nullptr;
 	}
 	FreeMapData();
 }
 
-void levelEditor_Unload() {
+void LevelEditor_Unload() {
 	AEGfxDestroyFont(font);
 }

@@ -20,7 +20,7 @@ Technology is prohibited.
 #include "GameStateManager.h"
 #include "Projectile.h"
 #include "Movement.h"
-#include "Render.h"
+#include "Load.h"
 #include "Enemies.h"
 #include "BinaryMap.h"
 #include "GameStateList.h"

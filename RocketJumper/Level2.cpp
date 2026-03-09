@@ -25,7 +25,6 @@ static int s = 80;
 objectsquares objectinfo2[2] = { 0 };
 
 static Projectile Projectiles[MAX_PROJECTILES];
-static AEGfxVertexList* pTestMesh = nullptr;
 
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
@@ -64,14 +63,12 @@ void Level2_Load()
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();
-	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 	
 	// Load platform assets
-	render::drawPlatform();
+	load::platform();
 
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 }
 
@@ -84,7 +81,6 @@ void Level2_Initialize()
 
 	// Load textures, defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
 	// Initialize player movement system
@@ -95,33 +91,12 @@ void Level2_Initialize()
 
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+	init::enemy();
+	init::platform();
+	init::player();
+	init::projectile();
 
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pMesh = AEGfxMeshEnd();
-
-	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pTestMesh = AEGfxMeshEnd();
-
-	renderlogic::initPlatformMesh();
-
-	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt", 2)) {
 		printf("Could not import file");
 		return;
 	}
@@ -275,23 +250,23 @@ void Level2_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	// Draw map walls and floor
-	renderlogic::drawmap_Wall_floor(map, x, y, s);
+	renderlogic::drawMapWallFloor(map, x, y, s);
 
 	// ==== ENEMIES RENDER =======//
 	// Render enemies
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, pTestMesh,
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles (red color)
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);  // Changed from COLOR to TEXTURE
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, pTestMesh);
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxTextureSet(characterPictest, 0, 0);
-	renderlogic::Drawsquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
+	renderlogic::drawSquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
 		objectinfo2[player].xScale, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
@@ -299,7 +274,7 @@ void Level2_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
 	// ====== HUD: Player Health Display ======
 	if (font >= 0)
@@ -320,17 +295,11 @@ void Level2_Draw()
 
 void Level2_Free()
 {
-	if (pMesh) {
-		AEGfxMeshFree(pMesh);
-		pMesh = nullptr;
-	}
-
-	if (pTestMesh) {
-		AEGfxMeshFree(pTestMesh);
-		pTestMesh = nullptr;
-	}
-
-
+	freeAsset::platform();
+	freeAsset::door();
+	freeAsset::enemy();
+	freeAsset::player();
+	freeAsset::projectile();
 
 	if (map) {
 		delete[] map;
@@ -342,9 +311,8 @@ void Level2_Unload()
 {
 	// Unload ALL textures that were loaded in Initialize
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
-	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-	render::unloadPlatform();
+	unload::platform();
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 

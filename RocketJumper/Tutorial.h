@@ -1,15 +1,22 @@
 #pragma once
 
-#include "Render.h"
+#include "Load.h"
+#include "Draw.h"
+#include "Collision.h"
+#include "Player.h"
+#include "GameStateManager.h"
+#include "Projectile.h"
+#include "Movement.h"
+#include "Enemies.h"
 
-void tutorial_Load();
+void Tutorial_Load();
 
-void tutorial_Load_Initialize();
+void Tutorial_Initialize();
 
-void tutorial_Load_Update();
+void Tutorial_Update();
 
-void tutorial_Load_Draw();
+void Tutorial_Draw();
 
-void tutorial_Load_Free();
+void Tutorial_Free();
 
-void tutorial_Load_Unload();
+void Tutorial_Unload();

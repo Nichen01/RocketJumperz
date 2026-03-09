@@ -80,7 +80,7 @@ int** glassMap;
 //
 // ----------------------------------------------------------------------------
 
-int ImportMapDataFromFile(const char* FileName)
+int ImportMapDataFromFile(const char* FileName, int currentLevel)
 {
 	std::ifstream ifs(FileName, std::ios::in);
 	if (!ifs) return 0;
@@ -119,6 +119,22 @@ int ImportMapDataFromFile(const char* FileName)
 			}
 		}
 	}
+
+	for (int row = 0; row < BINARY_MAP_HEIGHT; ++row) {
+		for (int col = 0; col < BINARY_MAP_WIDTH; ++col) {
+			int tile = MapData[row][col];
+			if (tile >= 21 && tile <= 29) {
+				DoorLink door;
+				door.id = tile;       // door ID
+				door.level = currentLevel;
+				door.row = row;
+				door.col = col;
+				doors.push_back(door);
+			}
+		}
+	}
+
+	animSystem::init(d.anim, doorFrameCount, 0.08f, ANIM_IDLE);
 
 	ifs.close();
 	return 1;

@@ -4,7 +4,7 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "Collision.h"
 #include "Main.h"
-#include "Render.h"
+#include "Load.h"
 #include "Sound.h"
 
 // ---------------------------------------------------------------------------
@@ -26,7 +26,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// Using custom window procedure
-	int gGameRunning = 1;
+	//int gGameRunning = 1;
 	bool pause = false;
 	s8 pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	f32 width, height;
@@ -39,7 +39,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	printf("Team project test\n");
 
 	
-	GSM_Initialize(GS_LEVEL2);
+	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
 	{

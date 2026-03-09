@@ -17,7 +17,7 @@ Technology is prohibited.
 #include "Collision.h"
 #include "Projectile.h"
 #include "Movement.h"
-#include "Render.h"
+#include "Draw.h"
 
 
 // Local variables for projectile test level
@@ -164,13 +164,13 @@ void ProjectileTest_Draw()
 
 	// Render Obstacle (RED)
 	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.0f);
-	render::Drawsquare(testObjects[obstacle].xPos, testObjects[obstacle].yPos,
+	renderlogic::drawSquare(testObjects[obstacle].xPos, testObjects[obstacle].yPos,
 		testObjects[obstacle].xScale, testObjects[obstacle].yScale);
 	AEGfxMeshDraw(pTestMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render Player (WHITE)
 	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-	render::Drawsquare(testObjects[player].xPos, testObjects[player].yPos,
+	renderlogic::drawSquare(testObjects[player].xPos, testObjects[player].yPos,
 		testObjects[player].xScale, testObjects[player].yScale);
 	AEGfxMeshDraw(pTestMesh, AE_GFX_MDM_TRIANGLES);
 

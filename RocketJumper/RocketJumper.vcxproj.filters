@@ -52,7 +52,7 @@
     <ClCompile Include="ProjectileTest.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Render.cpp">
+    <ClCompile Include="Load.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Sound.cpp">
@@ -62,6 +62,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Tutorial.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="DoorSystem.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -102,7 +105,7 @@
     <ClInclude Include="Sound.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Render.h">
+    <ClInclude Include="Load.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="BinaryMap.h">
@@ -130,6 +133,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Tutorial.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DoorSystem.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

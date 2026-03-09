@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "Level1.h"
 #include "Level2.h"
 #include "LevelEditor.h"
+#include "Tutorial.h"
 
 #pragma once
 extern bool firstTimeLevel1;
