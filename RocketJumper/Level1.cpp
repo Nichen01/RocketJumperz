@@ -27,6 +27,7 @@ Technology is prohibited.
 #include "enemies.h"
 #include "binaryMap.h"
 #include "animation.h"
+#include "AssetManager.h"
 
 static s32* map = nullptr;
 static int x;
@@ -37,16 +38,12 @@ objectsquares objectinfo[2] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
-static AEGfxVertexList* pTestMesh = nullptr;
 
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
-static AEGfxTexture* meleeEnemyTexture = nullptr;
-static AEGfxTexture* rangedEnemyTexture = nullptr;
 
-//NEW MESH FOR MUSHROOM
-static AEGfxVertexList* meleeEnemyMesh = nullptr;
+// Mushroom animation state (mesh/textures owned by AssetManager)
 static SpriteAnimation meleeAnim;
 
 /*
@@ -95,16 +92,13 @@ void Level1_Load()
 	// Load platform tile textures
 	render::drawPlatform();
 
-	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	base5test = AEGfxTextureLoad("Assets/Base5.png");
-	plasma = AEGfxTextureLoad("Assets/plasma.png");
-	// Load enemy textures (create these assets or use placeholder)
-	meleeEnemyTexture = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
-	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
-
-
-	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
+	// Load textures via AssetManager (prevents duplicate loads across level reloads)
+	characterPictest = AssetManager::LoadTexture("characterPictest", "Assets/astronautRight.png");
+	base5test        = AssetManager::LoadTexture("base5test",        "Assets/Base5.png");
+	plasma           = AssetManager::LoadTexture("plasma",           "Assets/plasma.png");
+	doorTex          = AssetManager::LoadTexture("doorTex",          "Assets/DoorOpen.png");
+	AssetManager::LoadTexture("meleeEnemy",  "Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
+	AssetManager::LoadTexture("rangedEnemy", "Assets/RangedEnemy.png");
 
 	// Loading of assets for mushroomDie
 	//mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
@@ -162,6 +156,7 @@ void Level1_Initialize()
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pMesh = AEGfxMeshEnd();
+	AssetManager::StoreMesh("pMesh", pMesh);
 
 	AEGfxMeshStart();
 	AEGfxTriAdd(
@@ -174,6 +169,7 @@ void Level1_Initialize()
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	platformMesh = AEGfxMeshEnd();
+	AssetManager::StoreMesh("platformMesh", platformMesh);
 
 	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
 	AEGfxMeshStart();
@@ -185,7 +181,7 @@ void Level1_Initialize()
 		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pTestMesh = AEGfxMeshEnd();
+	AssetManager::StoreMesh("pTestMesh", AEGfxMeshEnd());
 
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
@@ -223,11 +219,16 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
 	//MUSHROOM ANIM TEST
-	animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
+	{
+		AEGfxVertexList* meleeEnemyMesh = nullptr;
+		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
+		AssetManager::StoreMesh("meleeEnemyMesh", meleeEnemyMesh);
+	}
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
 	animSystem::buildMesh(&doorMesh, 1, 7);
+	AssetManager::StoreMesh("doorMesh", doorMesh);
 	
 	if (!doorTex)
 		printf("DOOR TEXTURE NOT FOUND!\n");
@@ -373,10 +374,10 @@ void Level1_Draw()
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
-		meleeEnemyMesh,
-		pTestMesh,
-		meleeEnemyTexture,
-		rangedEnemyTexture,
+		AssetManager::GetMesh("meleeEnemyMesh"),
+		AssetManager::GetMesh("pTestMesh"),
+		AssetManager::GetTexture("meleeEnemy"),
+		AssetManager::GetTexture("rangedEnemy"),
 		animSystem::getUOffset(meleeAnim),
 		animSystem::getVOffset(meleeAnim));
 
@@ -384,7 +385,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, pTestMesh);
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh("pTestMesh"));
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -397,7 +398,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh("pTestMesh"));
 
 	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.
@@ -420,34 +421,15 @@ void Level1_Draw()
 
 void Level1_Free()
 {
-	// FREE MESHES AND MAP
-	if (pMesh) {
-		AEGfxMeshFree(pMesh);
-		pMesh = nullptr;
-	}
-
-	if (pTestMesh) {
-		AEGfxMeshFree(pTestMesh);
-		pTestMesh = nullptr;
-	}
-
-	if (platformMesh) {
-		AEGfxMeshFree(platformMesh);
-		platformMesh = nullptr;
-	}
+	// Free all registered meshes, then null the shared extern pointers draw.cpp holds
+	AssetManager::FreeAllMeshes();
+	pMesh        = nullptr;
+	platformMesh = nullptr;
+	doorMesh     = nullptr;
 
 	if (map) {
 		delete[] map;
 		map = nullptr;
-	}
-
-	if (meleeEnemyMesh) { 
-		AEGfxMeshFree(meleeEnemyMesh);
-		meleeEnemyMesh = nullptr; }
-
-	if (doorMesh) {
-		AEGfxMeshFree(doorMesh);
-		doorMesh = nullptr;
 	}
 
 	FreeMapData();
@@ -455,14 +437,15 @@ void Level1_Free()
 
 void Level1_Unload()
 {
-	// Unload ALL textures that were loaded in Initialize
-	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
-	if (base5test) { AEGfxTextureUnload(base5test); base5test = nullptr; }
-	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
+	// Unload all registered textures, then null the shared extern pointers draw.cpp holds.
+	// Note: platform1-9/glass are still managed by render::unloadPlatform() until
+	// render.cpp is migrated to AssetManager.
+	AssetManager::UnloadAllTextures();
+	characterPictest = nullptr;
+	base5test        = nullptr;
+	plasma           = nullptr;
+	doorTex          = nullptr;
 	render::unloadPlatform();
-	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
-	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
 
 	// Destroy the font created in Initialize
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }

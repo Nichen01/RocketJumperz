@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="aimingInterface.cpp" />
     <ClCompile Include="animation.cpp" />
+    <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="binaryMap.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="draw.cpp" />
@@ -34,6 +35,7 @@
   <ItemGroup>
     <ClInclude Include="aimingInterface.h" />
     <ClInclude Include="animation.h" />
+    <ClInclude Include="AssetManager.h" />
     <ClInclude Include="binaryMap.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="draw.h" />
