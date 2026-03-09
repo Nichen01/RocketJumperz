@@ -187,8 +187,8 @@ void Level1_Initialize()
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 60.0f;
-	objectinfo[player].yScale = 60.0f;
+	objectinfo[player].xScale = 50.0f;
+	objectinfo[player].yScale = 50.0f;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo[player]);
@@ -301,7 +301,7 @@ void Level1_Update()
 	/*gamelogic::Collision_movement(&enemies[0].shape, map, x,s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x,s, 1);*/
 	gamelogic::Collision_movement(&objectinfo[player], map, x,s, 1);
-
+	AEGfxSetCamPosition(objectinfo[player].xPos, objectinfo[player].yPos);
 	// -----------------------------------------------------------------------
 	// Door animation -- hardcoded proximity check
 	// -----------------------------------------------------------------------
@@ -400,6 +400,7 @@ void Level1_Draw()
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(font, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
+	
 }
 
 void Level1_Free()

@@ -159,69 +159,77 @@ namespace gamelogic {
 	// mapX = number of tile columns. index = tile value to treat as solid.
 	// Collision flags (COLLISION_LEFT, etc.) are defined in binaryMap.h.
 
-	void pos_to_index(float posX , float posY, float S) {
+	float posX_to_index(float pos, float S) {
 		
-		posX = ((posX +800.0f)-(S/2))/S;
-		posY = ((450.0f - posY) - (S / 2)) / S;
+		return ((pos +800.0f)-(S/2))/S;
+	}
+
+	float posY_to_index(float pos, float S) {
+
+		return ((450.0f - pos) - (S / 2)) / S;
 	}
 
 
 	int CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX,int mapS, int index)
 	{
-		float xPos = ((object->xPos + 800.0f) - (static_cast<float>(mapS) / 2)) / static_cast<float>(mapS);
-		float yPos = ((450.0f - object->yPos) - (static_cast<float>(mapS) / 2)) / static_cast<float>(mapS);
-		float xScale = object->xScale/static_cast<float>(mapS);
-		float yScale = object->yScale / static_cast<float>(mapS);
-
-		
 
 		float x1, y1, x2, y2;
 		int flag = 0;
-
 		// right
-		x1 = xPos + xScale / 2.f;
-		y1 = yPos + yScale / 4.f;
+		x1 = object->xPos + object->xScale / 2.f;
+		y1 = object->yPos + object->yScale / 4.f;
 
-		x2 = xPos + xScale / 2.f;
-		y2 = yPos - yScale / 4.f;
+		x2 = object->xPos + object->xScale / 2.f;
+		y2 = object->yPos - object->yScale / 4.f;
 
-		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
+		int index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
+		int index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+
+		std::cout << posX_to_index(object->xPos, mapS)<<' '<< posY_to_index(object->yPos, mapS) << '\n';
+
+		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_RIGHT;
 		}
 
 		// left
-		x1 = xPos - xScale / 2.f;
-		y1 = yPos - yScale / 4.f;
+		x1 = object->xPos - object->xScale / 2.f;
+		y1 = object->yPos - object->yScale / 4.f;
 
-		x2 = xPos - xScale / 2.f;
-		y2 = yPos + yScale / 4.f;
+		x2 = object->xPos - object->xScale / 2.f;
+		y2 = object->yPos + object->yScale / 4.f;
 
-		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
+		index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
+		index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_LEFT;
 		}
 
 		// top
-		x1 = xPos - xScale / 4.f;
-		y1 = yPos + yScale / 2.f;
+		x1 = object->xPos - object->xScale / 4.f;
+		y1 = object->yPos + object->yScale / 2.f;
 
-		x2 = xPos + xScale / 4.f;
-		y2 = yPos + yScale / 2.f;
+		x2 = object->xPos + object->xScale / 4.f;
+		y2 = object->yPos + object->yScale / 2.f;
 
-		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
+		index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
+		index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_TOP;
 		}
 
 		// bottom
-		x1 = xPos - xScale / 4.f;
-		y1 = yPos - yScale / 2.f;
+		x1 = object->xPos - object->xScale / 4.f;
+		y1 = object->yPos - object->yScale / 2.f;
 
-		x2 = xPos + xScale / 4.f;
-		y2 = yPos - yScale / 2.f;
+		x2 = object->xPos + object->xScale / 4.f;
+		y2 = object->yPos - object->yScale / 2.f;
 
-		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
+		index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
+		index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_BOTTOM;
 		}
-		std::cout << flag<< '\n';
+		
 		return flag;
 	}
 
