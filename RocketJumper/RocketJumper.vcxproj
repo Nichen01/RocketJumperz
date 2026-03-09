@@ -31,6 +31,7 @@
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Tutorial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AimingInterface.h" />
@@ -54,6 +55,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Tutorial.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

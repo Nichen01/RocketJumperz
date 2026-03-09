@@ -61,6 +61,9 @@
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Tutorial.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collision.h">
@@ -124,6 +127,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="LevelEditor.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Tutorial.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

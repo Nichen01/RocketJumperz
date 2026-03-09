@@ -23,6 +23,8 @@ Technology is prohibited.
 #include "Render.h"
 #include "Enemies.h"
 #include "BinaryMap.h"
+#include "GameStateList.h"
+#include "Animation.h"
 
 void Level1_Load();
 

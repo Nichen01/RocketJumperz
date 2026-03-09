@@ -15,9 +15,33 @@ AEGfxTexture* glass0 = NULL, *glass1 = NULL, *glass2 = NULL, *glass3 = NULL, *gl
 AEGfxVertexList* pMesh = nullptr;
 AEGfxVertexList * platformMesh = nullptr;
 
-
+f32 doorX, doorY;
+s32  doorFrameCount = 7;
+f32  doorFrameDelay = 0.08f;   // ~12 fps
+f32  doorWidth = 80.f;   // matches tile size s
+f32  doorHeight = 80.f;
+f32  doorTriggerRadius = 150.0f;  // px from door centre
+SpriteAnimation  doorAnim;
+AEGfxVertexList* doorMesh;
+bool doorIsOpen = false; // tracks fully-open state
+AEGfxTexture* doorTex;
 
 namespace renderlogic {
+	void initPlatformMesh() {
+		AEGfxMeshStart();
+		AEGfxTriAdd(
+			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+		AEGfxTriAdd(
+			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+		platformMesh = AEGfxMeshEnd();
+	}
+
 	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize) {
 		AEMtx33 scale = { 0 };
 		AEMtx33Scale(&scale, xsize, ysize);

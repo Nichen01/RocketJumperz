@@ -22,8 +22,7 @@ static int x = 16;
 static int y = 9;
 static int s = 80;
 
-//objectsquares objectinfo[2] = { 0 };
-
+objectsquares objectinfo2[2] = { 0 };
 
 static Projectile Projectiles[MAX_PROJECTILES];
 static AEGfxVertexList* pTestMesh = nullptr;
@@ -48,6 +47,9 @@ static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
+// Font resource (must be destroyed in Unload to avoid leak)
+static s8 fontLevel2 = -1;
+
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -61,10 +63,16 @@ void Level2_Load()
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();   
+	soundEffects = AEAudioCreateGroup();
+	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 	
 	// Load platform assets
 	render::drawPlatform();
+
+	// Load textures - these are defined in draw.cpp
+	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
+	base5test = AEGfxTextureLoad("Assets/Base5.png");
+	plasma = AEGfxTextureLoad("Assets/plasma.png");
 }
 
 void Level2_Initialize()
@@ -80,7 +88,7 @@ void Level2_Initialize()
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
 	// Initialize player movement system
-	movement::initPlayerMovement(objectinfo[player]);
+	movement::initPlayerMovement(objectinfo2[player]);
 
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
@@ -111,44 +119,36 @@ void Level2_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	pTestMesh = AEGfxMeshEnd();
 
-	// Allocate map array here (not at file scope) so it only exists
-	// while Level2 is active. Level2_Free() handles deallocation.
+	renderlogic::initPlatformMesh();
+
+	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
+		printf("Could not import file");
+		return;
+	}
+
+	x = BINARY_MAP_WIDTH;
+	y = BINARY_MAP_HEIGHT;
+
 	map = new s32[x * y]{ 0 };
 
-	// Create map with walls on borders and one obstacle in middle
-	// 1 for obstacle, 0 for playable area
-	int mapX = 0, mapY = 0;
-	for (mapY = 0; mapY < 9; mapY++) {
-		if (mapY == 0 || mapY == 9 - 1) {
-			for (mapX = 0; mapX < 16; mapX++) {
-				map[(mapY * 16 + mapX)] = 1;
-			}
-		}
-		else {
-			for (mapX = 0; mapX < 16; mapX++) {
-				if (mapX == 0 || mapX == 16 - 1) {
-					map[(mapY * 16 + mapX)] = 1;
-				}
-				else {
-					map[(mapY * 16 + mapX)] = 0;
-				}
-			}
+	for (int row{}; row < y; ++row) {
+		for (int col{}; col < x; col++) {
+			map[row * x + col] = MapData[row][col];
 		}
 	}
-	map[(4 * 16 + 6)] = 1;
 
-	objectinfo[player].xPos = 0.0f;
-	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 70.0f;
-	objectinfo[player].yScale = 70.0f;
+	objectinfo2[player].xPos = 0.0f;
+	objectinfo2[player].yPos = 0.0f;
+	objectinfo2[player].xScale = 60.0f;
+	objectinfo2[player].yScale = 60.0f;
 
 	// Initialize player health to 100 HP with no invincibility active
-	InitPlayerHealth(objectinfo[player]);
+	InitPlayerHealth(objectinfo2[player]);
 
-	objectinfo[obstacle].xPos = -400.0f;
-	objectinfo[obstacle].yPos = 0.0f;
-	objectinfo[obstacle].xScale = 100.0f;
-	objectinfo[obstacle].yScale = 400.0f;
+	objectinfo2[obstacle].xPos = -400.0f;
+	objectinfo2[obstacle].yPos = 0.0f;
+	objectinfo2[obstacle].xScale = 100.0f;
+	objectinfo2[obstacle].yScale = 400.0f;
 
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
@@ -163,11 +163,24 @@ void Level2_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, 50.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, 300.0f, -200.0f);
+
+	// DOOR
+	animSystem::buildMesh(&doorMesh, doorFrameCount);
+	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
+	if (!doorTex)
+		printf("DOOR TEXTURE NOT FOUND!\n");
+	else
+		printf("DOOR OK\n");
+
+	animSystem::init(doorAnim, doorFrameCount, doorFrameDelay, ANIM_IDLE, 0);
+	doorIsOpen = false;
+
 }
 
 void Level2_Update()
 {
-	
+
+	if (AEInputCheckTriggered(AEVK_L)) next = GS_LEVELEDITOR;
 	//====== AUDIO CONTROLS ======
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
@@ -192,7 +205,7 @@ void Level2_Update()
 
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
-	movement::physicsInput(objectinfo[player]);
+	movement::physicsInput(objectinfo2[player]);
 
 	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
@@ -200,14 +213,14 @@ void Level2_Update()
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
-	movement::updatePlayerPhysics(objectinfo[player]);
+	movement::updatePlayerPhysics(objectinfo2[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	projectileSystem::fireProjectiles(
 		static_cast<s32>(worldMouseX),
 		static_cast<s32>(worldMouseY),
-		objectinfo[player],
+		objectinfo2[player],
 		Projectiles,
 		MAX_PROJECTILES);
 
@@ -222,17 +235,15 @@ void Level2_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfo[player],
+		objectinfo2[player],
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-
-
 	// Tick down the player's invincibility timer each frame
-	UpdatePlayerInvincibility(objectinfo[player], dt);
+	UpdatePlayerInvincibility(objectinfo2[player], dt);
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
@@ -240,15 +251,15 @@ void Level2_Update()
 
 	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
 	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
-		objectinfo[player], Punch, soundEffects);
+		objectinfo2[player], Punch, soundEffects);
 
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
-		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
+		enemyProjectiles, MAX_PROJECTILES, objectinfo2[player]);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[2].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo2[player], 1);
 
 }
 
@@ -280,8 +291,8 @@ void Level2_Draw()
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxTextureSet(characterPictest, 0, 0);
-	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos,
-		objectinfo[player].xScale, objectinfo[player].yScale);
+	renderlogic::Drawsquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
+		objectinfo2[player].xScale, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render all active projectiles (YELLOW)
@@ -294,7 +305,7 @@ void Level2_Draw()
 	if (font >= 0)
 	{
 		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo[player].health);
+		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo2[player].health);
 
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -303,6 +314,8 @@ void Level2_Draw()
 
 		AEGfxPrint(font, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
+
+	renderlogic::drawTileArray();
 }
 
 void Level2_Free()
@@ -336,7 +349,7 @@ void Level2_Unload()
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 
 	// Destroy the font created in Initialize
-	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
+	if (fontLevel2 != -1) { AEGfxDestroyFont(fontLevel2); fontLevel2 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
 	AEAudioUnloadAudio(L2);

@@ -25,7 +25,6 @@ static u32 doorID{};
 static int promptRow = -1;
 static int promptCol = -1;
 
-
 void levelEditor_Load() {
 
 	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
@@ -104,7 +103,7 @@ void levelEditor_Update() {
 		level = 2;
 		next = GS_RESTART;
 	}
-	if (AEInputCheckTriggered(AEVK_L)) next = (level==1) ? GS_LEVEL1:GS_LEVEL2;
+	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : GS_LEVEL2;
 
 	// selecting asset
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
