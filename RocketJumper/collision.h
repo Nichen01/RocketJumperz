@@ -25,7 +25,7 @@ namespace gamelogic {
 
 	// Swept-AABB dynamic collision check between two moving objects.
 	// Returns 1 if A and B will collide within the current frame, 0 otherwise.
-	s8 dynamic_collision(objectsquares* A, objectsquares* B);
+	s8 dynamic_collision(objectsquares* A, objectsquares* B, float& firstTimeOfCollision);
 
 	// Static AABB collision (original verbose version kept for compatibility)
 	s8 collision(objectsquares* player, objectsquares* obstacle);
@@ -33,8 +33,28 @@ namespace gamelogic {
 	// Static AABB collision (compact version from Ivan)
 	s8 static_collision(objectsquares* player, objectsquares* obstacle);
 
+	inline bool CollisionIntersection_RectRect(objectsquares* player,objectsquares* obstacle, float& firstTimeOfCollision)		//Output: return the calculated value of tFirst
+	{
+		//Step 1
+		bool staticCollision = false;
+		staticCollision = static_collision(player, obstacle);
+		if (staticCollision)
+		{
+			return true;
+		}
+
+		//Step 2 until 5
+		return dynamic_collision(player, obstacle);
+	}
+
+	float posX_to_index(float pos, float S, float MS);
+
+	float posY_to_index(float pos, float S, float MS);
+
 	// Hotspot check and binary map collision
-	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index);
+	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX);
+
+	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index);
 
 	// Resolve object-to-tilemap collision. 'index' specifies which tile value
 	// counts as solid (pass 1 for standard walls).
