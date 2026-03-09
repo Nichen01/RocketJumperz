@@ -33,11 +33,8 @@ namespace gamelogic {
 	// Static AABB collision (compact version from Ivan)
 	s8 static_collision(objectsquares* player, objectsquares* obstacle);
 
-	float pos_to_index(float pos, int mapS);
 	// Hotspot check and binary map collision
-	int CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int mapS, int index);
-
-	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index);
+	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index);
 
 	// Resolve object-to-tilemap collision. 'index' specifies which tile value
 	// counts as solid (pass 1 for standard walls).

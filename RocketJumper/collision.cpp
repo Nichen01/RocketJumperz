@@ -159,20 +159,17 @@ namespace gamelogic {
 	// mapX = number of tile columns. index = tile value to treat as solid.
 	// Collision flags (COLLISION_LEFT, etc.) are defined in binaryMap.h.
 
-	float posX_to_index(float pos, float S) {
-		
-		return ((pos +800.0f)-(S/2))/S;
+	float posX_to_index(float pos, float S, float MS) {
+		return ((pos -(S/2)) + 800.0f)/MS;
 	}
 
-	float posY_to_index(float pos, float S) {
-
-		return ((450.0f - pos) - (S / 2)) / S;
+	float posY_to_index(float pos, float S, float MS) {
+		return -(((pos + (S / 2)) - 450.0f) / MS);
 	}
 
 
 	int CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX,int mapS, int index)
 	{
-
 		float x1, y1, x2, y2;
 		int flag = 0;
 		// right
@@ -182,10 +179,9 @@ namespace gamelogic {
 		x2 = object->xPos + object->xScale / 2.f;
 		y2 = object->yPos - object->yScale / 4.f;
 
-		int index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
-		int index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+		int index1 = (int)(posY_to_index(y1, object->yScale, mapS) * mapX + posX_to_index(x1, object->xScale, mapS));
+		int index2 = (int)(posY_to_index(y2, object->yScale, mapS) * mapX + posX_to_index(x2, object->yScale, mapS));
 
-		std::cout << posX_to_index(object->xPos, mapS)<<' '<< posY_to_index(object->yPos, mapS) << '\n';
 
 		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_RIGHT;
@@ -198,8 +194,8 @@ namespace gamelogic {
 		x2 = object->xPos - object->xScale / 2.f;
 		y2 = object->yPos + object->yScale / 4.f;
 
-		index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
-		index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+		index1 = (int)(posY_to_index(y1, object->yScale, mapS) * mapX + posX_to_index(x1, object->xScale, mapS));
+		index2 = (int)(posY_to_index(y2, object->yScale, mapS) * mapX + posX_to_index(x2, object->yScale, mapS));
 		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_LEFT;
 		}
@@ -211,8 +207,8 @@ namespace gamelogic {
 		x2 = object->xPos + object->xScale / 4.f;
 		y2 = object->yPos + object->yScale / 2.f;
 
-		index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
-		index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+		index1 = (int)(posY_to_index(y1, object->yScale, mapS) * mapX + posX_to_index(x1, object->xScale, mapS));
+		index2 = (int)(posY_to_index(y2, object->yScale, mapS) * mapX + posX_to_index(x2, object->yScale, mapS));
 		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_TOP;
 		}
@@ -224,8 +220,8 @@ namespace gamelogic {
 		x2 = object->xPos + object->xScale / 4.f;
 		y2 = object->yPos - object->yScale / 2.f;
 
-		index1 = (int)(posY_to_index(y1, mapS) * mapX + posX_to_index(x1, mapS));
-		index2 = (int)(posY_to_index(y2, mapS) * mapX + posX_to_index(x2, mapS));
+		index1 = (int)(posY_to_index(y1, object->yScale, mapS) * mapX + posX_to_index(x1, object->xScale, mapS));
+		index2 = (int)(posY_to_index(y2, object->yScale, mapS) * mapX + posX_to_index(x2, object->yScale, mapS));
 		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_BOTTOM;
 		}
@@ -235,26 +231,24 @@ namespace gamelogic {
 
 	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index) {
 		CheckInstanceBinaryMapCollision(object, map, mapX, mapS, index);
-		/*if (CheckInstanceBinaryMapCollision(object, map, mapX, mapS, index) & COLLISION_BOTTOM) {
-			object->xPos = object->xPos;
+		object->gridCollisionFlag = CheckInstanceBinaryMapCollision(object, map, mapX, mapS, index);
+
+		if ((object->gridCollisionFlag & COLLISION_BOTTOM) == COLLISION_BOTTOM) {
 			SnapToCell(&object->xPos);
 			object->velocityY = 0;
 		}
-		if (CheckInstanceBinaryMapCollision(object, map, mapX, mapS, index) & COLLISION_TOP) {
-			object->xPos = object->xPos;
+		if ((object->gridCollisionFlag & COLLISION_TOP) == COLLISION_TOP) {
 			SnapToCell(&object->xPos);
 			object->velocityY = 0;
 		}
-		if (CheckInstanceBinaryMapCollision(object, map, mapX, mapS, index) & COLLISION_LEFT) {
-			object->yPos = object->yPos;
+		if ((object->gridCollisionFlag & COLLISION_LEFT) == COLLISION_LEFT) {
 			SnapToCell(&object->xPos);
 			object->velocityY = 0;
 		}
-		if (CheckInstanceBinaryMapCollision(object, map, mapX, mapS, index) & COLLISION_RIGHT) {
-			object->yPos = object->yPos;
+		if ((object->gridCollisionFlag & COLLISION_RIGHT) == COLLISION_RIGHT) {
 			SnapToCell(&object->xPos);
 			object->velocityY = 0;
-		}*/
+		}
 	}
 
 	// Resolve object-to-tilemap collision. 'index' specifies which tile value

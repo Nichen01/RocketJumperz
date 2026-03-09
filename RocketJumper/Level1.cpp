@@ -27,7 +27,6 @@ Technology is prohibited.
 #include "enemies.h"
 #include "binaryMap.h"
 #include "animation.h"
-#include "sound.h"
 
 s32* map = nullptr;
 int x;
@@ -54,6 +53,11 @@ static AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 //==== sound and volume
 static f32 bgVolume = 1.f;
 
+static AEAudio L1;
+static AEAudio LaserBlast;
+static AEAudio Punch;
+static AEAudioGroup bgm;
+static AEAudioGroup soundEffects;
 
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 font = -1;
@@ -80,7 +84,7 @@ static bool             doorIsOpen = false; // tracks fully-open state
 void Level1_Load()
 {
 	// Load the music file once when the level loads
-	Level = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
+	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
 	// Create the audio group
 	bgm = AEAudioCreateGroup();
 	// Configure sound effects
@@ -132,7 +136,7 @@ void Level1_Load()
 
 void Level1_Initialize()
 {
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -187,8 +191,8 @@ void Level1_Initialize()
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
-	objectinfo[player].xScale = 50.0f;
-	objectinfo[player].yScale = 50.0f;
+	objectinfo[player].xScale = 60.0f;
+	objectinfo[player].yScale = 60.0f;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo[player]);
@@ -290,18 +294,10 @@ void Level1_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
-
-	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);*/
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
-	objectinfo[player].xPos += objectinfo[player].velocityX;
-	objectinfo[player].yPos += objectinfo[player].velocityY;
-
-	/*gamelogic::Collision_movement(&enemies[0].shape, map, x,s, 1);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x,s, 1);*/
-	gamelogic::Collision_movement(&objectinfo[player], map, x,s, 1);
-	AEGfxSetCamPosition(objectinfo[player].xPos, objectinfo[player].yPos);
 	// -----------------------------------------------------------------------
 	// Door animation -- hardcoded proximity check
 	// -----------------------------------------------------------------------
@@ -400,7 +396,6 @@ void Level1_Draw()
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(font, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
-	
 }
 
 void Level1_Free()
@@ -450,7 +445,7 @@ void Level1_Unload()
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
-	AEAudioUnloadAudio(Level);
+	AEAudioUnloadAudio(L1);
 	AEAudioUnloadAudio(LaserBlast);
 	AEAudioUnloadAudio(Punch);
 	AEAudioUnloadAudioGroup(bgm);

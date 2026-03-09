@@ -24,6 +24,8 @@ struct objectsquares {
 	AEVec2				velCurr;
 	BB				boundingBox;
 
+	int				gridCollisionFlag;
+
 	int leftX;
 	int rightX;
 	int topY;
