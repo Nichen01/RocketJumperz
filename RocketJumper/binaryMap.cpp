@@ -177,7 +177,7 @@ int GetCellValue(int X, int Y)
 void SnapToCell(float* Coordinate)
 {
 	int index = static_cast<int>(*Coordinate);
-	*Coordinate = index + 0.5f;
+	*Coordinate = index+0.5f;
 }
 
 int ExportMapDataToFile(const char* FileName)
