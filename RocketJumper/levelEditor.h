@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "binaryMap.h"
+#include "BinaryMap.h"
 #include <vector>
 
 struct TileAction {

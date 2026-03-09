@@ -13,18 +13,9 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <iostream>
-#include <cstdio>
+#include "pch.h"
 #include "Level2.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
-#include "projectile.h"
-#include "Movement.h"
-#include "render.h"
-#include "enemies.h"
+
 
 static s32* map = nullptr;
 static int x = 16;

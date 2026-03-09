@@ -1,10 +1,12 @@
 #pragma once
 #include "AEEngine.h"
-#include "animation.h"
+#include "Animation.h"
+#include "Level1.h"
 
 namespace renderlogic {
 	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
 	void drawmap_Wall_floor(int map[], int mapX, int mapY, int mapS);
+	void drawTileArray();
 }
 
 // Declare these as extern - they will be defined in Level1.cpp
@@ -42,4 +44,6 @@ extern AEGfxTexture* platform6;
 extern AEGfxTexture* platform7;
 extern AEGfxTexture* platform8;
 extern AEGfxTexture* platform9;
-extern AEGfxTexture* glass;
+extern AEGfxTexture* glass0, *glass1, *glass2, *glass3, *glass4;
+
+

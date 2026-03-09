@@ -1,5 +1,7 @@
-#include "render.h"
-#include "draw.h"
+#include "Render.h"
+#include "Draw.h"
+
+AEGfxTexture* platformTileArray[20] = { nullptr };
 
 namespace render {
 	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize) {
@@ -29,7 +31,11 @@ namespace render {
 		platform7 = AEGfxTextureLoad("Assets/Platform/platform7.png");
 		platform8 = AEGfxTextureLoad("Assets/Platform/platform8.png");
 		platform9 = AEGfxTextureLoad("Assets/Platform/platform0.png");
-		glass = AEGfxTextureLoad("Assets/Platform/glass.png");
+		glass0 = AEGfxTextureLoad("Assets/Platform/glass0.jpg");
+		glass1 = AEGfxTextureLoad("Assets/Platform/glass1.jpg");
+		glass2 = AEGfxTextureLoad("Assets/Platform/glass2.jpg");
+		glass3 = AEGfxTextureLoad("Assets/Platform/glass3.jpg");
+		glass4 = AEGfxTextureLoad("Assets/Platform/glass4.jpg");
 	}
 
 	void unloadPlatform() {
@@ -42,6 +48,13 @@ namespace render {
 		if (platform7) { AEGfxTextureUnload(platform7); platform7 = nullptr; }
 		if (platform8) { AEGfxTextureUnload(platform8); platform8 = nullptr; }
 		if (platform9) { AEGfxTextureUnload(platform9); platform9 = nullptr; }
-		if (glass) { AEGfxTextureUnload(glass); glass = nullptr; }
+		if (glass0) { AEGfxTextureUnload(glass0); glass0 = nullptr; }
+		if (glass1) { AEGfxTextureUnload(glass1); glass1 = nullptr; }
+		if (glass2) { AEGfxTextureUnload(glass2); glass2 = nullptr; }
+		if (glass3) { AEGfxTextureUnload(glass3); glass3 = nullptr; }
+		if (glass4) { AEGfxTextureUnload(glass4); glass4 = nullptr; }
+
 	}
-}
+
+
+} 

@@ -33,6 +33,7 @@ int** MapData;
 //in MapData is 1, it represents a collision cell, any other value is a non-collision
 //cell
 int** BinaryCollisionArray;
+int** glassMap;
 
 // ----------------------------------------------------------------------------
 //
@@ -78,40 +79,51 @@ int** BinaryCollisionArray;
 //	otherwise it returns 0
 //
 // ----------------------------------------------------------------------------
+
 int ImportMapDataFromFile(const char* FileName)
 {
 	std::ifstream ifs(FileName, std::ios::in);
-	if (!ifs) {
-		return 0;
-	}
+	if (!ifs) return 0;
 
 	ifs >> BINARY_MAP_WIDTH;
 	ifs >> BINARY_MAP_HEIGHT;
 
 	MapData = new int* [BINARY_MAP_HEIGHT];
 	BinaryCollisionArray = new int* [BINARY_MAP_HEIGHT];
+	glassMap = new int* [BINARY_MAP_HEIGHT];   // allocate glassMap rows
 
-	for (int i{}; i < BINARY_MAP_HEIGHT; i++) {
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
 		MapData[i] = new int[BINARY_MAP_WIDTH];
 		BinaryCollisionArray[i] = new int[BINARY_MAP_WIDTH];
+		glassMap[i] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
 	}
 
-	for (int i{}; i < BINARY_MAP_HEIGHT; i++) {
-		for (int j{}; j < BINARY_MAP_WIDTH; j++) {
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
+		for (int j = 0; j < BINARY_MAP_WIDTH; j++) {
 			int value;
 			ifs >> value;
 			MapData[i][j] = value;
 			BinaryCollisionArray[i][j] = (value >= 1) ? 1 : 0;
+
+			// assign random glass type if tile is "air"
+			if (value == 0) {
+				glassMap[i][j] = rand() % 5;
+			}
+			else {
+				glassMap[i][j] = -1;
+			}
+
 			if (value == 21) {
 				doorX = (j * 80) + 80 / 2 - 800.0f;
 				doorY = 450.0f - ((i * 80) + 80 / 2);
 			}
-
 		}
 	}
+
 	ifs.close();
 	return 1;
 }
+
 
 // ----------------------------------------------------------------------------
 //
@@ -122,17 +134,18 @@ int ImportMapDataFromFile(const char* FileName)
 // ----------------------------------------------------------------------------
 void FreeMapData(void)
 {
-	if (MapData) {
-		for (int i{}; i < BINARY_MAP_HEIGHT; i++) delete[] MapData[i];
-		delete[] MapData;
-		MapData = nullptr;
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
+		delete[] MapData[i];
+		delete[] BinaryCollisionArray[i];
+		delete[] glassMap[i];
 	}
+	delete[] MapData;
+	delete[] BinaryCollisionArray;
+	delete[] glassMap;
+	MapData = nullptr;
+	BinaryCollisionArray = nullptr;
+	glassMap = nullptr;
 
-	if (BinaryCollisionArray) {
-		for (int i{}; i < BINARY_MAP_HEIGHT; i++) delete[] BinaryCollisionArray[i];
-		delete[] BinaryCollisionArray;
-		BinaryCollisionArray = nullptr;
-	}
 }
 
 // ----------------------------------------------------------------------------

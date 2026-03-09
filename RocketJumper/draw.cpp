@@ -1,6 +1,7 @@
-#include "draw.h"
+
+#include "Draw.h"
 #include "AEGraphics.h"
-#include "binaryMap.h"
+#include "BinaryMap.h"
 
 // Global texture pointers -- declared extern in draw.h, defined here
 AEGfxTexture* characterPictest = NULL;
@@ -8,19 +9,14 @@ AEGfxTexture* base5test = NULL;
 AEGfxTexture* plasma = NULL;
 
 // Different types of platforms
-AEGfxTexture* platform1 = NULL;
-AEGfxTexture* platform2 = NULL;
-AEGfxTexture* platform3 = NULL;
-AEGfxTexture* platform4 = NULL;
-AEGfxTexture* platform5 = NULL;
-AEGfxTexture* platform6 = NULL;
-AEGfxTexture* platform7 = NULL;
-AEGfxTexture* platform8 = NULL;
-AEGfxTexture* platform9 = NULL;
-AEGfxTexture* glass = NULL;
+AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
+AEGfxTexture* glass0 = NULL, *glass1 = NULL, *glass2 = NULL, *glass3 = NULL, *glass4 = NULL;
 
 AEGfxVertexList* pMesh = nullptr;
 AEGfxVertexList * platformMesh = nullptr;
+
+
+
 namespace renderlogic {
 	void Drawsquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize) {
 		AEMtx33 scale = { 0 };
@@ -39,8 +35,9 @@ namespace renderlogic {
 		AEGfxSetTransform(transform.m);
 
 	}
+
 	void drawmap_Wall_floor(int map[], int mapX, int mapY, int mapS) {
-		int x, y, xo, yo;
+		int xo, yo;
 		//iterate and print map in 2D map array
 		for (s32 row = 0; row < BINARY_MAP_HEIGHT; row++) {	  // check for row
 			for (s32 col = 0; col < BINARY_MAP_WIDTH; col++) { // check for column
@@ -49,14 +46,28 @@ namespace renderlogic {
 				yo = (row * mapS);
 
 				//default background
-				
+
 				switch (MapData[row][col]) {
-				case 0: //air
-					AEGfxTextureSet(glass, 0, 0);
-					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-					renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
-					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
-					break;
+				case 0: // air tile
+				{
+					int glassType = glassMap[row][col];
+					if (glassType >= 0) {
+						AEGfxSetTransparency(0.4f);
+						switch (glassType) {
+						case 0: AEGfxTextureSet(glass0, 0, 0); break;
+						case 1: AEGfxTextureSet(glass1, 0, 0); break;
+						case 2: AEGfxTextureSet(glass2, 0, 0); break;
+						case 3: AEGfxTextureSet(glass3, 0, 0); break;
+						case 4: AEGfxTextureSet(glass4, 0, 0); break;
+						}
+						renderlogic::Drawsquare(((float)xo + mapS / 2) - 800.0f,
+							450.0f - ((float)yo + mapS / 2),
+							(float)mapS, (float)mapS);
+						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+						AEGfxSetTransparency(1.f);
+					}
+				}
+				break;
 				case 11: // platform1
 					AEGfxTextureSet(platform1, 0, 0);
 					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -122,6 +133,26 @@ namespace renderlogic {
 
 			}
 
+		}
+
+	}
+
+	void drawTileArray() {
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxTextureSet(platform5, 0, 0);
+		AEMtx33 scl, rot, trans, transf;
+		AEMtx33Scale(&scl, 80.f, 80.f);
+		AEMtx33Rot(&rot, 0);
+		f32 coordsX{};
+
+		for (int j{}; j < 20; j++) {
+			AEMtx33Trans(&trans, -760.f + coordsX, -467.f);
+			AEMtx33Concat(&transf, &rot, &scl);
+			AEMtx33Concat(&transf, &trans, &transf);
+			AEGfxSetTransform(transf.m);
+			AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+			coordsX += 80.f;
 		}
 
 	}

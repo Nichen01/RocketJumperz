@@ -14,10 +14,10 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 #include <iostream>
 #include "ProjectileTest.h"
-#include "collision.h"
-#include "projectile.h"
+#include "Collision.h"
+#include "Projectile.h"
 #include "Movement.h"
-#include "render.h"
+#include "Render.h"
 
 
 // Local variables for projectile test level

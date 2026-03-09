@@ -13,20 +13,19 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <cmath>
-#include <cstdio>
+#include "pch.h"
 #include "Level1.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
+#include "Draw.h"
+#include "Collision.h"
+#include "Player.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
-#include "projectile.h"
+#include "Projectile.h"
 #include "Movement.h"
-#include "render.h"
-#include "enemies.h"
-#include "binaryMap.h"
-#include "animation.h"
+#include "Render.h"
+#include "Enemies.h"
+#include "BinaryMap.h"
+#include "Animation.h"
 
 s32* map = nullptr;
 int x;
@@ -117,6 +116,7 @@ void Level1_Load()
 	mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
 	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");
 
+
 	// Load platform assets
 	render::drawPlatform();
 
@@ -124,6 +124,7 @@ void Level1_Load()
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	base5test = AEGfxTextureLoad("Assets/Base5.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
+
 }
 
 void Level1_Initialize()
@@ -385,6 +386,8 @@ void Level1_Draw()
 
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(font, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+
+		renderlogic::drawTileArray();
 	}
 }
 
@@ -429,6 +432,13 @@ void Level1_Unload()
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
+
+	if (glassMap) {
+		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
+		delete[] glassMap;
+		glassMap = nullptr;
+	}
+
 
 	// Destroy the font created in Initialize
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }

@@ -2,10 +2,10 @@
 // includes
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "collision.h"
+#include "Collision.h"
 #include "Main.h"
-#include "render.h"
-#include "sound.h"
+#include "Render.h"
+#include "Sound.h"
 
 // ---------------------------------------------------------------------------
 // main

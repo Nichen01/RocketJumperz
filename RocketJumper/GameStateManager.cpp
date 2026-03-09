@@ -61,6 +61,13 @@ void GSM_Update()
 		fpDraw = levelEditor_Draw;
 		fpFree = levelEditor_Free;
 		fpUnload = levelEditor_Unload;
+	case GS_TUTORIAL:
+		fpLoad = levelEditor_Load;
+		fpInitialize = levelEditor_Initialize;
+		fpUpdate = levelEditor_Update;
+		fpDraw = levelEditor_Draw;
+		fpFree = levelEditor_Free;
+		fpUnload = levelEditor_Unload;
 	case GS_RESTART:
 		break;
 	case GS_QUIT:

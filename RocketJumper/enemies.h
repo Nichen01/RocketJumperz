@@ -14,8 +14,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "AEEngine.h"
-#include "player.h"
-#include "projectile.h"
+#include "Player.h"
+#include "Projectile.h"
 
 // Maximum number of enemies that can exist at once
 #define MAX_ENEMIES 10

@@ -1,4 +1,4 @@
-#include "projectile.h"
+#include "Projectile.h"
 
 namespace projectileSystem {
 
