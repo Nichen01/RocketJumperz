@@ -49,6 +49,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			GSM_Update();
 			fpLoad();
 			if (current != GS_MAINMENU) {
+				// Destroy previous pause font before creating a new one to
+				// avoid leaking a font handle on every level transition.
+				if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
 				pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 			}
 		}
@@ -117,4 +120,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// free the system
 	AEGfxDestroyFont(pausefont);
 	AESysExit();
+
+	return 0;
 }

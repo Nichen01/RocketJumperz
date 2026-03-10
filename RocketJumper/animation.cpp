@@ -56,9 +56,11 @@ namespace animSystem
     void update(SpriteAnimation& anim, f32 deltaTime)
     {
         // To check if animation finished in the previous frame, yes = 1, no = 0
-        anim.justFinished = 0;  
+        anim.justFinished = 0;
         // if animation is paused or idle, no need to calculate timers.
-        if (!anim.isPlaying || anim.playMode == ANIM_IDLE) return; 
+        if (!anim.isPlaying || anim.playMode == ANIM_IDLE) return;
+        // Guard: cannot advance frames if totalFrames is zero or negative
+        if (anim.totalFrames <= 0) return;
 
         //Increment the time elapsed
         anim.frameTimer += deltaTime;
@@ -148,6 +150,9 @@ namespace animSystem
 
     f32 getUOffset(const SpriteAnimation& anim)
     {
+        // Guard: avoid integer division by zero if cols was never set
+        if (anim.cols <= 0) return 0.f;
+
         // get the number of frames in the row by checking the columns
         int col = anim.currentFrame % anim.cols;
         return static_cast<f32>(col) /
@@ -156,6 +161,9 @@ namespace animSystem
 
     f32 getVOffset(const SpriteAnimation& anim)
     {
+        // Guard: avoid integer division by zero if cols or rows was never set
+        if (anim.cols <= 0 || anim.rows <= 0) return 0.f;
+
         int row = anim.currentFrame / anim.cols;
         return static_cast<f32>(row) /
             static_cast<f32>(anim.rows);

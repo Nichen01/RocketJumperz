@@ -30,12 +30,14 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileTest.cpp" />
     <ClCompile Include="Load.cpp" />
+    <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Tutorial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AimingInterface.h" />
+    <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="BinaryMap.h" />
     <ClInclude Include="Collision.h" />

@@ -42,8 +42,8 @@ struct SpriteAnimation
 {
     int          currentFrame;  // 0 .. (totalFrames - 1)
     int          totalFrames;   // Number of frames in the horizontal strip
-    int          cols;          // Number of rows in the sprite sheet
-    int          rows;          // Number of columns in the sprite sheet
+    int          cols;          // Number of columns in the sprite sheet
+    int          rows;          // Number of rows in the sprite sheet
     f32          frameTimer;    // Accumulated dt since last frame advance
     f32          frameDelay;    // Seconds per frame (e.g. 0.08f ≈ 12 fps)
     AnimPlayMode playMode;
@@ -60,8 +60,8 @@ struct SpriteAnimation
 namespace animSystem
 {
     void init(SpriteAnimation& anim,
-        int          rows,
         int          cols,
+        int          rows,
         int          totalFrames,
         f32          frameDelay,
         AnimPlayMode mode = ANIM_IDLE,

@@ -23,7 +23,6 @@ Technology is prohibited.
 #include "GameStateList.h"
 #include "projectile.h"
 #include "Movement.h"
-#include "render.h"
 #include "enemies.h"
 #include "binaryMap.h"
 #include "animation.h"
@@ -32,6 +31,9 @@ static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
 static int s = 80;
+
+// Font handle for in-game text rendering
+static s8 font = -1;
 
 objectsquares objectinfo2[2] = { 0 };
 
@@ -44,6 +46,12 @@ static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
 static AEGfxTexture* doorTexture = nullptr;
+
+// Font resource (must be destroyed in Unload to avoid leak)
+static s8 fontLevel1 = -1;
+
+// Tracks whether the player is near a door (used in Draw for flashing E prompt)
+static bool playerNear = false;
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
@@ -87,7 +95,7 @@ void Level2_Initialize()
 
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
-	// Create font for gameover text (stored so we can destroy it in Unload)
+	// Create font for HUD text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
@@ -154,12 +162,15 @@ void Level2_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
+	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
+	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
+
 	// DOOR
 
-	// guard the build 
-	if (!doorMesh) animSystem::buildMesh(&doorMesh, doorFrameCount);
-
-	animSystem::buildMesh(&doorMesh, doorFrameCount);
+	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
+	// Free any existing doorMesh first to avoid leaking if re-initialized.
+	if (doorMesh) { AEGfxMeshFree(doorMesh); doorMesh = nullptr; }
+	animSystem::buildMesh(&doorMesh, 1, 7);
 
 	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
@@ -252,11 +263,12 @@ void Level2_Update()
 
 	for (auto& door : doors) {
 
-		if (door.firstLevel != 1 && door.secondLevel != 1) continue;
+		if (door.firstLevel != 2 && door.secondLevel != 2) continue;
 		f32 dx = objectinfo2[player].xPos - door.worldX;
 		f32 dy = objectinfo2[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		bool playerNear = (dist <= doorTriggerRadius);
+		// Assign to file-scope static so Level2_Draw can read it
+		playerNear = (dist <= doorTriggerRadius);
 
 		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
 			animSystem::play(door.anim, ANIM_PLAY_ONCE);
@@ -280,6 +292,9 @@ void Level2_Update()
 			}
 		}
 	}
+
+	// MUSHROOM ANIMATION
+	animSystem::update(meleeAnim, dt);
 }
 
 void Level2_Draw()
@@ -300,8 +315,8 @@ void Level2_Draw()
 	// Render enemies
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
-		meleeEnemyMesh,
-		pTestMesh,
+		enemyMesh,
+		projectileMesh,
 		meleeEnemyTexture,
 		rangedEnemyTexture,
 		animSystem::getUOffset(meleeAnim),

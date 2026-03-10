@@ -21,7 +21,7 @@ static int x = 16;
 static int y = 9;
 static int s = 80;
 
-static s8 font;
+static s8 font = -1;
 
 objectsquares objectinfoTut[2] = { 0 };
 
@@ -150,10 +150,10 @@ void Tutorial_Initialize()
 
 	// DOOR
 
-	// guard the build 
-	if (!doorMesh) animSystem::buildMesh(&doorMesh, doorFrameCount);
-
-	animSystem::buildMesh(&doorMesh, doorFrameCount);
+	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
+	// Free any existing doorMesh first to avoid leaking if re-initialized.
+	if (doorMesh) { AEGfxMeshFree(doorMesh); doorMesh = nullptr; }
+	animSystem::buildMesh(&doorMesh, 1, 7);
 
 	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
@@ -316,7 +316,7 @@ void Tutorial_Draw()
 	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh,
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh, projectileMesh,
 		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles with plasma texture
@@ -391,12 +391,12 @@ void Tutorial_Unload()
 		doorTex = nullptr;
 	}
 
-	// Unload ALL textures that were loaded in Initialize
+	// Unload ALL textures that were loaded in Initialize.
+	// NOTE: doorTex is already unloaded above, so do not unload it again here.
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
 
 	unload::platform();
 	unload::ui();
@@ -408,7 +408,10 @@ void Tutorial_Unload()
 	}
 
 
-	// Destroy the font created in Initialize
+	// Destroy the font created in Load (tutorial text labels)
+	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
+
+	// Destroy the font created in Initialize (HUD health text)
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load

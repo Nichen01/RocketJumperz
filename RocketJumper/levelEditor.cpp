@@ -470,4 +470,15 @@ void LevelEditor_Free() {
 void LevelEditor_Unload() {
 	AEGfxDestroyFont(font);
 	unload::ui();
+
+	// Unload all tile textures loaded in LevelEditor_Load to prevent memory leaks.
+	// Each AEGfxTextureLoad allocates internal memory that must be freed.
+	for (int i = 0; i < 10; i++)
+	{
+		if (tileTextures[i])
+		{
+			AEGfxTextureUnload(tileTextures[i]);
+			tileTextures[i] = nullptr;
+		}
+	}
 }

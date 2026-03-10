@@ -171,7 +171,7 @@ namespace gamelogic {
 		y2 = object->yPos - object->yScale / 4.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_RIGHT;
+			object->flag = static_cast<u8>(object->flag | COLLISION_RIGHT);
 		}
 
 		// left
@@ -182,7 +182,7 @@ namespace gamelogic {
 		y2 = object->yPos + object->yScale / 4.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_LEFT;
+			object->flag = static_cast<u8>(object->flag | COLLISION_LEFT);
 		}
 
 		// top
@@ -193,7 +193,7 @@ namespace gamelogic {
 		y2 = object->yPos + object->yScale / 2.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_TOP;
+			object->flag = static_cast<u8>(object->flag | COLLISION_TOP);
 		}
 
 		// bottom
@@ -204,7 +204,7 @@ namespace gamelogic {
 		y2 = object->yPos - object->yScale / 2.f;
 
 		if (map[(int)(y1 * mapX + x1)] == index || map[(int)(y2 * mapX + x2)] == index) {
-			object->flag = object->flag | COLLISION_BOTTOM;
+			object->flag = static_cast<u8>(object->flag | COLLISION_BOTTOM);
 		}
 	}
 

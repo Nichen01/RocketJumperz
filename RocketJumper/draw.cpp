@@ -136,7 +136,9 @@ namespace renderlogic {
 
 					f32 uOffset = 0.f; // default to frame 0
 					for (auto& door : doors) {
-						if ((door.firstLevel == 1 || door.secondLevel == 1) &&
+						// Match this tile to the correct door by position,
+						// using currentGameLevel so it works on every level.
+						if ((door.firstLevel == currentGameLevel || door.secondLevel == currentGameLevel) &&
 							fabsf(door.worldX - tileWorldX) < 1.f &&
 							fabsf(door.worldY - tileWorldY) < 1.f)
 						{

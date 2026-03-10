@@ -135,8 +135,10 @@ int ImportMapDataFromFile(const char* FileName)
 				default: door.firstLevel = 0; door.secondLevel = 0; break;
 				}
 
-				// initialize animation for this door
-				animSystem::init(door.anim, doorFrameCount, 0.08f, ANIM_IDLE);
+				// Initialize animation for this door.
+			// The door sprite is a 7-frame horizontal strip (1 row, 7 columns).
+			// animSystem::init parameter order (per .cpp): cols, rows -- so pass 7, 1.
+			animSystem::init(door.anim, 7, 1, 7, 0.08f, ANIM_IDLE);
 
 				doors.push_back(door);
 			}

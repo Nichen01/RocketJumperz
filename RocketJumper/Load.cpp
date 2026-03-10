@@ -111,6 +111,8 @@ namespace load {
 		glass2 = AEGfxTextureLoad("Assets/Platform/glass2.jpg");
 		glass3 = AEGfxTextureLoad("Assets/Platform/glass3.jpg");
 		glass4 = AEGfxTextureLoad("Assets/Platform/glass4.jpg");
+
+		
 	}
 
 	void mushroom() {
@@ -219,6 +221,7 @@ namespace unload {
 		if (platform7) { AEGfxTextureUnload(platform7); platform7 = nullptr; }
 		if (platform8) { AEGfxTextureUnload(platform8); platform8 = nullptr; }
 		if (platform9) { AEGfxTextureUnload(platform9); platform9 = nullptr; }
+		glass();
 	}
 
 	void glass() {

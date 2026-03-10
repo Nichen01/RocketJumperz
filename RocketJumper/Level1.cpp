@@ -22,7 +22,8 @@ Technology is prohibited.
 #include "GameStateList.h"
 #include "projectile.h"
 #include "Movement.h"
-#include "render.h"
+// render.h was removed in Joraye merge; Load.h (via Level1.h) provides
+// load::platform() and unload::platform() which replaced render:: functions.
 #include "enemies.h"
 #include "binaryMap.h"
 #include "animation.h"
@@ -45,6 +46,13 @@ static Projectile enemyProjectiles[MAX_PROJECTILES];
 // Mushroom animation state (mesh/textures owned by AssetManager)
 static SpriteAnimation meleeAnim;
 
+// Base texture loaded via AssetManager (no extern in draw.h, Level1-only)
+static AEGfxTexture* base5test = nullptr;
+
+// Font handle for in-game text -- UNUSED, kept for reference only.
+// The active font handle is fontLevel1 (declared below), which is
+// created in Initialize and destroyed in Unload.
+
 /*
 static AEGfxTexture* mushroomDieTexture[9] = { nullptr };
 static AEGfxTexture* mushroomHitTexture[5] = { nullptr };
@@ -60,16 +68,11 @@ static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
-f32 doorX, doorY;
-s32  DOOR_FRAME_COUNT = 7;
-f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
-f32  DOOR_WIDTH = static_cast<f32>(s);   // matches tile size s
-f32  DOOR_HEIGHT = static_cast<f32>(s);
-f32  DOOR_TRIGGER_RADIUS = 150.0f;  // px from door centre
-SpriteAnimation  doorAnim;
-AEGfxVertexList* doorMesh;
-bool doorIsOpen = false; // tracks fully-open state
-AEGfxTexture* doorTex;
+// Door variables (doorX, doorY, doorAnim, doorMesh, doorIsOpen, doorTex)
+// are defined in draw.cpp and declared extern in draw.h.
+// The constants below are Level1-specific door animation parameters.
+static s32  DOOR_FRAME_COUNT = 7;
+static f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
 
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
@@ -91,7 +94,10 @@ void Level1_Load()
 	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
 	// Load platform tile textures
-	render::drawPlatform();
+	load::platform();
+
+	// Load UI textures (eButton used by flashing door prompt in Draw)
+	load::ui();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	characterPictest = AssetManager::LoadTexture("characterPictest", "Assets/astronautRight.png");
@@ -137,8 +143,8 @@ void Level1_Initialize()
 
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
-	// Create font for gameover text (stored so we can destroy it in Unload)
-	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	// Create font for HUD text (stored so we can destroy it in Unload)
+	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo1[player]);
@@ -146,9 +152,15 @@ void Level1_Initialize()
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
-	//=============CREATE TEXTURED MESH FOR WALLS==================//
-	// This mesh is used by draw.cpp for rendering walls
-
+	//=============CREATE TEXTURED MESH FOR PLAYER==================//
+	// A full quad (2 triangles) is required for the player sprite to render
+	// correctly.  The previous code was missing AEGfxMeshStart() and only
+	// had one triangle, which caused the player to appear as a half-sprite.
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 	AEGfxTriAdd(
 		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
 		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
@@ -323,10 +335,10 @@ void Level1_Update()
 
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
-		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
+		enemyProjectiles, MAX_PROJECTILES, objectinfo1[player]);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo1[player], 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -338,7 +350,8 @@ void Level1_Update()
 		f32 dx = objectinfo1[player].xPos - door.worldX;
 		f32 dy = objectinfo1[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		bool playerNear = (dist <= doorTriggerRadius);
+		// Assign to the file-scope static so Level1_Draw can read it
+		playerNear = (dist <= doorTriggerRadius);
 
 		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
 			animSystem::play(door.anim, ANIM_PLAY_ONCE);
@@ -472,14 +485,12 @@ void Level1_Free()
 void Level1_Unload()
 {
 	// Unload all registered textures, then null the shared extern pointers draw.cpp holds.
-	// Note: platform1-9/glass are still managed by render::unloadPlatform() until
-	// render.cpp is migrated to AssetManager.
+	// Unload all AssetManager-tracked textures, then null the shared extern pointers.
 	AssetManager::UnloadAllTextures();
 	characterPictest = nullptr;
 	base5test        = nullptr;
 	plasma           = nullptr;
 	doorTex          = nullptr;
-	render::unloadPlatform();
 
 	unload::platform();
 	unload::ui();
