@@ -239,6 +239,7 @@ void Level1_Update()
 	if (doorAnim.justFinished)
 		doorIsOpen = (doorAnim.currentFrame == doorFrameCount - 1);
 	// -----------------------------------------------------------------------
+
 }
 
 void Level1_Draw()

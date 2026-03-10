@@ -129,13 +129,16 @@ int ImportMapDataFromFile(const char* FileName, int currentLevel)
 				door.level = currentLevel;
 				door.row = row;
 				door.col = col;
+				door.worldX = (col * 80) + 40 - 800.0f;
+				door.worldY = 450.0f - (row * 80 + 40);
+
+				// initialize animation for this door
+				animSystem::init(door.anim, doorFrameCount, 0.08f, ANIM_IDLE);
+
 				doors.push_back(door);
 			}
 		}
 	}
-
-	animSystem::init(d.anim, doorFrameCount, 0.08f, ANIM_IDLE);
-
 	ifs.close();
 	return 1;
 }
