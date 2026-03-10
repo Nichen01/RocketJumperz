@@ -7,10 +7,6 @@
 AEGfxTexture* characterPictest = NULL;
 AEGfxTexture* plasma = NULL;
 
-// Different types of platforms
-AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
-AEGfxTexture* glass0 = NULL, *glass1 = NULL, *glass2 = NULL, *glass3 = NULL, *glass4 = NULL;
-
 f32 doorX, doorY;
 s32  doorFrameCount = 7;
 f32  doorFrameDelay = 0.08f;   // ~12 fps
@@ -179,6 +175,39 @@ namespace renderlogic {
 			coordsX += 80.f;
 		}
 
+	}
+
+	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale) {
+		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
+		AEMtx33Scale(&uiScl, scale, scale);
+		AEMtx33Rot(&uiRot, 0);
+		
+		AEMtx33Trans(&uiTransl, x, y);
+		AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
+		AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxTextureSet(textureAsset, 0, 0);
+		AEGfxSetTransform(uiTransf.m);
+		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
+	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale = 40.f) {
+		static f32 timer = 0.f;
+		f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+		timer += dt;
+
+		f32 alpha = (sinf(timer * 6.f) + 1.f) / 2.f;
+		alpha = 0.4f + alpha * 0.6f;
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(alpha);
+		AEGfxTextureSet(textureAsset, 0.f, 0.f);
+		drawSquare(x, y, scale, scale);
+		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxSetTransparency(1.f);  // reset transparency after drawing
 	}
 }
 

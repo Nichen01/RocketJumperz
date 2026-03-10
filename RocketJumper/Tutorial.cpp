@@ -21,6 +21,8 @@ static int x = 16;
 static int y = 9;
 static int s = 80;
 
+static s8 font;
+
 objectsquares objectinfoTut[2] = { 0 };
 
 // Local variables for projectile test level
@@ -41,6 +43,10 @@ static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
+static char strBuffer[100];
+
+static bool playerNear;
+
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
@@ -48,6 +54,8 @@ static s8 fontLevel1 = -1;
 
 void Tutorial_Load()
 {
+	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
+
 	// Load the music file once when the level loads
 	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
 	// Create the audio group
@@ -57,13 +65,13 @@ void Tutorial_Load()
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();
 
-	// Load platform assets
-	load::platform();
-
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
+	// Load platform assets
+	load::platform();
+	load::ui();
 }
 
 void Tutorial_Initialize()
@@ -88,6 +96,7 @@ void Tutorial_Initialize()
 	init::platform();
 	init::player();
 	init::projectile();
+	init::ui();
 
 	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
@@ -117,8 +126,8 @@ void Tutorial_Initialize()
 	}
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
-		objectinfoTut[player].xPos = 0.f;
-		objectinfoTut[player].yPos = 0.f;
+		objectinfoTut[player].xPos = 600.f;
+		objectinfoTut[player].yPos = -350.f;
 	}
 	objectinfoTut[player].xScale = 60.0f;
 	objectinfoTut[player].yScale = 60.0f;
@@ -237,11 +246,11 @@ void Tutorial_Update()
 
 	for (auto& door : doors) {
 
-		if (door.firstLevel != 1 && door.secondLevel != 1) continue;  // fix: && not ||
+		if (door.firstLevel != 0 && door.secondLevel != 0) continue;
 		f32 dx = objectinfoTut[player].xPos - door.worldX;
 		f32 dy = objectinfoTut[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		bool playerNear = (dist <= doorTriggerRadius);
+		playerNear = (dist <= doorTriggerRadius);
 
 		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
 			animSystem::play(door.anim, ANIM_PLAY_ONCE);
@@ -278,9 +287,33 @@ void Tutorial_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
+
+	// ==== RENDER UI FOR TUTORIAL ==== //
+	renderlogic::drawTileArray();
+	renderlogic::drawUITexture(350.f, -280.f, leftClick, 50.f);
+	renderlogic::drawUITexture(-50.f, -280.f, gButton, 50.f);
+	renderlogic::drawUITexture(-600.f, 10.f, spacebar, 50.f);
+	renderlogic::drawUITexture(280.f, 250.f, eButton, 50.f);
+
+	memset(strBuffer, 0, 100 * sizeof(char));
+	f32 textWidth, textHeight;
+	AEGfxGetPrintSize(font, strBuffer, 0.15f, &textWidth, &textHeight);
+	sprintf_s(strBuffer, "Left Click to Propel");
+	AEGfxPrint(font, strBuffer, 0.5f, -0.6f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "towards Mouse Cursor");
+	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "G To Toggle Gravity");
+	AEGfxPrint(font, strBuffer, 0.0f, -0.63f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "Spacebar to Jump");
+	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.4f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "E to Enter");
+	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh,
@@ -321,9 +354,13 @@ void Tutorial_Draw()
 
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
-
 	}
-	renderlogic::drawTileArray();
+	
+	// ===== RENDERING OF THE FLASHING 'E' ===== //
+	if (playerNear) {
+		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
+	}
+
 }
 
 void Tutorial_Free()
@@ -333,6 +370,7 @@ void Tutorial_Free()
 	freeAsset::enemy();
 	freeAsset::player();
 	freeAsset::projectile();
+	freeAsset::ui();
 
 	if (map) {
 		delete[] map;
@@ -356,12 +394,12 @@ void Tutorial_Unload()
 	// Unload ALL textures that were loaded in Initialize
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-
-	unload::platform();
-
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
+
+	unload::platform();
+	unload::ui();
 
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];

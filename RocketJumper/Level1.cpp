@@ -44,6 +44,8 @@ static AEAudioGroup soundEffects;
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
+static bool playerNear;
+
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level1_Load()
@@ -57,13 +59,13 @@ void Level1_Load()
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();
 
-	// Load platform assets
-	load::platform();
-
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
 
+	// Load platform assets
+	load::platform();
+	load::ui();
 }
 
 void Level1_Initialize()
@@ -88,6 +90,7 @@ void Level1_Initialize()
 	init::platform();
 	init::player();
 	init::projectile();
+	init::ui();
 
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
@@ -279,8 +282,6 @@ void Level1_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-	std::cout << "doorMesh=" << doorMesh << " doorTex=" << doorTex << "\n";
-
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
 
@@ -326,6 +327,10 @@ void Level1_Draw()
 
 	}
 	renderlogic::drawTileArray();
+
+	if (playerNear) {
+		renderlogic::flashingTexture(objectinfo1[player].xPos, objectinfo1[player].yPos + 60.f, eButton, 50.f);
+	}
 }
 
 void Level1_Free()
@@ -335,6 +340,7 @@ void Level1_Free()
 	freeAsset::enemy();
 	freeAsset::player();
 	freeAsset::projectile();
+	freeAsset::ui();
 
 	if (map) {
 		delete[] map;
@@ -359,11 +365,12 @@ void Level1_Unload()
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
 
-	unload::platform();
-
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
 	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
+
+	unload::platform();
+	unload::ui();
 
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];

@@ -7,6 +7,8 @@ namespace renderlogic {
 	void drawSquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
 	void drawMapWallFloor(int map[], int mapX, int mapY, int mapS);
 	void drawTileArray();
+	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale = 40.f);
+	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp
@@ -34,15 +36,5 @@ extern AEGfxTexture* doorTex;
 
 // ---------------------------------------------------------------------------
 
-extern AEGfxTexture* platform1;
-extern AEGfxTexture* platform2;
-extern AEGfxTexture* platform3;
-extern AEGfxTexture* platform4;
-extern AEGfxTexture* platform5;
-extern AEGfxTexture* platform6;
-extern AEGfxTexture* platform7;
-extern AEGfxTexture* platform8;
-extern AEGfxTexture* platform9;
-extern AEGfxTexture* glass0, *glass1, *glass2, *glass3, *glass4;
 
 

@@ -2,8 +2,7 @@
 #include "pch.h"
 #include "BinaryMap.h"
 #include <vector>
-
-
+#include "Draw.h"
 
 struct TileAction {
 	s32 row;

@@ -44,6 +44,8 @@ static AEAudioGroup soundEffects;
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
+static bool playerNear;
+
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level2_Load()
@@ -57,12 +59,13 @@ void Level2_Load()
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();
 
-	// Load platform assets
-	load::platform();
-
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
 	plasma = AEGfxTextureLoad("Assets/plasma.png");
+
+	// Load platform assets
+	load::platform();
+	load::ui();
 
 }
 
@@ -237,7 +240,7 @@ void Level2_Update()
 
 	for (auto& door : doors) {
 
-		if (door.firstLevel != 1 && door.secondLevel != 1) continue;  // fix: && not ||
+		if (door.firstLevel != 1 && door.secondLevel != 1) continue;
 		f32 dx = objectinfo2[player].xPos - door.worldX;
 		f32 dy = objectinfo2[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
@@ -277,8 +280,6 @@ void Level2_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
-
-	std::cout << "doorMesh=" << doorMesh << " doorTex=" << doorTex << "\n";
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
@@ -325,6 +326,11 @@ void Level2_Draw()
 
 	}
 	renderlogic::drawTileArray();
+
+	// ===== RENDERING OF THE FLASHING 'E' ===== //
+	if (playerNear) {
+		renderlogic::flashingTexture(objectinfo2[player].xPos, objectinfo2[player].yPos + 60.f, eButton, 50.f);
+	}
 }
 
 void Level2_Free()
@@ -357,12 +363,12 @@ void Level2_Unload()
 	// Unload ALL textures that were loaded in Initialize
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-
-	unload::platform();
-
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-	if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
+	
+	unload::door();
+	unload::platform();
+	unload::ui();
 
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];

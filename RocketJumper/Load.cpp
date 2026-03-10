@@ -1,15 +1,25 @@
 #include "Load.h"
 #include "Draw.h"
 
+// define texture array
 AEGfxTexture* mushroomDieTexture[9] = { nullptr };
 AEGfxTexture* mushroomHitTexture[5] = { nullptr };
 AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
+
+// define textures
+
+	// different types of platforms
+	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
+	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
+	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * button4 = NULL, * spacebar = NULL;
+
 
 // define the mesh
 AEGfxVertexList* platformMesh = nullptr;
 AEGfxVertexList* enemyMesh = nullptr;
 AEGfxVertexList* pMesh = nullptr;
 AEGfxVertexList* projectileMesh = nullptr;
+AEGfxVertexList* uiMesh = nullptr;
 
 namespace init {
 
@@ -67,6 +77,21 @@ namespace init {
 			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 		projectileMesh = AEGfxMeshEnd();
 	}
+
+	void ui() {
+		AEGfxMeshStart();
+		AEGfxTriAdd(
+			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+		AEGfxTriAdd(
+			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+		uiMesh = AEGfxMeshEnd();
+	}
+
 }
 
 namespace load {
@@ -119,6 +144,23 @@ namespace load {
 		mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");
 	}
 
+	void ui() {
+		ctrl1 = AEGfxTextureLoad("Assets/UI/ctrl1.png");
+		ctrl2 = AEGfxTextureLoad("Assets/UI/ctrl2.png");
+		leftArrow = AEGfxTextureLoad("Assets/UI/leftArrow.png");
+		rightArrow = AEGfxTextureLoad("Assets/UI/rightArrow.png");
+		leftClick = AEGfxTextureLoad("Assets/UI/leftClick.png");
+		rightClick = AEGfxTextureLoad("Assets/UI/rightClick.png");
+		eButton = AEGfxTextureLoad("Assets/UI/eButton.png");
+		gButton = AEGfxTextureLoad("Assets/UI/gButton.png");
+		sButton = AEGfxTextureLoad("Assets/UI/sButton.png");
+		zButton = AEGfxTextureLoad("Assets/UI/zButton.png");
+		button1 = AEGfxTextureLoad("Assets/UI/1Button.png");
+		button2 = AEGfxTextureLoad("Assets/UI/2Button.png");
+		button3 = AEGfxTextureLoad("Assets/UI/3Button.png");
+		button4 = AEGfxTextureLoad("Assets/UI/4Button.png");
+		spacebar = AEGfxTextureLoad("Assets/UI/spacebar.png");
+	}
 } 
 
 namespace freeAsset {
@@ -156,6 +198,13 @@ namespace freeAsset {
 			projectileMesh = nullptr;
 		}
 	}
+
+	void ui() {
+		if (uiMesh) {
+			AEGfxMeshFree(uiMesh);
+			uiMesh = nullptr;
+		}
+	}
 }
 
 namespace unload {
@@ -178,5 +227,27 @@ namespace unload {
 		if (glass2) { AEGfxTextureUnload(glass2); glass2 = nullptr; }
 		if (glass3) { AEGfxTextureUnload(glass3); glass3 = nullptr; }
 		if (glass4) { AEGfxTextureUnload(glass4); glass4 = nullptr; }
+	}
+
+	void ui() {
+		if (ctrl1) { AEGfxTextureUnload(ctrl1); ctrl1 = nullptr; }
+		if (ctrl2) { AEGfxTextureUnload(ctrl2); ctrl2 = nullptr; }
+		if (leftArrow) { AEGfxTextureUnload(leftArrow); leftArrow = nullptr; }
+		if (rightArrow) { AEGfxTextureUnload(rightArrow); rightArrow = nullptr; }
+		if (leftClick) { AEGfxTextureUnload(leftClick); leftClick = nullptr; }
+		if (rightClick) { AEGfxTextureUnload(rightClick); rightClick = nullptr; }
+		if (eButton) { AEGfxTextureUnload(eButton); eButton = nullptr; }
+		if (gButton) { AEGfxTextureUnload(gButton); gButton = nullptr; }
+		if (sButton) { AEGfxTextureUnload(sButton); sButton = nullptr; }
+		if (zButton) { AEGfxTextureUnload(zButton); zButton = nullptr; }
+		if (button1) { AEGfxTextureUnload(button1); button1 = nullptr; }
+		if (button2) { AEGfxTextureUnload(button2); button2 = nullptr; }
+		if (button3) { AEGfxTextureUnload(button3); button3 = nullptr; }
+		if (button4) { AEGfxTextureUnload(button4); button4 = nullptr; }
+		if (spacebar) { AEGfxTextureUnload(spacebar); spacebar = nullptr; }
+	}
+
+	void door() {
+		if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
 	}
 }
