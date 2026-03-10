@@ -4,11 +4,12 @@
 
 struct DoorLink {
     int id;
-    int level;
+    int firstLevel;
+    int secondLevel;
     int row, col;
     float worldX, worldY;
     bool isOpen = false;
-    SpriteAnimation anim;  // each door has its own animation
+    SpriteAnimation anim;
 };
 
 extern std::vector<DoorLink> doors;

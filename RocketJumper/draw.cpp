@@ -131,11 +131,28 @@ namespace renderlogic {
 					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					break;
-				case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29:// door tile 
-					AEGfxTextureSet(doorTex, animSystem::getUOffset(doorAnim), 0.f); 
-					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
-					AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES); 
+				case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29:
+				{
+					// Find the matching door for this tile position
+					float tileWorldX = ((float)xo + mapS / 2) - 800.0f;
+					float tileWorldY = 450.0f - ((float)yo + mapS / 2);
+
+					f32 uOffset = 0.f; // default to frame 0
+					for (auto& door : doors) {
+						if (door.level == 1 &&
+							fabsf(door.worldX - tileWorldX) < 1.f &&
+							fabsf(door.worldY - tileWorldY) < 1.f)
+						{
+							uOffset = animSystem::getUOffset(door.anim);
+							break;
+						}
+					}
+
+					AEGfxTextureSet(doorTex, uOffset, 0.f);
+					renderlogic::drawSquare(tileWorldX, tileWorldY, (float)mapS, (float)mapS);
+					AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
 					break;
+				}
 				default: //defaults to playable area
 					break;
 				}

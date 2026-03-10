@@ -12,7 +12,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "animation.h"
+#include "Animation.h"
 
 namespace animSystem
 {

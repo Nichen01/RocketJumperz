@@ -218,27 +218,37 @@ void Level1_Update()
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo1[player], 15);
 
 	// -----------------------------------------------------------------------
-	// Door animation -- hardcoded proximity check
+	// Door animation
 	// -----------------------------------------------------------------------
-	f32 dx = objectinfo1[player].xPos - doorX;
-	f32 dy = objectinfo1[player].yPos - doorY;
-	f32 dist = sqrtf(dx * dx + dy * dy);
-	bool playerNear = (dist <= doorTriggerRadius);
 
-	// Trigger open: player just entered range and door is fully closed
-	if (playerNear && !doorIsOpen && doorAnim.playMode != ANIM_PLAY_ONCE)
-		animSystem::play(doorAnim, ANIM_PLAY_ONCE);
+	for (auto& door : doors) {
+		if (door.level != 1) continue;
 
-	// Trigger close: player just left range and door is fully open
-	if (!playerNear && doorIsOpen && doorAnim.playMode != ANIM_PLAY_REVERSE)
-		animSystem::play(doorAnim, ANIM_PLAY_REVERSE);
+		f32 dx = objectinfo1[player].xPos - door.worldX;
+		f32 dy = objectinfo1[player].yPos - door.worldY;
+		f32 dist = sqrtf(dx * dx + dy * dy);
+		bool playerNear = (dist <= doorTriggerRadius);
 
-	animSystem::update(doorAnim, dt);
+		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE) {
+			std::cout << "[Door " << door.id << "] TRIGGERING OPEN\n";
+			animSystem::play(door.anim, ANIM_PLAY_ONCE);
+		}
 
-	// justFinished is true for one frame when a one-shot completes
-	if (doorAnim.justFinished)
-		doorIsOpen = (doorAnim.currentFrame == doorFrameCount - 1);
-	// -----------------------------------------------------------------------
+		if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE) {
+			std::cout << "[Door " << door.id << "] TRIGGERING CLOSE\n";
+			animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+		}
+
+		animSystem::update(door.anim, dt);
+
+		if (door.anim.justFinished) {
+			std::cout << "[Door " << door.id << "] ANIM FINISHED at frame=" << door.anim.currentFrame << "\n";
+			if (door.anim.currentFrame == doorFrameCount - 1)
+				door.isOpen = true;
+			else if (door.anim.currentFrame == 0)
+				door.isOpen = false;
+		}
+	}
 
 }
 

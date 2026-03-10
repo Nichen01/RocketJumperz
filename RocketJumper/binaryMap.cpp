@@ -139,6 +139,11 @@ int ImportMapDataFromFile(const char* FileName, int currentLevel)
 			}
 		}
 	}
+	std::cout << "Total doors registered: " << doors.size() << "\n";
+	for (auto& d : doors)
+		std::cout << "  Door id=" << d.id << " level=" << d.level
+		<< " worldX=" << d.worldX << " worldY=" << d.worldY << "\n";
+
 	ifs.close();
 	return 1;
 }

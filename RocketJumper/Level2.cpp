@@ -139,17 +139,40 @@ void Level2_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, 50.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, 300.0f, -200.0f);
 
-	// DOOR
-	animSystem::buildMesh(&doorMesh, doorFrameCount);
-	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
-	if (!doorTex)
-		printf("DOOR TEXTURE NOT FOUND!\n");
-	else
-		printf("DOOR OK\n");
+	// -----------------------------------------------------------------------
+	// Door animation
+	// -----------------------------------------------------------------------
 
-	animSystem::init(doorAnim, doorFrameCount, doorFrameDelay, ANIM_IDLE, 0);
-	doorIsOpen = false;
+	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 
+	for (auto& door : doors) {
+		if (door.level != 1) continue;
+
+		f32 dx = objectinfo2[player].xPos - door.worldX;
+		f32 dy = objectinfo2[player].yPos - door.worldY;
+		f32 dist = sqrtf(dx * dx + dy * dy);
+		bool playerNear = (dist <= doorTriggerRadius);
+
+		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE) {
+			std::cout << "[Door " << door.id << "] TRIGGERING OPEN\n";
+			animSystem::play(door.anim, ANIM_PLAY_ONCE);
+		}
+
+		if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE) {
+			std::cout << "[Door " << door.id << "] TRIGGERING CLOSE\n";
+			animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+		}
+
+		animSystem::update(door.anim, dt);
+
+		if (door.anim.justFinished) {
+			std::cout << "[Door " << door.id << "] ANIM FINISHED at frame=" << door.anim.currentFrame << "\n";
+			if (door.anim.currentFrame == doorFrameCount - 1)
+				door.isOpen = true;
+			else if (door.anim.currentFrame == 0)
+				door.isOpen = false;
+		}
+	}
 }
 
 void Level2_Update()
