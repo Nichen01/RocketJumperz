@@ -133,13 +133,14 @@ namespace renderlogic {
 					break;
 				case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29:
 				{
+					if (!doorMesh || !doorTex) break;  // safety guard
 					// Find the matching door for this tile position
 					float tileWorldX = ((float)xo + mapS / 2) - 800.0f;
 					float tileWorldY = 450.0f - ((float)yo + mapS / 2);
 
 					f32 uOffset = 0.f; // default to frame 0
 					for (auto& door : doors) {
-						if (door.level == 1 &&
+						if ((door.firstLevel == 1 || door.secondLevel == 1) &&
 							fabsf(door.worldX - tileWorldX) < 1.f &&
 							fabsf(door.worldY - tileWorldY) < 1.f)
 						{

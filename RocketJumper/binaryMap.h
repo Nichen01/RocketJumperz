@@ -49,7 +49,7 @@ enum TYPE_OBJECT
 
 int		GetCellValue(int X, int Y);
 void	SnapToCell(float *Coordinate);
-int		ImportMapDataFromFile(const char *FileName, int);
+int		ImportMapDataFromFile(const char *FileName);
 void	FreeMapData(void);
 void	PrintRetrievedInformation(void);
 int		ExportMapDataToFile(const char* FileName);

@@ -2,6 +2,9 @@
 #include <vector>
 #include "Animation.h"
 
+extern int currentGameLevel;
+extern int playerEnteredDoorId;
+
 struct DoorLink {
     int id;
     int firstLevel;

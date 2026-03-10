@@ -80,8 +80,10 @@ int** glassMap;
 //
 // ----------------------------------------------------------------------------
 
-int ImportMapDataFromFile(const char* FileName, int currentLevel)
+int ImportMapDataFromFile(const char* FileName)
 {
+	doors.clear();
+
 	std::ifstream ifs(FileName, std::ios::in);
 	if (!ifs) return 0;
 
@@ -112,11 +114,6 @@ int ImportMapDataFromFile(const char* FileName, int currentLevel)
 			else {
 				glassMap[i][j] = -1;
 			}
-
-			if (value == 21) {
-				doorX = (j * 80) + 80 / 2 - 800.0f;
-				doorY = 450.0f - ((i * 80) + 80 / 2);
-			}
 		}
 	}
 
@@ -126,11 +123,17 @@ int ImportMapDataFromFile(const char* FileName, int currentLevel)
 			if (tile >= 21 && tile <= 29) {
 				DoorLink door;
 				door.id = tile;       // door ID
-				door.level = currentLevel;
 				door.row = row;
 				door.col = col;
 				door.worldX = (col * 80) + 40 - 800.0f;
 				door.worldY = 450.0f - (row * 80 + 40);
+
+				switch (tile) {
+				case 21: door.firstLevel = 0; door.secondLevel = 1; break;
+				case 22: door.firstLevel = 1; door.secondLevel = 2; break;
+				case 23: door.firstLevel = 2; door.secondLevel = 3; break;
+				default: door.firstLevel = 0; door.secondLevel = 0; break;
+				}
 
 				// initialize animation for this door
 				animSystem::init(door.anim, doorFrameCount, 0.08f, ANIM_IDLE);
@@ -139,11 +142,6 @@ int ImportMapDataFromFile(const char* FileName, int currentLevel)
 			}
 		}
 	}
-	std::cout << "Total doors registered: " << doors.size() << "\n";
-	for (auto& d : doors)
-		std::cout << "  Door id=" << d.id << " level=" << d.level
-		<< " worldX=" << d.worldX << " worldY=" << d.worldY << "\n";
-
 	ifs.close();
 	return 1;
 }

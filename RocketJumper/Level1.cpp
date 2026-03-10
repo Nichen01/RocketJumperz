@@ -68,6 +68,8 @@ void Level1_Load()
 
 void Level1_Initialize()
 {
+	currentGameLevel = 1;
+
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
@@ -87,7 +89,7 @@ void Level1_Initialize()
 	init::player();
 	init::projectile();
 
-	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt", 1)) {
+	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
 		return;
 	}
@@ -103,8 +105,21 @@ void Level1_Initialize()
 		}
 	}
 
-	objectinfo1[player].xPos = 0.0f;
-	objectinfo1[player].yPos = 0.0f;
+	// Spawn player at the door they came from
+	bool spawnSet = false;
+	for (auto& door : doors) {
+		if (door.id == playerEnteredDoorId) {
+			objectinfo1[player].xPos = door.worldX;
+			objectinfo1[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			spawnSet = true;
+			break;
+		}
+	}
+	// fallback if no door found (first time loading)
+	if (!spawnSet) {
+		objectinfo1[player].xPos = 0.f;
+		objectinfo1[player].yPos = 0.f;
+	}
 	objectinfo1[player].xScale = 60.0f;
 	objectinfo1[player].yScale = 60.0f;
 
@@ -125,16 +140,15 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
 	// DOOR
+
+	// guard the build 
+	if (!doorMesh) animSystem::buildMesh(&doorMesh, doorFrameCount);
+
 	animSystem::buildMesh(&doorMesh, doorFrameCount);
+
 	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
-	if (!doorTex)
-		printf("DOOR TEXTURE NOT FOUND!\n");
-	else
-		printf("DOOR OK\n");
-
-	animSystem::init(doorAnim, doorFrameCount, doorFrameDelay, ANIM_IDLE, 0);
-	doorIsOpen = false;
-
+	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
+	else printf("DOOR OK\n");
 }
 
 void Level1_Update()
@@ -222,31 +236,33 @@ void Level1_Update()
 	// -----------------------------------------------------------------------
 
 	for (auto& door : doors) {
-		if (door.level != 1) continue;
 
+		if (door.firstLevel != 1 && door.secondLevel != 1) continue;
 		f32 dx = objectinfo1[player].xPos - door.worldX;
 		f32 dy = objectinfo1[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
 		bool playerNear = (dist <= doorTriggerRadius);
 
-		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE) {
-			std::cout << "[Door " << door.id << "] TRIGGERING OPEN\n";
+		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
 			animSystem::play(door.anim, ANIM_PLAY_ONCE);
-		}
 
-		if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE) {
-			std::cout << "[Door " << door.id << "] TRIGGERING CLOSE\n";
+		if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE)
 			animSystem::play(door.anim, ANIM_PLAY_REVERSE);
-		}
 
 		animSystem::update(door.anim, dt);
 
-		if (door.anim.justFinished) {
-			std::cout << "[Door " << door.id << "] ANIM FINISHED at frame=" << door.anim.currentFrame << "\n";
-			if (door.anim.currentFrame == doorFrameCount - 1)
-				door.isOpen = true;
-			else if (door.anim.currentFrame == 0)
-				door.isOpen = false;
+		if (door.anim.justFinished)
+			door.isOpen = (door.anim.currentFrame != 0);
+
+		// E key transition -- inside the loop so door and playerNear are in scope
+		if (playerNear && door.isOpen && AEInputCheckTriggered(AEVK_E)) {
+			int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
+			playerEnteredDoorId = door.id; // remember which door was used
+			switch (toLevel) {
+			case 0: next = GS_TUTORIAL; break;
+			case 1: next = GS_LEVEL1; break;
+			case 2: next = GS_LEVEL2; break;
+			}
 		}
 	}
 
@@ -262,6 +278,8 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
+
+	std::cout << "doorMesh=" << doorMesh << " doorTex=" << doorTex << "\n";
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
@@ -312,7 +330,6 @@ void Level1_Draw()
 
 void Level1_Free()
 {
-	// FREE MESHES AND MAP
 	freeAsset::platform();
 	freeAsset::door();
 	freeAsset::enemy();
@@ -329,6 +346,15 @@ void Level1_Free()
 
 void Level1_Unload()
 {
+	if (doorMesh) {
+		AEGfxMeshFree(doorMesh);
+		doorMesh = nullptr;
+	}
+	if (doorTex) {
+		AEGfxTextureUnload(doorTex);
+		doorTex = nullptr;
+	}
+
 	// Unload ALL textures that were loaded in Initialize
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }

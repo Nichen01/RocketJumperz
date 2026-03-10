@@ -88,11 +88,11 @@ void LevelEditor_Initialize() {
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	switch (level) {
 	case 1:
-		ImportMapDataFromFile("Assets/Map/Level1_Map.txt", 1);
+		ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
 		std::cout << "File 1 read";
 		break;
 	case 2:
-		ImportMapDataFromFile("Assets/Map/Level2_Map.txt", 2);
+		ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
 		std::cout << "File 2 read";
 		break;
 	}

@@ -41,8 +41,6 @@ static AEAudio Punch;
 static AEAudioGroup bgm;
 static AEAudioGroup soundEffects;
 
-static char strBuffer[100];
-
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
@@ -70,6 +68,8 @@ void Tutorial_Load()
 
 void Tutorial_Initialize()
 {
+	currentGameLevel = 2;
+
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
@@ -89,7 +89,7 @@ void Tutorial_Initialize()
 	init::player();
 	init::projectile();
 
-	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt", 0)) {
+	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
 		return;
 	}
@@ -105,8 +105,21 @@ void Tutorial_Initialize()
 		}
 	}
 
-	objectinfoTut[player].xPos = 600.0f;
-	objectinfoTut[player].yPos = -310.0f;
+	// Spawn player at the door they came from
+	bool spawnSet = false;
+	for (auto& door : doors) {
+		if (door.id == playerEnteredDoorId) {
+			objectinfoTut[player].xPos = door.worldX;
+			objectinfoTut[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			spawnSet = true;
+			break;
+		}
+	}
+	// fallback if no door found (first time loading)
+	if (!spawnSet) {
+		objectinfoTut[player].xPos = 0.f;
+		objectinfoTut[player].yPos = 0.f;
+	}
 	objectinfoTut[player].xScale = 60.0f;
 	objectinfoTut[player].yScale = 60.0f;
 
@@ -127,21 +140,21 @@ void Tutorial_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
 	// DOOR
+
+	// guard the build 
+	if (!doorMesh) animSystem::buildMesh(&doorMesh, doorFrameCount);
+
 	animSystem::buildMesh(&doorMesh, doorFrameCount);
+
 	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
-	if (!doorTex)
-		printf("DOOR TEXTURE NOT FOUND!\n");
-	else
-		printf("DOOR OK\n");
-
-	animSystem::init(doorAnim, doorFrameCount, doorFrameDelay, ANIM_IDLE, 0);
-	doorIsOpen = false;
-
+	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
+	else printf("DOOR OK\n");
 }
 
 void Tutorial_Update()
 {
 
+	if (AEInputCheckTriggered(AEVK_L)) next = GS_LEVELEDITOR;
 	//====== AUDIO CONTROLS ======
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
@@ -219,27 +232,39 @@ void Tutorial_Update()
 	gamelogic::OBJ_to_map(map, x, s, &objectinfoTut[player], 15);
 
 	// -----------------------------------------------------------------------
-	// Door animation -- hardcoded proximity check
+	// Door animation
 	// -----------------------------------------------------------------------
-	f32 dx = objectinfoTut[player].xPos - doorX;
-	f32 dy = objectinfoTut[player].yPos - doorY;
-	f32 dist = sqrtf(dx * dx + dy * dy);
-	bool playerNear = (dist <= doorTriggerRadius);
 
-	// Trigger open: player just entered range and door is fully closed
-	if (playerNear && !doorIsOpen && doorAnim.playMode != ANIM_PLAY_ONCE)
-		animSystem::play(doorAnim, ANIM_PLAY_ONCE);
+	for (auto& door : doors) {
 
-	// Trigger close: player just left range and door is fully open
-	if (!playerNear && doorIsOpen && doorAnim.playMode != ANIM_PLAY_REVERSE)
-		animSystem::play(doorAnim, ANIM_PLAY_REVERSE);
+		if (door.firstLevel != 1 && door.secondLevel != 1) continue;  // fix: && not ||
+		f32 dx = objectinfoTut[player].xPos - door.worldX;
+		f32 dy = objectinfoTut[player].yPos - door.worldY;
+		f32 dist = sqrtf(dx * dx + dy * dy);
+		bool playerNear = (dist <= doorTriggerRadius);
 
-	animSystem::update(doorAnim, dt);
+		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
+			animSystem::play(door.anim, ANIM_PLAY_ONCE);
 
-	// justFinished is true for one frame when a one-shot completes
-	if (doorAnim.justFinished)
-		doorIsOpen = (doorAnim.currentFrame == doorFrameCount - 1);
-	// -----------------------------------------------------------------------
+		if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE)
+			animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+
+		animSystem::update(door.anim, dt);
+
+		if (door.anim.justFinished)
+			door.isOpen = (door.anim.currentFrame != 0);
+
+		// E key transition -- inside the loop so door and playerNear are in scope
+		if (playerNear && door.isOpen && AEInputCheckTriggered(AEVK_E)) {
+			int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
+			playerEnteredDoorId = door.id;  // remember which door was used
+			switch (toLevel) {
+			case 0: next = GS_TUTORIAL; break;
+			case 1: next = GS_LEVEL1; break;
+			case 2: next = GS_LEVEL2; break;
+			}
+		}
+	}
 }
 
 void Tutorial_Draw()
@@ -252,6 +277,7 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
+
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
@@ -302,7 +328,6 @@ void Tutorial_Draw()
 
 void Tutorial_Free()
 {
-	// FREE MESHES AND MAP
 	freeAsset::platform();
 	freeAsset::door();
 	freeAsset::enemy();
@@ -319,6 +344,15 @@ void Tutorial_Free()
 
 void Tutorial_Unload()
 {
+	if (doorMesh) {
+		AEGfxMeshFree(doorMesh);
+		doorMesh = nullptr;
+	}
+	if (doorTex) {
+		AEGfxTextureUnload(doorTex);
+		doorTex = nullptr;
+	}
+
 	// Unload ALL textures that were loaded in Initialize
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
