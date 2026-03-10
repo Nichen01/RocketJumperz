@@ -1,7 +1,8 @@
 #pragma once
 #include "pch.h"
-#include "binaryMap.h"
+#include "BinaryMap.h"
 #include <vector>
+#include "Draw.h"
 
 struct TileAction {
 	s32 row;
@@ -10,14 +11,14 @@ struct TileAction {
 	s32 newValue;
 };
 
-void levelEditor_Load();
+void LevelEditor_Load();
 
-void levelEditor_Initialize();
+void LevelEditor_Initialize();
 
-void levelEditor_Update();
+void LevelEditor_Update();
 
-void levelEditor_Draw();
+void LevelEditor_Draw();
 
-void levelEditor_Free();
+void LevelEditor_Free();
 
-void levelEditor_Unload();
+void LevelEditor_Unload();

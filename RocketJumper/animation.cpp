@@ -12,7 +12,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "animation.h"
+#include "Animation.h"
 
 namespace animSystem
 {
@@ -181,5 +181,6 @@ namespace animSystem
             -0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.f);
         *outMesh = AEGfxMeshEnd();
     }
+
 
 } // namespace animSystem

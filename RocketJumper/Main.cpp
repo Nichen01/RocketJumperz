@@ -2,10 +2,10 @@
 // includes
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "collision.h"
+#include "Collision.h"
 #include "Main.h"
-#include "render.h"
-#include "sound.h"
+#include "Load.h"
+#include "Sound.h"
 
 // ---------------------------------------------------------------------------
 // main
@@ -26,7 +26,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// Using custom window procedure
-	int gGameRunning = 1;
+	//int gGameRunning = 1;
 	bool pause = false;
 	s8 pausefont = -1; 
 	//MenuButton playButton;

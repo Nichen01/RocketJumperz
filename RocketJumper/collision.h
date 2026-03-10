@@ -1,7 +1,7 @@
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
-#include "player.h"
+#include "Player.h"
 extern f64					g_fixedDT;
 extern f64					g_dt;
 extern f64					g_appTime;

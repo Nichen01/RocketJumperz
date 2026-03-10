@@ -1,5 +1,5 @@
-#include "player.h"
-#include "collision.h"
+#include "Player.h"
+#include "Collision.h"
 #include <cstdio>
 
 // ---------------------------------------------------------------------------

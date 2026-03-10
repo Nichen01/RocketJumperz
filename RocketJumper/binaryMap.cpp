@@ -33,6 +33,7 @@ int** MapData;
 //in MapData is 1, it represents a collision cell, any other value is a non-collision
 //cell
 int** BinaryCollisionArray;
+int** glassMap;
 
 // ----------------------------------------------------------------------------
 //
@@ -78,40 +79,73 @@ int** BinaryCollisionArray;
 //	otherwise it returns 0
 //
 // ----------------------------------------------------------------------------
+
 int ImportMapDataFromFile(const char* FileName)
 {
+	doors.clear();
+
 	std::ifstream ifs(FileName, std::ios::in);
-	if (!ifs) {
-		return 0;
-	}
+	if (!ifs) return 0;
 
 	ifs >> BINARY_MAP_WIDTH;
 	ifs >> BINARY_MAP_HEIGHT;
 
 	MapData = new int* [BINARY_MAP_HEIGHT];
 	BinaryCollisionArray = new int* [BINARY_MAP_HEIGHT];
+	glassMap = new int* [BINARY_MAP_HEIGHT];   // allocate glassMap rows
 
-	for (int i{}; i < BINARY_MAP_HEIGHT; i++) {
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
 		MapData[i] = new int[BINARY_MAP_WIDTH];
 		BinaryCollisionArray[i] = new int[BINARY_MAP_WIDTH];
+		glassMap[i] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
 	}
 
-	for (int i{}; i < BINARY_MAP_HEIGHT; i++) {
-		for (int j{}; j < BINARY_MAP_WIDTH; j++) {
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
+		for (int j = 0; j < BINARY_MAP_WIDTH; j++) {
 			int value;
 			ifs >> value;
 			MapData[i][j] = value;
 			BinaryCollisionArray[i][j] = (value >= 1) ? 1 : 0;
-			if (value == 21) {
-				doorX = (j * 80) + 80 / 2 - 800.0f;
-				doorY = 450.0f - ((i * 80) + 80 / 2);
-			}
 
+			// assign random glass type if tile is "air"
+			if (value == 0) {
+				glassMap[i][j] = rand() % 5;
+			}
+			else {
+				glassMap[i][j] = -1;
+			}
+		}
+	}
+
+	for (int row = 0; row < BINARY_MAP_HEIGHT; ++row) {
+		for (int col = 0; col < BINARY_MAP_WIDTH; ++col) {
+			int tile = MapData[row][col];
+			if (tile >= 21 && tile <= 29) {
+				DoorLink door;
+				door.id = tile;       // door ID
+				door.row = row;
+				door.col = col;
+				door.worldX = (col * 80) + 40 - 800.0f;
+				door.worldY = 450.0f - (row * 80 + 40);
+
+				switch (tile) {
+				case 21: door.firstLevel = 0; door.secondLevel = 1; break;
+				case 22: door.firstLevel = 1; door.secondLevel = 2; break;
+				case 23: door.firstLevel = 2; door.secondLevel = 3; break;
+				default: door.firstLevel = 0; door.secondLevel = 0; break;
+				}
+
+				// initialize animation for this door
+				animSystem::init(door.anim, doorFrameCount, 0.08f, ANIM_IDLE);
+
+				doors.push_back(door);
+			}
 		}
 	}
 	ifs.close();
 	return 1;
 }
+
 
 // ----------------------------------------------------------------------------
 //
@@ -122,17 +156,18 @@ int ImportMapDataFromFile(const char* FileName)
 // ----------------------------------------------------------------------------
 void FreeMapData(void)
 {
-	if (MapData) {
-		for (int i{}; i < BINARY_MAP_HEIGHT; i++) delete[] MapData[i];
-		delete[] MapData;
-		MapData = nullptr;
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
+		delete[] MapData[i];
+		delete[] BinaryCollisionArray[i];
+		delete[] glassMap[i];
 	}
+	delete[] MapData;
+	delete[] BinaryCollisionArray;
+	delete[] glassMap;
+	MapData = nullptr;
+	BinaryCollisionArray = nullptr;
+	glassMap = nullptr;
 
-	if (BinaryCollisionArray) {
-		for (int i{}; i < BINARY_MAP_HEIGHT; i++) delete[] BinaryCollisionArray[i];
-		delete[] BinaryCollisionArray;
-		BinaryCollisionArray = nullptr;
-	}
 }
 
 // ----------------------------------------------------------------------------

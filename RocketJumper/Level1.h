@@ -14,15 +14,17 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 #include "pch.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
+#include "Draw.h"
+#include "Collision.h"
+#include "Player.h"
 #include "GameStateManager.h"
-#include "projectile.h"
+#include "Projectile.h"
 #include "Movement.h"
-#include "render.h"
-#include "enemies.h"
-#include "binaryMap.h"
+#include "Load.h"
+#include "Enemies.h"
+#include "BinaryMap.h"
+#include "GameStateList.h"
+#include "Animation.h"
 
 void Level1_Load();
 

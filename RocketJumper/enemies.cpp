@@ -12,10 +12,10 @@ Technology is prohibited.
 */
 /* End Header *********************************************************************/
 
-#include "enemies.h"
-#include "collision.h"
-#include "render.h"
-#include "player.h"
+#include "Enemies.h"
+#include "Collision.h"
+#include "Draw.h"
+#include "Player.h"
 #include <cmath>
 
 namespace enemySystem {
@@ -113,6 +113,10 @@ namespace enemySystem {
     s8 hasLineOfSight(Enemy& enemy, objectsquares& player,
         int map[], int mapX, int mapY, int mapS)
     {
+        map = map;
+        mapX = mapX;
+        mapS = mapS;
+        mapY = mapY;
         // For now, just check distance
         // TODO: Add raycast to check for walls between enemy and player
         f32 distance = getDistance(enemy.shape.xPos, enemy.shape.yPos,
@@ -331,7 +335,7 @@ namespace enemySystem {
                 }
 
                 // Draw enemy
-                render::Drawsquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
+                renderlogic::drawSquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
                     enemies[i].shape.xScale, enemies[i].shape.yScale);
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
             }

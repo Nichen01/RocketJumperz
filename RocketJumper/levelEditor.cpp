@@ -1,11 +1,9 @@
 
-#include "levelEditor.h"
+#include "LevelEditor.h"
 #include "GameStateManager.h"
 
 // GLOBAL VARIABLES
 static AEGfxTexture* door;
-static AEGfxVertexList* levelTileMesh = nullptr;
-static AEGfxVertexList* uiMesh = nullptr;
 static AEGfxTexture* tileTextures[10];
 static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
@@ -13,9 +11,6 @@ static s8 font;
 int level{ 1 };
 s32 currentTileIndex{}, doorCount{ 1 };
 static std::vector<TileAction> actionHistory;
-
-// UI textures
-static AEGfxTexture* ctrl1, *ctrl2, *leftArrow, *leftClick, *rightArrow, *rightClick, *sButton, *zButton, *button1, *button2, *button3, *button4;
 
 // door prompt
 static float doorPromptAlpha = 1.0f;
@@ -25,24 +20,13 @@ static u32 doorID{};
 static int promptRow = -1;
 static int promptCol = -1;
 
+static char strBuffer[100];
 
-void levelEditor_Load() {
+void LevelEditor_Load() {
 
 	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
 
-	// UI textures
-	ctrl1 = AEGfxTextureLoad("Assets/UI/ctrl1.png");
-	ctrl2 = AEGfxTextureLoad("Assets/UI/ctrl2.png");
-	leftArrow = AEGfxTextureLoad("Assets/UI/leftArrow.png");
-	rightArrow = AEGfxTextureLoad("Assets/UI/rightArrow.png");
-	leftClick = AEGfxTextureLoad("Assets/UI/leftClick.png");
-	rightClick = AEGfxTextureLoad("Assets/UI/rightClick.png");
-	sButton = AEGfxTextureLoad("Assets/UI/sButton.png");
-	zButton = AEGfxTextureLoad("Assets/UI/zButton.png");
-	button1 = AEGfxTextureLoad("Assets/UI/1Button.png");
-	button2 = AEGfxTextureLoad("Assets/UI/2Button.png");
-	button3 = AEGfxTextureLoad("Assets/UI/3Button.png");
-	button4 = AEGfxTextureLoad("Assets/UI/4Button.png");
+	load::ui();
 
 	tileTextures[0] = AEGfxTextureLoad("Assets/Platform/platform1.png");
 	tileTextures[1] = AEGfxTextureLoad("Assets/Platform/platform2.png");
@@ -57,30 +41,10 @@ void levelEditor_Load() {
 
 }
 
-void levelEditor_Initialize() {
+void LevelEditor_Initialize() {
 
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	levelTileMesh = AEGfxMeshEnd();
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	uiMesh = AEGfxMeshEnd();
+	init::platform();
+	init::ui();
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	switch (level) {
@@ -95,7 +59,7 @@ void levelEditor_Initialize() {
 	}
 }
 
-void levelEditor_Update() {
+void LevelEditor_Update() {
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
 		level = 1;
 		next = GS_RESTART;
@@ -104,7 +68,7 @@ void levelEditor_Update() {
 		level = 2;
 		next = GS_RESTART;
 	}
-	if (AEInputCheckTriggered(AEVK_L)) next = (level==1) ? GS_LEVEL1:GS_LEVEL2;
+	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : GS_LEVEL2;
 
 	// selecting asset
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
@@ -220,7 +184,7 @@ void levelEditor_Update() {
 	}
 }
 
-void levelEditor_Draw() {
+void LevelEditor_Draw() {
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
     AEGfxSetBlendMode(AE_GFX_BM_NONE);
@@ -309,7 +273,7 @@ void levelEditor_Draw() {
 			AEMtx33Concat(&transf, &transl, &transf);
 
 			AEGfxSetTransform(transf.m);
-			AEGfxMeshDraw(levelTileMesh, AE_GFX_MDM_TRIANGLES);
+			AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
 			if (isGridHovered) {
 				if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_S)) {
@@ -344,6 +308,26 @@ void levelEditor_Draw() {
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "5", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
+			else if (MapData[row][col] == 16 || MapData[row][col] == 26) {
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
+				AEGfxPrint(font, "6", normX, normY, 0.5f, 1, 1, 1, 1);
+			}
+			else if (MapData[row][col] == 17 || MapData[row][col] == 27) {
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
+				AEGfxPrint(font, "7", normX, normY, 0.5f, 1, 1, 1, 1);
+			}
+			else if (MapData[row][col] == 18 || MapData[row][col] == 28) {
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
+				AEGfxPrint(font, "8", normX, normY, 0.5f, 1, 1, 1, 1);
+			}
+			else if (MapData[row][col] == 19 || MapData[row][col] == 29) {
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
+				AEGfxPrint(font, "9", normX, normY, 0.5f, 1, 1, 1, 1);
+			}
 		}
 	}
 
@@ -362,15 +346,13 @@ void levelEditor_Draw() {
 	}
 
 	AEGfxSetTransform(tileTransf.m);
-	AEGfxMeshDraw(levelTileMesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
-	char strBuffer[100];
 	memset(strBuffer, 0, 100 * sizeof(char));
-
+	f32 tileTextWidth, tileTextHeight;
+	AEGfxGetPrintSize(font, strBuffer, 0.15f, &tileTextWidth, &tileTextHeight);
 	// to print the text below the asset
 	switch (currentTileIndex) {
-		f32 tileTextWidth, tileTextHeight;
-		AEGfxGetPrintSize(font, strBuffer, 0.15f, &tileTextWidth, &tileTextHeight);
 	case 0:
 		sprintf_s(strBuffer, "Platform: Top Left Corner");
 		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
@@ -415,137 +397,39 @@ void levelEditor_Draw() {
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	
-	// default scale and rotation
-	AEMtx33 uiScl, uiRot;
-	AEMtx33Scale(&uiScl, 40.f, 40.f);
-	AEMtx33Rot(&uiRot, 0);
+	renderlogic::drawUITexture(-170.f, -330.f, leftArrow);
+	renderlogic::drawUITexture(-20.f, -330.f, rightArrow);
+	renderlogic::drawUITexture(570.f, 400.f, leftClick);
+	renderlogic::drawUITexture(570.f, 280.f, rightClick);
+	renderlogic::drawUITexture(570.f, 170.f, ctrl1);
+	renderlogic::drawUITexture(610.f, 170.f, ctrl2);
+	renderlogic::drawUITexture(670.f, 170.f, sButton);
+	renderlogic::drawUITexture(570.f, 280.f, rightClick);
+	renderlogic::drawUITexture(570.f, 60.f, ctrl1);
+	renderlogic::drawUITexture(610.f, 600.f, ctrl2);
+	renderlogic::drawUITexture(670.f, 60.f, zButton);
+	renderlogic::drawUITexture(570.f, -60.f, ctrl1);
+	renderlogic::drawUITexture(610.f, -60.f, ctrl2);
+	renderlogic::drawUITexture(650.f, -60.f, button1);
+	renderlogic::drawUITexture(690.f, -60.f, button2);
+	renderlogic::drawUITexture(730.f, -60.f, button3);
+	renderlogic::drawUITexture(770.f, -60.f, button4);
 
-	// left arrow
-	AEMtx33 uiTransl, uiTransf;
-	AEMtx33Trans(&uiTransl, -170.f, -330.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxTextureSet(leftArrow, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	// right arrow
-	AEMtx33Trans(&uiTransl, -20.f, -330.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(rightArrow, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	// left click
-	AEMtx33Trans(&uiTransl, 570.f, 400.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(leftClick, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
+	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.5f, &uiTextWidth, &uiTextHeight);
 	sprintf_s(strBuffer, "Left Click to Set");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.76f, 0.3f, 1.f, 1.f, 1.f, 1.f);
 
-	// right click
-	AEMtx33Trans(&uiTransl, 570.f, 280.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(rightClick, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
 	sprintf_s(strBuffer, "Right Click to Clear");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.5f, 0.25f, 1.f, 1.f, 1.f, 1.f);
 
-	// save
-	AEMtx33Trans(&uiTransl, 570.f, 170.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(ctrl1, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	AEMtx33Trans(&uiTransl, 610.f, 170.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(ctrl2, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	AEMtx33Trans(&uiTransl, 670.f, 170.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(sButton, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
 	sprintf_s(strBuffer, "CTRL + S to Save");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.25f, 0.3f, 1.f, 1.f, 1.f, 1.f);
 
-	AEMtx33Trans(&uiTransl, 570.f, 60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(ctrl1, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	AEMtx33Trans(&uiTransl, 610.f, 60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(ctrl2, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	AEMtx33Trans(&uiTransl, 670.f, 60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(zButton, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
 	sprintf_s(strBuffer, "CTRL + Z to Undo");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.f, 0.3f, 1.f, 1.f, 1.f, 1.f);
 
-	AEMtx33Trans(&uiTransl, 570.f, -60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(ctrl1, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	AEMtx33Trans(&uiTransl, 610.f, -60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(ctrl2, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-
-	AEMtx33Trans(&uiTransl, 650.f, -60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(button1, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-	AEMtx33Trans(&uiTransl, 690.f, -60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(button2, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-	AEMtx33Trans(&uiTransl, 730.f, -60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(button3, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
-	AEMtx33Trans(&uiTransl, 770.f, -60.f);
-	AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
-	AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
-	AEGfxTextureSet(button4, 0, 0);
-	AEGfxSetTransform(uiTransf.m);
-	AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
 	sprintf_s(strBuffer, "CTRL + (Number)");
 	AEGfxPrint(font, strBuffer, 0.67f, -0.3f, 0.3f, 1.f, 1.f, 1.f, 1.f);
 	sprintf_s(strBuffer, "for Level");
@@ -563,13 +447,11 @@ void levelEditor_Draw() {
 		AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, doorPromptAlpha);
 
 		// draw rectangle behind text
-		renderlogic::Drawsquare(boxX * AEGfxGetWindowWidth() / 2.0f,
+		renderlogic::drawSquare(boxX * AEGfxGetWindowWidth() / 2.0f,
 			boxY * AEGfxGetWindowHeight() / 2.0f,
 			boxWidth, boxHeight);
-		AEGfxMeshDraw(levelTileMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
-		// now draw the text on top
-		char strBuffer[100];
 		memset(strBuffer, 0, sizeof(strBuffer));
 		f32 doorTextWidth, doorTextHeight;
 		AEGfxGetPrintSize(font, strBuffer, 0.2f, &doorTextWidth, &doorTextHeight);
@@ -578,15 +460,14 @@ void levelEditor_Draw() {
 
 }
 
-void levelEditor_Free() {
+void LevelEditor_Free() {
 
-	if (levelTileMesh) {
-		AEGfxMeshFree(levelTileMesh);
-		levelTileMesh = nullptr;
-	}
+	freeAsset::platform();
+	freeAsset::ui();
 	FreeMapData();
 }
 
-void levelEditor_Unload() {
+void LevelEditor_Unload() {
 	AEGfxDestroyFont(font);
+	unload::ui();
 }
