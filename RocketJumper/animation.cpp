@@ -12,16 +12,29 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "animation.h"
+#include "Animation.h"
 
 namespace animSystem
 {
+    /*!*************************************************************************
+     * animSystem::init
+     * @brief Initializes sprite animation details for entity
+     *
+     * @param SpriteAnimation&    Access struct containing anim data
+     * @param int totalFrames     Total number of animation frames needed
+     * @param f32 frameDelay      Amount of time spent showing ONE frame
+     * @return                    void
+     ***************************************************************************/
     void init(SpriteAnimation& anim,
+        int          cols,
+        int          rows,
         int          totalFrames,
         f32          frameDelay,
         AnimPlayMode mode,
         int          startFrame)
     {
+        anim.rows = rows;
+        anim.cols = cols;
         anim.totalFrames = totalFrames;
         anim.frameDelay = frameDelay;
         anim.playMode = mode;
@@ -32,14 +45,28 @@ namespace animSystem
         anim.justFinished = 0;
     }
 
+    /*!*************************************************************************
+     * animSystem::update
+     * @brief Function to update and play the animation
+     *
+     * @param SpriteAnimation&    Access struct containing anim data
+     * @param f32 deltaTime       Time elapsed between the previous frame and current frame
+     * @return                    void
+     ***************************************************************************/
     void update(SpriteAnimation& anim, f32 deltaTime)
     {
-        anim.justFinished = 0;  // clear the one-frame pulse from last update
-
+        // To check if animation finished in the previous frame, yes = 1, no = 0
+        anim.justFinished = 0;
+        // if animation is paused or idle, no need to calculate timers.
         if (!anim.isPlaying || anim.playMode == ANIM_IDLE) return;
+        // Guard: cannot advance frames if totalFrames is zero or negative
+        if (anim.totalFrames <= 0) return;
 
+        //Increment the time elapsed
         anim.frameTimer += deltaTime;
+        //while the frame isn't as much as the frameDelay, do nothing
         if (anim.frameTimer < anim.frameDelay) return;
+        //
         anim.frameTimer -= anim.frameDelay;
 
         switch (anim.playMode)
@@ -123,28 +150,45 @@ namespace animSystem
 
     f32 getUOffset(const SpriteAnimation& anim)
     {
-        return static_cast<f32>(anim.currentFrame) /
-            static_cast<f32>(anim.totalFrames);
+        // Guard: avoid integer division by zero if cols was never set
+        if (anim.cols <= 0) return 0.f;
+
+        // get the number of frames in the row by checking the columns
+        int col = anim.currentFrame % anim.cols;
+        return static_cast<f32>(col) /
+            static_cast<f32>(anim.cols);
     }
 
-    void buildMesh(AEGfxVertexList** outMesh, int totalFrames)
+    f32 getVOffset(const SpriteAnimation& anim)
     {
-        if (!outMesh || totalFrames <= 0) return;
+        // Guard: avoid integer division by zero if cols or rows was never set
+        if (anim.cols <= 0 || anim.rows <= 0) return 0.f;
+
+        int row = anim.currentFrame / anim.cols;
+        return static_cast<f32>(row) /
+            static_cast<f32>(anim.rows);
+    }
+
+    void buildMesh(AEGfxVertexList** outMesh, int rows, int cols)
+    {
+        if (!outMesh || cols <= 0 || rows <= 0) return;
 
         // UVs span exactly one frame: [0.0, 1/totalFrames]
         // AEGfxTextureSet's UV offset then slides this window to the right frame.
-        f32 uMax = 1.f / static_cast<f32>(totalFrames);
+        f32 uMax = 1.f / static_cast<f32>(cols);
+        f32 vMax = 1.f / static_cast<f32>(rows);
 
         AEGfxMeshStart();
         AEGfxTriAdd(
-            -0.5f, -0.5f, 0xFFFFFFFF, 0.f, 1.f,
-            0.5f, -0.5f, 0xFFFFFFFF, uMax, 1.f,
+            -0.5f, -0.5f, 0xFFFFFFFF, 0.f, vMax,
+            0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
             -0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.f);
         AEGfxTriAdd(
-            0.5f, -0.5f, 0xFFFFFFFF, uMax, 1.f,
+            0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
             0.5f, 0.5f, 0xFFFFFFFF, uMax, 0.f,
             -0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.f);
         *outMesh = AEGfxMeshEnd();
     }
+
 
 } // namespace animSystem

@@ -1,7 +1,7 @@
 #pragma once
 #include "AEEngine.h"
-#include "movement.h"
-#include "collision.h"
+#include "Movement.h"
+#include "Collision.h"
 
 /*namespace aiming {
 	extern AEGfxTexture *aimingInterface = nullptr;

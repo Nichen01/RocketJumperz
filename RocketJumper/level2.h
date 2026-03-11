@@ -13,6 +13,16 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+
+#include "Load.h"
+#include "Draw.h"
+#include "Collision.h"
+#include "Player.h"
+#include "GameStateManager.h"
+#include "Projectile.h"
+#include "Movement.h"
+#include "Enemies.h"
+
 extern int screenWidth; extern int screenLength;
 
 void Level2_Load();

@@ -1,15 +1,24 @@
 #pragma once
 #include "pch.h"
-#include "binaryMap.h"
+#include "BinaryMap.h"
+#include <vector>
+#include "Draw.h"
 
-void levelEditor_Load();
+struct TileAction {
+	s32 row;
+	s32 col;
+	s32 prevValue;
+	s32 newValue;
+};
 
-void levelEditor_Initialize();
+void LevelEditor_Load();
 
-void levelEditor_Update();
+void LevelEditor_Initialize();
 
-void levelEditor_Draw();
+void LevelEditor_Update();
 
-void levelEditor_Free();
+void LevelEditor_Draw();
 
-void levelEditor_Unload();
+void LevelEditor_Free();
+
+void LevelEditor_Unload();

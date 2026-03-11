@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="collision.cpp">
+    <ClCompile Include="Collision.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="projectile.cpp">
+    <ClCompile Include="Projectile.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="movement.cpp">
+    <ClCompile Include="Movement.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
+    <ClCompile Include="Player.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
@@ -22,57 +22,60 @@
     <ClCompile Include="Level1.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="draw.cpp">
+    <ClCompile Include="Draw.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="enemies.cpp">
+    <ClCompile Include="Enemies.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="animation.cpp">
+    <ClCompile Include="Animation.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="aimingInterface.cpp">
+    <ClCompile Include="AimingInterface.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="binaryMap.cpp">
+    <ClCompile Include="BinaryMap.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="gameover.cpp">
+    <ClCompile Include="Gameover.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Level2.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="levelEditor.cpp">
+    <ClCompile Include="LevelEditor.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="projectileTest.cpp">
+    <ClCompile Include="ProjectileTest.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="render.cpp">
+    <ClCompile Include="Load.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Sound.cpp">
+    <ClCompile Include="Tutorial.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="DoorSystem.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="collision.h">
+    <ClInclude Include="Collision.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="movement.h">
+    <ClInclude Include="Movement.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="projectile.h">
+    <ClInclude Include="Projectile.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="player.h">
+    <ClInclude Include="Player.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="GameStateList.h">
@@ -84,28 +87,31 @@
     <ClInclude Include="Level1.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="draw.h">
+    <ClInclude Include="Draw.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="enemies.h">
+    <ClInclude Include="Enemies.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="animation.h">
+    <ClInclude Include="Animation.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="aimingInterface.h">
+    <ClInclude Include="AimingInterface.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="render.h">
+    <ClInclude Include="Sound.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="binaryMap.h">
+    <ClInclude Include="Load.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="gameover.h">
+    <ClInclude Include="BinaryMap.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="level2.h">
+    <ClInclude Include="Gameover.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Level2.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Main.h">
@@ -114,13 +120,19 @@
     <ClInclude Include="pch.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="projectileTest.h">
+    <ClInclude Include="ProjectileTest.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="MainMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Sound.h">
+    <ClInclude Include="LevelEditor.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Tutorial.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DoorSystem.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

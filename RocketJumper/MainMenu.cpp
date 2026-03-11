@@ -30,7 +30,9 @@ static void DrawCreditsMenu();
 // ==================== GLOBAL RESOURCES ====================
 static AEGfxVertexList* buttonMesh = nullptr;
 static AEGfxVertexList* backgroundMesh = nullptr;
+static AEGfxVertexList* titleMesh = nullptr;
 static AEGfxTexture* backgroundTexture = nullptr;
+static AEGfxTexture* titleTexture = nullptr;
 static s8 menuFont = -1;
 
 // Current menu state
@@ -49,6 +51,7 @@ static MenuButton quitButton;
 
 // Back button for sub-menus
 static MenuButton backButton;
+
 
 // Animation constants
 static const f32 BUTTON_SCALE_NORMAL = 1.0f;
@@ -184,10 +187,30 @@ void MainMenu_Load() {
 
     backgroundMesh = AEGfxMeshEnd();
 
+    // Create Title mesh (fullscreen quad)
+    AEGfxMeshStart();
+
+    AEGfxTriAdd(
+        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+        0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+    AEGfxTriAdd(
+        0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+        0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+    titleMesh = AEGfxMeshEnd();
+
     // Load background texture 
     backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
+    }
+
+    titleTexture = AEGfxTextureLoad("Assets/Title.png");
+    if (!titleTexture) {
+        printf("Warning: title.png not found. Title banner will not render.\n");
     }
 
     // Load font 
@@ -211,10 +234,10 @@ void MainMenu_Init() {
     const char* text;
     bool isHovered;
     */ 
-    playButton = { 0.0f, 50.0f, 375.0f, 80.0f, 1.0f, 1.0f, "PLAY", false };
-    instructionsButton = { 0.0f, -70.0f, 375.0f, 80.0f, 1.0f, 1.0f, "INSTRUCTIONS", false };
-    creditsButton = { 0.0f, -190.0f, 375.0f, 80.0f, 1.0f, 1.0f, "CREDITS", false };
-    quitButton = { 0.0f, -310.0f, 375.0f, 80.0f, 1.0f, 1.0f, "QUIT", false };
+    playButton = { 0.0f, 0.0f, 375.0f, 80.0f, 1.0f, 1.0f, "PLAY", false };
+    instructionsButton = { 0.0f, -120.0f, 375.0f, 80.0f, 1.0f, 1.0f, "INSTRUCTIONS", false };
+    creditsButton = { 0.0f, -240.0f, 375.0f, 80.0f, 1.0f, 1.0f, "CREDITS", false };
+    quitButton = { 0.0f, -360.0f, 375.0f, 80.0f, 1.0f, 1.0f, "QUIT", false };
 
     // Initialize back button (used in sub-menus)
     backButton = { 0.0f, -350.0f, 250.0f, 70.0f, 1.0f, 1.0f, "BACK", false };
@@ -251,7 +274,7 @@ void UpdateMainMenu() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (playButton.isHovered) {
-            next = GS_LEVEL1;  // Change to test file if needed
+            next = GS_TUTORIAL;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");
         }
         else if (instructionsButton.isHovered) {
@@ -360,12 +383,42 @@ void DrawBackground() {
 }
 
 void DrawMainMenu() {
-    // Draw title
-    if (menuFont >= 0) {
-        MenuHelpers::drawTextCentered("ROCKET JUMPERZ", 0.0f, 320.0f, 1.5f, menuFont);
+    // --- Draw the title banner image in the top portion of the screen ---
+    // Screen is 1600x900 with (0,0) at center, so Y ranges from -450 to +450.
+    // Buttons start at y=50 (PLAY) and go down to y=-310 (QUIT).
+    // We place the banner centered at y=270, which is well above the top button.
+    // Banner dimensions: 700 wide x 300 tall -- fills roughly the top 33% of screen.
+    const f32 kTitleBannerWidth  = 700.0f;
+    const f32 kTitleBannerHeight = 450.0f;
+    const f32 kTitleBannerY      = 250.0f;  // Vertical center of the banner
+
+    if (titleTexture && titleMesh) {
+        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+        AEGfxTextureSet(titleTexture, 0.0f, 0.0f);
+
+        // Use full-brightness white so the texture renders at its original colors
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+        AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+        AEGfxSetTransparency(1.0f);
+
+        // Build the transform: scale the unit quad to banner size, then translate up
+        AEMtx33 bannerScale, bannerTranslate, bannerTransform;
+        AEMtx33Scale(&bannerScale, kTitleBannerWidth, kTitleBannerHeight);
+        AEMtx33Trans(&bannerTranslate, 0.0f, kTitleBannerY);
+        AEMtx33Concat(&bannerTransform, &bannerTranslate, &bannerScale);
+
+        AEGfxSetTransform(bannerTransform.m);
+        AEGfxMeshDraw(titleMesh, AE_GFX_MDM_TRIANGLES);
+    }
+    else {
+        // Fallback: render the title as text if the texture failed to load
+        if (menuFont >= 0) {
+            MenuHelpers::drawTextCentered("DEAD WEIGHT", 0.0f, 320.0f, 1.5f, menuFont);
+        }
     }
 
-    // Draw all buttons
+    // Draw all buttons (positioned in the lower half of the screen)
     MenuHelpers::drawButton(playButton, buttonMesh, menuFont);
     MenuHelpers::drawButton(instructionsButton, buttonMesh, menuFont);
     MenuHelpers::drawButton(creditsButton, buttonMesh, menuFont);
@@ -455,6 +508,11 @@ void MainMenu_Free() {
         buttonMesh = nullptr;
     }
 
+    if (titleMesh) {
+        AEGfxMeshFree(titleMesh);
+        titleMesh = nullptr;
+    }
+
     if (backgroundMesh) {
         AEGfxMeshFree(backgroundMesh);
         backgroundMesh = nullptr;
@@ -467,6 +525,11 @@ void MainMenu_Unload() {
     if (backgroundTexture) {
         AEGfxTextureUnload(backgroundTexture);
         backgroundTexture = nullptr;
+    }
+
+    if (titleTexture) {
+        AEGfxTextureUnload(titleTexture);
+        titleTexture = nullptr;
     }
 
     if (menuFont >= 0) {

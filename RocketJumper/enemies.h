@@ -14,8 +14,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "AEEngine.h"
-#include "player.h"
-#include "projectile.h"
+#include "Player.h"
+#include "Projectile.h"
 
 // Maximum number of enemies that can exist at once
 #define MAX_ENEMIES 10
@@ -75,10 +75,14 @@ namespace enemySystem {
         f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup);
 
     // Render all active enemies
-    void renderEnemies(Enemy enemies[], s32 maxCount,
-        AEGfxVertexList* mesh,
+    void renderEnemies(Enemy enemies[],
+        s32 maxCount,
+        AEGfxVertexList* meleeMesh,
+        AEGfxVertexList* rangedMesh,
         AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture);
+        AEGfxTexture* rangedTexture,
+        f32 meleeUOffset = 0.0f,
+        f32 meleeVoffset = 0.0f);
 
     // Check if player collided with any melee enemies
     // Returns damage dealt to player

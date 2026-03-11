@@ -2,10 +2,10 @@
 // includes
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "collision.h"
+#include "Collision.h"
 #include "Main.h"
-#include "render.h"
-#include "sound.h"
+#include "Load.h"
+#include "Sound.h"
 
 // ---------------------------------------------------------------------------
 // main
@@ -26,9 +26,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// Using custom window procedure
-	int gGameRunning = 1;
+	//int gGameRunning = 1;
 	bool pause = false;
-	
+	s8 pausefont = -1; 
+	//MenuButton playButton;
+	//MenuButton quitButton;
+	f32 width, height;
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -38,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	printf("Team project test\n");
 
 	
-	GSM_Initialize(GS_LEVEL1);
+	GSM_Initialize(GS_MAINMENU);
 
 	while (current != GS_QUIT)
 	{
@@ -46,7 +49,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			GSM_Update();
 			fpLoad();
 			if (current != GS_MAINMENU) {
-				
+				// Destroy previous pause font before creating a new one to
+				// avoid leaking a font handle on every level transition.
+				if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
+				pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 			}
 		}
 		else {
@@ -105,13 +111,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (next != GS_RESTART) {
 			fpUnload();
+			previous = current;
 		}
 
-		previous = current;
 		current = next;
 	}
 
 	// free the system
 	AEGfxDestroyFont(pausefont);
 	AESysExit();
+
+	return 0;
 }

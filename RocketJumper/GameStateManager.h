@@ -12,11 +12,14 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/\
 #include "pch.h"
-#include "mapEditor_Level1.h"
-#include "mapEditor_Level2.h"
 #include "MainMenu.h"
-#include "projectileTest.h"
-#include "levelEditor.h"
+#include "ProjectileTest.h"
+#include "GameStateList.h"
+#include "Level1.h"
+#include "Level2.h"
+#include "LevelEditor.h"
+#include "Tutorial.h"
+
 #pragma once
 extern bool firstTimeLevel1;
 extern bool firstTimeLevel2;

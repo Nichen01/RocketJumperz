@@ -13,29 +13,17 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <iostream>
-#include <cstdio>
-#include "Level2.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
-#include "projectile.h"
-#include "Movement.h"
-#include "enemies.h"
-#include "binaryMap.h"
-#include "animation.h"
+#include "pch.h"
+#include "Level1.h"
 
 static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
 static int s = 80;
 
-// Font handle for in-game text rendering
 static s8 font = -1;
 
-objectsquares objectinfo2[2] = { 0 };
+objectsquares objectinfoTut[2] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -45,26 +33,23 @@ static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
-static AEGfxTexture* doorTexture = nullptr;
-
-// Font resource (must be destroyed in Unload to avoid leak)
-static s8 fontLevel1 = -1;
-
-// Tracks whether the player is near a door (used in Draw for flashing E prompt)
-static bool playerNear = false;
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
 
+static char strBuffer[100];
 
-//ANIMATION
-SpriteAnimation meleeAnim;
+static bool playerNear;
 
+// Font resource (must be destroyed in Unload to avoid leak)
+static s8 fontLevel1 = -1;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
-void Level2_Load()
+void Tutorial_Load()
 {
+	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
+
 	audio::loadsound();
 
 	// Load textures - these are defined in draw.cpp
@@ -74,20 +59,19 @@ void Level2_Load()
 	// Load platform assets
 	load::platform();
 	load::ui();
-
 }
 
-void Level2_Initialize()
+void Tutorial_Initialize()
 {
-	currentGameLevel = 2;
+	currentGameLevel = 0;
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
-	// Create font for HUD text (stored so we can destroy it in Unload)
+	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
-	movement::initPlayerMovement(objectinfo2[player]);
+	movement::initPlayerMovement(objectinfoTut[player]);
 
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
@@ -99,8 +83,9 @@ void Level2_Initialize()
 	init::platform();
 	init::player();
 	init::projectile();
+	init::ui();
 
-	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
 		return;
 	}
@@ -120,22 +105,22 @@ void Level2_Initialize()
 	bool spawnSet = false;
 	for (auto& door : doors) {
 		if (door.id == playerEnteredDoorId) {
-			objectinfo2[player].xPos = door.worldX;
-			objectinfo2[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			objectinfoTut[player].xPos = door.worldX;
+			objectinfoTut[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
 			spawnSet = true;
 			break;
 		}
 	}
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
-		objectinfo2[player].xPos = 0.f;
-		objectinfo2[player].yPos = 0.f;
+		objectinfoTut[player].xPos = 600.f;
+		objectinfoTut[player].yPos = -300.f;
 	}
-	objectinfo2[player].xScale = (float)s;
-	objectinfo2[player].yScale = (float)s;
+	objectinfoTut[player].xScale = (float)s;
+	objectinfoTut[player].yScale = (float)s;
 
 	// Initialize player health to 100 HP with no invincibility active
-	InitPlayerHealth(objectinfo2[player]);
+	InitPlayerHealth(objectinfoTut[player]);
 
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
@@ -150,9 +135,6 @@ void Level2_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
-	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
-	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
-
 	// DOOR
 
 	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
@@ -165,7 +147,7 @@ void Level2_Initialize()
 	else printf("DOOR OK\n");
 }
 
-void Level2_Update()
+void Tutorial_Update()
 {
 
 	if (AEInputCheckTriggered(AEVK_L)) next = GS_LEVELEDITOR;
@@ -192,7 +174,7 @@ void Level2_Update()
 
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
-	movement::physicsInput(objectinfo2[player]);
+	movement::physicsInput(objectinfoTut[player]);
 
 	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
@@ -200,14 +182,14 @@ void Level2_Update()
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
-	movement::updatePlayerPhysics(objectinfo2[player]);
+	movement::updatePlayerPhysics(objectinfoTut[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	projectileSystem::fireProjectiles(
 		static_cast<s32>(worldMouseX),
 		static_cast<s32>(worldMouseY),
-		objectinfo2[player],
+		objectinfoTut[player],
 		Projectiles,
 		MAX_PROJECTILES);
 
@@ -220,7 +202,7 @@ void Level2_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfo2[player],
+		objectinfoTut[player],
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -228,7 +210,7 @@ void Level2_Update()
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// Tick down the player's invincibility timer each frame
-	UpdatePlayerInvincibility(objectinfo2[player], dt);
+	UpdatePlayerInvincibility(objectinfoTut[player], dt);
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
@@ -236,18 +218,18 @@ void Level2_Update()
 
 	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
 	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
-		objectinfo2[player], Punch, soundEffects);
+		objectinfoTut[player], Punch, soundEffects);
 
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
-		enemyProjectiles, MAX_PROJECTILES, objectinfo2[player]);
-	//gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
-	//gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
-	//gamelogic::OBJ_to_map(map, x, s, &objectinfo2[player], 15);
+		enemyProjectiles, MAX_PROJECTILES, objectinfoTut[player]);
+	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfoTut[player], 15);*/
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 15);
+	gamelogic::Collision_movement(&objectinfoTut[player], map, x, s, 15);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -255,11 +237,10 @@ void Level2_Update()
 
 	for (auto& door : doors) {
 
-		if (door.firstLevel != 2 && door.secondLevel != 2) continue;
-		f32 dx = objectinfo2[player].xPos - door.worldX;
-		f32 dy = objectinfo2[player].yPos - door.worldY;
+		if (door.firstLevel != 0 && door.secondLevel != 0) continue;
+		f32 dx = objectinfoTut[player].xPos - door.worldX;
+		f32 dy = objectinfoTut[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		// Assign to file-scope static so Level2_Draw can read it
 		playerNear = (dist <= doorTriggerRadius);
 
 		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
@@ -284,12 +265,9 @@ void Level2_Update()
 			}
 		}
 	}
-
-	// MUSHROOM ANIMATION
-	animSystem::update(meleeAnim, dt);
 }
 
-void Level2_Draw()
+void Tutorial_Draw()
 {
 	AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
 
@@ -303,16 +281,34 @@ void Level2_Draw()
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
 
+	// ==== RENDER UI FOR TUTORIAL ==== //
+	renderlogic::drawTileArray();
+	renderlogic::drawUITexture(350.f, -280.f, leftClick, 50.f);
+	renderlogic::drawUITexture(-50.f, -280.f, gButton, 50.f);
+	renderlogic::drawUITexture(-600.f, 10.f, spacebar, 50.f);
+	renderlogic::drawUITexture(280.f, 250.f, eButton, 50.f);
+
+	memset(strBuffer, 0, 100 * sizeof(char));
+	f32 textWidth, textHeight;
+	AEGfxGetPrintSize(font, strBuffer, 0.15f, &textWidth, &textHeight);
+	sprintf_s(strBuffer, "Left Click to Propel");
+	AEGfxPrint(font, strBuffer, 0.5f, -0.6f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "towards Mouse Cursor");
+	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "G To Toggle Gravity");
+	AEGfxPrint(font, strBuffer, 0.0f, -0.63f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "Spacebar to Jump");
+	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.4f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "E to Enter");
+	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
+
 	// ==== ENEMIES RENDER =======//
-	// Render enemies
-	enemySystem::renderEnemies(enemies,
-		MAX_ENEMIES,
-		enemyMesh,
-		projectileMesh,
-		meleeEnemyTexture,
-		rangedEnemyTexture,
-		animSystem::getUOffset(meleeAnim),
-		animSystem::getVOffset(meleeAnim));
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh, projectileMesh,
+		meleeEnemyTexture, rangedEnemyTexture);
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -323,8 +319,8 @@ void Level2_Draw()
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxTextureSet(characterPictest, 0, 0);
-	renderlogic::drawSquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
-		objectinfo2[player].xScale, objectinfo2[player].yScale);
+	renderlogic::drawSquare(objectinfoTut[player].xPos, objectinfoTut[player].yPos,
+		objectinfoTut[player].xScale, objectinfoTut[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render player projectiles with plasma texture
@@ -339,7 +335,7 @@ void Level2_Draw()
 	if (fontLevel1 >= 0)
 	{
 		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo2[player].health);
+		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfoTut[player].health);
 
 		// Prepare render state for font (font uses a glyph texture atlas)
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -349,23 +345,23 @@ void Level2_Draw()
 
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
-
 	}
-	renderlogic::drawTileArray();
-
+	
 	// ===== RENDERING OF THE FLASHING 'E' ===== //
 	if (playerNear) {
-		renderlogic::flashingTexture(objectinfo2[player].xPos, objectinfo2[player].yPos + 60.f, eButton, 50.f);
+		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
 	}
+
 }
 
-void Level2_Free()
+void Tutorial_Free()
 {
 	freeAsset::platform();
 	freeAsset::door();
 	freeAsset::enemy();
 	freeAsset::player();
 	freeAsset::projectile();
+	freeAsset::ui();
 
 	if (map) {
 		delete[] map;
@@ -375,7 +371,7 @@ void Level2_Free()
 	FreeMapData();
 }
 
-void Level2_Unload()
+void Tutorial_Unload()
 {
 	if (doorMesh) {
 		AEGfxMeshFree(doorMesh);
@@ -386,13 +382,13 @@ void Level2_Unload()
 		doorTex = nullptr;
 	}
 
-	// Unload ALL textures that were loaded in Initialize
+	// Unload ALL textures that were loaded in Initialize.
+	// NOTE: doorTex is already unloaded above, so do not unload it again here.
 	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
 	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
 	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
 	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-	
-	unload::door();
+
 	unload::platform();
 	unload::ui();
 
@@ -403,7 +399,10 @@ void Level2_Unload()
 	}
 
 
-	// Destroy the font created in Initialize
+	// Destroy the font created in Load (tutorial text labels)
+	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
+
+	// Destroy the font created in Initialize (HUD health text)
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
