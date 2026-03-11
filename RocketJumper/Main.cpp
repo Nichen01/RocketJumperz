@@ -28,10 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	int gGameRunning = 1;
 	bool pause = false;
-	s8 pausefont = -1; 
-	//MenuButton playButton;
-	//MenuButton quitButton;
-	f32 width, height;
+	
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -49,7 +46,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			GSM_Update();
 			fpLoad();
 			if (current != GS_MAINMENU) {
-				pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+				
 			}
 		}
 		else {
