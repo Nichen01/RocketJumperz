@@ -220,8 +220,8 @@ void Level1_Initialize()
 		objectinfo[player].xPos = 0.f;
 		objectinfo[player].yPos = 0.f;
 	}
-	objectinfo[player].xScale = 60.0f;
-	objectinfo[player].yScale = 60.0f;
+	objectinfo[player].xScale = (float)s;
+	objectinfo[player].yScale = (float)s;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo[player]);
@@ -333,9 +333,13 @@ void Level1_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
+	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);*/
+
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&objectinfo[player], map, x, s, 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
