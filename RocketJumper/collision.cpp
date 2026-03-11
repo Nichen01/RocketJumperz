@@ -235,30 +235,35 @@ namespace gamelogic {
 	}
 
 	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index) {
+		object->xPos += object->velocityX;
+		object->yPos += object->velocityY;
+
 		float NposX = posX_to_index(object->xPos, mapS);
 		float NposY = posY_to_index(object->yPos, mapS);
-
-		object->gridCollisionFlag = CheckInstanceBinaryMapCollision(NposX, NposY, 1.0f, 1.0f, map, index, mapX, mapS);
+		float NScaleX = object->xScale/ mapS;
+		float NScaleY = object->xScale / mapS;
+		
+		object->gridCollisionFlag = CheckInstanceBinaryMapCollision(NposX, NposY, NScaleX, NScaleY, map, index, mapX, mapS);
 
 
 		if ((object->gridCollisionFlag & COLLISION_BOTTOM) == COLLISION_BOTTOM) {
 			SnapToCell(&NposY);
-			object->yPos= 450 -(NposY*mapS);
+			object->yPos= (float)(screenLength / 2) -(NposY * mapS);
 			object->velocityY = 0;
 		}
 		if ((object->gridCollisionFlag & COLLISION_TOP) == COLLISION_TOP) {
 			SnapToCell(&NposY);
-			object->yPos = 450 -(NposY * mapS);
+			object->yPos = (float)(screenLength / 2) -(NposY * mapS);
 			object->velocityY = 0;
 		}
 		if ((object->gridCollisionFlag & COLLISION_LEFT) == COLLISION_LEFT) {
 			SnapToCell(&NposX);
-			object->xPos = mapS * NposX - 800; 
+			object->xPos = mapS * NposX - (float)(screenWidth/2);
 			object->velocityX = 0;
 		}
 		if ((object->gridCollisionFlag & COLLISION_RIGHT) == COLLISION_RIGHT) {
 			SnapToCell(&NposX);
-			object->xPos = mapS * NposX - 800;
+			object->xPos = mapS * NposX - (float)(screenWidth / 2);
 			object->velocityX = 0;
 		}
 	}
