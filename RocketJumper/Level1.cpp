@@ -29,6 +29,7 @@ Technology is prohibited.
 #include "animation.h"
 #include "AssetManager.h"
 
+
 static s32* map = nullptr;
 static int x;
 static int y;
@@ -62,11 +63,11 @@ static AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 //==== sound and volume
 static f32 bgVolume = 1.f;
 
-static AEAudio L1;
-static AEAudio LaserBlast;
-static AEAudio Punch;
-static AEAudioGroup bgm;
-static AEAudioGroup soundEffects;
+//static AEAudio L1;
+//static AEAudio LaserBlast;
+//static AEAudio Punch;
+//static AEAudioGroup bgm;
+//static AEAudioGroup soundEffects;
 
 // Door variables (doorX, doorY, doorAnim, doorMesh, doorIsOpen, doorTex)
 // are defined in draw.cpp and declared extern in draw.h.
@@ -83,15 +84,7 @@ static bool playerNear;
 
 void Level1_Load()
 {
-	// Load the music file once when the level loads
-	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
-	// Create the audio group
-	bgm = AEAudioCreateGroup();
-	// Configure sound effects
-	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
-	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	//soundEffects = AEAudioCreateGroup();
-	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
+	audio::loadsound();
 
 	// Load platform tile textures
 	load::platform();
@@ -144,7 +137,7 @@ void Level1_Initialize()
 {
 	currentGameLevel = 1;
 
-	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -280,6 +273,7 @@ void Level1_Update()
 			bgVolume = 0.f;
 		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
+
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -509,9 +503,6 @@ void Level1_Unload()
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
-	AEAudioUnloadAudio(L1);
-	AEAudioUnloadAudio(LaserBlast);
-	AEAudioUnloadAudio(Punch);
-	AEAudioUnloadAudioGroup(bgm);
-	AEAudioUnloadAudioGroup(soundEffects);
+
+	audio::unloadsound();
 }

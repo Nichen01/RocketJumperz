@@ -25,6 +25,7 @@ Technology is prohibited.
 #include "BinaryMap.h"
 #include "GameStateList.h"
 #include "Animation.h"
+#include "sound.h"
 
 void Level1_Load();
 

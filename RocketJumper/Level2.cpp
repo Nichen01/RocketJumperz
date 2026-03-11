@@ -56,11 +56,6 @@ static bool playerNear = false;
 //==== sound and volume
 static f32 bgVolume = 1.f;
 
-static AEAudio L1;
-static AEAudio LaserBlast;
-static AEAudio Punch;
-static AEAudioGroup bgm;
-static AEAudioGroup soundEffects;
 
 //ANIMATION
 SpriteAnimation meleeAnim;
@@ -70,14 +65,7 @@ SpriteAnimation meleeAnim;
 
 void Level2_Load()
 {
-	// Load the music file once when the level loads
-	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
-	// Create the audio group
-	bgm = AEAudioCreateGroup();
-	// Configure sound effects
-	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
-	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();
+	audio::loadsound();
 
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
@@ -93,7 +81,7 @@ void Level2_Initialize()
 {
 	currentGameLevel = 2;
 
-	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -415,9 +403,5 @@ void Level2_Unload()
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
-	AEAudioUnloadAudio(L1);
-	AEAudioUnloadAudio(LaserBlast);
-	AEAudioUnloadAudio(Punch);
-	AEAudioUnloadAudioGroup(bgm);
-	AEAudioUnloadAudioGroup(soundEffects);
+	audio::unloadsound();
 }
