@@ -2,10 +2,10 @@
 // includes
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "collision.h"
+#include "Collision.h"
 #include "Main.h"
-#include "render.h"
-#include "sound.h"
+#include "Load.h"
+#include "Sound.h"
 
 // ---------------------------------------------------------------------------
 // main
@@ -41,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	printf("Team project test\n");
 
 	
-	GSM_Initialize(GS_LEVEL1);
+	GSM_Initialize(GS_MAINMENU);
 
 	while (current != GS_QUIT)
 	{
@@ -49,6 +49,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			GSM_Update();
 			fpLoad();
 			if (current != GS_MAINMENU) {
+				// Destroy previous pause font before creating a new one to
+				// avoid leaking a font handle on every level transition.
+				if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
 				pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 			}
 		}
@@ -117,5 +120,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// free the system
 	AEGfxDestroyFont(pausefont);
 	AESysExit();
+
 	return 0;
 }

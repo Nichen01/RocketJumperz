@@ -45,7 +45,6 @@ void GSM_Update()
 		fpFree = MainMenu_Free;
 		fpUnload = MainMenu_Unload;
 		break;
-	
 	case GS_LEVEL2:
 		fpLoad = Level2_Load;
 		fpInitialize = Level2_Initialize;
@@ -55,12 +54,21 @@ void GSM_Update()
 		fpUnload = Level2_Unload;
 		break;
 	case GS_LEVELEDITOR:
-		fpLoad = levelEditor_Load;
-		fpInitialize = levelEditor_Initialize;
-		fpUpdate = levelEditor_Update;
-		fpDraw = levelEditor_Draw;
-		fpFree = levelEditor_Free;
-		fpUnload = levelEditor_Unload;
+		fpLoad = LevelEditor_Load;
+		fpInitialize = LevelEditor_Initialize;
+		fpUpdate = LevelEditor_Update;
+		fpDraw = LevelEditor_Draw;
+		fpFree = LevelEditor_Free;
+		fpUnload = LevelEditor_Unload;
+		break;
+	case GS_TUTORIAL:
+		fpLoad = Tutorial_Load;
+		fpInitialize = Tutorial_Initialize;
+		fpUpdate = Tutorial_Update;
+		fpDraw = Tutorial_Draw;
+		fpFree = Tutorial_Free;
+		fpUnload = Tutorial_Unload;
+		break;
 	case GS_RESTART:
 		break;
 	case GS_QUIT:

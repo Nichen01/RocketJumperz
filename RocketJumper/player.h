@@ -57,7 +57,7 @@ enum objecttype {
 	enemy
 };
 
-extern objectsquares objectinfo[2];
+extern objectsquares objectinfo2[2];
 
 // ---- Player Health Functions ----
 // Call once in Initialize to set health to max and reset invincibility

@@ -12,10 +12,10 @@ Technology is prohibited.
 */
 /* End Header *********************************************************************/
 
-#include "enemies.h"
-#include "collision.h"
-#include "render.h"
-#include "player.h"
+#include "Enemies.h"
+#include "Collision.h"
+#include "Draw.h"
+#include "Player.h"
 #include <cmath>
 
 namespace enemySystem {
@@ -113,6 +113,10 @@ namespace enemySystem {
     s8 hasLineOfSight(Enemy& enemy, objectsquares& player,
         int map[], int mapX, int mapY, int mapS)
     {
+        map = map;
+        mapX = mapX;
+        mapS = mapS;
+        mapY = mapY;
         // For now, just check distance
         // TODO: Add raycast to check for walls between enemy and player
         f32 distance = getDistance(enemy.shape.xPos, enemy.shape.yPos,
@@ -285,48 +289,53 @@ namespace enemySystem {
      * @return VOID
      ***************************************************************************/
     // Render all active enemies
-    void renderEnemies(Enemy enemies[], s32 maxCount,
-        AEGfxVertexList* mesh,
+    void renderEnemies(Enemy enemies[],
+        s32 maxCount,
+        AEGfxVertexList* meleeMesh,
+        AEGfxVertexList* rangedMesh,
         AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture)
+        AEGfxTexture* rangedTexture,
+        f32 meleeUOffset,
+        f32 meleeVoffset)
     {
         for (int i = 0; i < maxCount; i++)
         {
             if (enemies[i].isActive == 1)
             {
-                // Choose texture based on enemy type and if the texture is not NULL
+                // Choose texture, mesh, and UV offsets based on enemy type
                 AEGfxTexture* texture = nullptr;
+                AEGfxVertexList* mesh = nullptr;
+                f32 uOffset = 0.0f;
+                f32 vOffset = 0.0f;
                 if (enemies[i].type == ENEMY_MELEE)
                 {
                     texture = meleeTexture;
+                    mesh = meleeMesh;
+                    uOffset = meleeUOffset;
+                    vOffset = meleeVoffset;
                 }
                 else if (enemies[i].type == ENEMY_RANGED)
                 {
                     texture = rangedTexture;
+                    mesh = rangedMesh;
                 }
+
+                if (!mesh) continue;
 
                 // Texture available ==> set render mode and texture set
                 if (texture)
                 {
                     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-                    AEGfxTextureSet(texture, 0, 0);
+                    AEGfxTextureSet(texture, uOffset, vOffset);
                 }
-                //else
-                //{
-                //    // Fallback to colored squares if no texture
-                //    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-                //    if (enemies[i].type == ENEMY_MELEE)
-                //    {
-                //        AEGfxSetColorToAdd(1.0f, 0.3f, 0.3f, 1.0f);  // Red for melee
-                //    }
-                //    else
-                //    {
-                //        AEGfxSetColorToAdd(0.3f, 0.3f, 1.0f, 1.0f);  // Blue for ranged
-                //    }
-                //}
+                else {
+                    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+                    AEGfxTextureSet(nullptr, 0.0f, 0.0f);
+                    AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
+                }
 
                 // Draw enemy
-                render::Drawsquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
+                renderlogic::drawSquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
                     enemies[i].shape.xScale, enemies[i].shape.yScale);
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
             }

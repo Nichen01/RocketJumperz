@@ -16,10 +16,9 @@ Technology is prohibited.
 #ifndef BINARY_MAP_H_
 #define BINARY_MAP_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "pch.h"
+#include "Draw.h"
+#include "DoorSystem.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -30,6 +29,7 @@ extern int BINARY_MAP_WIDTH;
 extern int BINARY_MAP_HEIGHT;
 extern int** MapData;
 extern int** BinaryCollisionArray;
+extern int** glassMap;
 
 
 // ----------------------------------------------------------------------------
