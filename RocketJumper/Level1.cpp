@@ -137,7 +137,7 @@ void Level1_Load()
 	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");*/
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
-	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 
 void Level1_Initialize()
@@ -150,7 +150,7 @@ void Level1_Initialize()
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
-	movement::initPlayerMovement(objectinfo1[player]);
+	movement::initPlayerMovement(objectinfo[player]);
 
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
@@ -216,22 +216,22 @@ void Level1_Initialize()
 	bool spawnSet = false;
 	for (auto& door : doors) {
 		if (door.id == playerEnteredDoorId) {
-			objectinfo1[player].xPos = door.worldX;
-			objectinfo1[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			objectinfo[player].xPos = door.worldX;
+			objectinfo[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
 			spawnSet = true;
 			break;
 		}
 	}
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
-		objectinfo1[player].xPos = 0.f;
-		objectinfo1[player].yPos = 0.f;
+		objectinfo[player].xPos = 0.f;
+		objectinfo[player].yPos = 0.f;
 	}
-	objectinfo1[player].xScale = 60.0f;
-	objectinfo1[player].yScale = 60.0f;
+	objectinfo[player].xScale = 60.0f;
+	objectinfo[player].yScale = 60.0f;
 
 	// Initialize player health to 100 HP with no invincibility active
-	InitPlayerHealth(objectinfo1[player]);
+	InitPlayerHealth(objectinfo[player]);
 
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
@@ -290,7 +290,7 @@ void Level1_Update()
 
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
-	movement::physicsInput(objectinfo1[player]);
+	movement::physicsInput(objectinfo[player]);
 
 	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
@@ -298,14 +298,14 @@ void Level1_Update()
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
-	movement::updatePlayerPhysics(objectinfo1[player]);
+	movement::updatePlayerPhysics(objectinfo[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	projectileSystem::fireProjectiles(
 		static_cast<s32>(worldMouseX),
 		static_cast<s32>(worldMouseY),
-		objectinfo1[player],
+		objectinfo[player],
 		Projectiles,
 		MAX_PROJECTILES);
 
@@ -318,7 +318,7 @@ void Level1_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfo1[player],
+		objectinfo[player],
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -326,7 +326,7 @@ void Level1_Update()
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// Tick down the player's invincibility timer each frame
-	UpdatePlayerInvincibility(objectinfo1[player], dt);
+	UpdatePlayerInvincibility(objectinfo[player], dt);
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
@@ -334,14 +334,14 @@ void Level1_Update()
 
 	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
 	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
-		objectinfo1[player], Punch, soundEffects);
+		objectinfo[player], Punch, soundEffects);
 
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
-		enemyProjectiles, MAX_PROJECTILES, objectinfo1[player]);
+		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo1[player], 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -350,8 +350,8 @@ void Level1_Update()
 	for (auto& door : doors) {
 
 		if (door.firstLevel != 1 && door.secondLevel != 1) continue;
-		f32 dx = objectinfo1[player].xPos - door.worldX;
-		f32 dy = objectinfo1[player].yPos - door.worldY;
+		f32 dx = objectinfo[player].xPos - door.worldX;
+		f32 dy = objectinfo[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
 		// Assign to the file-scope static so Level1_Draw can read it
 		playerNear = (dist <= doorTriggerRadius);
@@ -434,8 +434,8 @@ void Level1_Draw()
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxTextureSet(characterPictest, 0, 0);
-	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
-		objectinfo1[player].xScale, objectinfo1[player].yScale);
+	renderlogic::drawSquare(objectinfo[player].xPos, objectinfo[player].yPos,
+		objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render player projectiles with plasma texture
@@ -450,7 +450,7 @@ void Level1_Draw()
 	if (fontLevel1 >= 0)
 	{
 		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo1[player].health);
+		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo[player].health);
 
 		// Prepare render state for font (font uses a glyph texture atlas)
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -465,7 +465,7 @@ void Level1_Draw()
 	renderlogic::drawTileArray();
 
 	if (playerNear) {
-		renderlogic::flashingTexture(objectinfo1[player].xPos, objectinfo1[player].yPos + 60.f, eButton, 50.f);
+		renderlogic::flashingTexture(objectinfo[player].xPos, objectinfo[player].yPos + 60.f, eButton, 50.f);
 	}
 }
 
