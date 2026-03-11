@@ -58,6 +58,9 @@
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collision.h">
@@ -115,6 +118,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="MainMenu.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
