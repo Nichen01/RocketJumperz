@@ -7,4 +7,6 @@
 #include "GameStateManager.h"
 #include "GameStateList.h"
 
+extern bool pause;
+
 #endif

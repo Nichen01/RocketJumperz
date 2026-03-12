@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "Level2.h"
 #include "LevelEditor.h"
 #include "Tutorial.h"
+#include "VictoryScreen.h"
+#include "DeathScreen.h"
 
 #pragma once
 extern bool firstTimeLevel1;

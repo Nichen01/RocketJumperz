@@ -220,8 +220,8 @@ void Level1_Initialize()
 		objectinfo[player].xPos = 0.f;
 		objectinfo[player].yPos = 0.f;
 	}
-	objectinfo[player].xScale = (float)s;
-	objectinfo[player].yScale = (float)s;
+	objectinfo[player].xScale = 60.0f;
+	objectinfo[player].yScale = 60.0f;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo[player]);

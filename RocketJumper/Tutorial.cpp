@@ -116,8 +116,8 @@ void Tutorial_Initialize()
 		objectinfoTut[player].xPos = 600.f;
 		objectinfoTut[player].yPos = -300.f;
 	}
-	objectinfoTut[player].xScale = (float)s;
-	objectinfoTut[player].yScale = (float)s;
+	objectinfoTut[player].xScale = 80.0f;
+	objectinfoTut[player].yScale = 80.0f;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfoTut[player]);
@@ -223,9 +223,7 @@ void Tutorial_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfoTut[player]);
-	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfoTut[player], 15);*/
+	
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);

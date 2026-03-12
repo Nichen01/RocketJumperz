@@ -1,10 +1,7 @@
 #pragma once
 #include "AEEngine.h"
+#include "MainMenu.h"
 
-extern s8 pausefont = -1;
-//MenuButton playButton;
-//MenuButton quitButton;
-extern f32 width, height;
 
 void Pause_Load();
 
