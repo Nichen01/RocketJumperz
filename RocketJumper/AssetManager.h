@@ -45,6 +45,8 @@ namespace AssetManager {
     // -------------------------------------------------------------------------
     // Meshes  (built procedurally, not loaded from a file)
     // -------------------------------------------------------------------------
+    // Creates a 1x1 mesh and automatically stores it in the cache.
+    AEGfxVertexList* Build1x1Mesh(const std::string& name);
 
     // Registers a mesh pointer under name.  Overwrites any previous entry
     // without freeing it, so only call once per name per lifecycle.

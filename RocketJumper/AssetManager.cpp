@@ -43,8 +43,7 @@ namespace AssetManager {
     AEGfxTexture* GetTexture(const std::string& name)
     {
         auto it = sTextures.find(name);
-        if (it != sTextures.end())
-            return it->second;
+        if (it != sTextures.end()) return it->second;
 
         printf("[AssetManager] WARNING: Texture \"%s\" not found.\n", name.c_str());
         return nullptr;
@@ -63,9 +62,48 @@ namespace AssetManager {
     // -------------------------------------------------------------------------
     // Meshes
     // -------------------------------------------------------------------------
+    // Creates a 1x1 mesh(full quad) and automatically stores it in the cache. 
+    AEGfxVertexList* Build1x1Mesh(const std::string& name)
+    {
+        // Start mesh creation
+        AEGfxMeshStart();
+
+        // Triangle 1 (Bottom-Left, Bottom-Right, Top-Left)
+        AEGfxTriAdd(
+            -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+            0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+            -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+        // Triangle 2 (Bottom-Right, Top-Right, Top-Left)
+        AEGfxTriAdd(
+            0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+            0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+            -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+        // End creation and grab the pointer
+        AEGfxVertexList* newMesh = AEGfxMeshEnd();
+
+        // Prevent memory leak by freeing the old mesh if the name already exists
+        auto it = sMeshes.find(name);
+        if (it != sMeshes.end() && it->second != nullptr) {
+            AEGfxMeshFree(it->second);
+        }
+
+        // Store it safely in the map
+        sMeshes[name] = newMesh;
+
+        // Return the pointer so the caller can use it immediately!
+        return newMesh;
+    }
 
     void StoreMesh(const std::string& name, AEGfxVertexList* mesh)
     {
+        // Prevent memory leak by freeing the old mesh if the name already exists
+        auto it = sMeshes.find(name);
+        if (it != sMeshes.end() && it->second != nullptr) {
+            AEGfxMeshFree(it->second);
+        }
+
         sMeshes[name] = mesh;
     }
 

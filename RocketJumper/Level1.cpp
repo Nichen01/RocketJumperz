@@ -39,6 +39,8 @@ extern objectsquares objectinfo[2] = { 0 };
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
 
+static AEGfxVertexList* pTestMesh = nullptr;
+
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
@@ -107,34 +109,29 @@ void Level1_Load()
 	AssetManager::LoadTexture("meleeEnemy",  "Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
 	AssetManager::LoadTexture("rangedEnemy", "Assets/RangedEnemy.png");
 
-	// Loading of assets for mushroomDie
-	mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
-	mushroomDieTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie1.png");
-	mushroomDieTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie2.png");
-	mushroomDieTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie3.png");
-	mushroomDieTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie4.png");
-	mushroomDieTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie5.png");
-	mushroomDieTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie6.png");
-	mushroomDieTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie7.png");
-	mushroomDieTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie8.png");
+	// Loading of assets for mushroomDie using AssetManager
+	for (int i = 0; i < 9; ++i) {
+		char name[64], path[128];
+		sprintf_s(name, "mushroomDie%d", i);
+		sprintf_s(path, "Assets/Enemy/MushroomDie/MushroomDie%d.png", i);
+		mushroomDieTexture[i] = AssetManager::LoadTexture(name, path);
+	}
 
-	// Loading of assets for mushroomHit
-	mushroomHitTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit0.png");
-	mushroomHitTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit1.png");
-	mushroomHitTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit2.png");
-	mushroomHitTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit3.png");
-	mushroomHitTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit4.png");
+	// Loading of assets for mushroomHit using AssetManager
+	for (int i = 0; i < 5; ++i) {
+		char name[64], path[128];
+		sprintf_s(name, "mushroomHit%d", i);
+		sprintf_s(path, "Assets/Enemy/MushroomHit/MushroomHit%d.png", i);
+		mushroomHitTexture[i] = AssetManager::LoadTexture(name, path);
+	}
 
-	// Loading of assets for mushroomIdle
-	mushroomIdleTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle0.png");
-	mushroomIdleTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle1.png");
-	mushroomIdleTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle2.png");
-	mushroomIdleTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle3.png");
-	mushroomIdleTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle4.png");
-	mushroomIdleTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle5.png");
-	mushroomIdleTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle6.png");
-	/*mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
-	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");*/
+	// Loading of assets for mushroomIdle using AssetManager
+	for (int i = 0; i < 7; ++i) { // Kept to 0-6 as per the original active array limits
+		char name[64], path[128];
+		sprintf_s(name, "mushroomIdle%d", i);
+		sprintf_s(path, "Assets/Enemy/MushroomIdle/MushroomIdle%d.png", i);
+		mushroomIdleTexture[i] = AssetManager::LoadTexture(name, path);
+	}
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -147,7 +144,7 @@ void Level1_Initialize()
 	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	//fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -156,46 +153,10 @@ void Level1_Initialize()
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
 	//=============CREATE TEXTURED MESH FOR PLAYER==================//
-	// A full quad (2 triangles) is required for the player sprite to render
-	// correctly.  The previous code was missing AEGfxMeshStart() and only
-	// had one triangle, which caused the player to appear as a half-sprite.
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pMesh = AEGfxMeshEnd();
-	AssetManager::StoreMesh("pMesh", pMesh);
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	platformMesh = AEGfxMeshEnd();
-	AssetManager::StoreMesh("platformMesh", platformMesh);
-
-	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AssetManager::StoreMesh("pTestMesh", AEGfxMeshEnd());
-
+	pMesh = AssetManager::Build1x1Mesh("pMesh");
+	platformMesh = AssetManager::Build1x1Mesh("platformMesh");
+	pTestMesh = AssetManager::Build1x1Mesh("pTestMesh");
+	
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
 		return;
@@ -387,18 +348,6 @@ void Level1_Update()
 	// MUSHROOM ANIMATION
 	animSystem::update(meleeAnim, dt);
 
-	//need fix animation
-	/*
-	static float frameTimer{ 0.0f };
-	frameTimer += dt;
-	if (frameTimer >= 0.1f) {
-		static int currentFrame{};
-		currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
-		meleeEnemyTexture = mushroomIdleTexture[currentFrame];
-		frameTimer = 0.0f;
-	}
-	*/
-
 }
 
 void Level1_Draw()
@@ -429,7 +378,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh("pTestMesh"));
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -471,11 +420,18 @@ void Level1_Draw()
 
 void Level1_Free()
 {
-	// Free all registered meshes, then null the shared extern pointers draw.cpp holds
+	// Unload all AssetManager-tracked textures
 	AssetManager::FreeAllMeshes();
-	pMesh        = nullptr;
+
+	// Null the shared extern pointers
+	pMesh = nullptr;
 	platformMesh = nullptr;
-	doorMesh     = nullptr;
+	doorMesh = nullptr;
+	characterPictest = nullptr;
+	base5test = nullptr;
+	plasma = nullptr;
+	doorTex = nullptr;
+
 
 	if (map) {
 		delete[] map;
@@ -487,16 +443,14 @@ void Level1_Free()
 
 void Level1_Unload()
 {
-	// Unload all registered textures, then null the shared extern pointers draw.cpp holds.
 	// Unload all AssetManager-tracked textures, then null the shared extern pointers.
-	AssetManager::UnloadAllTextures();
-	characterPictest = nullptr;
-	base5test        = nullptr;
-	plasma           = nullptr;
-	doorTex          = nullptr;
+	AssetManager::UnloadAllTextures(); 
 
-	unload::platform();
-	unload::ui();
+
+	// Safely null out mushroom textures (AssetManager already freed the memory)
+	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
+	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
+	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
 
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
@@ -504,8 +458,7 @@ void Level1_Unload()
 		glassMap = nullptr;
 	}
 
-
-	// Destroy the font created in Initialize
+	// Destroy the font created in Load
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load

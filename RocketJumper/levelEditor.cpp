@@ -1,6 +1,7 @@
 
 #include "LevelEditor.h"
 #include "GameStateManager.h"
+#include "AssetManager.h"
 
 // GLOBAL VARIABLES
 static AEGfxTexture* door;
@@ -28,23 +29,24 @@ void LevelEditor_Load() {
 
 	load::ui();
 
-	tileTextures[0] = AEGfxTextureLoad("Assets/Platform/platform1.png");
-	tileTextures[1] = AEGfxTextureLoad("Assets/Platform/platform2.png");
-	tileTextures[2] = AEGfxTextureLoad("Assets/Platform/platform3.png");
-	tileTextures[3] = AEGfxTextureLoad("Assets/Platform/platform4.png");
-	tileTextures[4] = AEGfxTextureLoad("Assets/Platform/platform5.png");
-	tileTextures[5] = AEGfxTextureLoad("Assets/Platform/platform6.png");
-	tileTextures[6] = AEGfxTextureLoad("Assets/Platform/platform7.png");
-	tileTextures[7] = AEGfxTextureLoad("Assets/Platform/platform8.png");
-	tileTextures[8] = AEGfxTextureLoad("Assets/Platform/platform9.png");
-	tileTextures[9] = AEGfxTextureLoad("Assets/Platform/staticDoor.jpg");
+	// Load textures via AssetManager
+	tileTextures[0] = AssetManager::LoadTexture("le_plat1", "Assets/Platform/platform1.png");
+	tileTextures[1] = AssetManager::LoadTexture("le_plat2", "Assets/Platform/platform2.png");
+	tileTextures[2] = AssetManager::LoadTexture("le_plat3", "Assets/Platform/platform3.png");
+	tileTextures[3] = AssetManager::LoadTexture("le_plat4", "Assets/Platform/platform4.png");
+	tileTextures[4] = AssetManager::LoadTexture("le_plat5", "Assets/Platform/platform5.png");
+	tileTextures[5] = AssetManager::LoadTexture("le_plat6", "Assets/Platform/platform6.png");
+	tileTextures[6] = AssetManager::LoadTexture("le_plat7", "Assets/Platform/platform7.png");
+	tileTextures[7] = AssetManager::LoadTexture("le_plat8", "Assets/Platform/platform8.png");
+	tileTextures[8] = AssetManager::LoadTexture("le_plat9", "Assets/Platform/platform9.png");
+	tileTextures[9] = AssetManager::LoadTexture("le_door", "Assets/Platform/staticDoor.jpg");
 
 }
 
 void LevelEditor_Initialize() {
 
-	init::platform();
-	init::ui();
+	platformMesh = AssetManager::Build1x1Mesh("platformMesh");
+	uiMesh = AssetManager::Build1x1Mesh("uiMesh");
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	switch (level) {
@@ -462,23 +464,21 @@ void LevelEditor_Draw() {
 
 void LevelEditor_Free() {
 
-	freeAsset::platform();
-	freeAsset::ui();
+	AssetManager::FreeAllMeshes();
+
+	platformMesh = nullptr;
+	uiMesh = nullptr;
 	FreeMapData();
 }
 
 void LevelEditor_Unload() {
-	AEGfxDestroyFont(font);
-	unload::ui();
+	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
-	// Unload all tile textures loaded in LevelEditor_Load to prevent memory leaks.
-	// Each AEGfxTextureLoad allocates internal memory that must be freed.
+	AssetManager::UnloadAllTextures();
+
+	// Null out the pointers safely
 	for (int i = 0; i < 10; i++)
 	{
-		if (tileTextures[i])
-		{
-			AEGfxTextureUnload(tileTextures[i]);
-			tileTextures[i] = nullptr;
-		}
+		tileTextures[i] = nullptr;
 	}
 }
