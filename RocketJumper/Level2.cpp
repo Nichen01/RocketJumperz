@@ -24,6 +24,7 @@ Technology is prohibited.
 #include "Movement.h"
 #include "render.h"
 #include "enemies.h"
+#include "aimingInterface.h"
 
 static s32* map = new s32[144]{ 0 };
 static int x = 16;
@@ -44,16 +45,13 @@ static AEGfxTexture* rangedEnemyTexture = nullptr;
 static f32 playerHealth = 100.0f;
 
 //==== sound and volume
-
 static f32 bgVolume = 1.f;
-static f32 bgmPitch = 1.f;
 
-static AEAudio L2;
-static AEAudio LaserBlast;
-static AEAudio Punch;
-static AEAudioGroup bgm;
-static AEAudioGroup soundEffects;
-
+static AEAudio L1;
+static  AEAudio LaserBlast;
+static  AEAudio Punch;
+static  AEAudioGroup bgm;
+static  AEAudioGroup soundEffects;
 
 
 
@@ -62,24 +60,23 @@ static AEAudioGroup soundEffects;
 
 void Level2_Load()
 {
-	
 	// Load the music file once when the level loads
-	L2 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
+	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
 	// Create the audio group
 	bgm = AEAudioCreateGroup();
 	// Configure sound effects
 	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();   
-	
+	soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
+	aiming::loadAiming();
 
 }
 
 void Level2_Initialize()
 {
-	AEAudioPlay(L2, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
-	//s8 font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	s8 font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Load textures - these are defined in draw.cpp
 	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
@@ -120,7 +117,6 @@ void Level2_Initialize()
 	pTestMesh = AEGfxMeshEnd();
 
 	// Create map with walls on borders and one obstacle in middle
-	// row*16+column
 	// 1 for obstacle, 0 for playable area
 	int mapX = 0, mapY = 0;
 	for (mapY = 0; mapY < 9; mapY++) {
@@ -141,7 +137,7 @@ void Level2_Initialize()
 		}
 	}
 	map[(4 * 16 + 6)] = 1;
-	map[(1 * 16 + 14)] = 10;
+	map[(1 * 16 + 1)] = 10;
 
 	objectinfo[player].xPos = 0.0f;
 	objectinfo[player].yPos = 0.0f;
@@ -163,14 +159,12 @@ void Level2_Initialize()
 	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, 50.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, 300.0f, -200.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 }
 
 void Level2_Update()
 {
-	/*
 	//====== AUDIO CONTROLS ======
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
@@ -184,7 +178,6 @@ void Level2_Update()
 			bgVolume = 0.f;
 		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
-	*/
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -204,6 +197,7 @@ void Level2_Update()
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo[player]);
+	aiming::updateAiming(objectinfo[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -241,14 +235,12 @@ void Level2_Update()
 	// Check enemies damaging player
 	f32 damageTaken = enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
 		objectinfo[player], Punch, soundEffects);
-
 	if (damageTaken > 0.0f) {
 		playerHealth -= damageTaken;
 		printf("Player Health: %.1f\n", playerHealth);
 	}
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[2].shape);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player]);
 
 }
@@ -283,6 +275,7 @@ void Level2_Draw()
 	renderlogic::Drawsquare(objectinfo[player].xPos, objectinfo[player].yPos,
 		objectinfo[player].xScale, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	aiming::drawAiming();
 
 	// Render all active projectiles (YELLOW)
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -301,7 +294,6 @@ void Level2_Free()
 		AEGfxMeshFree(pTestMesh);
 		pTestMesh = nullptr;
 	}
-
 }
 
 void Level2_Unload()
@@ -312,7 +304,8 @@ void Level2_Unload()
 	if (meleeEnemyTexture) AEGfxTextureUnload(meleeEnemyTexture);
 	if (rangedEnemyTexture) AEGfxTextureUnload(rangedEnemyTexture);
 
-	AEAudioUnloadAudio(L2);
+	AEAudioUnloadAudio(L1);
 	AEAudioUnloadAudio(LaserBlast);
 	AEAudioUnloadAudioGroup(bgm);
+	aiming::unloadAiming();
 }

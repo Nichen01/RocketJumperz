@@ -13,6 +13,7 @@ namespace movement {
     constexpr f32 MIN_VELOCITY = 0.1f;       // Velocity threshold to stop completely
     constexpr f32 TERMINAL_VELOCITY = 5.f;    // Velocity will not increase pass this
     constexpr f32 GRAVITY = 0.2f;
+    extern int bulletCount;
 
     // Initialize player velocities (call in Load)
     void initPlayerMovement(objectsquares& player);

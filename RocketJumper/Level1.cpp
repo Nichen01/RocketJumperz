@@ -201,12 +201,14 @@ void Level1_Update()
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
-	projectileSystem::fireProjectiles(
-		static_cast<s32>(worldMouseX),
-		static_cast<s32>(worldMouseY),
-		objectinfo[player],
-		Projectiles,
-		MAX_PROJECTILES);
+	if (movement::bulletCount) {
+		projectileSystem::fireProjectiles(
+			static_cast<s32>(worldMouseX),
+			static_cast<s32>(worldMouseY),
+			objectinfo[player],
+			Projectiles,
+			MAX_PROJECTILES);
+	}
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
