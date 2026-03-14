@@ -185,9 +185,12 @@ void Level2_Initialize()
 
 void Level2_Update()
 {
+	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
+	if (AEInputCheckTriggered(AEVK_L)) {
+		next = GS_LEVELEDITOR;
+	}
 
-	if (AEInputCheckTriggered(AEVK_L)) next = GS_LEVELEDITOR;
-	//====== AUDIO CONTROLS ======
+	// ====== AUDIO CONTROLS ====== //
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
 		if (bgVolume <= 0.f)

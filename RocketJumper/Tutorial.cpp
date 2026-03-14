@@ -52,7 +52,7 @@ static s8 fontLevel1 = -1;
 
 void Tutorial_Load()
 {
-	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
+	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	audio::loadsound();
 

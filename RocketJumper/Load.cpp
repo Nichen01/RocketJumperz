@@ -12,7 +12,7 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	// different types of platforms
 	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
 	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
-	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * button4 = NULL, * spacebar = NULL;
+	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
 
 
 // define the mesh
@@ -175,7 +175,6 @@ namespace load {
 		AssetManager::LoadTexture(TEX_BUTTON1, "Assets/UI/1Button.png");
 		AssetManager::LoadTexture(TEX_BUTTON2, "Assets/UI/2Button.png");
 		AssetManager::LoadTexture(TEX_BUTTON3, "Assets/UI/3Button.png");
-		AssetManager::LoadTexture(TEX_BUTTON4, "Assets/UI/4Button.png");
 		AssetManager::LoadTexture(TEX_SPACEBAR, "Assets/UI/spacebar.png");
 
 		// Sync the extern pointers so other files can use them directly
@@ -192,7 +191,6 @@ namespace load {
 		button1 = AssetManager::GetTexture(TEX_BUTTON1);
 		button2 = AssetManager::GetTexture(TEX_BUTTON2);
 		button3 = AssetManager::GetTexture(TEX_BUTTON3);
-		button4 = AssetManager::GetTexture(TEX_BUTTON4);
 		spacebar = AssetManager::GetTexture(TEX_SPACEBAR);
 	}
 } 

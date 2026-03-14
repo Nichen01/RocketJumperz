@@ -251,7 +251,12 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
-	//====== AUDIO CONTROLS ======
+	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
+	if (AEInputCheckTriggered(AEVK_L)) {
+		next = GS_LEVELEDITOR;
+	}
+
+	//====== AUDIO CONTROLS ======//
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
 		if (bgVolume <= 0.f)
@@ -435,7 +440,7 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
-	// ====== HUD: Player Health Display ======
+	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
 	if (fontLevel1 >= 0)
@@ -453,8 +458,11 @@ void Level1_Draw()
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 	}
+
+	// ====== HARDCODED TILES AT THE BOTTOM ====== //
 	renderlogic::drawTileArray();
 
+	// ====== FLASHING E BUTTON WHEN PLAYER IS NEAR A DOOR ====== //
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfo[player].xPos, objectinfo[player].yPos + 60.f, eButton, 50.f);
 	}
