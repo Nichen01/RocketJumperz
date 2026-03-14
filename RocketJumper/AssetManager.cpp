@@ -1,6 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file         AssetManager.cpp
+\author	      Nicholas Chen (c.chen)
+\date         January, 31, 2026
 \brief        Implementation of the AssetManager namespace.
 
 Copyright (C) 2026 DigiPen Institute of Technology.
@@ -18,13 +20,28 @@ namespace AssetManager {
     // -------------------------------------------------------------------------
     // Internal storage
     // -------------------------------------------------------------------------
+    // To store the mehes and textures into an ordered map
     static std::unordered_map<std::string, AEGfxTexture*>    sTextures;
     static std::unordered_map<std::string, AEGfxVertexList*> sMeshes;
 
     // -------------------------------------------------------------------------
     // Textures
+    // Load -> get -> unload
     // -------------------------------------------------------------------------
-
+    /*!*************************************************************************
+     * LOAD TEXTURE
+     * @brief Loads a texture from the disk, caches it, and returns the pointer.
+     *
+     * Usage in level files: Call this in the level's Load() function to
+     * ensure all necessary textures are loaded into memory before the level
+     * begins. 
+     * If a texture with the same name is already loaded, it will
+     * return the existing texture to prevent duplicate loading.
+     * * Example: AssetManager::LoadTexture("HeroTex", "Assets/Hero.png");
+     *
+     * @param name       The custom string identifier to cache the texture under
+     * @param filePath   The relative or absolute path to the texture file
+     * @return AEGfxTexture* ***************************************************************************/
     AEGfxTexture* LoadTexture(const std::string& name, const std::string& filePath)
     {
         auto it = sTextures.find(name);
@@ -40,6 +57,20 @@ namespace AssetManager {
         return tex;
     }
 
+
+    /*!*************************************************************************
+     * GET TEXTURE
+     * @brief Retrieves a previously loaded texture from the asset cache.
+     *
+     * Usage in level files: Call this during Initialize(), Update(), or Draw()
+     * when you need to assign a texture to a game object or bind it for
+     * rendering. 
+     * - must ensure LoadTexture() was called first.
+     * * Example: myObject.pTex = AssetManager::GetTexture("HeroTex");
+     *
+     * @param name       The custom string identifier of the desired texture
+     * @return AEGfxTexture* (Returns nullptr if not found)
+     ***************************************************************************/
     AEGfxTexture* GetTexture(const std::string& name)
     {
         auto it = sTextures.find(name);
@@ -49,6 +80,16 @@ namespace AssetManager {
         return nullptr;
     }
 
+    /*!*************************************************************************
+     * UNLOAD ALL TEXTURES
+     * @brief Frees all cached textures from memory.
+     *
+     * Usage in level files: Call this inside the level's UNLOAD() function
+     * to prevent memory leaks when transitioning to a new level or quitting.
+     * * Example: AssetManager::UnloadAllTextures();
+     *
+     * @return VOID
+     ***************************************************************************/
     void UnloadAllTextures()
     {
         for (auto& pair : sTextures)
@@ -60,9 +101,20 @@ namespace AssetManager {
     }
 
     // -------------------------------------------------------------------------
-    // Meshes
+    // MESHES
     // -------------------------------------------------------------------------
-    // Creates a 1x1 mesh(full quad) and automatically stores it in the cache. 
+    /*!*************************************************************************
+     * BUILD 1X1 MESH
+     * @brief Creates a 1x1 quad mesh with UVs and stores it in the cache.
+     *
+     * Usage: Call in LOAD() or INIT() to generate standard square meshes for 2D sprites. 
+     * It automatically handles CREATING and RETURNING the new mesh. 
+     * NO NEED TO STORE MESH 
+     * * Example: AssetManager::Build1x1Mesh("QuadMesh");
+     *
+     * @param name       To name the mesh
+     * @return AEGfxVertexList*
+     ***************************************************************************/
     AEGfxVertexList* Build1x1Mesh(const std::string& name)
     {
         // Start mesh creation
@@ -96,34 +148,78 @@ namespace AssetManager {
         return newMesh;
     }
 
+    /*!*************************************************************************
+     * STORE MESH
+     * @brief Saves a custom mesh that you have manually built into the manager's memory. 
+     * You give it a name and the mesh data
+     *
+     * Usage: Use this in Load() IF you have built a custom
+     * shape (usually for animination meshes) using AEGfxMeshStart/End and want
+     * the AssetManager to handle its lifecycle.
+     * * Example: AssetManager::StoreMesh("CustomTriangle", myTriMeshPtr);
+     *
+     * @param name       The custom string identifier to cache the mesh under
+     * @param mesh       Pointer to the manually constructed AEGfxVertexList
+     * @return VOID
+     ***************************************************************************/
     void StoreMesh(const std::string& name, AEGfxVertexList* mesh)
     {
-        // Prevent memory leak by freeing the old mesh if the name already exists
+        // Search the mesh map
         auto it = sMeshes.find(name);
         if (it != sMeshes.end() && it->second != nullptr) {
             AEGfxMeshFree(it->second);
         }
 
+        // store the mesh pointer in the unordered map under the name
         sMeshes[name] = mesh;
     }
 
+
+    /*!*************************************************************************
+     * GET MESH
+     * @brief Retrieve a mesh that is already being held by the manager. 
+     * You ask for it by its name, and the manager hands you the pointer so you can use it to draw your object.
+     *
+     * Usage: Call in Inite() or Draw() to ASSIGN
+     * the mesh to a game object or bind it for drawing.
+     * * Example: myObject.pMesh = AssetManager::GetMesh("QuadMesh");
+     *
+     * @param name       The custom string identifier of the desired mesh
+     * @return AEGfxVertexList* (Returns nullptr if not found)
+     ***************************************************************************/
     AEGfxVertexList* GetMesh(const std::string& name)
     {
+        // Search the texture map for the provided name
         auto it = sMeshes.find(name);
+        // If mesh alrdy exists, return pointer to that mesh
         if (it != sMeshes.end())
             return it->second;
 
+        // if path/mesh not found, print warning and return null
         printf("[AssetManager] WARNING: Mesh \"%s\" not found.\n", name.c_str());
         return nullptr;
     }
 
+
+    /*!*************************************************************************
+     * FREE ALL MESHES
+     * @brief Frees all cached meshes from GPU memory and clears the map.
+     *
+     * Usage in level files: Call this inside your level's Unload() function
+     * alongside UnloadAllTextures() to ensure a clean state for the next level.
+     * * Example: AssetManager::FreeAllMeshes();
+     *
+     * @return VOID
+     ***************************************************************************/
     void FreeAllMeshes()
     {
+        // Loop through every key-value pair in the mesh map
         for (auto& pair : sMeshes)
         {
-            if (pair.second)
-                AEGfxMeshFree(pair.second);
+            // Check if mesh pointer is valid
+            if (pair.second) AEGfxMeshFree(pair.second); // delete from memory
         }
+        // Remove all entries from the map now that memory is freed
         sMeshes.clear();
     }
 
