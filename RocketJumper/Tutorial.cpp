@@ -78,7 +78,7 @@ void Tutorial_Load()
 void Tutorial_Initialize()
 {
 	currentGameLevel = 0;
-	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);
