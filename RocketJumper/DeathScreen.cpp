@@ -59,7 +59,7 @@ void DeathScreen_Update() {
 
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
-            next = GS_TUTORIAL;  // Change to test file if needed
+            next = GS_LEVEL1;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {

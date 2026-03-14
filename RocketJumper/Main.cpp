@@ -12,6 +12,7 @@
 // main
 
 bool pause = false;
+bool canpause = true;
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -40,15 +41,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
-	
 	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
 	{
+		if (current == GS_MAINMENU) {
+			canpause = false;
+		}
+		if (current == GS_VICTORY) {
+			canpause = false;
+		}
+		if (current == GS_DEATH) {
+			canpause = false;
+		}
+
 		if (current != GS_RESTART) {
 			GSM_Update();
 			fpLoad();
-			if (current != GS_MAINMENU) {
+			if (canpause) {
 				Pause_Load();			
 			}
 		}
@@ -56,7 +66,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			current = previous;	
 			next = previous;
 		}
-		if (current != GS_MAINMENU) {
+		if (canpause) {
 			Pause_Initialize();
 		}
 		
@@ -66,7 +76,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			AESysFrameStart();
 
-			if (current != GS_MAINMENU) {
+			if (canpause) {
 				if (AEInputCheckTriggered(AEVK_TAB)) {
 					if (pause) {
 						pause = false;
@@ -106,19 +116,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			g_appTime += g_dt;
 		}
-		if (current != GS_MAINMENU) {
+		if (canpause) {
 			Pause_Free();
 		}
 		fpFree();
 
 		if (next != GS_RESTART) {
-			if (current != GS_MAINMENU) {
+			if (canpause) {
 				Pause_Unload();
 			}
 			fpUnload();
 			previous = current;
 		}
-
+		canpause = true;
 		current = next;
 	}
 
