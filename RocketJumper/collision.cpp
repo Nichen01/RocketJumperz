@@ -169,7 +169,7 @@ namespace gamelogic {
 	}
 
 
-	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX,int mapS)
+	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX)
 	{
 		float x1, y1, x2, y2;
 		int flag = 0;
@@ -238,12 +238,12 @@ namespace gamelogic {
 		object->xPos += object->velocityX;
 		object->yPos += object->velocityY;
 
-		float NposX = posX_to_index(object->xPos, mapS);
-		float NposY = posY_to_index(object->yPos, mapS);
+		float NposX = posX_to_index(object->xPos, (float)mapS);
+		float NposY = posY_to_index(object->yPos, (float)mapS);
 		float NScaleX = object->xScale/ mapS;
 		float NScaleY = object->xScale / mapS;
 		
-		object->gridCollisionFlag = CheckInstanceBinaryMapCollision(NposX, NposY, NScaleX, NScaleY, map, index, mapX, mapS);
+		object->gridCollisionFlag = CheckInstanceBinaryMapCollision(NposX, NposY, NScaleX, NScaleY, map, index, mapX);
 
 
 		if ((object->gridCollisionFlag & COLLISION_BOTTOM) == COLLISION_BOTTOM) {

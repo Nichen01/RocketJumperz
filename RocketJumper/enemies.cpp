@@ -29,8 +29,8 @@ namespace enemySystem {
         {
             enemies[i].shape.xPos = 0.0f;
             enemies[i].shape.yPos = 0.0f;
-            enemies[i].shape.xScale = 35.0f;  // Default enemy size
-            enemies[i].shape.yScale = 35.0f;
+            enemies[i].shape.xScale = 80.0f;  // Default enemy size
+            enemies[i].shape.yScale = 80.0f;
             enemies[i].type = ENEMY_MELEE;
             enemies[i].shape.velocityX = 0.0f;
             enemies[i].shape.velocityY = 0.0f;
@@ -82,8 +82,8 @@ namespace enemySystem {
             enemies[foundSlot].detectionRange = MELEE_DETECTION_RANGE;
             enemies[foundSlot].attackRange = MELEE_ATTACK_RANGE;
             enemies[foundSlot].moveSpeed = MELEE_MOVE_SPEED;
-            enemies[foundSlot].shape.xScale = 30.0f;
-            enemies[foundSlot].shape.yScale = 30.0f;
+            enemies[foundSlot].shape.xScale = 80.0f;
+            enemies[foundSlot].shape.yScale = 80.0f;
         }
         else if (type == ENEMY_RANGED)
         {
@@ -91,8 +91,8 @@ namespace enemySystem {
             enemies[foundSlot].detectionRange = RANGED_DETECTION_RANGE;
             enemies[foundSlot].attackRange = RANGED_ATTACK_RANGE;
             enemies[foundSlot].moveSpeed = RANGED_MOVE_SPEED;
-            enemies[foundSlot].shape.xScale = 30.0f;
-            enemies[foundSlot].shape.yScale = 30.0f;
+            enemies[foundSlot].shape.xScale = 80.0f;
+            enemies[foundSlot].shape.yScale = 80.0f;
         }
 
         // Debugging

@@ -37,7 +37,7 @@ static int y;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 40.0f;
+const float PlayerScale = 80.0f;
 
 extern objectsquares objectinfo[2] = { 0 };
 
