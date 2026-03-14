@@ -87,7 +87,7 @@ enum TextureID {
     TEX_MAX
 };
 
-// Define all possible meshes here
+// Define all meshes here
 enum MeshID {
     MESH_PLAYER,
     MESH_PLATFORM,
@@ -103,8 +103,8 @@ enum MeshID {
 
 class AssetManager {
 private:
-    static AEGfxTexture* s_Textures[TEX_MAX];
-    static AEGfxVertexList* s_Meshes[MESH_MAX];
+    static AEGfxTexture* sTextures[TEX_MAX];
+    static AEGfxVertexList* sMeshes[MESH_MAX];
 
 public:
 
