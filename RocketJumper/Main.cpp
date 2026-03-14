@@ -6,9 +6,12 @@
 #include "Main.h"
 #include "Load.h"
 #include "Sound.h"
+#include "PauseMenu.h"
 
 // ---------------------------------------------------------------------------
 // main
+
+bool pause = false;
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -27,11 +30,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Using custom window procedure
 	//int gGameRunning = 1;
-	bool pause = false;
-	s8 pausefont = -1; 
-	//MenuButton playButton;
-	//MenuButton quitButton;
-	f32 width, height;
+
+
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -41,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	printf("Team project test\n");
 
 	
-	GSM_Initialize(GS_LEVEL1);
+	GSM_Initialize(GS_VICTORY);
 
 	while (current != GS_QUIT)
 	{
@@ -49,17 +49,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			GSM_Update();
 			fpLoad();
 			if (current != GS_MAINMENU) {
-				// Destroy previous pause font before creating a new one to
-				// avoid leaking a font handle on every level transition.
-				if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
-				pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+				Pause_Load();			
 			}
 		}
 		else {
 			current = previous;	
 			next = previous;
 		}
-
+		if (current != GS_MAINMENU) {
+			Pause_Initialize();
+		}
+		
 		fpInitialize();
 
 		while (next == current)
@@ -84,8 +84,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				fpDraw();
 
 				if (pause) {
-					AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
-					AEGfxPrint(pausefont, "PAUSE", -width / 2, height, 1, 1, 1, 1, 1);
+					Pause_Update();
+					Pause_Draw();
 					audio::audiolevel(0.2f);
 				}
 			}
@@ -106,10 +106,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			g_appTime += g_dt;
 		}
-
+		if (current != GS_MAINMENU) {
+			Pause_Free();
+		}
 		fpFree();
 
 		if (next != GS_RESTART) {
+			if (current != GS_MAINMENU) {
+				Pause_Unload();
+			}
 			fpUnload();
 			previous = current;
 		}
@@ -118,7 +123,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// free the system
-	AEGfxDestroyFont(pausefont);
 	AESysExit();
 
 	return 0;

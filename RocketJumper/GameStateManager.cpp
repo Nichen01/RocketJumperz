@@ -60,6 +60,22 @@ void GSM_Update()
 		fpDraw = LevelEditor_Draw;
 		fpFree = LevelEditor_Free;
 		fpUnload = LevelEditor_Unload;
+		break;		
+	case GS_VICTORY:
+		fpLoad = VictoryScreen_Load;
+		fpInitialize = VictoryScreen_Init;
+		fpUpdate = VictoryScreen_Update;
+		fpDraw = VictoryScreen_Draw;
+		fpFree = VictoryScreen_Free;
+		fpUnload = VictoryScreen_Unload;
+		break;
+	case GS_DEATH:
+		fpLoad = DeathScreen_Load;
+		fpInitialize = DeathScreen_Init;
+		fpUpdate = DeathScreen_Update;
+		fpDraw = DeathScreen_Draw;
+		fpFree = DeathScreen_Free;
+		fpUnload = DeathScreen_Unload;
 		break;
 	case GS_TUTORIAL:
 		fpLoad = Tutorial_Load;
