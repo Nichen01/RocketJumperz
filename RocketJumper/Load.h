@@ -29,19 +29,3 @@ namespace load {
 	void mushroom();
 	void ui();
 }
-
-namespace freeAsset {
-	void platform();
-	void door();
-	void enemy();
-	void player();
-	void projectile();
-	void ui();
-}
-
-namespace unload {
-	void platform();
-	void glass();
-	void ui();
-	void door();
-}

@@ -41,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	printf("Team project test\n");
 
 	
-	GSM_Initialize(GS_VICTORY);
+	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
 	{

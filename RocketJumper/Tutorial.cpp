@@ -15,6 +15,7 @@ Technology is prohibited.
 
 #include "pch.h"
 #include "Level1.h"
+#include "AssetManager.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -52,38 +53,50 @@ void Tutorial_Load()
 
 	audio::loadsound();
 
-	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	plasma = AEGfxTextureLoad("Assets/plasma.png");
+	// Load textures via AssetManager (enum-based IDs)
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/MeleeEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+
+	// Sync the extern pointers so other files can use them directly
+	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
+	plasma            = AssetManager::GetTexture(TEX_PLASMA);
+	doorTex           = AssetManager::GetTexture(TEX_DOOR);
+	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
 
 	// Load platform assets
 	load::platform();
 	load::ui();
+
+	// Create font for gameover text (stored so we can destroy it in Unload)
+	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 
 void Tutorial_Initialize()
 {
 	currentGameLevel = 0;
-
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
-
-	// Create font for gameover text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);
-
-	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
-	init::enemy();
-	init::platform();
-	init::player();
-	init::projectile();
-	init::ui();
+	AssetManager::BuildSqrMesh(MESH_ENEMY);
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_PLAYER);
+	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
+	AssetManager::BuildSqrMesh(MESH_UI);
+	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
+	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
+	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
+	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
+	uiMesh         = AssetManager::GetMesh(MESH_UI);
 
 	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
@@ -127,9 +140,7 @@ void Tutorial_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	// Load enemy textures (create these assets or use placeholder)
-	meleeEnemyTexture = AEGfxTextureLoad("Assets/MeleeEnemy.png");
-	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
+	
 
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
@@ -139,10 +150,11 @@ void Tutorial_Initialize()
 
 	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
 	// Free any existing doorMesh first to avoid leaking if re-initialized.
-	if (doorMesh) { AEGfxMeshFree(doorMesh); doorMesh = nullptr; }
-	animSystem::buildMesh(&doorMesh, 1, 7);
+	AEGfxVertexList* tempDoorMesh = nullptr;
+	animSystem::buildMesh(&tempDoorMesh, 1, 7);
+	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
+	doorMesh = tempDoorMesh;
 
-	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");
 }
@@ -356,12 +368,7 @@ void Tutorial_Draw()
 
 void Tutorial_Free()
 {
-	freeAsset::platform();
-	freeAsset::door();
-	freeAsset::enemy();
-	freeAsset::player();
-	freeAsset::projectile();
-	freeAsset::ui();
+	AssetManager::FreeAllMeshes();
 
 	if (map) {
 		delete[] map;
@@ -373,31 +380,13 @@ void Tutorial_Free()
 
 void Tutorial_Unload()
 {
-	if (doorMesh) {
-		AEGfxMeshFree(doorMesh);
-		doorMesh = nullptr;
-	}
-	if (doorTex) {
-		AEGfxTextureUnload(doorTex);
-		doorTex = nullptr;
-	}
-
-	// Unload ALL textures that were loaded in Initialize.
-	// NOTE: doorTex is already unloaded above, so do not unload it again here.
-	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
-	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
-	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-
-	unload::platform();
-	unload::ui();
-
+	AssetManager::UnloadAllTextures();
+	
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
 		delete[] glassMap;
 		glassMap = nullptr;
 	}
-
 
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }

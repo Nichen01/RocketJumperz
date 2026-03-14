@@ -27,6 +27,7 @@ Technology is prohibited.
 #include "aimingInterface.h"
 #include "binaryMap.h"
 #include "animation.h"
+#include "AssetManager.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -40,6 +41,8 @@ objectsquares objectinfo2[2] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
+
+
 
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
@@ -69,13 +72,26 @@ void Level2_Load()
 	aiming::loadAiming();
 	audio::loadsound();
 
-	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	plasma = AEGfxTextureLoad("Assets/plasma.png");
+	// LOADING TEXTURES
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/MeleeEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
 
-	// Load platform assets
+	// Sync the extern pointers so other files can use them directly
+	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
+	plasma            = AssetManager::GetTexture(TEX_PLASMA);
+	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
+	doorTex           = AssetManager::GetTexture(TEX_DOOR);
+
 	load::platform();
 	load::ui();
+
+	// Create font for HUD text (stored so we can destroy it in Unload)
+	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+
 
 }
 
@@ -85,8 +101,7 @@ void Level2_Initialize()
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
-	// Create font for HUD text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo2[player]);
@@ -97,10 +112,15 @@ void Level2_Initialize()
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
-	init::enemy();
-	init::platform();
-	init::player();
-	init::projectile();
+	// BUILD MESHES
+	AssetManager::BuildSqrMesh(MESH_ENEMY);
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_PLAYER);
+	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
+	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
+	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
+	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
+	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
 
 	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
 		printf("Could not import file");
@@ -144,9 +164,7 @@ void Level2_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	// Load enemy textures (create these assets or use placeholder)
-	meleeEnemyTexture = AEGfxTextureLoad("Assets/MeleeEnemy.png");
-	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
+	
 
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
@@ -155,16 +173,11 @@ void Level2_Initialize()
 	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
-	// DOOR
-
-	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
-	// Free any existing doorMesh first to avoid leaking if re-initialized.
-	if (doorMesh) { AEGfxMeshFree(doorMesh); doorMesh = nullptr; }
-	animSystem::buildMesh(&doorMesh, 1, 7);
-
-	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
-	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
-	else printf("DOOR OK\n");
+	// Custom door mesh via AssetManager
+	AEGfxVertexList* tempDoorMesh = nullptr;
+	animSystem::buildMesh(&tempDoorMesh, 1, 7);
+	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
+	doorMesh = tempDoorMesh;
 }
 
 void Level2_Update()
@@ -367,11 +380,13 @@ void Level2_Draw()
 
 void Level2_Free()
 {
-	freeAsset::platform();
-	freeAsset::door();
-	freeAsset::enemy();
-	freeAsset::player();
-	freeAsset::projectile();
+	AssetManager::FreeAllMeshes();
+
+	doorMesh = nullptr;
+	pMesh = nullptr;
+	platformMesh = nullptr;
+	enemyMesh = nullptr;
+	projectileMesh = nullptr;
 
 	if (map) {
 		delete[] map;
@@ -383,24 +398,15 @@ void Level2_Free()
 
 void Level2_Unload()
 {
-	if (doorMesh) {
-		AEGfxMeshFree(doorMesh);
-		doorMesh = nullptr;
-	}
-	if (doorTex) {
-		AEGfxTextureUnload(doorTex);
-		doorTex = nullptr;
-	}
-
 	// Unload ALL textures that were loaded in Initialize
-	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
-	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
-	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
+	AssetManager::UnloadAllTextures();
+
+	characterPictest = nullptr;
+	plasma = nullptr;
+	meleeEnemyTexture = nullptr;
+	rangedEnemyTexture = nullptr;
+	doorTex = nullptr;
 	
-	unload::door();
-	unload::platform();
-	unload::ui();
 
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];

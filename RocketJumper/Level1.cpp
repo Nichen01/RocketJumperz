@@ -41,6 +41,8 @@ extern objectsquares objectinfo[2] = { 0 };
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
 
+static AEGfxVertexList* pTestMesh = nullptr;
+
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
@@ -94,41 +96,62 @@ void Level1_Load()
 	load::ui();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	characterPictest = AssetManager::LoadTexture("characterPictest", "Assets/astronautRight.png");
-	base5test        = AssetManager::LoadTexture("base5test",        "Assets/Base5.png");
-	plasma           = AssetManager::LoadTexture("plasma",           "Assets/plasma.png");
-	doorTex          = AssetManager::LoadTexture("doorTex",          "Assets/DoorOpen.png");
-	AssetManager::LoadTexture("meleeEnemy",  "Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
-	AssetManager::LoadTexture("rangedEnemy", "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 
-	// Loading of assets for mushroomDie
-	mushroomDieTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie0.png");
-	mushroomDieTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie1.png");
-	mushroomDieTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie2.png");
-	mushroomDieTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie3.png");
-	mushroomDieTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie4.png");
-	mushroomDieTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie5.png");
-	mushroomDieTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie6.png");
-	mushroomDieTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie7.png");
-	mushroomDieTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomDie/MushroomDie8.png");
+	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
+	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
+	base5test        = AssetManager::GetTexture(TEX_BASE5TEST);
+	plasma           = AssetManager::GetTexture(TEX_PLASMA);
+	doorTex          = AssetManager::GetTexture(TEX_DOOR);
 
-	// Loading of assets for mushroomHit
-	mushroomHitTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit0.png");
-	mushroomHitTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit1.png");
-	mushroomHitTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit2.png");
-	mushroomHitTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit3.png");
-	mushroomHitTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomHit/MushroomHit4.png");
+	// Loading of assets for mushroomDie using AssetManager
+	{
+		const TextureID dieIDs[9] = {
+			TEX_MUSHROOM_DIE0, TEX_MUSHROOM_DIE1, TEX_MUSHROOM_DIE2,
+			TEX_MUSHROOM_DIE3, TEX_MUSHROOM_DIE4, TEX_MUSHROOM_DIE5,
+			TEX_MUSHROOM_DIE6, TEX_MUSHROOM_DIE7, TEX_MUSHROOM_DIE8
+		};
+		for (int i = 0; i < 9; ++i) {
+			char path[128];
+			sprintf_s(path, "Assets/Enemy/MushroomDie/MushroomDie%d.png", i);
+			AssetManager::LoadTexture(dieIDs[i], path);
+			mushroomDieTexture[i] = AssetManager::GetTexture(dieIDs[i]);
+		}
+	}
 
-	// Loading of assets for mushroomIdle
-	mushroomIdleTexture[0] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle0.png");
-	mushroomIdleTexture[1] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle1.png");
-	mushroomIdleTexture[2] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle2.png");
-	mushroomIdleTexture[3] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle3.png");
-	mushroomIdleTexture[4] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle4.png");
-	mushroomIdleTexture[5] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle5.png");
-	mushroomIdleTexture[6] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle6.png");
-	/*mushroomIdleTexture[7] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle7.png");
-	mushroomIdleTexture[8] = AEGfxTextureLoad("Assets/Enemy/MushroomIdle/MushroomIdle8.png");*/
+	// Loading of assets for mushroomHit using AssetManager
+	{
+		const TextureID hitIDs[5] = {
+			TEX_MUSHROOM_HIT0, TEX_MUSHROOM_HIT1, TEX_MUSHROOM_HIT2,
+			TEX_MUSHROOM_HIT3, TEX_MUSHROOM_HIT4
+		};
+		for (int i = 0; i < 5; ++i) {
+			char path[128];
+			sprintf_s(path, "Assets/Enemy/MushroomHit/MushroomHit%d.png", i);
+			AssetManager::LoadTexture(hitIDs[i], path);
+			mushroomHitTexture[i] = AssetManager::GetTexture(hitIDs[i]);
+		}
+	}
+
+	// Loading of assets for mushroomIdle using AssetManager
+	{
+		const TextureID idleIDs[7] = {
+			TEX_MUSHROOM_IDLE0, TEX_MUSHROOM_IDLE1, TEX_MUSHROOM_IDLE2,
+			TEX_MUSHROOM_IDLE3, TEX_MUSHROOM_IDLE4, TEX_MUSHROOM_IDLE5,
+			TEX_MUSHROOM_IDLE6
+		};
+		for (int i = 0; i < 7; ++i) {
+			char path[128];
+			sprintf_s(path, "Assets/Enemy/MushroomIdle/MushroomIdle%d.png", i);
+			AssetManager::LoadTexture(idleIDs[i], path);
+			mushroomIdleTexture[i] = AssetManager::GetTexture(idleIDs[i]);
+		}
+	}
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -141,7 +164,7 @@ void Level1_Initialize()
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	//fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -150,46 +173,13 @@ void Level1_Initialize()
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
 	//=============CREATE TEXTURED MESH FOR PLAYER==================//
-	// A full quad (2 triangles) is required for the player sprite to render
-	// correctly.  The previous code was missing AEGfxMeshStart() and only
-	// had one triangle, which caused the player to appear as a half-sprite.
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	pMesh = AEGfxMeshEnd();
-	AssetManager::StoreMesh("pMesh", pMesh);
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	platformMesh = AEGfxMeshEnd();
-	AssetManager::StoreMesh("platformMesh", platformMesh);
-
-	//=============CREATE SQUARE MESH FOR PROJECTILES==================//
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-	AssetManager::StoreMesh("pTestMesh", AEGfxMeshEnd());
-
+	AssetManager::BuildSqrMesh(MESH_PLAYER);
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_TEST);
+	pMesh        = AssetManager::GetMesh(MESH_PLAYER);
+	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
+	pTestMesh    = AssetManager::GetMesh(MESH_TEST);
+	
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
 		return;
@@ -242,13 +232,13 @@ void Level1_Initialize()
 	{
 		AEGfxVertexList* meleeEnemyMesh = nullptr;
 		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh("meleeEnemyMesh", meleeEnemyMesh);
+		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
 	}
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
 	animSystem::buildMesh(&doorMesh, 1, 7);
-	AssetManager::StoreMesh("doorMesh", doorMesh);
+	AssetManager::StoreMesh(MESH_DOOR, doorMesh);
 	
 	if (!doorTex)
 		printf("DOOR TEXTURE NOT FOUND!\n");
@@ -337,7 +327,13 @@ void Level1_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
-	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
+
+	// If player health < 0, go to death screen
+	if (objectinfo[player].health <= 0) {
+		next = GS_MAINMENU;
+	}
+
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);*/
 
@@ -389,18 +385,6 @@ void Level1_Update()
 	// MUSHROOM ANIMATION
 	animSystem::update(meleeAnim, dt);
 
-	//need fix animation
-	/*
-	static float frameTimer{ 0.0f };
-	frameTimer += dt;
-	if (frameTimer >= 0.1f) {
-		static int currentFrame{};
-		currentFrame = (currentFrame + 1) % 9; // 9 mushroom idle frames
-		meleeEnemyTexture = mushroomIdleTexture[currentFrame];
-		frameTimer = 0.0f;
-	}
-	*/
-
 }
 
 void Level1_Draw()
@@ -420,10 +404,10 @@ void Level1_Draw()
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
-		AssetManager::GetMesh("meleeEnemyMesh"),
-		AssetManager::GetMesh("pTestMesh"),
-		AssetManager::GetTexture("meleeEnemy"),
-		AssetManager::GetTexture("rangedEnemy"),
+		AssetManager::GetMesh(MESH_MELEE_ENEMY),
+		AssetManager::GetMesh(MESH_TEST),
+		AssetManager::GetTexture(TEX_MUSHROOM_IDLE_SHEET),
+		AssetManager::GetTexture(TEX_RANGED_ENEMY),
 		animSystem::getUOffset(meleeAnim),
 		animSystem::getVOffset(meleeAnim));
 
@@ -431,7 +415,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh("pTestMesh"));
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -445,7 +429,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh("pTestMesh"));
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
 	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.
@@ -474,11 +458,18 @@ void Level1_Draw()
 
 void Level1_Free()
 {
-	// Free all registered meshes, then null the shared extern pointers draw.cpp holds
+	// Unload all AssetManager-tracked textures
 	AssetManager::FreeAllMeshes();
-	pMesh        = nullptr;
+
+	// Null the shared extern pointers
+	pMesh = nullptr;
 	platformMesh = nullptr;
-	doorMesh     = nullptr;
+	doorMesh = nullptr;
+	characterPictest = nullptr;
+	base5test = nullptr;
+	plasma = nullptr;
+	doorTex = nullptr;
+
 
 	if (map) {
 		delete[] map;
@@ -490,14 +481,14 @@ void Level1_Free()
 
 void Level1_Unload()
 {
-	// Unload all registered textures, then null the shared extern pointers draw.cpp holds.
 	// Unload all AssetManager-tracked textures, then null the shared extern pointers.
-	AssetManager::UnloadAllTextures();
-	characterPictest = nullptr;
-	base5test        = nullptr;
-	plasma           = nullptr;
-	doorTex          = nullptr;
+	AssetManager::UnloadAllTextures(); 
 
+
+	// Safely null out mushroom textures (AssetManager already freed the memory)
+	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
+	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
+	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
 	aiming::unloadAiming();
 	unload::platform();
 	unload::ui();
@@ -508,8 +499,7 @@ void Level1_Unload()
 		glassMap = nullptr;
 	}
 
-
-	// Destroy the font created in Initialize
+	// Destroy the font created in Load
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
