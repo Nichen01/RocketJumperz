@@ -158,6 +158,7 @@ void Level1_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	aiming::loadAiming();
 }
 
 void Level1_Initialize()
