@@ -66,12 +66,19 @@ void Tutorial_Load()
 	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
 	soundEffects = AEAudioCreateGroup();
 
-	// Load textures - these are defined in draw.cpp
-	characterPictest = AssetManager::LoadTexture("characterPictest", "Assets/astronautRight.png");
-	plasma = AssetManager::LoadTexture("plasma", "Assets/plasma.png");
-	doorTex = AssetManager::LoadTexture("doorTex", "Assets/DoorOpen.png");
-	meleeEnemyTexture = AssetManager::LoadTexture("meleeEnemy", "Assets/MeleeEnemy.png");
-	rangedEnemyTexture = AssetManager::LoadTexture("rangedEnemy", "Assets/RangedEnemy.png");
+	// Load textures via AssetManager (enum-based IDs)
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/MeleeEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+
+	// Sync the extern pointers so other files can use them directly
+	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
+	plasma            = AssetManager::GetTexture(TEX_PLASMA);
+	doorTex           = AssetManager::GetTexture(TEX_DOOR);
+	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
 
 	// Load platform assets
 	load::platform();
@@ -93,11 +100,16 @@ void Tutorial_Initialize()
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
-	enemyMesh = AssetManager::Build1x1Mesh("enemyMesh");
-	platformMesh = AssetManager::Build1x1Mesh("platformMesh");
-	pMesh = AssetManager::Build1x1Mesh("pMesh");
-	projectileMesh = AssetManager::Build1x1Mesh("projectileMesh");
-	uiMesh = AssetManager::Build1x1Mesh("uiMesh");
+	AssetManager::BuildSqrMesh(MESH_ENEMY);
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_PLAYER);
+	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
+	AssetManager::BuildSqrMesh(MESH_UI);
+	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
+	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
+	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
+	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
+	uiMesh         = AssetManager::GetMesh(MESH_UI);
 
 	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
@@ -153,7 +165,7 @@ void Tutorial_Initialize()
 	// Free any existing doorMesh first to avoid leaking if re-initialized.
 	AEGfxVertexList* tempDoorMesh = nullptr;
 	animSystem::buildMesh(&tempDoorMesh, 1, 7);
-	AssetManager::StoreMesh("doorMesh", tempDoorMesh);
+	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
 	doorMesh = tempDoorMesh;
 
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
@@ -366,12 +378,6 @@ void Tutorial_Draw()
 void Tutorial_Free()
 {
 	AssetManager::FreeAllMeshes();
-	doorMesh = nullptr;
-	pMesh = nullptr;
-	platformMesh = nullptr;
-	projectileMesh = nullptr;
-	enemyMesh = nullptr;
-	uiMesh = nullptr;
 
 	if (map) {
 		delete[] map;
@@ -384,21 +390,12 @@ void Tutorial_Free()
 void Tutorial_Unload()
 {
 	AssetManager::UnloadAllTextures();
-
-	//NULL ALL TEXTURES
-	doorTex = nullptr;
-	characterPictest = nullptr;
-	plasma = nullptr;
-	meleeEnemyTexture = nullptr;
-	rangedEnemyTexture = nullptr;
-
 	
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
 		delete[] glassMap;
 		glassMap = nullptr;
 	}
-
 
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }

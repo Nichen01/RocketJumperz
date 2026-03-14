@@ -29,24 +29,38 @@ void LevelEditor_Load() {
 
 	load::ui();
 
-	// Load textures via AssetManager
-	tileTextures[0] = AssetManager::LoadTexture("le_plat1", "Assets/Platform/platform1.png");
-	tileTextures[1] = AssetManager::LoadTexture("le_plat2", "Assets/Platform/platform2.png");
-	tileTextures[2] = AssetManager::LoadTexture("le_plat3", "Assets/Platform/platform3.png");
-	tileTextures[3] = AssetManager::LoadTexture("le_plat4", "Assets/Platform/platform4.png");
-	tileTextures[4] = AssetManager::LoadTexture("le_plat5", "Assets/Platform/platform5.png");
-	tileTextures[5] = AssetManager::LoadTexture("le_plat6", "Assets/Platform/platform6.png");
-	tileTextures[6] = AssetManager::LoadTexture("le_plat7", "Assets/Platform/platform7.png");
-	tileTextures[7] = AssetManager::LoadTexture("le_plat8", "Assets/Platform/platform8.png");
-	tileTextures[8] = AssetManager::LoadTexture("le_plat9", "Assets/Platform/platform9.png");
-	tileTextures[9] = AssetManager::LoadTexture("le_door", "Assets/Platform/staticDoor.jpg");
+	// Load textures via AssetManager (enum-based IDs)
+	AssetManager::LoadTexture(TEX_PLATFORM1, "Assets/Platform/platform1.png");
+	AssetManager::LoadTexture(TEX_PLATFORM2, "Assets/Platform/platform2.png");
+	AssetManager::LoadTexture(TEX_PLATFORM3, "Assets/Platform/platform3.png");
+	AssetManager::LoadTexture(TEX_PLATFORM4, "Assets/Platform/platform4.png");
+	AssetManager::LoadTexture(TEX_PLATFORM5, "Assets/Platform/platform5.png");
+	AssetManager::LoadTexture(TEX_PLATFORM6, "Assets/Platform/platform6.png");
+	AssetManager::LoadTexture(TEX_PLATFORM7, "Assets/Platform/platform7.png");
+	AssetManager::LoadTexture(TEX_PLATFORM8, "Assets/Platform/platform8.png");
+	AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
+	AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
+
+	// Fill the local tileTextures array from the AssetManager cache
+	tileTextures[0] = AssetManager::GetTexture(TEX_PLATFORM1);
+	tileTextures[1] = AssetManager::GetTexture(TEX_PLATFORM2);
+	tileTextures[2] = AssetManager::GetTexture(TEX_PLATFORM3);
+	tileTextures[3] = AssetManager::GetTexture(TEX_PLATFORM4);
+	tileTextures[4] = AssetManager::GetTexture(TEX_PLATFORM5);
+	tileTextures[5] = AssetManager::GetTexture(TEX_PLATFORM6);
+	tileTextures[6] = AssetManager::GetTexture(TEX_PLATFORM7);
+	tileTextures[7] = AssetManager::GetTexture(TEX_PLATFORM8);
+	tileTextures[8] = AssetManager::GetTexture(TEX_PLATFORM9);
+	tileTextures[9] = AssetManager::GetTexture(TEX_STATIC_DOOR);
 
 }
 
 void LevelEditor_Initialize() {
 
-	platformMesh = AssetManager::Build1x1Mesh("platformMesh");
-	uiMesh = AssetManager::Build1x1Mesh("uiMesh");
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_UI);
+	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
+	uiMesh       = AssetManager::GetMesh(MESH_UI);
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	switch (level) {

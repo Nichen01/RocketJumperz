@@ -102,35 +102,61 @@ void Level1_Load()
 	load::ui();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	characterPictest = AssetManager::LoadTexture("characterPictest", "Assets/astronautRight.png");
-	base5test        = AssetManager::LoadTexture("base5test",        "Assets/Base5.png");
-	plasma           = AssetManager::LoadTexture("plasma",           "Assets/plasma.png");
-	doorTex          = AssetManager::LoadTexture("doorTex",          "Assets/DoorOpen.png");
-	AssetManager::LoadTexture("meleeEnemy",  "Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
-	AssetManager::LoadTexture("rangedEnemy", "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+
+	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
+	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
+	base5test        = AssetManager::GetTexture(TEX_BASE5TEST);
+	plasma           = AssetManager::GetTexture(TEX_PLASMA);
+	doorTex          = AssetManager::GetTexture(TEX_DOOR);
 
 	// Loading of assets for mushroomDie using AssetManager
-	for (int i = 0; i < 9; ++i) {
-		char name[64], path[128];
-		sprintf_s(name, "mushroomDie%d", i);
-		sprintf_s(path, "Assets/Enemy/MushroomDie/MushroomDie%d.png", i);
-		mushroomDieTexture[i] = AssetManager::LoadTexture(name, path);
+	{
+		const TextureID dieIDs[9] = {
+			TEX_MUSHROOM_DIE0, TEX_MUSHROOM_DIE1, TEX_MUSHROOM_DIE2,
+			TEX_MUSHROOM_DIE3, TEX_MUSHROOM_DIE4, TEX_MUSHROOM_DIE5,
+			TEX_MUSHROOM_DIE6, TEX_MUSHROOM_DIE7, TEX_MUSHROOM_DIE8
+		};
+		for (int i = 0; i < 9; ++i) {
+			char path[128];
+			sprintf_s(path, "Assets/Enemy/MushroomDie/MushroomDie%d.png", i);
+			AssetManager::LoadTexture(dieIDs[i], path);
+			mushroomDieTexture[i] = AssetManager::GetTexture(dieIDs[i]);
+		}
 	}
 
 	// Loading of assets for mushroomHit using AssetManager
-	for (int i = 0; i < 5; ++i) {
-		char name[64], path[128];
-		sprintf_s(name, "mushroomHit%d", i);
-		sprintf_s(path, "Assets/Enemy/MushroomHit/MushroomHit%d.png", i);
-		mushroomHitTexture[i] = AssetManager::LoadTexture(name, path);
+	{
+		const TextureID hitIDs[5] = {
+			TEX_MUSHROOM_HIT0, TEX_MUSHROOM_HIT1, TEX_MUSHROOM_HIT2,
+			TEX_MUSHROOM_HIT3, TEX_MUSHROOM_HIT4
+		};
+		for (int i = 0; i < 5; ++i) {
+			char path[128];
+			sprintf_s(path, "Assets/Enemy/MushroomHit/MushroomHit%d.png", i);
+			AssetManager::LoadTexture(hitIDs[i], path);
+			mushroomHitTexture[i] = AssetManager::GetTexture(hitIDs[i]);
+		}
 	}
 
 	// Loading of assets for mushroomIdle using AssetManager
-	for (int i = 0; i < 7; ++i) { // Kept to 0-6 as per the original active array limits
-		char name[64], path[128];
-		sprintf_s(name, "mushroomIdle%d", i);
-		sprintf_s(path, "Assets/Enemy/MushroomIdle/MushroomIdle%d.png", i);
-		mushroomIdleTexture[i] = AssetManager::LoadTexture(name, path);
+	{
+		const TextureID idleIDs[7] = {
+			TEX_MUSHROOM_IDLE0, TEX_MUSHROOM_IDLE1, TEX_MUSHROOM_IDLE2,
+			TEX_MUSHROOM_IDLE3, TEX_MUSHROOM_IDLE4, TEX_MUSHROOM_IDLE5,
+			TEX_MUSHROOM_IDLE6
+		};
+		for (int i = 0; i < 7; ++i) {
+			char path[128];
+			sprintf_s(path, "Assets/Enemy/MushroomIdle/MushroomIdle%d.png", i);
+			AssetManager::LoadTexture(idleIDs[i], path);
+			mushroomIdleTexture[i] = AssetManager::GetTexture(idleIDs[i]);
+		}
 	}
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
@@ -153,9 +179,12 @@ void Level1_Initialize()
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
 	//=============CREATE TEXTURED MESH FOR PLAYER==================//
-	pMesh = AssetManager::Build1x1Mesh("pMesh");
-	platformMesh = AssetManager::Build1x1Mesh("platformMesh");
-	pTestMesh = AssetManager::Build1x1Mesh("pTestMesh");
+	AssetManager::BuildSqrMesh(MESH_PLAYER);
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_TEST);
+	pMesh        = AssetManager::GetMesh(MESH_PLAYER);
+	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
+	pTestMesh    = AssetManager::GetMesh(MESH_TEST);
 	
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
@@ -209,13 +238,13 @@ void Level1_Initialize()
 	{
 		AEGfxVertexList* meleeEnemyMesh = nullptr;
 		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh("meleeEnemyMesh", meleeEnemyMesh);
+		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
 	}
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
 	animSystem::buildMesh(&doorMesh, 1, 7);
-	AssetManager::StoreMesh("doorMesh", doorMesh);
+	AssetManager::StoreMesh(MESH_DOOR, doorMesh);
 	
 	if (!doorTex)
 		printf("DOOR TEXTURE NOT FOUND!\n");
@@ -300,6 +329,12 @@ void Level1_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
+
+	// If player health < 0, go to death screen
+	if (objectinfo[player].health <= 0) {
+		next = GS_MAINMENU;
+	}
+
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
@@ -367,10 +402,10 @@ void Level1_Draw()
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
-		AssetManager::GetMesh("meleeEnemyMesh"),
-		AssetManager::GetMesh("pTestMesh"),
-		AssetManager::GetTexture("meleeEnemy"),
-		AssetManager::GetTexture("rangedEnemy"),
+		AssetManager::GetMesh(MESH_MELEE_ENEMY),
+		AssetManager::GetMesh(MESH_TEST),
+		AssetManager::GetTexture(TEX_MUSHROOM_IDLE_SHEET),
+		AssetManager::GetTexture(TEX_RANGED_ENEMY),
 		animSystem::getUOffset(meleeAnim),
 		animSystem::getVOffset(meleeAnim));
 
@@ -378,7 +413,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, pTestMesh);
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
 	//====== PLAYER RENDER =========//
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -391,7 +426,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh("pTestMesh"));
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
 	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.

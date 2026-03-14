@@ -81,11 +81,18 @@ void Level2_Load()
 	soundEffects = AEAudioCreateGroup();
 
 	// LOADING TEXTURES
-	characterPictest = AssetManager::LoadTexture("characterPictest", "Assets/astronautRight.png");
-	plasma = AssetManager::LoadTexture("plasma", "Assets/plasma.png");
-	meleeEnemyTexture = AssetManager::LoadTexture("meleeEnemy", "Assets/MeleeEnemy.png");
-	rangedEnemyTexture = AssetManager::LoadTexture("rangedEnemy", "Assets/RangedEnemy.png");
-	doorTex = AssetManager::LoadTexture("doorTex", "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/MeleeEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+
+	// Sync the extern pointers so other files can use them directly
+	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
+	plasma            = AssetManager::GetTexture(TEX_PLASMA);
+	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
+	doorTex           = AssetManager::GetTexture(TEX_DOOR);
 
 	load::platform();
 	load::ui();
@@ -113,11 +120,15 @@ void Level2_Initialize()
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
-	// BUILD MESHES 
-	enemyMesh = AssetManager::Build1x1Mesh("enemyMesh");
-	platformMesh = AssetManager::Build1x1Mesh("platformMesh");
-	pMesh = AssetManager::Build1x1Mesh("pMesh");
-	projectileMesh = AssetManager::Build1x1Mesh("projectileMesh");
+	// BUILD MESHES
+	AssetManager::BuildSqrMesh(MESH_ENEMY);
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_PLAYER);
+	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
+	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
+	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
+	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
+	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
 
 	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
 		printf("Could not import file");
@@ -173,7 +184,7 @@ void Level2_Initialize()
 	// Custom door mesh via AssetManager
 	AEGfxVertexList* tempDoorMesh = nullptr;
 	animSystem::buildMesh(&tempDoorMesh, 1, 7);
-	AssetManager::StoreMesh("doorMesh", tempDoorMesh);
+	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
 	doorMesh = tempDoorMesh;
 }
 
