@@ -23,7 +23,7 @@ Technology is prohibited.
 #include "projectile.h"
 #include "Movement.h"
 // render.h was removed in Joraye merge; Load.h (via Level1.h) provides
-// load::platform() and unload::platform() which replaced render:: functions.
+// load::platform() which replaced render:: functions.
 #include "enemies.h"
 #include "aimingInterface.h"
 #include "binaryMap.h"
@@ -35,6 +35,9 @@ static s32* map = nullptr;
 static int x;
 static int y;
 static int s = 80;
+
+// Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
+const float PlayerScale = 40.0f;
 
 extern objectsquares objectinfo[2] = { 0 };
 
@@ -159,6 +162,10 @@ void Level1_Load()
 
 void Level1_Initialize()
 {
+	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
+	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
+	plasma = AssetManager::GetTexture(TEX_PLASMA);
+	doorTex = AssetManager::GetTexture(TEX_DOOR);
 	currentGameLevel = 1;
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
@@ -211,8 +218,8 @@ void Level1_Initialize()
 		objectinfo[player].xPos = 0.f;
 		objectinfo[player].yPos = 0.f;
 	}
-	objectinfo[player].xScale = (float)s;
-	objectinfo[player].yScale = (float)s;
+	objectinfo[player].xScale = PlayerScale;
+	objectinfo[player].yScale = PlayerScale;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo[player]);
@@ -335,7 +342,7 @@ void Level1_Update()
 
 	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);*/
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
@@ -418,7 +425,11 @@ void Level1_Draw()
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
 	//====== PLAYER RENDER =========//
+	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
 	renderlogic::drawSquare(objectinfo[player].xPos, objectinfo[player].yPos,
 		objectinfo[player].xScale, objectinfo[player].yScale);
@@ -461,14 +472,6 @@ void Level1_Free()
 	// Unload all AssetManager-tracked textures
 	AssetManager::FreeAllMeshes();
 
-	// Null the shared extern pointers
-	pMesh = nullptr;
-	platformMesh = nullptr;
-	doorMesh = nullptr;
-	characterPictest = nullptr;
-	base5test = nullptr;
-	plasma = nullptr;
-	doorTex = nullptr;
 
 
 	if (map) {
@@ -490,8 +493,7 @@ void Level1_Unload()
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
 	aiming::unloadAiming();
-	unload::platform();
-	unload::ui();
+	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];

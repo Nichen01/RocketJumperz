@@ -22,6 +22,9 @@ static int x = 16;
 static int y = 9;
 static int s = 80;
 
+// Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
+const float PlayerScale = 40.0f;
+
 static s8 font = -1;
 
 objectsquares objectinfoTut[2] = { 0 };
@@ -78,7 +81,7 @@ void Tutorial_Load()
 void Tutorial_Initialize()
 {
 	currentGameLevel = 0;
-	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);
@@ -129,8 +132,8 @@ void Tutorial_Initialize()
 		objectinfoTut[player].xPos = 600.f;
 		objectinfoTut[player].yPos = -300.f;
 	}
-	objectinfoTut[player].xScale = (float)s;
-	objectinfoTut[player].yScale = (float)s;
+	objectinfoTut[player].xScale = PlayerScale;
+	objectinfoTut[player].yScale = PlayerScale;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfoTut[player]);
@@ -329,7 +332,11 @@ void Tutorial_Draw()
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
 	//====== PLAYER RENDER =========//
+	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
 	renderlogic::drawSquare(objectinfoTut[player].xPos, objectinfoTut[player].yPos,
 		objectinfoTut[player].xScale, objectinfoTut[player].yScale);
