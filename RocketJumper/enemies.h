@@ -14,8 +14,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "AEEngine.h"
-#include "player.h"
-#include "projectile.h"
+#include "Player.h"
+#include "Projectile.h"
 
 // Maximum number of enemies that can exist at once
 #define MAX_ENEMIES 10
@@ -39,6 +39,9 @@ struct Enemy {
     f32 moveSpeed;           // How fast enemy moves
     s8 isActive;             // Is this enemy slot active?
     s8 hasLineOfSight;       // Can enemy see player?
+
+    s32 currentFrame;        // current frame index
+    f32 frameTimer;          // timer for frame switching
 };
 
 namespace enemySystem {
@@ -48,14 +51,14 @@ namespace enemySystem {
     constexpr f32 MELEE_MOVE_SPEED = 4.0f;
     constexpr f32 MELEE_HEALTH = 50.0f;
     constexpr f32 MELEE_ATTACK_COOLDOWN = 1.0f;  // Seconds between attacks
-    constexpr f32 MELEE_DAMAGE = 10.0f;
+    constexpr f32 MELEE_DAMAGE = 15.0f;
 
     constexpr f32 RANGED_DETECTION_RANGE = 800.0f;
     constexpr f32 RANGED_ATTACK_RANGE = 800.0f;
     constexpr f32 RANGED_MOVE_SPEED = 1.5f;
     constexpr f32 RANGED_HEALTH = 30.0f;
     constexpr f32 RANGED_ATTACK_COOLDOWN = 2.0f;  // Seconds between shots
-    constexpr f32 RANGED_DAMAGE = 5.0f;
+    constexpr f32 RANGED_DAMAGE = 30.0f;
 
     // Initialize all enemies to inactive state
     void initEnemies(Enemy enemies[], s32 maxCount);
@@ -72,10 +75,14 @@ namespace enemySystem {
         f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup);
 
     // Render all active enemies
-    void renderEnemies(Enemy enemies[], s32 maxCount,
-        AEGfxVertexList* mesh,
+    void renderEnemies(Enemy enemies[],
+        s32 maxCount,
+        AEGfxVertexList* meleeMesh,
+        AEGfxVertexList* rangedMesh,
         AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture);
+        AEGfxTexture* rangedTexture,
+        f32 meleeUOffset = 0.0f,
+        f32 meleeVoffset = 0.0f);
 
     // Check if player collided with any melee enemies
     // Returns damage dealt to player
@@ -85,6 +92,10 @@ namespace enemySystem {
     // Check if player projectiles hit any enemies
     void checkProjectileEnemyCollision(Enemy enemies[], s32 maxCount,
         Projectile projectiles[], s32 maxProjectiles);
+
+    // Check if enemy projectiles hit the player. Returns total damage dealt.
+    f32 checkEnemyPlayerProjectileCollision(Projectile enemyProjectiles[],
+        s32 maxProjectiles, objectsquares& player);
 
     // Helper: Calculate distance between two points
     f32 getDistance(f32 x1, f32 y1, f32 x2, f32 y2);

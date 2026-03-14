@@ -1,20 +1,62 @@
-#include "player.h"
-#include "collision.h"
+#include "Player.h"
+#include "Collision.h"
+#include <cstdio>
 
+// ---------------------------------------------------------------------------
+// InitPlayerHealth
+// Sets the player's health to the maximum and clears the invincibility timer.
+// Call this once during Level Initialize, after creating the player object.
+// ---------------------------------------------------------------------------
+void InitPlayerHealth(objectsquares& playerObj)
+{
+	playerObj.health = kPlayerMaxHealth;
+	playerObj.invincibilityTimer = 0.0f;
+}
 
-	void calcCorners(int map[], int mapX, objectsquares* player1) {
+// ---------------------------------------------------------------------------
+// PlayerTakeDamage
+// Reduces player health by 'amount'. If the invincibility timer is still
+// active (from a recent hit), no damage is applied and the function returns
+// false. Otherwise, damage is applied, health is clamped to [0, maxHealth],
+// and the invincibility timer is started.
+//
+// Can be used for any damage source -- enemies, traps,
+// projectiles, environmental hazards, etc. Just pass the amount.
+// ---------------------------------------------------------------------------
+bool PlayerTakeDamage(objectsquares& playerObj, int amount)
+{
+	// If the player is still invincible from a recent hit, skip damage
+	if (playerObj.invincibilityTimer > 0.0f)
+		return false;
 
-		//determines coordinates in 2D array
-		
-		player1->leftX = (int)((player1->xPos - (player1->xScale / 2.0))+800)/ 100;
-		player1->rightX = (int)((player1->xPos + (player1->xScale / 2.0)) + 800) / 100;
-		player1->topY = -((int)((player1->yPos + (player1->yScale / 2.0)) - 450) / 100);
-		player1->bottomY = -((int)((player1->yPos - (player1->yScale / 2.0)) - 450) / 100);
-		
+	// Apply damage, clamping health to [0, maxHealth]
+	playerObj.health -= amount;
 
-		//determine data in corners, top bottom left right
-		player1->TR = map[player1->topY * mapX + player1->rightX];
-		player1->TL = map[player1->topY * mapX + player1->leftX];
-		player1->BR = map[player1->bottomY * mapX + player1->rightX];
-		player1->BL = map[player1->bottomY * mapX + player1->leftX];
+	if (playerObj.health < 0)
+		playerObj.health = 0;
+	if (playerObj.health > kPlayerMaxHealth)
+		playerObj.health = kPlayerMaxHealth;
+
+	// Start the invincibility window so the player is not hit every frame
+	playerObj.invincibilityTimer = kHitInvincibilityDuration;
+
+	printf("Player took %d damage! Health: %d / %d\n",
+		amount, playerObj.health, kPlayerMaxHealth);
+
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// UpdatePlayerInvincibility
+// Ticks down the invincibility timer each frame. Call this once per frame
+// in the Level Update function, passing the frame delta time.
+// ---------------------------------------------------------------------------
+void UpdatePlayerInvincibility(objectsquares& playerObj, f32 dt)
+{
+	if (playerObj.invincibilityTimer > 0.0f)
+	{
+		playerObj.invincibilityTimer -= dt;
+		if (playerObj.invincibilityTimer < 0.0f)
+			playerObj.invincibilityTimer = 0.0f;
 	}
+}

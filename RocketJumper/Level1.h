@@ -13,6 +13,19 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+#include "pch.h"
+#include "Draw.h"
+#include "Collision.h"
+#include "Player.h"
+#include "GameStateManager.h"
+#include "Projectile.h"
+#include "Movement.h"
+#include "Load.h"
+#include "Enemies.h"
+#include "BinaryMap.h"
+#include "GameStateList.h"
+#include "Animation.h"
+#include "sound.h"
 
 void Level1_Load();
 

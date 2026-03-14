@@ -1,4 +1,4 @@
-#include "projectile.h"
+#include "Projectile.h"
 
 namespace projectileSystem {
 
@@ -40,9 +40,9 @@ namespace projectileSystem {
                 projectiles[foundSlot].shape.xPos = player.xPos;
                 projectiles[foundSlot].shape.yPos = player.yPos;
 
-                // Calculate direction from player to mouse
-                f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
-                f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
+                // Calculate direction AWAY from mouse (rocket-jumper: fire opposite to aim)
+                f32 dx = player.xPos - static_cast<f32>(worldMouseX);
+                f32 dy = player.yPos - static_cast<f32>(worldMouseY);
 
                 // Normalize direction vector
                 f32 length = sqrtf(dx * dx + dy * dy);
@@ -76,9 +76,9 @@ namespace projectileSystem {
         {
             if (projectiles[i].isActive == 1)
             {
-                // Move projectile
-                projectiles[i].shape.xPos -= projectiles[i].shape.velocityX;
-                projectiles[i].shape.yPos -= projectiles[i].shape.velocityY;
+                // Move projectile along its velocity vector (away from mouse)
+                projectiles[i].shape.xPos += projectiles[i].shape.velocityX;
+                projectiles[i].shape.yPos += projectiles[i].shape.velocityY;
 
                 // Check if projectile is off-screen
                 if (projectiles[i].shape.xPos > 800.0f || projectiles[i].shape.xPos < -800.0f ||
@@ -92,20 +92,24 @@ namespace projectileSystem {
     }
 
     //======================RENDER ALL ACTIVE PROJECTILES====================================//
-    void renderProjectiles(Projectile projectiles[], s32 maxCount, AEGfxVertexList* mesh)
+    void renderProjectiles(Projectile projectiles[], s32 maxCount, AEGfxTexture* texture, AEGfxVertexList* mesh)
     {
         if (!mesh)
         {
-            printf("MESH IS NULL!");
+            printf("MESH IS NULL!\n");
             return;
         }
+
+        if (!texture)
+        {
+            printf("TEXTURE IS NULL!\n");
+            
+        }
+
         for (int i = 0; i < maxCount; i++)
         {
             if (projectiles[i].isActive == 1)
             {
-                // Set projectile color (yellow for visibility)
-                AEGfxSetColorToAdd(1.0f, 1.0f, 0.0f, 1.0f);
-
                 // Set up transformation matrix
                 AEMtx33 scale = { 0 };
                 AEMtx33Scale(&scale, projectiles[i].shape.xScale, projectiles[i].shape.yScale);
@@ -121,6 +125,12 @@ namespace projectileSystem {
                 AEMtx33Concat(&transform, &translate, &transform);
 
                 AEGfxSetTransform(transform.m);
+
+                // Set texture if provided
+                if (texture)
+                {
+                    AEGfxTextureSet(texture, 0.0f, 0.0f);
+                }
 
                 // Draw the projectile
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);

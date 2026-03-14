@@ -1,7 +1,6 @@
-#pragma once
 /* Start Header ************************************************************************/
 /*!
-\file		  enemy.h
+\file		  enemies.cpp
 \author	      Nicholas Chen (c.chen)
 \date         January, 31, 2026
 \brief        Enemy system with melee and ranged enemy types
@@ -13,15 +12,15 @@ Technology is prohibited.
 */
 /* End Header *********************************************************************/
 
-#include "enemies.h"
-#include "collision.h"
-#include "draw.h"
+#include "Enemies.h"
+#include "Collision.h"
+#include "Draw.h"
+#include "Player.h"
 #include <cmath>
 
 namespace enemySystem {
-    // Audio
-    AEAudio LaserBlaster = AEAudioLoadSound("Assets/ore.mp3");
-    AEAudioGroup se = AEAudioCreateGroup();
+    // Note: Audio resources are loaded and managed by Level files, not here.
+    // They are passed in as parameters to updateEnemies().
 
     // Initialize all enemies to inactive state
     void initEnemies(Enemy enemies[], s32 maxCount)
@@ -30,8 +29,8 @@ namespace enemySystem {
         {
             enemies[i].shape.xPos = 0.0f;
             enemies[i].shape.yPos = 0.0f;
-            enemies[i].shape.xScale = 70.0f;  // Default enemy size
-            enemies[i].shape.yScale = 70.0f;
+            enemies[i].shape.xScale = 35.0f;  // Default enemy size
+            enemies[i].shape.yScale = 35.0f;
             enemies[i].type = ENEMY_MELEE;
             enemies[i].shape.velocityX = 0.0f;
             enemies[i].shape.velocityY = 0.0f;
@@ -83,8 +82,8 @@ namespace enemySystem {
             enemies[foundSlot].detectionRange = MELEE_DETECTION_RANGE;
             enemies[foundSlot].attackRange = MELEE_ATTACK_RANGE;
             enemies[foundSlot].moveSpeed = MELEE_MOVE_SPEED;
-            enemies[foundSlot].shape.xScale = 70.0f;
-            enemies[foundSlot].shape.yScale = 70.0f;
+            enemies[foundSlot].shape.xScale = 30.0f;
+            enemies[foundSlot].shape.yScale = 30.0f;
         }
         else if (type == ENEMY_RANGED)
         {
@@ -92,8 +91,8 @@ namespace enemySystem {
             enemies[foundSlot].detectionRange = RANGED_DETECTION_RANGE;
             enemies[foundSlot].attackRange = RANGED_ATTACK_RANGE;
             enemies[foundSlot].moveSpeed = RANGED_MOVE_SPEED;
-            enemies[foundSlot].shape.xScale = 60.0f;
-            enemies[foundSlot].shape.yScale = 60.0f;
+            enemies[foundSlot].shape.xScale = 30.0f;
+            enemies[foundSlot].shape.yScale = 30.0f;
         }
 
         // Debugging
@@ -114,6 +113,10 @@ namespace enemySystem {
     s8 hasLineOfSight(Enemy& enemy, objectsquares& player,
         int map[], int mapX, int mapY, int mapS)
     {
+        map = map;
+        mapX = mapX;
+        mapS = mapS;
+        mapY = mapY;
         // For now, just check distance
         // TODO: Add raycast to check for walls between enemy and player
         f32 distance = getDistance(enemy.shape.xPos, enemy.shape.yPos,
@@ -286,48 +289,53 @@ namespace enemySystem {
      * @return VOID
      ***************************************************************************/
     // Render all active enemies
-    void renderEnemies(Enemy enemies[], s32 maxCount,
-        AEGfxVertexList* mesh,
+    void renderEnemies(Enemy enemies[],
+        s32 maxCount,
+        AEGfxVertexList* meleeMesh,
+        AEGfxVertexList* rangedMesh,
         AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture)
+        AEGfxTexture* rangedTexture,
+        f32 meleeUOffset,
+        f32 meleeVoffset)
     {
         for (int i = 0; i < maxCount; i++)
         {
             if (enemies[i].isActive == 1)
             {
-                // Choose texture based on enemy type and if the texture is not NULL
+                // Choose texture, mesh, and UV offsets based on enemy type
                 AEGfxTexture* texture = nullptr;
-                if (enemies[i].type == ENEMY_MELEE && meleeTexture)
+                AEGfxVertexList* mesh = nullptr;
+                f32 uOffset = 0.0f;
+                f32 vOffset = 0.0f;
+                if (enemies[i].type == ENEMY_MELEE)
                 {
                     texture = meleeTexture;
+                    mesh = meleeMesh;
+                    uOffset = meleeUOffset;
+                    vOffset = meleeVoffset;
                 }
-                else if (enemies[i].type == ENEMY_RANGED && rangedTexture)
+                else if (enemies[i].type == ENEMY_RANGED)
                 {
                     texture = rangedTexture;
+                    mesh = rangedMesh;
                 }
+
+                if (!mesh) continue;
 
                 // Texture available ==> set render mode and texture set
                 if (texture)
                 {
                     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-                    AEGfxTextureSet(texture, 0, 0);
+                    AEGfxTextureSet(texture, uOffset, vOffset);
                 }
-                else
-                {
-                    // Fallback to colored squares if no texture
+                else {
                     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-                    if (enemies[i].type == ENEMY_MELEE)
-                    {
-                        AEGfxSetColorToAdd(1.0f, 0.3f, 0.3f, 1.0f);  // Red for melee
-                    }
-                    else
-                    {
-                        AEGfxSetColorToAdd(0.3f, 0.3f, 1.0f, 1.0f);  // Blue for ranged
-                    }
+                    AEGfxTextureSet(nullptr, 0.0f, 0.0f);
+                    AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
                 }
 
                 // Draw enemy
-                renderlogic::Drawsquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
+                renderlogic::drawSquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
                     enemies[i].shape.xScale, enemies[i].shape.yScale);
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
             }
@@ -356,14 +364,18 @@ namespace enemySystem {
                 // Check collision using existing collision system
                 if (gamelogic::collision(&player, &enemies[i].shape))
                 {
-                    // Only deal damage if cooldown is ready
+                    // Only deal damage if enemy attack cooldown is ready
                     if (enemies[i].attackCooldown <= 0.0f)
                     {
-                        // Play the sound passed in from Level 1
-                        AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
-                        totalDamage += MELEE_DAMAGE; 
-                        enemies[i].attackCooldown = MELEE_ATTACK_COOLDOWN; // Reset cooldown
-                        printf("Player hit by melee enemy %d! Damage: %.1f\n", i, MELEE_DAMAGE);
+                        // Try to apply damage through the central health system.
+                        // PlayerTakeDamage checks the player's invincibility timer.
+                        int meleeDmg = static_cast<int>(MELEE_DAMAGE);
+                        if (PlayerTakeDamage(player, meleeDmg))
+                        {
+                            AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
+                            totalDamage += MELEE_DAMAGE;
+                            enemies[i].attackCooldown = MELEE_ATTACK_COOLDOWN;
+                        }
                     }
                 }
             }
@@ -411,5 +423,29 @@ namespace enemySystem {
                 }
             }
         }
+    }
+
+    // Checks whether any enemy projectile has hit the player.
+    // Uses PlayerTakeDamage so invincibility timer is respected.
+    f32 checkEnemyPlayerProjectileCollision(Projectile enemyprojectiles[], s32 maxProjectiles, objectsquares& player)
+    {
+        f32 totalDamage = 0.0f;
+        for (int i{}; i < maxProjectiles; ++i)
+        {
+            if (enemyprojectiles[i].isActive == 1)
+            {
+                if (gamelogic::collision(&enemyprojectiles[i].shape, &player))
+                {
+                    int rangedDmg = static_cast<int>(RANGED_DAMAGE);
+                    if (PlayerTakeDamage(player, rangedDmg))
+                    {
+                        totalDamage += RANGED_DAMAGE;
+                    }
+                    // Destroy the projectile on contact regardless of invincibility
+                    enemyprojectiles[i].isActive = 0;
+                }
+            }
+        }
+        return totalDamage;
     }
 }

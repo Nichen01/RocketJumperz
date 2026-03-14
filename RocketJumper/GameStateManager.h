@@ -11,9 +11,18 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/\
+#include "pch.h"
+#include "MainMenu.h"
+#include "ProjectileTest.h"
+#include "GameStateList.h"
+#include "Level1.h"
+#include "Level2.h"
+#include "LevelEditor.h"
+#include "Tutorial.h"
 
 #pragma once
-#include "GameStateList.h"
+extern bool firstTimeLevel1;
+extern bool firstTimeLevel2;
 
 typedef void(*FP)(void);
 

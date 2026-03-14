@@ -20,8 +20,8 @@ namespace movement {
 
     AEVec2 getMouse(objectsquares &player) {
         AEInputGetCursorPosition(&mouseX,&mouseY);
-        mouseX -= static_cast<s32>(((screenWidth / 2) + player.xPos + player.velocityX));
-        mouseY = static_cast<s32>(((screenLength / 2) - mouseY - player.yPos - player.velocityY));
+        mouseX -= static_cast<s32>((screenWidth / 2) + player.xPos + player.velocityX);
+        mouseY = static_cast<s32>((screenLength / 2) - mouseY - player.yPos - player.velocityY);
         mouseDistance = sqrtf(static_cast<f32>(mouseX * mouseX + mouseY * mouseY));
         // Normalize direction vector (only if distance > 0 to avoid division by zero)
         if (mouseDistance > 0.0f)
