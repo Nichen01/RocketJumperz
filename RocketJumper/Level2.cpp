@@ -203,7 +203,7 @@ void Level2_Update()
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo2[player]);
-	aiming::updateAiming(objectinfo[player]);
+	aiming::updateAiming(objectinfo2[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
