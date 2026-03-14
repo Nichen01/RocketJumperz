@@ -37,7 +37,7 @@ static int y;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 80.0f;
+const float PlayerScale = 75.0f;
 
 extern objectsquares objectinfo[2] = { 0 };
 
@@ -60,20 +60,10 @@ static AEGfxTexture* base5test = nullptr;
 // The active font handle is fontLevel1 (declared below), which is
 // created in Initialize and destroyed in Unload.
 
-/*
-static AEGfxTexture* mushroomDieTexture[9] = { nullptr };
-static AEGfxTexture* mushroomHitTexture[5] = { nullptr };
-static AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
-*/
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
 
-//static AEAudio L1;
-//static AEAudio LaserBlast;
-//static AEAudio Punch;
-//static AEAudioGroup bgm;
-//static AEAudioGroup soundEffects;
 
 // Door variables (doorX, doorY, doorAnim, doorMesh, doorIsOpen, doorTex)
 // are defined in draw.cpp and declared extern in draw.h.
@@ -98,12 +88,14 @@ void Level1_Load()
 	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
 
+
+
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
 	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
-	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdleSheet.png");
+	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 
 	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
@@ -172,7 +164,7 @@ void Level1_Initialize()
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
-	//fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo[player]);
@@ -234,7 +226,7 @@ void Level1_Initialize()
 
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -100.0f, -200.0f);
 
 	//MUSHROOM ANIM TEST
 	{

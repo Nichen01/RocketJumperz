@@ -35,9 +35,9 @@ static int y = 9;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 80.0f;
+const float PlayerScale = 75.0f;
 
-// Font handle for in-game text rendering
+// Font handle for in-game text rendering 
 static s8 font = -1;
 
 objectsquares objectinfo2[2] = { 0 };
@@ -78,7 +78,7 @@ void Level2_Load()
 	// LOADING TEXTURES
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/MeleeEnemy.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
 
@@ -94,8 +94,6 @@ void Level2_Load()
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-
-
 }
 
 void Level2_Initialize()
@@ -104,7 +102,6 @@ void Level2_Initialize()
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
-	
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo2[player]);
@@ -114,6 +111,9 @@ void Level2_Initialize()
 
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
+	AEGfxVertexList* meleeEnemyMesh = nullptr;
+	animSystem::buildMesh(&meleeEnemyMesh, 2, 3); // 3 rows, 3 columns
+	AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
 
 	// BUILD MESHES
 	AssetManager::BuildSqrMesh(MESH_ENEMY);
@@ -137,7 +137,7 @@ void Level2_Initialize()
 
 	for (int row{}; row < y; ++row) {
 		for (int col{}; col < x; col++) {
-			map[row * x + col] = MapData[row][col];
+			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
 
@@ -262,13 +262,13 @@ void Level2_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfo2[player]);
-	//gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
-	//gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
-	//gamelogic::OBJ_to_map(map, x, s, &objectinfo2[player], 15);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo2[player], 1);
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 15);
+	//gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
+	//gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
+	//gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 15);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -328,7 +328,7 @@ void Level2_Draw()
 	// Render enemies
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
-		enemyMesh,
+		AssetManager::GetMesh(MESH_MELEE_ENEMY),
 		projectileMesh,
 		meleeEnemyTexture,
 		rangedEnemyTexture,

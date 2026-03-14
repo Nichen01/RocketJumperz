@@ -82,8 +82,8 @@ namespace enemySystem {
             enemies[foundSlot].detectionRange = MELEE_DETECTION_RANGE;
             enemies[foundSlot].attackRange = MELEE_ATTACK_RANGE;
             enemies[foundSlot].moveSpeed = MELEE_MOVE_SPEED;
-            enemies[foundSlot].shape.xScale = 80.0f;
-            enemies[foundSlot].shape.yScale = 80.0f;
+            enemies[foundSlot].shape.xScale = 70.0f;
+            enemies[foundSlot].shape.yScale = 70.0f;
         }
         else if (type == ENEMY_RANGED)
         {
