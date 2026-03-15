@@ -250,9 +250,9 @@ void Level2_Update()
 		enemyProjectiles, MAX_PROJECTILES, objectinfo2[player]);
 
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 15);
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation

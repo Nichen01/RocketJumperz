@@ -165,7 +165,6 @@ namespace gamelogic {
 	
 		int index1 = (int)y1 * mapX + (int)x1;
 		int index2 = (int)y2 * mapX + (int)x2;
-
 		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_RIGHT;
 		}
