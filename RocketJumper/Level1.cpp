@@ -22,7 +22,7 @@ static int y;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 45.0f;
+const float PlayerScale = 80.0f;
 
 extern objectsquares objectinfo[2] = { 0 };
 
@@ -319,10 +319,6 @@ void Level1_Update()
 	if (objectinfo[player].health <= 0) {
 		next = GS_MAINMENU;
 	}
-
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);

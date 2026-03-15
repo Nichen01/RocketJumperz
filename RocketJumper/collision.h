@@ -20,8 +20,6 @@ extern int	COLLISION_TOP;	//0100
 extern int	COLLISION_BOTTOM;	//1000
 
 namespace gamelogic {
-	// Update bounding box for an object using AEVec2-based BB struct
-	void Obj_boundingbox(objectsquares* object);
 
 	// Swept-AABB dynamic collision check between two moving objects.
 	// Returns 1 if A and B will collide within the current frame, 0 otherwise.
@@ -56,7 +54,4 @@ namespace gamelogic {
 
 	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index);
 
-	// Resolve object-to-tilemap collision. 'index' specifies which tile value
-	// counts as solid (pass 1 for standard walls).
-	void OBJ_to_map(int map[], int x, int s, objectsquares* object, int index);
 }

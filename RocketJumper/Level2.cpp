@@ -22,7 +22,7 @@ static int y = 9;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 45.0f;
+const float PlayerScale = 80.0f;
 
 // Font handle for in-game text rendering 
 static s8 font = -1;
@@ -248,13 +248,11 @@ void Level2_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfo2[player]);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo2[player], 1);
 
-	//gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
-	//gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
-	//gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 15);
+
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
+	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 15);
 
 	// -----------------------------------------------------------------------
 	// Door animation
