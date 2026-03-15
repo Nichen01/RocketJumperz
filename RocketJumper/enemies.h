@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "AEEngine.h"
 #include "Player.h"
 #include "Projectile.h"
+#include "drops.h"
 
 // Maximum number of enemies that can exist at once
 #define MAX_ENEMIES 10
@@ -70,7 +71,7 @@ namespace enemySystem {
 
     // Update all active enemies (AI, movement, attacks)
     void updateEnemies(Enemy enemies[], s32 maxCount,
-        objectsquares& player,
+        objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
         f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup);
 

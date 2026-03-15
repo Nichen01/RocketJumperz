@@ -28,6 +28,7 @@ Technology is prohibited.
 #include "Movement.h"
 #include "Player.h"
 #include "Projectile.h"
+#include "drops.h"
 
 extern int screenWidth; extern int screenLength;
 

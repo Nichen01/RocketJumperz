@@ -84,7 +84,7 @@ namespace enemySystem {
             enemies[foundSlot].moveSpeed = MELEE_MOVE_SPEED;
             enemies[foundSlot].shape.xScale = 70.0f;
             enemies[foundSlot].shape.yScale = 70.0f;
-        }
+        } 
         else if (type == ENEMY_RANGED)
         {
             enemies[foundSlot].health = RANGED_HEALTH;
@@ -133,7 +133,7 @@ namespace enemySystem {
      * @return VOID
      ***************************************************************************/
     void updateEnemies(Enemy enemies[], s32 maxCount,
-        objectsquares& player,
+        objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
         f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup)
     {
@@ -272,6 +272,10 @@ namespace enemySystem {
             if (enemies[i].health <= 0.0f)
             {
                 enemies[i].isActive = 0;
+                loot[i].info.xPos = enemies[i].shape.xPos;
+                loot[i].info.yPos = enemies[i].shape.yPos;
+                loot[i].info.flag = 1;
+
                 printf("Enemy %d defeated!\n", i);
             }
         }

@@ -25,6 +25,7 @@ static int s = 80;
 const float PlayerScale = 45.0f;
 
 extern objectsquares objectinfo[2] = { 0 };
+drop L1Drop[MAX_ENEMIES] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -229,6 +230,7 @@ void Level1_Initialize()
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
+	pickup::initDrops(L1Drop, MAX_ENEMIES,PlayerScale);
 }
 
 void Level1_Update()
@@ -272,6 +274,7 @@ void Level1_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo[player]);
 	aiming::updateAiming(objectinfo[player]);
+	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -293,7 +296,7 @@ void Level1_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfo[player],
+		objectinfo[player],L1Drop,
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -403,6 +406,8 @@ void Level1_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+
+	pickup::drawDrops(L1Drop, MAX_ENEMIES);
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
