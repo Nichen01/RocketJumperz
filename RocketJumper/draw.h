@@ -1,7 +1,11 @@
 #pragma once
+#include "pch.h"
 #include "AEEngine.h"
 #include "Animation.h"
 #include "Level1.h"
+#include "AEGraphics.h"
+#include "BinaryMap.h"
+#include "Enemies.h"
 
 namespace renderlogic {
 	void drawSquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
@@ -9,11 +13,11 @@ namespace renderlogic {
 	void drawTileArray();
 	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale = 40.f);
 	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
+	void drawGlassTile(int glassType, float xo, float yo, int mapS);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp
 extern AEGfxVertexList* pMesh;
-
 extern AEGfxTexture* characterPictest;
 extern AEGfxTexture* platformTex1;
 extern AEGfxTexture* platformTex2;
@@ -36,5 +40,5 @@ extern AEGfxTexture* doorTex;
 
 // ---------------------------------------------------------------------------
 
-
+extern Enemy enemies[MAX_ENEMIES];
 

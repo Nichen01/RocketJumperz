@@ -32,7 +32,6 @@ static Projectile Projectiles[MAX_PROJECTILES];
 static AEGfxVertexList* pTestMesh = nullptr;
 
 // ENEMY DATA
-static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 
 // Mushroom animation state (mesh/textures owned by AssetManager)
@@ -47,7 +46,6 @@ static AEGfxTexture* base5test = nullptr;
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
-
 
 // Door variables (doorX, doorY, doorAnim, doorMesh, doorIsOpen, doorTex)
 // are defined in draw.cpp and declared extern in draw.h.
@@ -202,8 +200,6 @@ void Level1_Initialize()
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
-
-
 
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);

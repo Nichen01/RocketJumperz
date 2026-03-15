@@ -105,11 +105,15 @@ int ImportMapDataFromFile(const char* FileName)
 			int value;
 			ifs >> value;
 			MapData[i][j] = value;
-			BinaryCollisionArray[i][j] = (value/10 == 1) ? 1 : 0;
-
+			if (value >= 31 && value <= 39) {
+				BinaryCollisionArray[i][j] = 0; // enemy spawn tiles are walkable
+			}
+			else {
+				BinaryCollisionArray[i][j] = (value / 10 == 1) ? 1 : 0;
+			}
 
 			// assign random glass type if tile is "air"
-			if (value == 0) {
+			if (value == 0 || (value >= 31 && value <= 39)) {
 				glassMap[i][j] = rand() % 5;
 			}
 			else {
@@ -123,7 +127,7 @@ int ImportMapDataFromFile(const char* FileName)
 			int tile = MapData[row][col];
 			if (tile >= 21 && tile <= 29) {
 				DoorLink door;
-				door.id = tile;       // door ID
+				door.id = tile; // door ID
 				door.row = row;
 				door.col = col;
 				door.worldX = (col * 80) + 40 - 800.0f;
@@ -136,7 +140,7 @@ int ImportMapDataFromFile(const char* FileName)
 				default: door.firstLevel = 0; door.secondLevel = 0; break;
 				}
 
-				// Initialize animation for this door.
+			// Initialize animation for this door.
 			// The door sprite is a 7-frame horizontal strip (1 row, 7 columns).
 			// animSystem::init parameter order (per .cpp): cols, rows -- so pass 7, 1.
 			animSystem::init(door.anim, 7, 1, 7, 0.08f, ANIM_IDLE);

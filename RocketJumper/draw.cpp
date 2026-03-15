@@ -1,10 +1,11 @@
 #include "Draw.h"
-#include "AEGraphics.h"
-#include "BinaryMap.h"
+
 
 // Global texture pointers -- declared extern in draw.h, defined here
 AEGfxTexture* characterPictest = NULL;
 AEGfxTexture* plasma = NULL;
+
+Enemy enemies[MAX_ENEMIES];
 
 f32 doorX, doorY;
 s32  doorFrameCount = 7;
@@ -48,6 +49,9 @@ namespace renderlogic {
 
 				xo = (col * mapS);
 				yo = (row * mapS);
+
+				//float enemyWorldX = ((float)xo + mapS / 2) - 800.0f;
+				//float enemyWorldY = 450.0f - ((float)yo + mapS / 2);
 
 				//default background
 
@@ -151,6 +155,12 @@ namespace renderlogic {
 					AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
 					break;
 				}
+				//case 31:
+				//	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemyWorldX, enemyWorldY);
+				//	break;
+				//case 32:
+				//	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemyWorldX, enemyWorldY);
+				//	break;
 				default: //defaults to playable area
 					break;
 				}

@@ -33,7 +33,7 @@ objectsquares objectinfo2[2] = { 0 };
 static Projectile Projectiles[MAX_PROJECTILES];
 
 // ENEMY DATA
-static Enemy enemies[MAX_ENEMIES];
+//static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
