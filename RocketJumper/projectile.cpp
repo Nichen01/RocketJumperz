@@ -2,9 +2,19 @@
 
 namespace projectileSystem {
 
-    // Initialize all projectiles to inactive state
+    /*!*************************************************************************
+     * INIT PROJECTILES
+     * @brief Initializes an array of projectiles, setting their initial
+     * positions, sizes, velocities, and marking them as inactive.
+     * Usage: projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
+     *
+     * @param projectiles[]  Array containing projectile structs to initialize
+     * @param maxCount       Maximum number of projectiles in the array
+     * @return VOID
+     ***************************************************************************/
     void initProjectiles(Projectile projectiles[], s32 maxCount)
     {
+        // loop through all projectile slots to set data
         for (int i = 0; i < maxCount; i++)
         {
             projectiles[i].shape.xPos = 0.0f;
@@ -17,30 +27,50 @@ namespace projectileSystem {
         }
     }
 
-    // FIRE A NEW PROJECTILE
-    void fireProjectiles(s32 worldMouseX, s32 worldMouseY, objectsquares& player, Projectile projectiles[], s32 maxCount)
+    /*!*************************************************************************
+     * FIRE PROJECTILES
+     * @brief Finds an inactive projectile slot and fires it from the player's
+     * position. Calculates direction vector away from the mouse cursor
+     * and sets the projectile's velocity.
+     * Usage: projectileSystem::fireProjectiles(mouseX, mouseY, playerObj, Projectiles, MAX_PROJECTILES);
+     *
+     * @param worldMouseX    Mouse X coordinate in world space
+     * @param worldMouseY    Mouse Y coordinate in world space
+     * @param player         Reference to the player object to spawn projectiles from
+     * @param projectiles[]  Array containing the projectile structs
+     * @param maxCount       Maximum number of projectiles in the array
+     * @return VOID
+     ***************************************************************************/
+    void fireProjectiles(s32 worldMouseX, 
+        s32 worldMouseY, 
+        objectsquares& player, 
+        Projectile projectiles[], 
+        s32 maxCount, 
+        AEAudio attackSound, 
+        AEAudioGroup sfxGroup)
     {
         if (AEInputCheckTriggered(AEVK_LBUTTON))
         {
-            // Find first inactive projectile slot
             s32 foundSlot = -1;
+
+            // Find first inactive projectile slot in projectiles array
             for (int i = 0; i < maxCount; i++)
             {
                 if (projectiles[i].isActive == 0)
                 {
-                    foundSlot = i;
+                    foundSlot = i; // set potential slot to proj index
                     break;  // Exit loop early when we find a slot
                 }
             }
 
-            // if found an available slot, fire the projectile
+            // if slot available, fire the projectile
             if (foundSlot != -1)
             {
-                // Set projectile starting position to player position
+                // Set projectile starting pos to player pos
                 projectiles[foundSlot].shape.xPos = player.xPos;
                 projectiles[foundSlot].shape.yPos = player.yPos;
 
-                // Calculate direction AWAY from mouse (rocket-jumper: fire opposite to aim)
+                // Calculate direction vector AWAY from mouse (rocket-jumper: fire opposite to aim)
                 f32 dx = player.xPos - static_cast<f32>(worldMouseX);
                 f32 dy = player.yPos - static_cast<f32>(worldMouseY);
 
@@ -59,7 +89,7 @@ namespace projectileSystem {
 
                 // Activate projectile
                 projectiles[foundSlot].isActive = 1;
-
+                AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
                 printf("Projectile slot %d fired!\n", foundSlot);
             }
             else

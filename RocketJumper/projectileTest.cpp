@@ -139,7 +139,9 @@ void ProjectileTest_Update()
 		static_cast<s32>(worldMouseY),
 		testObjects[player],
 		testProjectiles,
-		MAX_PROJECTILES);
+		MAX_PROJECTILES,
+		LaserBlast,
+		soundEffects);
 	//==================================================//
 
 	// Update all active projectiles

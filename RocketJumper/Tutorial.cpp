@@ -218,7 +218,9 @@ void Tutorial_Update()
 		static_cast<s32>(worldMouseY),
 		objectinfoTut[player],
 		Projectiles,
-		MAX_PROJECTILES);
+		MAX_PROJECTILES,
+		LaserBlast,
+		soundEffects);
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);

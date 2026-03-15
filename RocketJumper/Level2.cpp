@@ -222,7 +222,9 @@ void Level2_Update()
 			static_cast<s32>(worldMouseY),
 			objectinfo2[player],
 			Projectiles,
-			MAX_PROJECTILES);
+			MAX_PROJECTILES,
+			LaserBlast,
+			soundEffects);
 	}
 
 	// Update all active projectiles

@@ -1,9 +1,10 @@
 #pragma once
 #include "AEEngine.h"
 #include "collision.h"  
+#include "AEAudio.h"
 
 // max number of projectiles that can be active at once
-#define MAX_PROJECTILES 5
+constexpr s32 MAX_PROJECTILES = 5;
 
 // Projectile structure containing all data for a single projectile
 struct Projectile
@@ -18,10 +19,13 @@ namespace projectileSystem {
     void initProjectiles(Projectile projectiles[], s32 maxCount);
 
     // Fire a new projectile toward mouse position
-    void fireProjectiles(s32 worldMouseX, s32 worldMouseY,
+    void fireProjectiles(s32 worldMouseX,
+        s32 worldMouseY,
         objectsquares& player,
         Projectile projectiles[],
-        s32 maxCount);
+        s32 maxCount,
+        AEAudio attackSound,
+        AEAudioGroup sfxGroup);
 
     // Update all active projectiles (movement, bounds checking)
     void UpdateProjectiles(Projectile projectiles[], s32 maxCount);
