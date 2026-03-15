@@ -318,7 +318,7 @@ void Level1_Update()
 
 	// If player health < 0, go to death screen
 	if (objectinfo[player].health <= 0) {
-		next = GS_MAINMENU;
+		next = GS_DEATH;
 	}
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);

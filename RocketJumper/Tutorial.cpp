@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "pch.h"
 #include "Level1.h"
 #include "AssetManager.h"
+#include "Level1.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -252,6 +253,11 @@ void Tutorial_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfoTut[player]);
+
+	// If player health < 0, go to death screen
+	if (objectinfoTut[player].health <= 0) {
+		next = GS_DEATH;
+	}
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
