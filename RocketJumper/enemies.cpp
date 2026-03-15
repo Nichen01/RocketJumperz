@@ -22,9 +22,17 @@ namespace enemySystem {
     // Note: Audio resources are loaded and managed by Level files, not here.
     // They are passed in as parameters to updateEnemies().
 
-    // Initialize all enemies to inactive state
+    /*!*************************************************************************
+     * INIT ENEMIES
+     * @brief Initializes all enemies to an inactive state with default values
+     *
+     * @param enemies[]    Array containing all the enemies
+     * @param maxCount     Maximum number of enemies
+     * @return VOID
+     ***************************************************************************/
     void initEnemies(Enemy enemies[], s32 maxCount)
     {
+        // loop through the array of enemies and set all properties to 0
         for (int i = 0; i < maxCount; i++)
         {
             enemies[i].shape.xPos = 0.0f;
@@ -39,12 +47,22 @@ namespace enemySystem {
             enemies[i].detectionRange = 0.0f;
             enemies[i].attackRange = 0.0f;
             enemies[i].moveSpeed = 0.0f;
-            enemies[i].isActive = 0;
+            enemies[i].isActive = 0; // so to inactive so it wont update/render unless instructed to 
             enemies[i].hasLineOfSight = 0;
         }
     }
 
-    // Spawn a new enemy at specified position
+    /*!*************************************************************************
+     * SPAWN ENEMY
+     * @brief Spawns a new enemy of a specific type at the given coordinates
+     *
+     * @param enemies[]    Array containing all the enemies
+     * @param maxCount     Maximum number of enemies
+     * @param type         Enum specifying if it is a MELEE or RANGED enemy
+     * @param xPos         X coordinate to spawn the enemy at
+     * @param yPos         Y coordinate to spawn the enemy at
+     * @return s8          Returns 1 if spawn is successful, 0 if no slots available
+     ***************************************************************************/
     s8 spawnEnemy(Enemy enemies[], s32 maxCount,
         EnemyType type, f32 xPos, f32 yPos)
     {
@@ -59,14 +77,14 @@ namespace enemySystem {
             }
         }
 
-        // If no slots available, return failure
+        // If no slots available(all slots active), return failure
         if (foundSlot == -1)
         {
             printf("Cannot spawn enemy: No available slots (max: %d)\n", maxCount);
             return 0;
         }
 
-        // Initialize enemy based on type
+        // Initialize new enemy based on type
         enemies[foundSlot].shape.xPos = xPos;
         enemies[foundSlot].shape.yPos = yPos;
         enemies[foundSlot].type = type;
@@ -74,8 +92,9 @@ namespace enemySystem {
         enemies[foundSlot].shape.velocityY = 0.0f;
         enemies[foundSlot].attackCooldown = 0.0f;
         enemies[foundSlot].hasLineOfSight = 0;
-        enemies[foundSlot].isActive = 1;
+        enemies[foundSlot].isActive = 1; // set active to update and render
 
+        // assign stats based on enemy type
         if (type == ENEMY_MELEE)
         {
             enemies[foundSlot].health = MELEE_HEALTH;
@@ -109,7 +128,18 @@ namespace enemySystem {
         return sqrtf(dx * dx + dy * dy);
     }
 
-    // Helper function: Check line of sight (basic version, doesn't check walls yet)
+    /*!*************************************************************************
+     * HAS LINE OF SIGHT
+     * @brief Checks if the enemy has a clear line of sight to the player
+     *
+     * @param enemy        Reference to the enemy checking line of sight
+     * @param player       Reference to the player object
+     * @param map[]        Array representing the collision map (unused currently)
+     * @param mapX         Width of the map (unused currently)
+     * @param mapY         Height of the map (unused currently)
+     * @param mapS         Scale/Size of map tiles (unused currently)
+     * @return s8          Returns 1 if the player is within sight, 0 otherwise
+     ***************************************************************************/
     s8 hasLineOfSight(Enemy& enemy, objectsquares& player,
         int map[], int mapX, int mapY, int mapS)
     {
@@ -128,8 +158,14 @@ namespace enemySystem {
      * UPDATE ENEMIES
      * @brief Update all active enemies (AI, movement, attacks)
      *
-     * @param enemies[]    Array containing all the enemies 
-     * @param maxCount     Maximum number of enemies
+     * @param enemies[]          Array containing all the enemies
+     * @param maxCount           Maximum number of enemies
+     * @param player             Reference to the player to track position
+     * @param enemyProjectiles[] Array for enemy projectiles
+     * @param maxProjectiles     Maximum number of projectiles allowed
+     * @param deltaTime          Time elapsed since last frame
+     * @param attackSound        Sound to play when an enemy attacks
+     * @param sfxGroup           Audio group for volume control
      * @return VOID
      ***************************************************************************/
     void updateEnemies(Enemy enemies[], s32 maxCount,
@@ -137,11 +173,13 @@ namespace enemySystem {
         Projectile enemyProjectiles[], s32 maxProjectiles,
         f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup)
     {
+        // iterate through enemy slots 
         for (int i = 0; i < maxCount; i++)
         {
+            // skip inactive enemies
             if (enemies[i].isActive == 0) continue;
 
-            // Decrease attack cooldown
+            // Decrease attack cooldown using delta time to be framerate independent 
             if (enemies[i].attackCooldown > 0.0f)
             {
                 enemies[i].attackCooldown -= deltaTime;
@@ -158,7 +196,7 @@ namespace enemySystem {
             {
                 enemies[i].hasLineOfSight = 1;
 
-                // Calculate direction to player
+                // Calculate direction vector(dx, dy) to player
                 f32 dx = player.xPos - enemies[i].shape.xPos;
                 f32 dy = player.yPos - enemies[i].shape.yPos;
 
@@ -178,17 +216,6 @@ namespace enemySystem {
                     {
                         enemies[i].shape.velocityX = dx * enemies[i].moveSpeed;
                         enemies[i].shape.velocityY = dy * enemies[i].moveSpeed;
-
-                        // Apply movement
-                        //enemies[i].shape.xPos += enemies[i].velocityX;
-                        //enemies[i].shape.yPos += enemies[i].velocityY;
-                    }
-                    else
-                    {
-                        
-                        // Stop moving when in attack range
-                        //enemies[i].shape.velocityX = 0.0f;
-                        //enemies[i].shape.velocityY = 0.0f;
                     }
                 }
                 // === RANGED ENEMY BEHAVIOR === //
@@ -203,9 +230,6 @@ namespace enemySystem {
                         // opp direction * speed = move away
                         enemies[i].shape.velocityX = -dx * enemies[i].moveSpeed;
                         enemies[i].shape.velocityY = -dy * enemies[i].moveSpeed;
-
-                        //enemies[i].shape.xPos += enemies[i].velocityX;
-                        //enemies[i].shape.yPos += enemies[i].velocityY;
                     }
                     // Too far,  move closer
                     else if (distanceToPlayer > enemies[i].attackRange)
@@ -213,15 +237,6 @@ namespace enemySystem {
                         // direction * move speed = move towards
                         enemies[i].shape.velocityX = dx * enemies[i].moveSpeed;
                         enemies[i].shape.velocityY = dy * enemies[i].moveSpeed;
-
-                        //enemies[i].shape.xPos += enemies[i].velocityX;
-                        //enemies[i].shape.yPos += enemies[i].velocityY;
-                    }
-                    else
-                    {
-                        // In range, stop
-                        //enemies[i].velocityX = 0.0f;
-                        //enemies[i].velocityY = 0.0f;
                     }
 
                     // If in range and cooldown is ready = shoot at player
@@ -233,8 +248,6 @@ namespace enemySystem {
                         {
                             if (enemyProjectiles[p].isActive == 0) // if projectile is not active(available)
                             {
-                                
-
                                 // Fire projectile towards player
                                 // init projectile position at enemy position and init size
                                 enemyProjectiles[p].shape.xPos = enemies[i].shape.xPos;
@@ -242,6 +255,7 @@ namespace enemySystem {
                                 enemyProjectiles[p].shape.xScale = 10.0f;
                                 enemyProjectiles[p].shape.yScale = 10.0f;
 
+                                // set projectile velocity using normalized direction vector to player
                                 f32 projectileSpeed = 8.0f;
                                 enemyProjectiles[p].shape.velocityX = dx * projectileSpeed;
                                 enemyProjectiles[p].shape.velocityY = dy * projectileSpeed;
@@ -271,7 +285,7 @@ namespace enemySystem {
             // Check if enemy is dead
             if (enemies[i].health <= 0.0f)
             {
-                enemies[i].isActive = 0;
+                enemies[i].isActive = 0; // free up slot for new spawn
                 printf("Enemy %d defeated!\n", i);
             }
         }
@@ -283,12 +297,15 @@ namespace enemySystem {
      *
      * @param enemies[]         Array containing all the enemies
      * @param maxCount          Maximum number of enemies
-     * @param mesh              VertexList containing mesh for each enemy
+     * @param meleeMesh         VertexList containing mesh for MELEE enemy
+     * @param rangedMesh        VertexList containing mesh for RANGED enemy
      * @param meleeTexture      Texture set containing texture for MELEE enemy
      * @param rangedTexture     Texture set containing texture for RANGED enemy
+     * @param meleeUOffset      U offset for melee texture animation
+     * @param meleeVoffset      V offset for melee texture animation
      * @return VOID
      ***************************************************************************/
-    // Render all active enemies
+     // Render all active enemies
     void renderEnemies(Enemy enemies[],
         s32 maxCount,
         AEGfxVertexList* meleeMesh,
@@ -298,6 +315,7 @@ namespace enemySystem {
         f32 meleeUOffset,
         f32 meleeVoffset)
     {
+        // loop through enemies array
         for (int i = 0; i < maxCount; i++)
         {
             if (enemies[i].isActive == 1)
@@ -319,7 +337,7 @@ namespace enemySystem {
                     texture = rangedTexture;
                     mesh = rangedMesh;
                 }
-
+                // prevent crash if mesh isn't loaded
                 if (!mesh) continue;
 
                 // Texture available ==> set render mode and texture set
@@ -328,13 +346,13 @@ namespace enemySystem {
                     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
                     AEGfxTextureSet(texture, uOffset, vOffset);
                 }
-                else {
+                else { // no texture fall back to solid color
                     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
                     AEGfxTextureSet(nullptr, 0.0f, 0.0f);
                     AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
                 }
 
-                // Draw enemy
+                // Draw enemy using coordinates and the bound mesh
                 renderlogic::drawSquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
                     enemies[i].shape.xScale, enemies[i].shape.yScale);
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
@@ -349,7 +367,9 @@ namespace enemySystem {
      * @param enemies[]    Array containing all the enemies
      * @param maxCount     Maximum number of enemies
      * @param player       Struct data for the player square
-     * @return             (f32) Total damage done to player 
+     * @param attackSound  Audio for attack impact
+     * @param sfxGroup     Audio group for the sound
+     * @return f32         Total damage done to player
      ***************************************************************************/
     f32 checkPlayerEnemyCollision(Enemy enemies[], s32 maxCount,
         objectsquares& player, AEAudio attackSound, AEAudioGroup sfxGroup)
@@ -359,6 +379,7 @@ namespace enemySystem {
         // For every enemy
         for (int i = 0; i < maxCount; i++)
         {
+            // only active melee enemies do contact damage
             if (enemies[i].isActive == 1 && enemies[i].type == ENEMY_MELEE)
             {
                 // Check collision using existing collision system
@@ -374,6 +395,8 @@ namespace enemySystem {
                         {
                             AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
                             totalDamage += MELEE_DAMAGE;
+
+                            //reset the attack cooldown, to prevent damage every frame
                             enemies[i].attackCooldown = MELEE_ATTACK_COOLDOWN;
                         }
                     }
@@ -383,7 +406,6 @@ namespace enemySystem {
         return totalDamage;
     }
 
-    // Check if player projectiles hit any enemies
     /*!*************************************************************************
      * CHECK PROJECTILE ENEMY COLLISION
      * @brief Checks if player projectile hits enemy
@@ -391,7 +413,8 @@ namespace enemySystem {
      * @param enemies[]            Array containing all the enemies data
      * @param maxCount             Maximum number of enemies
      * @param projectiles[]        Struct data each player projectile
-     * @return                     VOID
+     * @param maxProjectiles       Maximum number of projectiles allowed
+     * @return VOID
      ***************************************************************************/
     void checkProjectileEnemyCollision(Enemy enemies[], s32 maxCount,
         Projectile projectiles[], s32 maxProjectiles)
@@ -417,7 +440,7 @@ namespace enemySystem {
 
                             printf("Enemy %d hit! Health remaining: %.1f\n",
                                 e, enemies[e].health);
-                            break;  // One projectile can only hit one enemy
+                            break;  // break, so only one projectile hits one enemy
                         }
                     }
                 }
@@ -425,15 +448,24 @@ namespace enemySystem {
         }
     }
 
-    // Checks whether any enemy projectile has hit the player.
-    // Uses PlayerTakeDamage so invincibility timer is respected.
+    /*!*************************************************************************
+     * CHECK ENEMY PLAYER PROJECTILE COLLISION
+     * @brief Checks whether any enemy projectile has hit the player
+     *
+     * @param enemyprojectiles[]   Array containing all enemy projectiles
+     * @param maxProjectiles       Maximum number of enemy projectiles
+     * @param player               Reference to the player object
+     * @return f32                 Total damage dealt to the player
+     ***************************************************************************/
     f32 checkEnemyPlayerProjectileCollision(Projectile enemyprojectiles[], s32 maxProjectiles, objectsquares& player)
     {
         f32 totalDamage = 0.0f;
+
         for (int i{}; i < maxProjectiles; ++i)
         {
             if (enemyprojectiles[i].isActive == 1)
             {
+                // check if there is a collision between projectile and player
                 if (gamelogic::collision(&enemyprojectiles[i].shape, &player))
                 {
                     int rangedDmg = static_cast<int>(RANGED_DAMAGE);

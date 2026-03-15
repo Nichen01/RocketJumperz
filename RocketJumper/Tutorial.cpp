@@ -38,6 +38,9 @@ static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
 
+// Mushroom animation state (mesh/textures owned by AssetManager)
+static SpriteAnimation meleeAnim;
+
 //==== sound and volume
 static f32 bgVolume = 1.f;
 
@@ -60,7 +63,7 @@ void Tutorial_Load()
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
-	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/MeleeEnemy.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 
 	// Sync the extern pointers so other files can use them directly
@@ -148,6 +151,15 @@ void Tutorial_Initialize()
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
+
+	// Build animated mesh for melee enemy (3 cols x 2 rows spritesheet)
+	{
+		AEGfxVertexList* meleeEnemyMesh = nullptr;
+		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
+		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
+	}
+	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
+	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
 
@@ -277,6 +289,9 @@ void Tutorial_Update()
 			}
 		}
 	}
+
+	// MUSHROOM ANIMATION
+	animSystem::update(meleeAnim, dt);
 }
 
 void Tutorial_Draw()
@@ -319,8 +334,12 @@ void Tutorial_Draw()
 	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh, projectileMesh,
-		meleeEnemyTexture, rangedEnemyTexture);
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES,
+		AssetManager::GetMesh(MESH_MELEE_ENEMY),
+		projectileMesh,
+		meleeEnemyTexture, rangedEnemyTexture,
+		animSystem::getUOffset(meleeAnim),
+		animSystem::getVOffset(meleeAnim));
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
