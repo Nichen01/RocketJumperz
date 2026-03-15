@@ -327,37 +327,51 @@ void Level1_Update()
 	// Door animation
 	// -----------------------------------------------------------------------
 
-	for (auto& door : doors) {
+	bool nearAnyDoor = false; // track if player is near at least one door
 
-		if (door.firstLevel != 1 && door.secondLevel != 1) continue;
+	for (auto& door : doors) {
+		// Only process doors connected to this level
+		if (door.firstLevel != 1 && door.secondLevel != 1)
+			continue;
+
 		f32 dx = objectinfo[player].xPos - door.worldX;
 		f32 dy = objectinfo[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		// Assign to the file-scope static so Level1_Draw can read it
-		playerNear = (dist <= doorTriggerRadius);
 
-		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
-			animSystem::play(door.anim, ANIM_PLAY_ONCE);
+		bool nearThisDoor = (dist <= doorTriggerRadius);
 
-		if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE)
-			animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+		if (nearThisDoor) {
+			nearAnyDoor = true; // accumulate result
 
+			// Handle door animation when player approaches/leaves
+			if (!door.isOpen && door.anim.playMode == ANIM_IDLE)
+				animSystem::play(door.anim, ANIM_PLAY_ONCE);
+
+			if (door.isOpen && door.anim.playMode == ANIM_IDLE)
+				animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+
+			// Handle E key transition
+			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
+				int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
+				playerEnteredDoorId = door.id; // remember which door was used
+				switch (toLevel) {
+				case 0: next = GS_TUTORIAL; break;
+				case 1: next = GS_LEVEL1;   break;
+				case 2: next = GS_LEVEL2;   break;
+				}
+			}
+		}
+
+		// Always update animation state
 		animSystem::update(door.anim, dt);
 
 		if (door.anim.justFinished)
 			door.isOpen = (door.anim.currentFrame != 0);
-
-		// E key transition -- inside the loop so door and playerNear are in scope
-		if (playerNear && door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-			int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
-			playerEnteredDoorId = door.id; // remember which door was used
-			switch (toLevel) {
-			case 0: next = GS_TUTORIAL; break;
-			case 1: next = GS_LEVEL1; break;
-			case 2: next = GS_LEVEL2; break;
-			}
-		}
 	}
+
+	// After loop, set global flag for rendering
+	playerNear = nearAnyDoor;
+
 
 	// justFinished is true for one frame when a one-shot completes
 	if (doorAnim.justFinished)
