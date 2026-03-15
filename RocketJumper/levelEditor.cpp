@@ -1,7 +1,5 @@
 
 #include "LevelEditor.h"
-#include "GameStateManager.h"
-#include "AssetManager.h"
 
 // GLOBAL VARIABLES
 static AEGfxTexture* door;
@@ -296,14 +294,14 @@ void LevelEditor_Draw() {
 			if (isGridHovered && (MapData[row][col] >= 11 && MapData[row][col] <= 19)) {
 				// normalize tile center
 				AEGfxGetPrintSize(font, "Tile", 0.4f, &textW, &textH);
-				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0;
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Tile", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
 			else if (isGridHovered && (MapData[row][col] >= 21 && MapData[row][col] <= 29)) {
 				// normalize tile center
 				AEGfxGetPrintSize(font, "Door", 0.4f, &textW, &textH);
-				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0;
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Door", normX, normY, 0.4f, 1, 1, 1, 1);
 			}

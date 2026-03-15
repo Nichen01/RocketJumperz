@@ -23,7 +23,7 @@ static int y = 9;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 80.0f;
+const float PlayerScale = 45.0f;
 
 static s8 font = -1;
 
@@ -122,7 +122,7 @@ void Tutorial_Initialize()
 	for (auto& door : doors) {
 		if (door.id == playerEnteredDoorId) {
 			objectinfoTut[player].xPos = door.worldX;
-			objectinfoTut[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			objectinfoTut[player].yPos = door.worldY; // slight offset so player isn't inside door
 			spawnSet = true;
 			break;
 		}

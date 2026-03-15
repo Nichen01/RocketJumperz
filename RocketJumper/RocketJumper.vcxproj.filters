@@ -79,7 +79,7 @@
     <ClCompile Include="Sound.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="VIctoryScreen.cpp">
+    <ClCompile Include="VictoryScreen.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

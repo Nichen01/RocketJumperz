@@ -13,7 +13,9 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+
 #include "pch.h"
+#include "AimingInterface.h"
 #include "Draw.h"
 #include "Collision.h"
 #include "Player.h"
@@ -25,7 +27,8 @@ Technology is prohibited.
 #include "BinaryMap.h"
 #include "GameStateList.h"
 #include "Animation.h"
-#include "sound.h"
+#include "Sound.h"
+#include "AssetManager.h"
 
 void Level1_Load();
 

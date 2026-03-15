@@ -13,21 +13,8 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include <iostream>
-#include <cstdio>
+// External libraries included in header file
 #include "Level2.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
-#include "projectile.h"
-#include "Movement.h"
-#include "enemies.h"
-#include "aimingInterface.h"
-#include "binaryMap.h"
-#include "animation.h"
-#include "AssetManager.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -35,7 +22,7 @@ static int y = 9;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 75.0f;
+const float PlayerScale = 45.0f;
 
 // Font handle for in-game text rendering 
 static s8 font = -1;
@@ -44,8 +31,6 @@ objectsquares objectinfo2[2] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
-
-
 
 // ENEMY DATA
 static Enemy enemies[MAX_ENEMIES];
@@ -63,10 +48,8 @@ static bool playerNear = false;
 //==== sound and volume
 static f32 bgVolume = 1.f;
 
-
 //ANIMATION
 SpriteAnimation meleeAnim;
-
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -146,7 +129,7 @@ void Level2_Initialize()
 	for (auto& door : doors) {
 		if (door.id == playerEnteredDoorId) {
 			objectinfo2[player].xPos = door.worldX;
-			objectinfo2[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			objectinfo2[player].yPos = door.worldY; // slight offset so player isn't inside door
 			spawnSet = true;
 			break;
 		}

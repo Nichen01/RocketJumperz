@@ -13,23 +13,8 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "pch.h"
+// External libraries are included in header file
 #include "Level1.h"
-#include "draw.h"
-#include "collision.h"
-#include "player.h"
-#include "GameStateManager.h"
-#include "GameStateList.h"
-#include "projectile.h"
-#include "Movement.h"
-// render.h was removed in Joraye merge; Load.h (via Level1.h) provides
-// load::platform() which replaced render:: functions.
-#include "enemies.h"
-#include "aimingInterface.h"
-#include "binaryMap.h"
-#include "animation.h"
-#include "AssetManager.h"
-
 
 static s32* map = nullptr;
 static int x;
@@ -37,7 +22,7 @@ static int y;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 75.0f;
+const float PlayerScale = 45.0f;
 
 extern objectsquares objectinfo[2] = { 0 };
 
@@ -59,7 +44,6 @@ static AEGfxTexture* base5test = nullptr;
 // Font handle for in-game text -- UNUSED, kept for reference only.
 // The active font handle is fontLevel1 (declared below), which is
 // created in Initialize and destroyed in Unload.
-
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
@@ -87,8 +71,6 @@ void Level1_Load()
 
 	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
-
-
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
@@ -201,7 +183,7 @@ void Level1_Initialize()
 	for (auto& door : doors) {
 		if (door.id == playerEnteredDoorId) {
 			objectinfo[player].xPos = door.worldX;
-			objectinfo[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			objectinfo[player].yPos = door.worldY; // slight offset so player isn't inside door
 			spawnSet = true;
 			break;
 		}
