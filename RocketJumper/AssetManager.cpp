@@ -40,7 +40,7 @@ void AssetManager::LoadTexture(TextureID id, const char* path) {
 
     // load the new texture from the path
     sTextures[id] = AEGfxTextureLoad(path);
-
+     
     // if that path returns null, then path is wrong
     if (sTextures[id] == nullptr) {
         std::cerr << "AssetManager Error: Failed to load texture at " << path << std::endl;

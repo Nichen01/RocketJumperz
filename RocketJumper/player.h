@@ -17,12 +17,13 @@ struct objectsquares {
 	u8 flag;
 
 	AEVec2				scale;
-	AEVec2				posCurr;
+	//AEVec2				posCurr;
 
 	AEVec2				posPrev;
 
 	AEVec2				velCurr;
 	BB				boundingBox;
+
 	int gridCollisionFlag;
 
 	int leftX;
