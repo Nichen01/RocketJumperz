@@ -14,14 +14,21 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "Load.h"
-#include "Draw.h"
+#include "pch.h"
+#include "AimingInterface.h"
+#include "Animation.h"
+#include "AssetManager.h"
+#include "BinaryMap.h"
 #include "Collision.h"
-#include "Player.h"
-#include "GameStateManager.h"
-#include "Projectile.h"
-#include "Movement.h"
+#include "Draw.h"
 #include "Enemies.h"
+#include "GameStateManager.h"
+#include "GameStateList.h"
+#include "Load.h"
+#include "Movement.h"
+#include "Player.h"
+#include "Projectile.h"
+#include "drops.h"
 
 extern int screenWidth; extern int screenLength;
 

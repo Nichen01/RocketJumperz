@@ -358,6 +358,8 @@ void MainMenu_Draw() {
 void DrawBackground() {
     if (backgroundTexture) {
         // Draw textured background
+       
+
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
         AEGfxTextureSet(backgroundTexture, 0, 0);
 

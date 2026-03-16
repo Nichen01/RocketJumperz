@@ -5,20 +5,20 @@
 namespace movement {
     // initialize the velocity 
     bool enableGravity, enableDrag;
-    u8 bulletCount, jetPackCooldown;
+    u8 jetPackCooldown;
     s32 mouseX,mouseY;
     f32 mouseDistance;
     AEVec2 directionVector;
+    int bulletCount = 10;
     void initPlayerMovement(objectsquares& player)
     {
         player.velocityX = 0.0f;
         player.velocityY = 0.0f;
-        bulletCount = 90;
         jetPackCooldown = 0;
         enableGravity = enableDrag = 1;
     }
 
-    void getMouse(objectsquares &player) {
+    AEVec2 getMouse(objectsquares &player) {
         AEInputGetCursorPosition(&mouseX,&mouseY);
         mouseX -= static_cast<s32>((screenWidth / 2) + player.xPos + player.velocityX);
         mouseY = static_cast<s32>((screenLength / 2) - mouseY - player.yPos - player.velocityY);
@@ -29,6 +29,7 @@ namespace movement {
             directionVector.x = mouseX / mouseDistance;
             directionVector.y = mouseY / mouseDistance;
         }
+        return directionVector;
     }
 
     void physicsInput(objectsquares& player)
@@ -42,6 +43,9 @@ namespace movement {
             enableDrag = (enableDrag) ? 0 : 1;
             printf("%d", enableDrag);
         }
+        if (AEInputCheckTriggered(AEVK_R)) {
+            bulletCount += 10;
+        }
         // Check if spacebar is pressed
         if (AEInputCheckTriggered(AEVK_SPACE)/* && (!jetPackCooldown)*/)
         {
@@ -52,7 +56,7 @@ namespace movement {
             printf("Jetpack fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             jetPackCooldown += 2;
             }
-        if (AEInputCheckTriggered(AEVK_LBUTTON))
+        if (AEInputCheckTriggered(AEVK_LBUTTON)&&bulletCount)
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
@@ -69,7 +73,7 @@ namespace movement {
             player.velocityY -= GRAVITY;
         }
         // Apply drag to velocities (exponential decay)
-        if (enableDrag) {
+        if (enableDrag) { 
             player.velocityX *= DRAG_COEFFICIENT;
             player.velocityY *= DRAG_COEFFICIENT;
         }
