@@ -106,7 +106,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_PLATFORM6, "Assets/Platform/platform6.png");
 		AssetManager::LoadTexture(TEX_PLATFORM7, "Assets/Platform/platform7.png");
 		AssetManager::LoadTexture(TEX_PLATFORM8, "Assets/Platform/platform8.png");
-		AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform0.png");
+		AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
 		AssetManager::LoadTexture(TEX_GLASS0, "Assets/Platform/glass0.jpg");
 		AssetManager::LoadTexture(TEX_GLASS1, "Assets/Platform/glass1.jpg");
 		AssetManager::LoadTexture(TEX_GLASS2, "Assets/Platform/glass2.jpg");
