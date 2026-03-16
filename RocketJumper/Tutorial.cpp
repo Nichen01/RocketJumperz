@@ -14,9 +14,10 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "pch.h"
-#include "Level1.h"
 #include "AssetManager.h"
 #include "Level1.h"
+#include "aimingInterface.h"
+#include "drops.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -29,6 +30,7 @@ const float PlayerScale = 80.0f;
 static s8 font = -1;
 
 objectsquares objectinfoTut[2] = { 0 };
+drop TutDrop[MAX_ENEMIES] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -57,7 +59,6 @@ static s8 fontLevel1 = -1;
 void Tutorial_Load()
 {
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
-
 	audio::loadsound();
 
 	// Load textures via AssetManager (enum-based IDs)
@@ -80,6 +81,7 @@ void Tutorial_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	aiming::loadAiming();
 }
 
 void Tutorial_Initialize()
@@ -173,6 +175,7 @@ void Tutorial_Initialize()
 
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");
+	pickup::initDrops(TutDrop, MAX_ENEMIES, PlayerScale);
 }
 
 void Tutorial_Update()
@@ -204,24 +207,28 @@ void Tutorial_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfoTut[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
+	if (AEInputCheckTriggered(AEVK_Q)) {
 		next = GS_QUIT;
+	}
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
+		next= GS_MAINMENU;
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfoTut[player]);
+	pickup::updateDrops(TutDrop, MAX_ENEMIES, objectinfoTut[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
-	projectileSystem::fireProjectiles(
+	if (movement::bulletCount) {projectileSystem::fireProjectiles(
 		static_cast<s32>(worldMouseX),
 		static_cast<s32>(worldMouseY),
 		objectinfoTut[player],
 		Projectiles,
 		MAX_PROJECTILES,
 		LaserBlast,
-		soundEffects);
+		soundEffects);}
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
@@ -232,7 +239,7 @@ void Tutorial_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfoTut[player],
+		objectinfoTut[player],TutDrop,
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -300,6 +307,7 @@ void Tutorial_Update()
 
 	// MUSHROOM ANIMATION
 	animSystem::update(meleeAnim, dt);
+	aiming::updateAiming(objectinfoTut[player]);
 }
 
 void Tutorial_Draw()
@@ -355,6 +363,7 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
+
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -394,7 +403,8 @@ void Tutorial_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
 	}
-
+	aiming::drawAiming();
+	pickup::drawDrops(TutDrop, MAX_ENEMIES);
 }
 
 void Tutorial_Free()
@@ -418,7 +428,7 @@ void Tutorial_Unload()
 		delete[] glassMap;
 		glassMap = nullptr;
 	}
-
+	aiming::unloadAiming();
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 

@@ -37,7 +37,7 @@ namespace aiming {
 		_itoa_s(movement::bulletCount, pText, 10);
 		f32 width, height;
 		AEGfxGetPrintSize(pFont, pText, 1.f, &width, &height);
-		AEGfxPrint(pFont, pText, 0.8, 0.8, 1,
+		AEGfxPrint(pFont, pText, 0.8f, 0.8f, 1,
 					1, 1, 1, 1);
 	}
 	void unloadAiming() {
