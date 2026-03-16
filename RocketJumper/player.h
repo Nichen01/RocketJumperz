@@ -17,12 +17,13 @@ struct objectsquares {
 	u8 flag;
 
 	AEVec2				scale;
-	AEVec2				posCurr;
+	//AEVec2				posCurr;
 
 	AEVec2				posPrev;
 
 	AEVec2				velCurr;
 	BB				boundingBox;
+
 	int gridCollisionFlag;
 
 	int leftX;
@@ -47,7 +48,7 @@ struct objectsquares {
 };
 
 // Maximum health the player can have
-constexpr int kPlayerMaxHealth    = 100;
+constexpr int kPlayerMaxHealth    = 1000;
 
 // How long the player is invincible after taking a hit (seconds)
 constexpr f32 kHitInvincibilityDuration = 0.5f;

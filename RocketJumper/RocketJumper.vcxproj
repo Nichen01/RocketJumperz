@@ -18,6 +18,7 @@
     <ClCompile Include="DeathScreen.cpp" />
     <ClCompile Include="DoorSystem.cpp" />
     <ClCompile Include="Draw.cpp" />
+    <ClCompile Include="drops.cpp" />
     <ClCompile Include="Enemies.cpp" />
     <ClCompile Include="Gameover.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="DeathScreen.h" />
     <ClInclude Include="DoorSystem.h" />
     <ClInclude Include="Draw.h" />
+    <ClInclude Include="drops.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="Gameover.h" />
     <ClInclude Include="GameStateList.h" />

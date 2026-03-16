@@ -82,6 +82,9 @@
     <ClCompile Include="VictoryScreen.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="drops.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collision.h">
@@ -169,6 +172,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="VictoryScreen.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="drops.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
