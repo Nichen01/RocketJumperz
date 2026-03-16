@@ -64,6 +64,7 @@ void Pause_Draw() {
 	AEGfxSetColorToAdd(0.3f, 0.3f, 0.3f, 0.8f);  // Bright blue when hovered
 	renderlogic::drawSquare(0.0f, 0.0f, 320.0f, 640.0f);
 	AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 
 	MenuHelpers::drawButton(resumeButton, buttonMesh, pausefont);
 	MenuHelpers::drawButton(tomenuButton, buttonMesh, pausefont);

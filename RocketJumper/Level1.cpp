@@ -34,6 +34,7 @@ static AEGfxVertexList* pTestMesh = nullptr;
 
 // ENEMY DATA
 static Projectile enemyProjectiles[MAX_PROJECTILES];
+static Enemy enemies[MAX_ENEMIES];
 
 // Mushroom animation state (mesh/textures owned by AssetManager)
 static SpriteAnimation meleeAnim;
@@ -45,7 +46,7 @@ static AEGfxTexture* base5test = nullptr;
 // The active font handle is fontLevel1 (declared below), which is
 // created in Initialize and destroyed in Unload.
 
-//==== sound and volume
+// Sound and volume
 static f32 bgVolume = 1.f;
 
 // Door variables (doorX, doorY, doorAnim, doorMesh, doorIsOpen, doorTex)
@@ -57,7 +58,11 @@ static f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
+// bool for checking player proximity with door
 static bool playerNear;
+
+// bool for keycard in inventory
+static bool keycardCollected;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -78,6 +83,7 @@ void Level1_Load()
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 
 	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
@@ -140,6 +146,7 @@ void Level1_Initialize()
 	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
 	doorTex = AssetManager::GetTexture(TEX_DOOR);
+	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	currentGameLevel = 1;
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
@@ -217,11 +224,6 @@ void Level1_Initialize()
 	// DOOR
 	animSystem::buildMesh(&doorMesh, 1, 7);
 	AssetManager::StoreMesh(MESH_DOOR, doorMesh);
-	
-	if (!doorTex)
-		printf("DOOR TEXTURE NOT FOUND!\n");
-	else
-		printf("DOOR OK\n");
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
@@ -382,6 +384,20 @@ void Level1_Update()
 	// MUSHROOM ANIMATION
 	animSystem::update(meleeAnim, dt);
 
+	// Checks if player is on the keycard
+	objectsquares keyObj;
+	keyObj.xPos = key.worldX;
+	keyObj.yPos = key.worldY;
+	keyObj.xScale = key.size;
+	keyObj.yScale = key.size;
+
+	if (gamelogic::static_collision(&objectinfo[player], &keyObj)) {
+		key.active = false;
+	}
+
+	if (!key.active) {
+		keycardCollected = true;
+	}
 }
 
 void Level1_Draw()
@@ -459,6 +475,11 @@ void Level1_Draw()
 	// ====== FLASHING E BUTTON WHEN PLAYER IS NEAR A DOOR ====== //
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfo[player].xPos, objectinfo[player].yPos + 60.f, eButton, 50.f);
+	}
+
+	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
+	if (keycardCollected) {
+
 	}
 }
 

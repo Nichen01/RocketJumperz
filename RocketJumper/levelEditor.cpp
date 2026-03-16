@@ -3,7 +3,7 @@
 
 // GLOBAL VARIABLES
 static AEGfxTexture* door;
-static AEGfxTexture* tileTextures[10];
+static AEGfxTexture* tileTextures[11];
 static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
 static s8 font;
@@ -26,6 +26,8 @@ void LevelEditor_Load() {
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	load::ui();
+	// Load sound
+	audio::loadsound();
 
 	// Load textures via AssetManager (enum-based IDs)
 	AssetManager::LoadTexture(TEX_PLATFORM1, "Assets/Platform/platform1.png");
@@ -38,8 +40,8 @@ void LevelEditor_Load() {
 	AssetManager::LoadTexture(TEX_PLATFORM8, "Assets/Platform/platform8.png");
 	AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
 	AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
+	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 
-	// Fill the local tileTextures array from the AssetManager cache
 	tileTextures[0] = AssetManager::GetTexture(TEX_PLATFORM1);
 	tileTextures[1] = AssetManager::GetTexture(TEX_PLATFORM2);
 	tileTextures[2] = AssetManager::GetTexture(TEX_PLATFORM3);
@@ -50,7 +52,7 @@ void LevelEditor_Load() {
 	tileTextures[7] = AssetManager::GetTexture(TEX_PLATFORM8);
 	tileTextures[8] = AssetManager::GetTexture(TEX_PLATFORM9);
 	tileTextures[9] = AssetManager::GetTexture(TEX_STATIC_DOOR);
-
+	tileTextures[10] = AssetManager::GetTexture(TEX_KEYCARD);
 }
 
 void LevelEditor_Initialize() {
@@ -86,12 +88,14 @@ void LevelEditor_Update() {
 
 	// selecting asset
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
+		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex++;
-		if (currentTileIndex >= 10) currentTileIndex = 0;
+		if (currentTileIndex >= 11) currentTileIndex = 0;
 	}
 	else if (AEInputCheckTriggered(AEVK_LEFT)) {
+		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex--;
-		if (currentTileIndex < 0) currentTileIndex = 9;
+		if (currentTileIndex < 0) currentTileIndex = 10;
 	}
 
 	// undo
@@ -104,7 +108,29 @@ void LevelEditor_Update() {
 		}
 	}
 
-	// door prompt
+	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_S)) {
+		if (level == 1) {
+			ExportMapDataToFile("Assets/Map/Level1_Map.txt");
+		}
+		else if (level == 2) {
+			ExportMapDataToFile("Assets/Map/Level2_Map.txt");
+		}
+	}
+
+	// Check if there's a keycard when left click
+	if (currentTileIndex == 10 && AEInputCheckTriggered(AEVK_LBUTTON)) {
+		if (level == 1 && keyCountLevel1 >= 1) {
+			std::cout << "Keycard already exists" << std::endl;
+		}
+		else if (level == 2 && keyCountLevel2 >= 1) {
+			std::cout << "Keycard already exists" << std::endl;
+		}
+		else if (level == 3 && keyCountLevel3 >= 1) {
+			std::cout << "Keycard already exists" << std::endl;
+		}
+	}
+
+	// Door prompt
 	if (currentTileIndex == 9 && AEInputCheckTriggered(AEVK_LBUTTON)) {
 		showDoorPrompt = true;
 		doorPromptAlpha = 1.0f;
@@ -238,7 +264,7 @@ void LevelEditor_Draw() {
 				worldMouseY >= yPos - halfSize && worldMouseY <= yPos + halfSize);
 
 			if (isGridHovered) {
-				AEGfxSetColorToMultiply(0.7f, 0.7f, 0.3f, 1.0f); // yellow highlight
+				AEGfxSetColorToMultiply(0.4f, 0.37f, 0.42f, 1.0f); // purple highlight
 				if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 					if (currentTileIndex == 9) {
 						promptRow = row;
@@ -246,7 +272,7 @@ void LevelEditor_Draw() {
 						showDoorPrompt = true;
 						doorPromptAlpha = 1.0f;
 					}
-					else {
+					else if (currentTileIndex >= 0 && currentTileIndex <= 8) {
 						TileAction action;
 						action.row = row;
 						action.col = col;
@@ -256,6 +282,34 @@ void LevelEditor_Draw() {
 						MapData[row][col] = action.newValue;
 						actionHistory.push_back(action);
 					}
+					else if (currentTileIndex == 10) {
+						bool placeKey = false;
+						std::cout << keyCountLevel1 << std::endl;
+						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
+						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
+						else if (level == 3 && keyCountLevel3 == 0) placeKey = true;
+
+						if (placeKey) {
+							TileAction action;
+							action.row = row;
+							action.col = col;
+							action.prevValue = MapData[row][col];
+							action.newValue = 67; // key tile ID
+
+							MapData[row][col] = action.newValue;
+							actionHistory.push_back(action);
+
+							// increment the counter right here
+							if (level == 1) keyCountLevel1++;
+							else if (level == 2) keyCountLevel2++;
+							else if (level == 3) keyCountLevel3++;
+						}
+						else {
+							std::cout << "Keycard already exists in this level!" << std::endl;
+						}
+					}
+
+
 				}
 				if (AEInputCheckTriggered(AEVK_RBUTTON)) {
 					TileAction action;
@@ -269,14 +323,18 @@ void LevelEditor_Draw() {
 				}
 			}                                                           
 			else if (MapData[row][col] >= 11 && MapData[row][col] <= 19) {
-				AEGfxSetColorToMultiply(0.2f, 0.2f, 0.2f, 1.0f); // dark gray
+				AEGfxSetColorToMultiply(0.49f, 0.49f, 0.49f, 1.0f); // dark gray
 			}
 			else if (MapData[row][col] <= 29 && MapData[row][col] >= 21) {
 				AEGfxSetColorToMultiply(0.5f, 0.8f, 0.5f, 1.f);
 			}
+			else if (MapData[row][col] == 67) { // key
+				AEGfxSetColorToMultiply(0.49f, 0.36f, 0.37f, 1.f);
+			}
 			else {
 				AEGfxSetColorToMultiply(0.8f, 0.8f, 0.8f, 1.0f); // default light gray
 			}
+
 
 			AEMtx33 scl, rot, transl, transf;
 			AEMtx33Scale(&scl, tileSize - gap, tileSize - gap);
@@ -304,6 +362,13 @@ void LevelEditor_Draw() {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Door", normX, normY, 0.4f, 1, 1, 1, 1);
+			}
+			else if (MapData[row][col] == 67) { // key
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Key", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Key", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
 			if (!isGridHovered && (MapData[row][col] == 11 || MapData[row][col] == 21)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
@@ -363,7 +428,7 @@ void LevelEditor_Draw() {
 	AEMtx33Concat(&tileTransf, &tileTransl, &tileTransf);
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	if (currentTileIndex >= 0 && currentTileIndex < 10 && tileTextures[currentTileIndex]) {
+	if (currentTileIndex >= 0 && currentTileIndex < 11 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);
 	}
 
@@ -377,11 +442,11 @@ void LevelEditor_Draw() {
 	switch (currentTileIndex) {
 	case 0:
 		sprintf_s(strBuffer, "Top Left Corner");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.3f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 1:
 		sprintf_s(strBuffer, "Top Middle");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.24f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 2:
 		sprintf_s(strBuffer, "Top Right Corner");
@@ -389,52 +454,56 @@ void LevelEditor_Draw() {
 		break;
 	case 3:
 		sprintf_s(strBuffer, "Middle Left");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.25f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 4:
 		sprintf_s(strBuffer, "Middle");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.2f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 5:
 		sprintf_s(strBuffer, "Middle Right");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.26f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 6:
 		sprintf_s(strBuffer, "Bottom Left Corner");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.33f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 7:
 		sprintf_s(strBuffer, "Bottom Middle");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.28f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 8:
 		sprintf_s(strBuffer, "Bottom Right Corner");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.35f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 9:
 		sprintf_s(strBuffer, "Door");
-		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.18f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 10:
+		sprintf_s(strBuffer, "Key");
+		AEGfxPrint(font, strBuffer, -0.17f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	}
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	
-	renderlogic::drawUITexture(-170.f, -330.f, leftArrow);
-	renderlogic::drawUITexture(-20.f, -330.f, rightArrow);
-	renderlogic::drawUITexture(570.f, 400.f, leftClick);
-	renderlogic::drawUITexture(570.f, 280.f, rightClick);
-	renderlogic::drawUITexture(570.f, 170.f, ctrl1);
-	renderlogic::drawUITexture(610.f, 170.f, ctrl2);
-	renderlogic::drawUITexture(670.f, 170.f, sButton);
-	renderlogic::drawUITexture(570.f, 280.f, rightClick);
-	renderlogic::drawUITexture(570.f, 60.f, ctrl1);
-	renderlogic::drawUITexture(610.f, 60.f, ctrl2);
-	renderlogic::drawUITexture(670.f, 60.f, zButton);
-	renderlogic::drawUITexture(570.f, -60.f, ctrl1);
-	renderlogic::drawUITexture(610.f, -60.f, ctrl2);
-	renderlogic::drawUITexture(650.f, -60.f, button1);
-	renderlogic::drawUITexture(690.f, -60.f, button2);
-	renderlogic::drawUITexture(730.f, -60.f, button3);
+	renderlogic::drawTexture(-170.f, -330.f, leftArrow, uiMesh);
+	renderlogic::drawTexture(-20.f, -330.f, rightArrow, uiMesh);
+	renderlogic::drawTexture(570.f, 400.f, leftClick, uiMesh);
+	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh);
+	renderlogic::drawTexture(570.f, 170.f, ctrl1, uiMesh);
+	renderlogic::drawTexture(610.f, 170.f, ctrl2, uiMesh);
+	renderlogic::drawTexture(670.f, 170.f, sButton, uiMesh);
+	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh);
+	renderlogic::drawTexture(570.f, 60.f, ctrl1, uiMesh);
+	renderlogic::drawTexture(610.f, 60.f, ctrl2, uiMesh);
+	renderlogic::drawTexture(670.f, 60.f, zButton, uiMesh);
+	renderlogic::drawTexture(570.f, -60.f, ctrl1, uiMesh);
+	renderlogic::drawTexture(610.f, -60.f, ctrl2, uiMesh);
+	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh);
+	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh);
+	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh);
 
 	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;
@@ -501,4 +570,6 @@ void LevelEditor_Unload() {
 	{
 		tileTextures[i] = nullptr;
 	}
+
+	audio::unloadsound();
 }

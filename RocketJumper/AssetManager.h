@@ -83,6 +83,8 @@ enum TextureID {
     // Mushroom idle sheet (spritesheet used by animation system)
     TEX_MUSHROOM_IDLE_SHEET,
 
+    // Key textuer
+    TEX_KEYCARD,
     // Add new textures above this line
     TEX_MAX
 };

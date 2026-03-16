@@ -13,7 +13,9 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
 	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
 	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
+	AEGfxTexture* keyTexture = NULL;
 
+	int keyX{}, keyY{};
 
 // define the mesh
 AEGfxVertexList* platformMesh = nullptr;
@@ -192,5 +194,10 @@ namespace load {
 		button2 = AssetManager::GetTexture(TEX_BUTTON2);
 		button3 = AssetManager::GetTexture(TEX_BUTTON3);
 		spacebar = AssetManager::GetTexture(TEX_SPACEBAR);
+	}
+
+	void key() {
+		AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
+		keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	}
 } 

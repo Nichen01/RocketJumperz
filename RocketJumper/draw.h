@@ -11,9 +11,10 @@ namespace renderlogic {
 	void drawSquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
 	void drawMapWallFloor(int map[], int mapX, int mapY, int mapS);
 	void drawTileArray();
-	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale = 40.f);
+	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scale = 40.f);
 	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
-	void drawGlassTile(int glassType, float xo, float yo, int mapS);
+	void drawGlass(int row, int col, int mapS, AEGfxVertexList* platformMesh);
+	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp
@@ -40,5 +41,5 @@ extern AEGfxTexture* doorTex;
 
 // ---------------------------------------------------------------------------
 
-extern Enemy enemies[MAX_ENEMIES];
+
 

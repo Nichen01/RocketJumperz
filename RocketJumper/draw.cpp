@@ -57,24 +57,7 @@ namespace renderlogic {
 
 				switch (MapData[row][col]) {
 				case 0: // air tile
-				{
-					int glassType = glassMap[row][col];
-					if (glassType >= 0) {
-						AEGfxSetTransparency(0.4f);
-						switch (glassType) {
-						case 0: AEGfxTextureSet(glass0, 0, 0); break;
-						case 1: AEGfxTextureSet(glass1, 0, 0); break;
-						case 2: AEGfxTextureSet(glass2, 0, 0); break;
-						case 3: AEGfxTextureSet(glass3, 0, 0); break;
-						case 4: AEGfxTextureSet(glass4, 0, 0); break;
-						}
-						renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f,
-							450.0f - ((float)yo + mapS / 2),
-							(float)mapS, (float)mapS);
-						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
-						AEGfxSetTransparency(1.f);
-					}
-				}
+					drawGlass(row, col, mapS, platformMesh);
 				break;
 				case 11: // platform1
 					AEGfxTextureSet(platform1, 0, 0);
@@ -161,6 +144,21 @@ namespace renderlogic {
 				//case 32:
 				//	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemyWorldX, enemyWorldY);
 				//	break;
+				case 67: // key
+					drawGlass(row, col, mapS, platformMesh);
+
+					if (key.active) {
+						AEGfxTextureSet(keyTexture, 0, 0);
+						renderlogic::drawSquare(
+							((float)xo + mapS / 2) - AEGfxGetWindowWidth() / 2,
+							AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2),
+							(float)mapS,
+							(float)mapS
+						);
+						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					}
+					break;
+
 				default: //defaults to playable area
 					break;
 				}
@@ -188,7 +186,7 @@ namespace renderlogic {
 
 	}
 
-	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale) {
+	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scale) {
 		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
 		AEMtx33Scale(&uiScl, scale, scale);
 		AEMtx33Rot(&uiRot, 0);
@@ -199,7 +197,7 @@ namespace renderlogic {
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxTextureSet(textureAsset, 0, 0);
 		AEGfxSetTransform(uiTransf.m);
-		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 	}
 
 	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale = 40.f) {
@@ -220,6 +218,49 @@ namespace renderlogic {
 		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 		AEGfxSetTransparency(1.f);  // reset transparency after drawing
 	}
+
+	// Draw glass only if the current cell has a valid glass type
+	void drawGlass(int row, int col, int mapS, AEGfxVertexList* mesh) {
+		int glassType = glassMap[row][col];
+		if (glassType < 0) return; // skip if no glass assigned
+
+		// Semi-transparent overlay
+		AEGfxSetTransparency(0.4f);
+
+		// Select texture based on type
+		switch (glassType) {
+		case 0: AEGfxTextureSet(glass0, 0, 0); break;
+		case 1: AEGfxTextureSet(glass1, 0, 0); break;
+		case 2: AEGfxTextureSet(glass2, 0, 0); break;
+		case 3: AEGfxTextureSet(glass3, 0, 0); break;
+		case 4: AEGfxTextureSet(glass4, 0, 0); break;
+		}
+
+		// Position square in world space
+		float xPos = (col * mapS + mapS / 2.0f) - 800.0f;
+		float yPos = 450.0f - (row * mapS + mapS / 2.0f);
+
+		renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+		// Reset transparency so later draws aren’t affected
+		AEGfxSetTransparency(1.0f);
+	}
+
+	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale) {
+		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
+		AEMtx33Scale(&uiScl, scale, scale);
+		AEMtx33Rot(&uiRot, 0);
+
+		AEMtx33Trans(&uiTransl, x, y);
+		AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
+		AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxTextureSet(textureAsset, 0, 0);
+		AEGfxSetTransform(uiTransf.m);
+		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
 }
 
 

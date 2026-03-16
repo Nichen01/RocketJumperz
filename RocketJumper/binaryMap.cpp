@@ -35,6 +35,12 @@ int** MapData;
 int** BinaryCollisionArray;
 int** glassMap;
 
+// extern key obj
+Key key{};
+int keyCountLevel1;
+int keyCountLevel2;
+int keyCountLevel3;
+
 // ----------------------------------------------------------------------------
 //
 //	This function opens the file name "FileName" and retrieves all the map data.
@@ -105,15 +111,24 @@ int ImportMapDataFromFile(const char* FileName)
 			int value;
 			ifs >> value;
 			MapData[i][j] = value;
-			if (value >= 31 && value <= 39) {
-				BinaryCollisionArray[i][j] = 0; // enemy spawn tiles are walkable
+			if (value == 40) {
+				BinaryCollisionArray[i][j] = 0;
 			}
 			else {
 				BinaryCollisionArray[i][j] = (value / 10 == 1) ? 1 : 0;
 			}
-
+			// to save coordinates of the key
+			if (value == 67) {
+				key.row = i;
+				key.col = j;
+				key.worldX = (j * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (i * key.size + key.size / 2.0f);
+				if (currentGameLevel == 1) keyCountLevel1 = 1;
+				else if (currentGameLevel == 2) keyCountLevel2 = 1;
+				else if (currentGameLevel == 3) keyCountLevel3 = 1;
+			}
 			// assign random glass type if tile is "air"
-			if (value == 0 || (value >= 31 && value <= 39)) {
+			if (value == 0 || (value >= 31 && value <= 39) || value == 67) {
 				glassMap[i][j] = rand() % 5;
 			}
 			else {
@@ -140,9 +155,6 @@ int ImportMapDataFromFile(const char* FileName)
 				default: door.firstLevel = 0; door.secondLevel = 0; break;
 				}
 
-			// Initialize animation for this door.
-			// The door sprite is a 7-frame horizontal strip (1 row, 7 columns).
-			// animSystem::init parameter order (per .cpp): cols, rows -- so pass 7, 1.
 			animSystem::init(door.anim, 7, 1, 7, 0.08f, ANIM_IDLE);
 
 				doors.push_back(door);

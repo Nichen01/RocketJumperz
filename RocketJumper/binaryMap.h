@@ -46,6 +46,19 @@ enum TYPE_OBJECT
 	TYPE_OBJECT_COIN			//4
 };
 
+struct Key {
+	int row;	// grid row
+	int col;	// grid column
+	f32 worldX;
+	f32 worldY;
+	f32 size{ 80.f };
+	bool active{ true };
+};
+
+extern Key key;
+extern int keyCountLevel1; // one level can only have one key
+extern int keyCountLevel2;
+extern int keyCountLevel3;
 
 int		GetCellValue(int X, int Y);
 void	SnapToCell(float *Coordinate);

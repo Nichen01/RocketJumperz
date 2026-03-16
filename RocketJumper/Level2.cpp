@@ -32,6 +32,7 @@ drop L2Drop[MAX_ENEMIES] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
+static Enemy enemies[MAX_ENEMIES];
 
 // ENEMY DATA
 //static Enemy enemies[MAX_ENEMIES];

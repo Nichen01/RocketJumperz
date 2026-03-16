@@ -16,8 +16,8 @@ Technology is prohibited.
 #include "pch.h"
 #include "AssetManager.h"
 #include "Level1.h"
-#include "aimingInterface.h"
-#include "drops.h"
+#include "AimingInterface.h"
+#include "Drops.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -149,8 +149,6 @@ void Tutorial_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	
-
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
@@ -163,8 +161,6 @@ void Tutorial_Initialize()
 	}
 	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
-
-	// DOOR
 
 	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
 	// Free any existing doorMesh first to avoid leaking if re-initialized.
