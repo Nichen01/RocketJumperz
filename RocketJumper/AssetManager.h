@@ -85,6 +85,20 @@ enum TextureID {
 
     // Key textuer
     TEX_KEYCARD,
+
+    // Error prompt
+    TEX_ERRORPROMPT,
+    TEX_PROMPT1,
+    TEX_PROMPT2,
+    TEX_PROMPT3,
+    TEX_PROMPT4,
+    TEX_PROMPT5,
+    TEX_PROMPT6,
+    TEX_PROMPT7,
+    TEX_PROMPT8,
+    TEX_PROMPT9,
+    TEX_REDBUTTON,
+    TEX_GREENBUTTON,
     // Add new textures above this line
     TEX_MAX
 };

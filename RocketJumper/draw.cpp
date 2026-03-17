@@ -180,9 +180,9 @@ namespace renderlogic {
 
 	}
 
-	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scale) {
+	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX, f32 scaleY) {
 		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
-		AEMtx33Scale(&uiScl, scale, scale);
+		AEMtx33Scale(&uiScl, scaleX, scaleY);
 		AEMtx33Rot(&uiRot, 0);
 		
 		AEMtx33Trans(&uiTransl, x, y);

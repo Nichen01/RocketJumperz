@@ -13,8 +13,10 @@ s32 currentTileIndex{}, doorCount{ 1 };
 static std::vector<TileAction> actionHistory;
 
 // door prompt
-static float doorPromptAlpha = 1.0f;
+static f32 doorPromptAlpha = 1.0f;
 static bool showDoorPrompt = false;
+static f32 errorPromptAlpha = 1.0f;
+static bool showErrorPrompt = false;
 static u32 doorID{};
 
 static int promptRow = -1;
@@ -148,6 +150,8 @@ void LevelEditor_Load() {
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	load::ui();
+	load::errorPrompt();
+	load::redButtonOption();
 	// Load sound
 	audio::loadsound();
 
@@ -269,6 +273,8 @@ void LevelEditor_Update() {
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 					showDoorPrompt = false;
 					doorPromptAlpha = 0.f;
+					showErrorPrompt = true;
+					errorPromptAlpha = 1.0f;
 				}
 				break;
 			}
@@ -591,12 +597,13 @@ void LevelEditor_Draw() {
 		break;
 	}
 
-
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	
 	renderlogic::drawTexture(-170.f, -330.f, leftArrow, uiMesh);
 	renderlogic::drawTexture(-20.f, -330.f, rightArrow, uiMesh);
-	renderlogic::drawTexture(570.f, 400.f, leftClick, uiMesh);
+	renderlogic::drawTexture(570.f, 400.f, ctrl1, uiMesh);
+	renderlogic::drawTexture(610.f, 400.f, ctrl2, uiMesh);
+	renderlogic::drawTexture(670.f, 400.f, leftClick, uiMesh);
 	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh);
 	renderlogic::drawTexture(570.f, 170.f, ctrl1, uiMesh);
 	renderlogic::drawTexture(610.f, 170.f, ctrl2, uiMesh);
@@ -614,7 +621,7 @@ void LevelEditor_Draw() {
 	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.5f, &uiTextWidth, &uiTextHeight);
-	sprintf_s(strBuffer, "Left Click to Set");
+	sprintf_s(strBuffer, "CTRL + Left Click to Set");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.76f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "Right Click to Clear");
@@ -652,6 +659,81 @@ void LevelEditor_Draw() {
 
 		for (doorButton& currentButton : buttonArr) {
 			drawDoorButton(currentButton, uiMesh, font);
+		}
+	}
+
+	if (showErrorPrompt && errorPromptAlpha > 0.0f) {
+		if (showDoorPrompt) {
+			for (doorButton& currentButton : buttonArr) {
+				updateDoorButtonHover(currentButton);
+				if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
+					if (currentButton.id == -1) {
+						showDoorPrompt = false;
+						doorPromptAlpha = 0.f;
+						break;
+					}
+
+					// check individual door counter
+					bool canPlace = false;
+					if (currentButton.id == 0 && tutDoorCount == 0) canPlace = true;
+					else if (currentButton.id == 1 && door1Count == 0) canPlace = true;
+					else if (currentButton.id == 2 && door2Count == 0) canPlace = true;
+					else if (currentButton.id == 3 && door3Count == 0) canPlace = true;
+
+					if (canPlace) {
+						TileAction action{};
+						action.row = promptRow;
+						action.col = promptCol;
+						action.prevValue = MapData[promptRow][promptCol];
+						action.newValue = 21 + currentButton.id;
+						MapData[promptRow][promptCol] = action.newValue;
+						actionHistory.push_back(action);
+
+						if (currentButton.id == 0) tutDoorCount++;
+						else if (currentButton.id == 1) door1Count++;
+						else if (currentButton.id == 2) door2Count++;
+						else if (currentButton.id == 3) door3Count++;
+
+						showDoorPrompt = false;
+						doorPromptAlpha = 0.f;
+					}
+					else {
+						AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						showDoorPrompt = false;
+						doorPromptAlpha = 0.f;
+
+						AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+						AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+						//========== ERROR PROMPT ==========//
+						renderlogic::drawTexture(-250.f, 200.f, prompt1, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(-150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(-50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(250.f, 200.f, prompt3, uiMesh, 100.f, 100.f);
+
+						renderlogic::drawTexture(-250.f, 100.f, prompt4, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(-150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(-50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(250.f, 100.f, prompt6, uiMesh, 100.f, 100.f);
+
+						renderlogic::drawTexture(-250.f, 0.f, prompt7, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(-150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(-50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						renderlogic::drawTexture(250.f, 0.f, prompt9, uiMesh, 100.f, 100.f);
+
+						AEGfxPrint(font, "ERROR", -0.1f, 0.3f, 0.9f, 1, 1, 1, 1);
+						AEGfxPrint(font, "Door already exists!", -0.25f, 0.1f, 0.8f, 1, 1, 1, 1);
+						renderlogic::drawTexture(0.f, -50.f, redButton, uiMesh, 200.f, 73.f);
+						AEGfxPrint(font, "Close", -0.07f, -0.14f, 0.8f, 1, 1, 1, 1);
+					}
+					break;
+				}
+			}
 		}
 	}
 }
