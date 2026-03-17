@@ -138,12 +138,6 @@ namespace renderlogic {
 					AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
 					break;
 				}
-				//case 31:
-				//	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemyWorldX, enemyWorldY);
-				//	break;
-				//case 32:
-				//	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemyWorldX, enemyWorldY);
-				//	break;
 				case 67: // key
 					drawGlass(row, col, mapS, platformMesh);
 

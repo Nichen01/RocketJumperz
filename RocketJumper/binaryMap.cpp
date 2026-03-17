@@ -41,6 +41,8 @@ int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int keyCountLevel3 = 0;
 
+int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
+
 // ----------------------------------------------------------------------------
 //
 //	This function opens the file name "FileName" and retrieves all the map data.
@@ -90,6 +92,9 @@ int ImportMapDataFromFile(const char* FileName)
 {
 	doors.clear();
 
+	keyCountLevel1 = 0, keyCountLevel2 = 0, keyCountLevel3 = 0;
+	tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
+
 	std::ifstream ifs(FileName, std::ios::in);
 	if (!ifs) return 0;
 
@@ -127,6 +132,21 @@ int ImportMapDataFromFile(const char* FileName)
 				else if (currentGameLevel == 2) keyCountLevel2 = 1;
 				else if (currentGameLevel == 3) keyCountLevel3 = 1;
 			}
+
+			// check the counts of door in one level
+			if (value == 21) {
+				tutDoorCount = 1;
+			}
+			else if (value == 22) {
+				door1Count = 1;
+			}
+			else if (value == 23) {
+				door2Count = 1;
+			}
+			else if (value == 24) {
+				door3Count = 1;
+			}
+
 			// assign random glass type if tile is "air"
 			if (value == 0 || (value >= 31 && value <= 39) || value == 67) {
 				glassMap[i][j] = rand() % 5;

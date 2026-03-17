@@ -6,6 +6,7 @@ static AEGfxTexture* door;
 static AEGfxTexture* tileTextures[11];
 static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
+static const char* pText3{ "Level 3" };
 static s8 font;
 int level{ 1 };
 s32 currentTileIndex{}, doorCount{ 1 };
@@ -31,7 +32,7 @@ static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 f
 static const f32 BUTTON_SCALE_NORMAL = 1.0f;
 static const f32 BUTTON_SCALE_HOVER = 1.15f;
 static const f32 BUTTON_SCALE_SPEED = 0.15f;
-static std::vector<doorButton> ButtonArr;
+static std::vector<doorButton> buttonArr;
 
 static bool isMouseOverDoorButton(const doorButton& button) {
 	s32 mouseX, mouseY;
@@ -186,30 +187,30 @@ void LevelEditor_Initialize() {
 	uiMesh       = AssetManager::GetMesh(MESH_UI);
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
-	ButtonArr.clear();
+	buttonArr.clear();
 	switch (level) {
 		case 1: {
 			ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
-			ButtonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			ButtonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0});
-			ButtonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
-			ButtonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0});
+			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
+			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
 			break;
 		}
 		case 2: {
 			ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
-			ButtonArr.push_back({ 0.f, -120.f, 150.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			ButtonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
-			ButtonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
-			ButtonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
+			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
+			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
 			break;
 		}
 		case 3: {
 			ImportMapDataFromFile("Assets/Map/Level3_Map.txt");
-			ButtonArr.push_back({ 0.f, -120.f, 150.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			ButtonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
-			ButtonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
-			ButtonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
+			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
+			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
 			break;
 		}
 	}
@@ -228,6 +229,51 @@ void LevelEditor_Update() {
 		next = GS_RESTART;
 	}
 	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : GS_LEVEL2;
+
+	if (showDoorPrompt) {
+		for (doorButton& currentButton : buttonArr) {
+			updateDoorButtonHover(currentButton);
+			if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
+				if (currentButton.id == -1) {
+					showDoorPrompt = false;
+					doorPromptAlpha = 0.f;
+					break;
+				}
+
+				// check individual door counter
+				bool canPlace = false;
+				if (currentButton.id == 0 && tutDoorCount == 0) canPlace = true;
+				else if (currentButton.id == 1 && door1Count == 0) canPlace = true;
+				else if (currentButton.id == 2 && door2Count == 0) canPlace = true;
+				else if (currentButton.id == 3 && door3Count == 0) canPlace = true;
+
+				if (canPlace) {
+					TileAction action{};
+					action.row = promptRow;
+					action.col = promptCol;
+					action.prevValue = MapData[promptRow][promptCol];
+					action.newValue = 21 + currentButton.id;
+					MapData[promptRow][promptCol] = action.newValue;
+					actionHistory.push_back(action);
+
+					if (currentButton.id == 0) tutDoorCount++;
+					else if (currentButton.id == 1) door1Count++;
+					else if (currentButton.id == 2) door2Count++;
+					else if (currentButton.id == 3) door3Count++;
+
+					showDoorPrompt = false;
+					doorPromptAlpha = 0.f;
+				}
+				else {
+					std::cout << "This door link already exists!" << std::endl;
+					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+					showDoorPrompt = false;
+					doorPromptAlpha = 0.f;
+				}
+				break;
+			}
+		}
+	}
 
 	// selecting asset
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
@@ -258,6 +304,9 @@ void LevelEditor_Update() {
 		else if (level == 2) {
 			ExportMapDataToFile("Assets/Map/Level2_Map.txt");
 		}
+		else if (level == 3) {
+			ExportMapDataToFile("Assets/Map/Level3_Map.txt");
+		}
 	}
 
 	// Check if there's a keycard when left click
@@ -270,99 +319,6 @@ void LevelEditor_Update() {
 		}
 		else if (level == 3 && keyCountLevel3 >= 1) {
 			std::cout << "Keycard already exists" << std::endl;
-		}
-	}
-
-	// Door prompt
-	if (currentTileIndex == 9 && AEInputCheckTriggered(AEVK_LBUTTON)) {
-		showDoorPrompt = true;
-		doorPromptAlpha = 1.0f;
-	}
-
-	if (showDoorPrompt) {
-		if (AEInputCheckTriggered(AEVK_1)) {
-			doorID = 1;
-			TileAction action{};
-			action.row = promptRow;
-			action.col = promptCol;
-			action.prevValue = MapData[promptRow][promptCol];
-			action.newValue = 20 + doorID;
-
-			MapData[promptRow][promptCol] = action.newValue;
-			actionHistory.push_back(action);
-
-			showDoorPrompt = false;
-			doorPromptAlpha = 0.f;
-		}
-		else if (AEInputCheckTriggered(AEVK_2)) {
-			doorID = 2;
-			TileAction action{};
-			action.row = promptRow;
-			action.col = promptCol;
-			action.prevValue = MapData[promptRow][promptCol];
-			action.newValue = 20 + doorID;
-
-			MapData[promptRow][promptCol] = action.newValue;
-			actionHistory.push_back(action);
-
-			showDoorPrompt = false;
-			doorPromptAlpha = 0.f;
-		}
-		else if (AEInputCheckTriggered(AEVK_3)) {
-			doorID = 3;
-			TileAction action{};
-			action.row = promptRow;
-			action.col = promptCol;
-			action.prevValue = MapData[promptRow][promptCol];
-			action.newValue = 20 + doorID;
-
-			MapData[promptRow][promptCol] = action.newValue;
-			actionHistory.push_back(action);
-
-			showDoorPrompt = false;
-			doorPromptAlpha = 0.f;
-		}
-		else if (AEInputCheckTriggered(AEVK_4)) {
-			doorID = 4;
-			TileAction action{};
-			action.row = promptRow;
-			action.col = promptCol;
-			action.prevValue = MapData[promptRow][promptCol];
-			action.newValue = 20 + doorID;
-
-			MapData[promptRow][promptCol] = action.newValue;
-			actionHistory.push_back(action);
-
-			showDoorPrompt = false;
-			doorPromptAlpha = 0.f;
-		}
-		else if (AEInputCheckTriggered(AEVK_5)) {
-			doorID = 5;
-			TileAction action{};
-			action.row = promptRow;
-			action.col = promptCol;
-			action.prevValue = MapData[promptRow][promptCol];
-			action.newValue = 20 + doorID;
-
-			MapData[promptRow][promptCol] = action.newValue;
-			actionHistory.push_back(action);
-
-			showDoorPrompt = false;
-			doorPromptAlpha = 0.f;
-		}
-		else if (AEInputCheckTriggered(AEVK_6)) {
-			doorID = 6;
-			TileAction action{};
-			action.row = promptRow;
-			action.col = promptCol;
-			action.prevValue = MapData[promptRow][promptCol];
-			action.newValue = 20 + doorID;
-
-			MapData[promptRow][promptCol] = action.newValue;
-			actionHistory.push_back(action);
-
-			showDoorPrompt = false;
-			doorPromptAlpha = 0.f;
 		}
 	}
 }
@@ -408,7 +364,7 @@ void LevelEditor_Draw() {
 
 			if (isGridHovered) {
 				AEGfxSetColorToMultiply(0.4f, 0.37f, 0.42f, 1.0f); // purple highlight
-				if (AEInputCheckTriggered(AEVK_LBUTTON)) {
+				if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
 					if (currentTileIndex == 9) {
 						promptRow = row;
 						promptCol = col;
@@ -427,7 +383,6 @@ void LevelEditor_Draw() {
 					}
 					else if (currentTileIndex == 10) {
 						bool placeKey = false;
-						std::cout << keyCountLevel1 << std::endl;
 						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
 						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
 						else if (level == 3 && keyCountLevel3 == 0) placeKey = true;
@@ -695,37 +650,8 @@ void LevelEditor_Draw() {
 
 		// Assign the buttons
 
-		for (doorButton& currentButton : ButtonArr) {
-			updateDoorButtonHover(currentButton);
+		for (doorButton& currentButton : buttonArr) {
 			drawDoorButton(currentButton, uiMesh, font);
-
-			if (AEInputCheckTriggered(AEVK_LBUTTON) && currentButton.isHovered) {
-				if (currentButton.id == -1) {
-					// Cancel button clicked
-					showDoorPrompt = false;
-					doorPromptAlpha = 0.f;
-					continue;
-				}
-
-				DoorLink newDoor;
-				newDoor.row = promptRow;
-				newDoor.col = promptCol;
-
-				if (strcmp(currentButton.text, "Tut") == 0) {
-					newDoor.entranceLevel = 0;
-					newDoor.exitLevel = level;
-				}
-				else {
-					newDoor.entranceLevel = level;
-					newDoor.exitLevel = currentButton.id;
-				}
-
-				doors.push_back(newDoor);
-
-				// Close prompt after valid selection
-				showDoorPrompt = false;
-				doorPromptAlpha = 0.f;
-			}
 		}
 	}
 }
