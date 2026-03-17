@@ -6,9 +6,13 @@
 #include "Main.h"
 #include "Load.h"
 #include "Sound.h"
+#include "PauseMenu.h"
 
 // ---------------------------------------------------------------------------
 // main
+
+bool pause = false;
+bool canpause = true;
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -27,11 +31,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Using custom window procedure
 	//int gGameRunning = 1;
-	bool pause = false;
-	s8 pausefont = -1; 
-	//MenuButton playButton;
-	//MenuButton quitButton;
-	f32 width, height;
+
+
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -40,33 +41,42 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
-	
-	GSM_Initialize(GS_MAINMENU);
+	GSM_Initialize(GS_TUTORIAL);
 
 	while (current != GS_QUIT)
 	{
+		if (current == GS_MAINMENU) {
+			canpause = false;
+		}
+		if (current == GS_VICTORY) {
+			canpause = false;
+		}
+		if (current == GS_DEATH) {
+			canpause = false;
+		}
+
 		if (current != GS_RESTART) {
 			GSM_Update();
 			fpLoad();
-			if (current != GS_MAINMENU) {
-				// Destroy previous pause font before creating a new one to
-				// avoid leaking a font handle on every level transition.
-				if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
-				pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+			if (canpause) {
+				Pause_Load();			
 			}
 		}
 		else {
 			current = previous;	
 			next = previous;
 		}
-
+		if (canpause) {
+			Pause_Initialize();
+		}
+		
 		fpInitialize();
 
 		while (next == current)
 		{
 			AESysFrameStart();
 
-			if (current != GS_MAINMENU) {
+			if (canpause) {
 				if (AEInputCheckTriggered(AEVK_TAB)) {
 					if (pause) {
 						pause = false;
@@ -77,16 +87,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				}
 
 				if (!pause) {
-					//audio::audiolevel(1.0f);
+					audio::audiolevel(1.0f);
 					fpUpdate();
 				}
 
 				fpDraw();
 
 				if (pause) {
-					AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
-					AEGfxPrint(pausefont, "PAUSE", -width / 2, height, 1, 1, 1, 1, 1);
-					//audio::audiolevel(0.2f);
+					Pause_Update();
+					Pause_Draw();
+					audio::audiolevel(0.2f);
 				}
 			}
 			else {
@@ -106,19 +116,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			g_appTime += g_dt;
 		}
-
+		if (canpause) {
+			Pause_Free();
+		}
 		fpFree();
 
 		if (next != GS_RESTART) {
+			if (canpause) {
+				Pause_Unload();
+			}
 			fpUnload();
 			previous = current;
 		}
-
+		canpause = true;
 		current = next;
 	}
 
 	// free the system
-	AEGfxDestroyFont(pausefont);
 	AESysExit();
 
 	return 0;

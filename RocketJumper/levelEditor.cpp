@@ -1,6 +1,5 @@
 
 #include "LevelEditor.h"
-#include "GameStateManager.h"
 
 // GLOBAL VARIABLES
 static AEGfxTexture* door;
@@ -24,27 +23,42 @@ static char strBuffer[100];
 
 void LevelEditor_Load() {
 
-	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
+	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	load::ui();
 
-	tileTextures[0] = AEGfxTextureLoad("Assets/Platform/platform1.png");
-	tileTextures[1] = AEGfxTextureLoad("Assets/Platform/platform2.png");
-	tileTextures[2] = AEGfxTextureLoad("Assets/Platform/platform3.png");
-	tileTextures[3] = AEGfxTextureLoad("Assets/Platform/platform4.png");
-	tileTextures[4] = AEGfxTextureLoad("Assets/Platform/platform5.png");
-	tileTextures[5] = AEGfxTextureLoad("Assets/Platform/platform6.png");
-	tileTextures[6] = AEGfxTextureLoad("Assets/Platform/platform7.png");
-	tileTextures[7] = AEGfxTextureLoad("Assets/Platform/platform8.png");
-	tileTextures[8] = AEGfxTextureLoad("Assets/Platform/platform9.png");
-	tileTextures[9] = AEGfxTextureLoad("Assets/Platform/staticDoor.jpg");
+	// Load textures via AssetManager (enum-based IDs)
+	AssetManager::LoadTexture(TEX_PLATFORM1, "Assets/Platform/platform1.png");
+	AssetManager::LoadTexture(TEX_PLATFORM2, "Assets/Platform/platform2.png");
+	AssetManager::LoadTexture(TEX_PLATFORM3, "Assets/Platform/platform3.png");
+	AssetManager::LoadTexture(TEX_PLATFORM4, "Assets/Platform/platform4.png");
+	AssetManager::LoadTexture(TEX_PLATFORM5, "Assets/Platform/platform5.png");
+	AssetManager::LoadTexture(TEX_PLATFORM6, "Assets/Platform/platform6.png");
+	AssetManager::LoadTexture(TEX_PLATFORM7, "Assets/Platform/platform7.png");
+	AssetManager::LoadTexture(TEX_PLATFORM8, "Assets/Platform/platform8.png");
+	AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
+	AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
+
+	// Fill the local tileTextures array from the AssetManager cache
+	tileTextures[0] = AssetManager::GetTexture(TEX_PLATFORM1);
+	tileTextures[1] = AssetManager::GetTexture(TEX_PLATFORM2);
+	tileTextures[2] = AssetManager::GetTexture(TEX_PLATFORM3);
+	tileTextures[3] = AssetManager::GetTexture(TEX_PLATFORM4);
+	tileTextures[4] = AssetManager::GetTexture(TEX_PLATFORM5);
+	tileTextures[5] = AssetManager::GetTexture(TEX_PLATFORM6);
+	tileTextures[6] = AssetManager::GetTexture(TEX_PLATFORM7);
+	tileTextures[7] = AssetManager::GetTexture(TEX_PLATFORM8);
+	tileTextures[8] = AssetManager::GetTexture(TEX_PLATFORM9);
+	tileTextures[9] = AssetManager::GetTexture(TEX_STATIC_DOOR);
 
 }
 
 void LevelEditor_Initialize() {
 
-	init::platform();
-	init::ui();
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_UI);
+	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
+	uiMesh       = AssetManager::GetMesh(MESH_UI);
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	switch (level) {
@@ -224,7 +238,7 @@ void LevelEditor_Draw() {
 				worldMouseY >= yPos - halfSize && worldMouseY <= yPos + halfSize);
 
 			if (isGridHovered) {
-				AEGfxSetColorToMultiply(0.95f, 0.95f, 0.5f, 1.0f); // yellow highlight
+				AEGfxSetColorToMultiply(0.7f, 0.7f, 0.3f, 1.0f); // yellow highlight
 				if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 					if (currentTileIndex == 9) {
 						promptRow = row;
@@ -275,55 +289,63 @@ void LevelEditor_Draw() {
 			AEGfxSetTransform(transf.m);
 			AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
-			if (isGridHovered) {
-				if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_S)) {
-					switch (level) {
-					case 1: ExportMapDataToFile("Assets/Map/Level1_Map.txt"); break;
-					case 2: ExportMapDataToFile("Assets/Map/Level2_Map.txt"); break;
-					}
-				}
+			float textW, textH;
+
+			if (isGridHovered && (MapData[row][col] >= 11 && MapData[row][col] <= 19)) {
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Tile", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Tile", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
-			if (MapData[row][col] == 11 || MapData[row][col] == 21) {
+			else if (isGridHovered && (MapData[row][col] >= 21 && MapData[row][col] <= 29)) {
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Door", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Door", normX, normY, 0.4f, 1, 1, 1, 1);
+			}
+			if (!isGridHovered && (MapData[row][col] == 11 || MapData[row][col] == 21)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "1", normX, normY, 0.5f, 1, 1, 1, 1);
 			} 
-			else if (MapData[row][col] == 12 || MapData[row][col] == 22) {
+			else if (!isGridHovered && (MapData[row][col] == 12 || MapData[row][col] == 22)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "2", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 13 || MapData[row][col] == 23) {
+			else if (!isGridHovered && (MapData[row][col] == 13 || MapData[row][col] == 23)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "3", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 14 || MapData[row][col] == 24) {
+			else if (!isGridHovered && (MapData[row][col] == 14 || MapData[row][col] == 24)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "4", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 15 || MapData[row][col] == 25) {
+			else if (!isGridHovered && (MapData[row][col] == 15 || MapData[row][col] == 25)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "5", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 16 || MapData[row][col] == 26) {
+			else if (!isGridHovered && (MapData[row][col] == 16 || MapData[row][col] == 26)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "6", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 17 || MapData[row][col] == 27) {
+			else if (!isGridHovered && (MapData[row][col] == 17 || MapData[row][col] == 27)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "7", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 18 || MapData[row][col] == 28) {
+			else if (!isGridHovered && (MapData[row][col] == 18 || MapData[row][col] == 28)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "8", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 19 || MapData[row][col] == 29) {
+			else if (!isGridHovered && (MapData[row][col] == 19 || MapData[row][col] == 29)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "9", normX, normY, 0.5f, 1, 1, 1, 1);
@@ -350,48 +372,48 @@ void LevelEditor_Draw() {
 
 	memset(strBuffer, 0, 100 * sizeof(char));
 	f32 tileTextWidth, tileTextHeight;
-	AEGfxGetPrintSize(font, strBuffer, 0.15f, &tileTextWidth, &tileTextHeight);
+	AEGfxGetPrintSize(font, strBuffer, 0.3f, &tileTextWidth, &tileTextHeight);
 	// to print the text below the asset
 	switch (currentTileIndex) {
 	case 0:
-		sprintf_s(strBuffer, "Platform: Top Left Corner");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Top Left Corner");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 1:
-		sprintf_s(strBuffer, "Platform: Top Middle");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Top Middle");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 2:
-		sprintf_s(strBuffer, "Platform: Top Right Corner");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Top Right Corner");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 3:
-		sprintf_s(strBuffer, "Platform: Middle Left");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Middle Left");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 4:
-		sprintf_s(strBuffer, "Platform: Middle");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Middle");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 5:
-		sprintf_s(strBuffer, "Platform: Middle Right");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Middle Right");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 6:
-		sprintf_s(strBuffer, "Platform: Bottom Left Corner");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Bottom Left Corner");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 7:
-		sprintf_s(strBuffer, "Platform: Bottom Middle");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Bottom Middle");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 8:
-		sprintf_s(strBuffer, "Platform: Bottom Right Corner");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Bottom Right Corner");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 9:
-		sprintf_s(strBuffer, "Platform: Door");
-		AEGfxPrint(font, strBuffer, -0.5f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(strBuffer, "Door");
+		AEGfxPrint(font, strBuffer, -0.32f, -0.9f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	}
 
@@ -406,34 +428,34 @@ void LevelEditor_Draw() {
 	renderlogic::drawUITexture(670.f, 170.f, sButton);
 	renderlogic::drawUITexture(570.f, 280.f, rightClick);
 	renderlogic::drawUITexture(570.f, 60.f, ctrl1);
-	renderlogic::drawUITexture(610.f, 600.f, ctrl2);
+	renderlogic::drawUITexture(610.f, 60.f, ctrl2);
 	renderlogic::drawUITexture(670.f, 60.f, zButton);
 	renderlogic::drawUITexture(570.f, -60.f, ctrl1);
 	renderlogic::drawUITexture(610.f, -60.f, ctrl2);
 	renderlogic::drawUITexture(650.f, -60.f, button1);
 	renderlogic::drawUITexture(690.f, -60.f, button2);
 	renderlogic::drawUITexture(730.f, -60.f, button3);
-	renderlogic::drawUITexture(770.f, -60.f, button4);
 
 	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.5f, &uiTextWidth, &uiTextHeight);
 	sprintf_s(strBuffer, "Left Click to Set");
-	AEGfxPrint(font, strBuffer, 0.67f, 0.76f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.67f, 0.76f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "Right Click to Clear");
-	AEGfxPrint(font, strBuffer, 0.67f, 0.5f, 0.25f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.67f, 0.5f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "CTRL + S to Save");
-	AEGfxPrint(font, strBuffer, 0.67f, 0.25f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.67f, 0.25f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "CTRL + Z to Undo");
-	AEGfxPrint(font, strBuffer, 0.67f, 0.f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.67f, 0.f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "CTRL + (Number)");
-	AEGfxPrint(font, strBuffer, 0.67f, -0.3f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.67f, -0.3f, 0.4f, 1.f, 1.f, 1.f, 1.f);
+
 	sprintf_s(strBuffer, "for Level");
-	AEGfxPrint(font, strBuffer, 0.67f, -0.35f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.67f, -0.35f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	// door prompt background box
 	if (showDoorPrompt && doorPromptAlpha > 0.0f) {
@@ -462,23 +484,21 @@ void LevelEditor_Draw() {
 
 void LevelEditor_Free() {
 
-	freeAsset::platform();
-	freeAsset::ui();
+	AssetManager::FreeAllMeshes();
+
+	platformMesh = nullptr;
+	uiMesh = nullptr;
 	FreeMapData();
 }
 
 void LevelEditor_Unload() {
-	AEGfxDestroyFont(font);
-	unload::ui();
+	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
-	// Unload all tile textures loaded in LevelEditor_Load to prevent memory leaks.
-	// Each AEGfxTextureLoad allocates internal memory that must be freed.
+	AssetManager::UnloadAllTextures();
+
+	// Null out the pointers safely
 	for (int i = 0; i < 10; i++)
 	{
-		if (tileTextures[i])
-		{
-			AEGfxTextureUnload(tileTextures[i]);
-			tileTextures[i] = nullptr;
-		}
+		tileTextures[i] = nullptr;
 	}
 }

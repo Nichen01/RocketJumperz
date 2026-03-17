@@ -12,7 +12,7 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	// different types of platforms
 	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
 	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
-	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * button4 = NULL, * spacebar = NULL;
+	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
 
 
 // define the mesh
@@ -98,22 +98,36 @@ namespace init {
 namespace load {
 
 	void platform() {
-		platform1 = AEGfxTextureLoad("Assets/Platform/platform1.png");
-		platform2 = AEGfxTextureLoad("Assets/Platform/platform2.png");
-		platform3 = AEGfxTextureLoad("Assets/Platform/platform3.png");
-		platform4 = AEGfxTextureLoad("Assets/Platform/platform4.png");
-		platform5 = AEGfxTextureLoad("Assets/Platform/platform5.png");
-		platform6 = AEGfxTextureLoad("Assets/Platform/platform6.png");
-		platform7 = AEGfxTextureLoad("Assets/Platform/platform7.png");
-		platform8 = AEGfxTextureLoad("Assets/Platform/platform8.png");
-		platform9 = AEGfxTextureLoad("Assets/Platform/platform0.png");
-		glass0 = AEGfxTextureLoad("Assets/Platform/glass0.jpg");
-		glass1 = AEGfxTextureLoad("Assets/Platform/glass1.jpg");
-		glass2 = AEGfxTextureLoad("Assets/Platform/glass2.jpg");
-		glass3 = AEGfxTextureLoad("Assets/Platform/glass3.jpg");
-		glass4 = AEGfxTextureLoad("Assets/Platform/glass4.jpg");
+		AssetManager::LoadTexture(TEX_PLATFORM1, "Assets/Platform/platform1.png");
+		AssetManager::LoadTexture(TEX_PLATFORM2, "Assets/Platform/platform2.png");
+		AssetManager::LoadTexture(TEX_PLATFORM3, "Assets/Platform/platform3.png");
+		AssetManager::LoadTexture(TEX_PLATFORM4, "Assets/Platform/platform4.png");
+		AssetManager::LoadTexture(TEX_PLATFORM5, "Assets/Platform/platform5.png");
+		AssetManager::LoadTexture(TEX_PLATFORM6, "Assets/Platform/platform6.png");
+		AssetManager::LoadTexture(TEX_PLATFORM7, "Assets/Platform/platform7.png");
+		AssetManager::LoadTexture(TEX_PLATFORM8, "Assets/Platform/platform8.png");
+		AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform0.png");
+		AssetManager::LoadTexture(TEX_GLASS0, "Assets/Platform/glass0.jpg");
+		AssetManager::LoadTexture(TEX_GLASS1, "Assets/Platform/glass1.jpg");
+		AssetManager::LoadTexture(TEX_GLASS2, "Assets/Platform/glass2.jpg");
+		AssetManager::LoadTexture(TEX_GLASS3, "Assets/Platform/glass3.jpg");
+		AssetManager::LoadTexture(TEX_GLASS4, "Assets/Platform/glass4.jpg");
 
-		
+		// Sync the extern pointers so draw.cpp can use them directly
+		platform1 = AssetManager::GetTexture(TEX_PLATFORM1);
+		platform2 = AssetManager::GetTexture(TEX_PLATFORM2);
+		platform3 = AssetManager::GetTexture(TEX_PLATFORM3);
+		platform4 = AssetManager::GetTexture(TEX_PLATFORM4);
+		platform5 = AssetManager::GetTexture(TEX_PLATFORM5);
+		platform6 = AssetManager::GetTexture(TEX_PLATFORM6);
+		platform7 = AssetManager::GetTexture(TEX_PLATFORM7);
+		platform8 = AssetManager::GetTexture(TEX_PLATFORM8);
+		platform9 = AssetManager::GetTexture(TEX_PLATFORM9);
+		glass0 = AssetManager::GetTexture(TEX_GLASS0);
+		glass1 = AssetManager::GetTexture(TEX_GLASS1);
+		glass2 = AssetManager::GetTexture(TEX_GLASS2);
+		glass3 = AssetManager::GetTexture(TEX_GLASS3);
+		glass4 = AssetManager::GetTexture(TEX_GLASS4);
 	}
 
 	void mushroom() {
@@ -148,110 +162,35 @@ namespace load {
 	}
 
 	void ui() {
-		ctrl1 = AEGfxTextureLoad("Assets/UI/ctrl1.png");
-		ctrl2 = AEGfxTextureLoad("Assets/UI/ctrl2.png");
-		leftArrow = AEGfxTextureLoad("Assets/UI/leftArrow.png");
-		rightArrow = AEGfxTextureLoad("Assets/UI/rightArrow.png");
-		leftClick = AEGfxTextureLoad("Assets/UI/leftClick.png");
-		rightClick = AEGfxTextureLoad("Assets/UI/rightClick.png");
-		eButton = AEGfxTextureLoad("Assets/UI/eButton.png");
-		gButton = AEGfxTextureLoad("Assets/UI/gButton.png");
-		sButton = AEGfxTextureLoad("Assets/UI/sButton.png");
-		zButton = AEGfxTextureLoad("Assets/UI/zButton.png");
-		button1 = AEGfxTextureLoad("Assets/UI/1Button.png");
-		button2 = AEGfxTextureLoad("Assets/UI/2Button.png");
-		button3 = AEGfxTextureLoad("Assets/UI/3Button.png");
-		button4 = AEGfxTextureLoad("Assets/UI/4Button.png");
-		spacebar = AEGfxTextureLoad("Assets/UI/spacebar.png");
+		AssetManager::LoadTexture(TEX_CTRL1, "Assets/UI/ctrl1.png");
+		AssetManager::LoadTexture(TEX_CTRL2, "Assets/UI/ctrl2.png");
+		AssetManager::LoadTexture(TEX_LEFT_ARROW, "Assets/UI/leftArrow.png");
+		AssetManager::LoadTexture(TEX_RIGHT_ARROW, "Assets/UI/rightArrow.png");
+		AssetManager::LoadTexture(TEX_LEFT_CLICK, "Assets/UI/leftClick.png");
+		AssetManager::LoadTexture(TEX_RIGHT_CLICK, "Assets/UI/rightClick.png");
+		AssetManager::LoadTexture(TEX_E_BUTTON, "Assets/UI/eButton.png");
+		AssetManager::LoadTexture(TEX_G_BUTTON, "Assets/UI/gButton.png");
+		AssetManager::LoadTexture(TEX_S_BUTTON, "Assets/UI/sButton.png");
+		AssetManager::LoadTexture(TEX_Z_BUTTON, "Assets/UI/zButton.png");
+		AssetManager::LoadTexture(TEX_BUTTON1, "Assets/UI/1Button.png");
+		AssetManager::LoadTexture(TEX_BUTTON2, "Assets/UI/2Button.png");
+		AssetManager::LoadTexture(TEX_BUTTON3, "Assets/UI/3Button.png");
+		AssetManager::LoadTexture(TEX_SPACEBAR, "Assets/UI/spacebar.png");
+
+		// Sync the extern pointers so other files can use them directly
+		ctrl1 = AssetManager::GetTexture(TEX_CTRL1);
+		ctrl2 = AssetManager::GetTexture(TEX_CTRL2);
+		leftArrow = AssetManager::GetTexture(TEX_LEFT_ARROW);
+		rightArrow = AssetManager::GetTexture(TEX_RIGHT_ARROW);
+		leftClick = AssetManager::GetTexture(TEX_LEFT_CLICK);
+		rightClick = AssetManager::GetTexture(TEX_RIGHT_CLICK);
+		eButton = AssetManager::GetTexture(TEX_E_BUTTON);
+		gButton = AssetManager::GetTexture(TEX_G_BUTTON);
+		sButton = AssetManager::GetTexture(TEX_S_BUTTON);
+		zButton = AssetManager::GetTexture(TEX_Z_BUTTON);
+		button1 = AssetManager::GetTexture(TEX_BUTTON1);
+		button2 = AssetManager::GetTexture(TEX_BUTTON2);
+		button3 = AssetManager::GetTexture(TEX_BUTTON3);
+		spacebar = AssetManager::GetTexture(TEX_SPACEBAR);
 	}
 } 
-
-namespace freeAsset {
-	void platform() {
-		if (platformMesh) {
-			AEGfxMeshFree(platformMesh);
-			platformMesh = nullptr;
-		}
-	}
-
-	void door() {
-		if (doorMesh) {
-			AEGfxMeshFree(doorMesh);
-			doorMesh = nullptr;
-		}
-	}
-
-	void enemy() {
-		if (enemyMesh) {
-			AEGfxMeshFree(enemyMesh);
-			enemyMesh = nullptr;
-		}
-	}
-
-	void player() {
-		if (pMesh) {
-			AEGfxMeshFree(pMesh);
-			pMesh = nullptr;
-		}
-	}
-
-	void projectile() {
-		if (projectileMesh) {
-			AEGfxMeshFree(projectileMesh);
-			projectileMesh = nullptr;
-		}
-	}
-
-	void ui() {
-		if (uiMesh) {
-			AEGfxMeshFree(uiMesh);
-			uiMesh = nullptr;
-		}
-	}
-}
-
-namespace unload {
-
-	void platform() {
-		if (platform1) { AEGfxTextureUnload(platform1); platform1 = nullptr; }
-		if (platform2) { AEGfxTextureUnload(platform2); platform2 = nullptr; }
-		if (platform3) { AEGfxTextureUnload(platform3); platform3 = nullptr; }
-		if (platform4) { AEGfxTextureUnload(platform4); platform4 = nullptr; }
-		if (platform5) { AEGfxTextureUnload(platform5); platform5 = nullptr; }
-		if (platform6) { AEGfxTextureUnload(platform6); platform6 = nullptr; }
-		if (platform7) { AEGfxTextureUnload(platform7); platform7 = nullptr; }
-		if (platform8) { AEGfxTextureUnload(platform8); platform8 = nullptr; }
-		if (platform9) { AEGfxTextureUnload(platform9); platform9 = nullptr; }
-		glass();
-	}
-
-	void glass() {
-		if (glass0) { AEGfxTextureUnload(glass0); glass0 = nullptr; }
-		if (glass1) { AEGfxTextureUnload(glass1); glass1 = nullptr; }
-		if (glass2) { AEGfxTextureUnload(glass2); glass2 = nullptr; }
-		if (glass3) { AEGfxTextureUnload(glass3); glass3 = nullptr; }
-		if (glass4) { AEGfxTextureUnload(glass4); glass4 = nullptr; }
-	}
-
-	void ui() {
-		if (ctrl1) { AEGfxTextureUnload(ctrl1); ctrl1 = nullptr; }
-		if (ctrl2) { AEGfxTextureUnload(ctrl2); ctrl2 = nullptr; }
-		if (leftArrow) { AEGfxTextureUnload(leftArrow); leftArrow = nullptr; }
-		if (rightArrow) { AEGfxTextureUnload(rightArrow); rightArrow = nullptr; }
-		if (leftClick) { AEGfxTextureUnload(leftClick); leftClick = nullptr; }
-		if (rightClick) { AEGfxTextureUnload(rightClick); rightClick = nullptr; }
-		if (eButton) { AEGfxTextureUnload(eButton); eButton = nullptr; }
-		if (gButton) { AEGfxTextureUnload(gButton); gButton = nullptr; }
-		if (sButton) { AEGfxTextureUnload(sButton); sButton = nullptr; }
-		if (zButton) { AEGfxTextureUnload(zButton); zButton = nullptr; }
-		if (button1) { AEGfxTextureUnload(button1); button1 = nullptr; }
-		if (button2) { AEGfxTextureUnload(button2); button2 = nullptr; }
-		if (button3) { AEGfxTextureUnload(button3); button3 = nullptr; }
-		if (button4) { AEGfxTextureUnload(button4); button4 = nullptr; }
-		if (spacebar) { AEGfxTextureUnload(spacebar); spacebar = nullptr; }
-	}
-
-	void door() {
-		if (doorTex) { AEGfxTextureUnload(doorTex); doorTex = nullptr; }
-	}
-}

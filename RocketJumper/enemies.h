@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "AEEngine.h"
 #include "Player.h"
 #include "Projectile.h"
+#include "drops.h"
 
 // Maximum number of enemies that can exist at once
 #define MAX_ENEMIES 10
@@ -53,8 +54,8 @@ namespace enemySystem {
     constexpr f32 MELEE_ATTACK_COOLDOWN = 1.0f;  // Seconds between attacks
     constexpr f32 MELEE_DAMAGE = 15.0f;
 
-    constexpr f32 RANGED_DETECTION_RANGE = 800.0f;
-    constexpr f32 RANGED_ATTACK_RANGE = 800.0f;
+    constexpr f32 RANGED_DETECTION_RANGE = 700.0f;
+    constexpr f32 RANGED_ATTACK_RANGE = 600.0f;
     constexpr f32 RANGED_MOVE_SPEED = 1.5f;
     constexpr f32 RANGED_HEALTH = 30.0f;
     constexpr f32 RANGED_ATTACK_COOLDOWN = 2.0f;  // Seconds between shots
@@ -70,7 +71,7 @@ namespace enemySystem {
 
     // Update all active enemies (AI, movement, attacks)
     void updateEnemies(Enemy enemies[], s32 maxCount,
-        objectsquares& player,
+        objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
         f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup);
 

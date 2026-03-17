@@ -14,16 +14,23 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "pch.h"
+#include "AssetManager.h"
 #include "Level1.h"
+#include "aimingInterface.h"
+#include "drops.h"
 
 static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
 static int s = 80;
 
+// Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
+const float PlayerScale = 80.0f;
+
 static s8 font = -1;
 
 objectsquares objectinfoTut[2] = { 0 };
+drop TutDrop[MAX_ENEMIES] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -34,14 +41,11 @@ static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
 
+// Mushroom animation state (mesh/textures owned by AssetManager)
+static SpriteAnimation meleeAnim;
+
 //==== sound and volume
 static f32 bgVolume = 1.f;
-
-static AEAudio L1;
-static AEAudio LaserBlast;
-static AEAudio Punch;
-static AEAudioGroup bgm;
-static AEAudioGroup soundEffects;
 
 static char strBuffer[100];
 
@@ -54,49 +58,54 @@ static s8 fontLevel1 = -1;
 
 void Tutorial_Load()
 {
-	font = AEGfxCreateFont("Assets/Fonts/PressStart2P-Regular.ttf", 50);
+	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
+	audio::loadsound();
 
-	// Load the music file once when the level loads
-	L1 = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
-	// Create the audio group
-	bgm = AEAudioCreateGroup();
-	// Configure sound effects
-	LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
-	Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-	soundEffects = AEAudioCreateGroup();
+	// Load textures via AssetManager (enum-based IDs)
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 
-	// Load textures - these are defined in draw.cpp
-	characterPictest = AEGfxTextureLoad("Assets/astronautRight.png");
-	plasma = AEGfxTextureLoad("Assets/plasma.png");
+	// Sync the extern pointers so other files can use them directly
+	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
+	plasma            = AssetManager::GetTexture(TEX_PLASMA);
+	doorTex           = AssetManager::GetTexture(TEX_DOOR);
+	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
 
 	// Load platform assets
 	load::platform();
 	load::ui();
+
+	// Create font for gameover text (stored so we can destroy it in Unload)
+	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	aiming::loadAiming();
 }
 
 void Tutorial_Initialize()
 {
 	currentGameLevel = 0;
-
-	AEAudioPlay(L1, bgm, 0.5f, 1.f, -1);
-
-	// Create font for gameover text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);
-
-	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
-	init::enemy();
-	init::platform();
-	init::player();
-	init::projectile();
-	init::ui();
+	AssetManager::BuildSqrMesh(MESH_ENEMY);
+	AssetManager::BuildSqrMesh(MESH_PLATFORM);
+	AssetManager::BuildSqrMesh(MESH_PLAYER);
+	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
+	AssetManager::BuildSqrMesh(MESH_UI);
+	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
+	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
+	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
+	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
+	uiMesh         = AssetManager::GetMesh(MESH_UI);
 
 	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
@@ -110,7 +119,7 @@ void Tutorial_Initialize()
 
 	for (int row{}; row < y; ++row) {
 		for (int col{}; col < x; col++) {
-			map[row * x + col] = MapData[row][col];
+			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
 
@@ -119,7 +128,7 @@ void Tutorial_Initialize()
 	for (auto& door : doors) {
 		if (door.id == playerEnteredDoorId) {
 			objectinfoTut[player].xPos = door.worldX;
-			objectinfoTut[player].yPos = door.worldY + 40.f; // slight offset so player isn't inside door
+			objectinfoTut[player].yPos = door.worldY; // slight offset so player isn't inside door
 			spawnSet = true;
 			break;
 		}
@@ -127,10 +136,10 @@ void Tutorial_Initialize()
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
 		objectinfoTut[player].xPos = 600.f;
-		objectinfoTut[player].yPos = -350.f;
+		objectinfoTut[player].yPos = -300.f;
 	}
-	objectinfoTut[player].xScale = 60.0f;
-	objectinfoTut[player].yScale = 60.0f;
+	objectinfoTut[player].xScale = PlayerScale;
+	objectinfoTut[player].yScale = PlayerScale;
 
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfoTut[player]);
@@ -140,24 +149,33 @@ void Tutorial_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	// Load enemy textures (create these assets or use placeholder)
-	meleeEnemyTexture = AEGfxTextureLoad("Assets/MeleeEnemy.png");
-	rangedEnemyTexture = AEGfxTextureLoad("Assets/RangedEnemy.png");
+	
 
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
+	// Build animated mesh for melee enemy (3 cols x 2 rows spritesheet)
+	{
+		AEGfxVertexList* meleeEnemyMesh = nullptr;
+		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
+		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
+	}
+	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
+	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
+
 	// DOOR
 
 	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
 	// Free any existing doorMesh first to avoid leaking if re-initialized.
-	if (doorMesh) { AEGfxMeshFree(doorMesh); doorMesh = nullptr; }
-	animSystem::buildMesh(&doorMesh, 1, 7);
+	AEGfxVertexList* tempDoorMesh = nullptr;
+	animSystem::buildMesh(&tempDoorMesh, 1, 7);
+	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
+	doorMesh = tempDoorMesh;
 
-	doorTex = AEGfxTextureLoad("Assets/DoorOpen.png");
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");
+	pickup::initDrops(TutDrop, MAX_ENEMIES, PlayerScale);
 }
 
 void Tutorial_Update()
@@ -189,22 +207,28 @@ void Tutorial_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfoTut[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
+	if (AEInputCheckTriggered(AEVK_Q)) {
 		next = GS_QUIT;
+	}
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
+		next= GS_MAINMENU;
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfoTut[player]);
+	pickup::updateDrops(TutDrop, MAX_ENEMIES, objectinfoTut[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
-	projectileSystem::fireProjectiles(
+	if (movement::bulletCount) {projectileSystem::fireProjectiles(
 		static_cast<s32>(worldMouseX),
 		static_cast<s32>(worldMouseY),
 		objectinfoTut[player],
 		Projectiles,
-		MAX_PROJECTILES);
+		MAX_PROJECTILES,
+		LaserBlast,
+		soundEffects);}
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
@@ -215,7 +239,7 @@ void Tutorial_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfoTut[player],
+		objectinfoTut[player],TutDrop,
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -236,9 +260,15 @@ void Tutorial_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfoTut[player]);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfoTut[player], 15);
+
+	// If player health < 0, go to death screen
+	if (objectinfoTut[player].health <= 0) {
+		next = GS_DEATH;
+	}
+
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&objectinfoTut[player], map, x, s, 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -274,6 +304,10 @@ void Tutorial_Update()
 			}
 		}
 	}
+
+	// MUSHROOM ANIMATION
+	animSystem::update(meleeAnim, dt);
+	aiming::updateAiming(objectinfoTut[player]);
 }
 
 void Tutorial_Draw()
@@ -316,8 +350,12 @@ void Tutorial_Draw()
 	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh, projectileMesh,
-		meleeEnemyTexture, rangedEnemyTexture);
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES,
+		AssetManager::GetMesh(MESH_MELEE_ENEMY),
+		projectileMesh,
+		meleeEnemyTexture, rangedEnemyTexture,
+		animSystem::getUOffset(meleeAnim),
+		animSystem::getVOffset(meleeAnim));
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -325,8 +363,13 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
+
 	//====== PLAYER RENDER =========//
+	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
 	renderlogic::drawSquare(objectinfoTut[player].xPos, objectinfoTut[player].yPos,
 		objectinfoTut[player].xScale, objectinfoTut[player].yScale);
@@ -360,17 +403,13 @@ void Tutorial_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
 	}
-
+	aiming::drawAiming();
+	pickup::drawDrops(TutDrop, MAX_ENEMIES);
 }
 
 void Tutorial_Free()
 {
-	freeAsset::platform();
-	freeAsset::door();
-	freeAsset::enemy();
-	freeAsset::player();
-	freeAsset::projectile();
-	freeAsset::ui();
+	AssetManager::FreeAllMeshes();
 
 	if (map) {
 		delete[] map;
@@ -382,32 +421,14 @@ void Tutorial_Free()
 
 void Tutorial_Unload()
 {
-	if (doorMesh) {
-		AEGfxMeshFree(doorMesh);
-		doorMesh = nullptr;
-	}
-	if (doorTex) {
-		AEGfxTextureUnload(doorTex);
-		doorTex = nullptr;
-	}
-
-	// Unload ALL textures that were loaded in Initialize.
-	// NOTE: doorTex is already unloaded above, so do not unload it again here.
-	if (characterPictest) { AEGfxTextureUnload(characterPictest); characterPictest = nullptr; }
-	if (plasma) { AEGfxTextureUnload(plasma); plasma = nullptr; }
-	if (meleeEnemyTexture) { AEGfxTextureUnload(meleeEnemyTexture); meleeEnemyTexture = nullptr; }
-	if (rangedEnemyTexture) { AEGfxTextureUnload(rangedEnemyTexture); rangedEnemyTexture = nullptr; }
-
-	unload::platform();
-	unload::ui();
-
+	AssetManager::UnloadAllTextures();
+	
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
 		delete[] glassMap;
 		glassMap = nullptr;
 	}
-
-
+	aiming::unloadAiming();
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
@@ -415,9 +436,5 @@ void Tutorial_Unload()
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
-	AEAudioUnloadAudio(L1);
-	AEAudioUnloadAudio(LaserBlast);
-	AEAudioUnloadAudio(Punch);
-	AEAudioUnloadAudioGroup(bgm);
-	AEAudioUnloadAudioGroup(soundEffects);
+	audio::unloadsound();
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
-#include "Player.h"
+#include "player.h"
 extern f64					g_fixedDT;
 extern f64					g_dt;
 extern f64					g_appTime;
@@ -20,12 +20,10 @@ extern int	COLLISION_TOP;	//0100
 extern int	COLLISION_BOTTOM;	//1000
 
 namespace gamelogic {
-	// Update bounding box for an object using AEVec2-based BB struct
-	void Obj_boundingbox(objectsquares* object);
 
 	// Swept-AABB dynamic collision check between two moving objects.
 	// Returns 1 if A and B will collide within the current frame, 0 otherwise.
-	s8 dynamic_collision(objectsquares* A, objectsquares* B);
+	s8 dynamic_collision(objectsquares* A, objectsquares* B, float& firstTimeOfCollision);
 
 	// Static AABB collision (original verbose version kept for compatibility)
 	s8 collision(objectsquares* player, objectsquares* obstacle);
@@ -33,10 +31,27 @@ namespace gamelogic {
 	// Static AABB collision (compact version from Ivan)
 	s8 static_collision(objectsquares* player, objectsquares* obstacle);
 
-	// Hotspot check and binary map collision
-	void CheckInstanceBinaryMapCollision(objectsquares* object, int map[], int mapX, int index);
+	inline bool CollisionIntersection_RectRect(objectsquares* player,objectsquares* obstacle, float& firstTimeOfCollision)		//Output: return the calculated value of tFirst
+	{
+		//Step 1
+		bool staticCollision = false;
+		staticCollision = static_collision(player, obstacle);
+		if (staticCollision)
+		{
+			return true;
+		}
 
-	// Resolve object-to-tilemap collision. 'index' specifies which tile value
-	// counts as solid (pass 1 for standard walls).
-	void OBJ_to_map(int map[], int x, int s, objectsquares* object, int index);
+		//Step 2 until 5
+		return dynamic_collision(player, obstacle,firstTimeOfCollision);
+	}
+
+	float posX_to_index(float pos, float MS);
+
+	float posY_to_index(float pos, float MS);
+
+	// Hotspot check and binary map collision
+	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX);
+
+	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index);
+
 }

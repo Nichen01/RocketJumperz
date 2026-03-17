@@ -1,13 +1,12 @@
 #pragma once
 #include "AEEngine.h"
-#include "Movement.h"
-#include "Collision.h"
+#include "movement.h"
+#include "collision.h"
+#include "draw.h"
 
-/*namespace aiming {
-	extern AEGfxTexture *aimingInterface = nullptr;
-	//extern AEVec2 movement::getMouse(objectsquares&);
+namespace aiming {
 	void loadAiming();
 	void updateAiming(objectsquares&);
 	void drawAiming();
 	void unloadAiming();
-}*/
+}
