@@ -37,9 +37,9 @@ int** glassMap;
 
 // extern key obj
 Key key{};
-int keyCountLevel1;
-int keyCountLevel2;
-int keyCountLevel3;
+int keyCountLevel1 = 0;
+int keyCountLevel2 = 0;
+int keyCountLevel3 = 0;
 
 // ----------------------------------------------------------------------------
 //
@@ -149,10 +149,10 @@ int ImportMapDataFromFile(const char* FileName)
 				door.worldY = 450.0f - (row * 80 + 40);
 
 				switch (tile) {
-				case 21: door.firstLevel = 0; door.secondLevel = 1; break;
-				case 22: door.firstLevel = 1; door.secondLevel = 2; break;
-				case 23: door.firstLevel = 2; door.secondLevel = 3; break;
-				default: door.firstLevel = 0; door.secondLevel = 0; break;
+				case 21: door.entranceLevel = 0; door.exitLevel = 1; break;
+				case 22: door.entranceLevel = 1; door.exitLevel = 2; break;
+				case 23: door.entranceLevel = 2; door.exitLevel = 3; break;
+				default: door.entranceLevel = 0; door.exitLevel = 0; break;
 				}
 
 			animSystem::init(door.anim, 7, 1, 7, 0.08f, ANIM_IDLE);

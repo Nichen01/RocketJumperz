@@ -334,7 +334,7 @@ void Level1_Update()
 
 	for (auto& door : doors) {
 		// Only process doors connected to this level
-		if (door.firstLevel != 1 && door.secondLevel != 1)
+		if (door.entranceLevel != 1 && door.exitLevel != 1)
 			continue;
 
 		f32 dx = objectinfo[player].xPos - door.worldX;
@@ -355,7 +355,7 @@ void Level1_Update()
 
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
+				int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
 				playerEnteredDoorId = door.id; // remember which door was used
 				switch (toLevel) {
 				case 0: next = GS_TUTORIAL; break;

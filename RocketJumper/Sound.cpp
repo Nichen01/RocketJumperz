@@ -20,7 +20,7 @@ namespace audio {
 		// Configure sound effects
 		LaserBlast = AEAudioLoadSound("Assets/Sounds/LaserBlast.mp3");
 		Punch = AEAudioLoadSound("Assets/Sounds/Punch.wav");
-		Error = AEAudioLoadSound("Assets/Sounds/Error.mp3");
+		Error = AEAudioLoadSound("Assets/Sounds/Error.wav");
 		Pickup = AEAudioLoadSound("Assets/Sounds/Pickup.wav");
 		ArrowSound = AEAudioLoadSound("Assets/Sounds/ArrowSound.wav");
 		soundEffects = AEAudioCreateGroup();   // short for 'sound effect'

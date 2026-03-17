@@ -1,7 +1,7 @@
 
 #include "LevelEditor.h"
 
-// GLOBAL VARIABLES
+// ==================== GLOBAL RESOURCES ==================== //
 static AEGfxTexture* door;
 static AEGfxTexture* tileTextures[11];
 static const char* pText1{ "Level 1" };
@@ -18,8 +18,129 @@ static u32 doorID{};
 
 static int promptRow = -1;
 static int promptCol = -1;
-
+ 
 static char strBuffer[100];
+
+// ==================== FORWARD DECLARATIONS ====================//
+static bool isMouseOverDoorButton(const doorButton& button);
+static void updateDoorButtonHover(doorButton& button);
+static void drawDoorButton(const doorButton& button, AEGfxVertexList* mesh, s8 fontID);
+static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
+
+// ==================== BUTTON ARRAY ==================== //
+static const f32 BUTTON_SCALE_NORMAL = 1.0f;
+static const f32 BUTTON_SCALE_HOVER = 1.15f;
+static const f32 BUTTON_SCALE_SPEED = 0.15f;
+static std::vector<doorButton> ButtonArr;
+
+static bool isMouseOverDoorButton(const doorButton& button) {
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	f32 halfWidth = (button.width * button.scale) / 2.0f;
+	f32 halfHeight = (button.height * button.scale) / 2.0f;
+
+	return (worldMouseX >= button.x - halfWidth &&
+		worldMouseX <= button.x + halfWidth &&
+		worldMouseY >= button.y - halfHeight &&
+		worldMouseY <= button.y + halfHeight);
+}
+
+static void updateDoorButtonHover(doorButton& button) {
+	button.isHovered = isMouseOverDoorButton(button);
+
+	// Set target scale based on hover state
+	button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
+
+	// Smooth interpolation towards target scale
+	if (button.scale < button.targetScale) {
+		button.scale += BUTTON_SCALE_SPEED;
+		if (button.scale > button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+	else if (button.scale > button.targetScale) {
+		button.scale -= BUTTON_SCALE_SPEED;
+		if (button.scale < button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+}
+
+static void drawDoorButton(const doorButton& button, AEGfxVertexList* mesh, s8 fontID) {
+	// Draw button background
+	AEMtx33 scale, translate, transform;
+	AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+	AEMtx33Trans(&translate, button.x, button.y);
+	AEMtx33Concat(&transform, &translate, &scale);
+
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 1.0f);  // black multiply so add color is pure
+
+	// Color based on hover state
+	if (button.id == -1) {
+		if (button.isHovered) {
+			AEGfxSetColorToAdd(0.9f, 0.2f, 0.2f, 0.8f);  // Bright red when hovered
+		}
+		else {
+			AEGfxSetColorToAdd(0.7f, 0.2f, 0.2f, 0.8f);  // Dark red normally
+		}
+	}
+	else {
+		if (button.isHovered) {
+			AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
+		}
+		else {
+			AEGfxSetColorToAdd(0.15f, 0.15f, 0.3f, 0.7f); // Dark blue-gray normally
+		}
+	}
+
+	AEGfxSetTransform(transform.m);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	// Draw button text
+	drawDoorTextCentered(button.text, button.x, button.y, button.scale, fontID);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID) {
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	if (fontID < 0) {
+		printf("FONT IS NOT LOADED."); return;
+	}
+
+	// Get text dimensions in normalized units (0 to 2 range per AE docs)
+	f32 textWidth, textHeight;
+	AEGfxGetPrintSize(fontID, text, scale, &textWidth, &textHeight);
+
+	// Convert world coordinates to normalized coordinates for AEGfxPrint.
+	// AEGfxPrint uses [-1, 1] range where (-1,-1) = bottom-left, (1,1) = top-right.
+	// Our world coords have (0,0) = center, so dividing by half-screen gives normalized.
+	f32 halfW = screenWidth / 2.0f;
+	f32 halfH = screenLength / 2.0f;
+	f32 normalizedX = x / halfW;
+	f32 normalizedY = y / halfH;
+
+	// Center the text by offsetting half the text dimensions
+	f32 printX = normalizedX - textWidth / 2.0f;
+	f32 printY = normalizedY - textHeight / 2.0f;
+
+	// Switch to TEXTURE mode so the font glyph atlas can be sampled
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	// Reset color modifiers so the font renders with its own colors
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxPrint(fontID, text, printX, printY,
+		scale, 1.0f, 1.0f, 1.0f, 1.0f);
+}
 
 void LevelEditor_Load() {
 
@@ -57,25 +178,47 @@ void LevelEditor_Load() {
 
 void LevelEditor_Initialize() {
 
+
+
 	AssetManager::BuildSqrMesh(MESH_PLATFORM);
 	AssetManager::BuildSqrMesh(MESH_UI);
 	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
 	uiMesh       = AssetManager::GetMesh(MESH_UI);
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
+	ButtonArr.clear();
 	switch (level) {
-	case 1:
-		ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
-		std::cout << "File 1 read";
-		break;
-	case 2:
-		ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
-		std::cout << "File 2 read";
-		break;
+		case 1: {
+			ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
+			ButtonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
+			ButtonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0});
+			ButtonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
+			ButtonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			break;
+		}
+		case 2: {
+			ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
+			ButtonArr.push_back({ 0.f, -120.f, 150.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
+			ButtonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
+			ButtonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
+			ButtonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			break;
+		}
+		case 3: {
+			ImportMapDataFromFile("Assets/Map/Level3_Map.txt");
+			ButtonArr.push_back({ 0.f, -120.f, 150.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
+			ButtonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
+			ButtonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
+			ButtonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
+			break;
+		}
 	}
 }
 
 void LevelEditor_Update() {
+	// blocking the tab button
+	if (AEInputCheckTriggered(AEVK_TAB)) {}
+
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
 		level = 1;
 		next = GS_RESTART;
@@ -306,6 +449,7 @@ void LevelEditor_Draw() {
 						}
 						else {
 							std::cout << "Keycard already exists in this level!" << std::endl;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
 					}
 
@@ -317,6 +461,12 @@ void LevelEditor_Draw() {
 					action.col = col;
 					action.prevValue = MapData[row][col];
 					action.newValue = 0;
+
+					if (MapData[row][col] == 67) {
+						if (level == 1) keyCountLevel1 = 0;
+						else if (level == 2) keyCountLevel2 = 0;
+						else if (level == 3) keyCountLevel3 = 0;
+					}
 
 					MapData[row][col] = action.newValue;
 					actionHistory.push_back(action);
@@ -486,6 +636,7 @@ void LevelEditor_Draw() {
 		break;
 	}
 
+
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	
 	renderlogic::drawTexture(-170.f, -330.f, leftArrow, uiMesh);
@@ -528,27 +679,55 @@ void LevelEditor_Draw() {
 
 	// door prompt background box
 	if (showDoorPrompt && doorPromptAlpha > 0.0f) {
-		float boxWidth = 1100.0f;
-		float boxHeight = 100.0f;
-		float boxX = 0.05f;
-		float boxY = 0.05f;
-
-		// set color (black with alpha)
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-		AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, doorPromptAlpha);
-
-		// draw rectangle behind text
-		renderlogic::drawSquare(boxX * AEGfxGetWindowWidth() / 2.0f,
-			boxY * AEGfxGetWindowHeight() / 2.0f,
-			boxWidth, boxHeight);
+		// Main prompt panel
+		float boxWidth = 850.0f;
+		float boxHeight = 400.0f;
+		AEGfxSetColorToMultiply(0.1f, 0.1f, 0.3f, doorPromptAlpha); // dark blue background
+		renderlogic::drawSquare(0, 0, boxWidth, boxHeight);
 		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
-		memset(strBuffer, 0, sizeof(strBuffer));
-		f32 doorTextWidth, doorTextHeight;
-		AEGfxGetPrintSize(font, strBuffer, 0.2f, &doorTextWidth, &doorTextHeight);
-		AEGfxPrint(font, "Assign a number to the door!", -0.55f, 0.0f, 0.7f, 1.0f, 1.0f, 1.0f, doorPromptAlpha);
-	}
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
+		// Title text
+		AEGfxPrint(font, "What level does this door lead to?", -0.44f, 0.25f, 0.8f, 1, 1, 1, 1);
+
+		// Assign the buttons
+
+		for (doorButton& currentButton : ButtonArr) {
+			updateDoorButtonHover(currentButton);
+			drawDoorButton(currentButton, uiMesh, font);
+
+			if (AEInputCheckTriggered(AEVK_LBUTTON) && currentButton.isHovered) {
+				if (currentButton.id == -1) {
+					// Cancel button clicked
+					showDoorPrompt = false;
+					doorPromptAlpha = 0.f;
+					continue;
+				}
+
+				DoorLink newDoor;
+				newDoor.row = promptRow;
+				newDoor.col = promptCol;
+
+				if (strcmp(currentButton.text, "Tut") == 0) {
+					newDoor.entranceLevel = 0;
+					newDoor.exitLevel = level;
+				}
+				else {
+					newDoor.entranceLevel = level;
+					newDoor.exitLevel = currentButton.id;
+				}
+
+				doors.push_back(newDoor);
+
+				// Close prompt after valid selection
+				showDoorPrompt = false;
+				doorPromptAlpha = 0.f;
+			}
+		}
+	}
 }
 
 void LevelEditor_Free() {

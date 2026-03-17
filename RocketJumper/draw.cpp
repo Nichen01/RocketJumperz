@@ -124,7 +124,7 @@ namespace renderlogic {
 					for (auto& door : doors) {
 						// Match this tile to the correct door by position,
 						// using currentGameLevel so it works on every level.
-						if ((door.firstLevel == currentGameLevel || door.secondLevel == currentGameLevel) &&
+						if ((door.entranceLevel == currentGameLevel || door.exitLevel == currentGameLevel) &&
 							fabsf(door.worldX - tileWorldX) < 1.f &&
 							fabsf(door.worldY - tileWorldY) < 1.f)
 						{
