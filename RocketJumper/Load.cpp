@@ -22,79 +22,6 @@ AEGfxVertexList* pMesh = nullptr;
 AEGfxVertexList* projectileMesh = nullptr;
 AEGfxVertexList* uiMesh = nullptr;
 
-namespace init {
-
-	void enemy() {
-		AEGfxMeshStart();
-		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-		enemyMesh = AEGfxMeshEnd();
-	}
-
-	void platform() {
-		AEGfxMeshStart();
-		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-		platformMesh = AEGfxMeshEnd();
-	}
-
-	void player() {
-		AEGfxMeshStart();
-		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-		pMesh = AEGfxMeshEnd();
-	}
-
-	void projectile() {
-		AEGfxMeshStart();
-		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-		projectileMesh = AEGfxMeshEnd();
-	}
-
-	void ui() {
-		AEGfxMeshStart();
-		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-		uiMesh = AEGfxMeshEnd();
-	}
-
-}
-
 namespace load {
 
 	void platform() {
@@ -128,37 +55,6 @@ namespace load {
 		glass2 = AssetManager::GetTexture(TEX_GLASS2);
 		glass3 = AssetManager::GetTexture(TEX_GLASS3);
 		glass4 = AssetManager::GetTexture(TEX_GLASS4);
-	}
-
-	void mushroom() {
-		// Loading of assets for mushroomDie
-		mushroomDieTexture[0] = AssetManager::LoadTexture("mDie0", "Assets/Enemy/MushroomDie/MushroomDie0.png");
-		mushroomDieTexture[1] = AssetManager::LoadTexture("mDie1", "Assets/Enemy/MushroomDie/MushroomDie1.png");
-		mushroomDieTexture[2] = AssetManager::LoadTexture("mDie2", "Assets/Enemy/MushroomDie/MushroomDie2.png");
-		mushroomDieTexture[3] = AssetManager::LoadTexture("mDie3", "Assets/Enemy/MushroomDie/MushroomDie3.png");
-		mushroomDieTexture[4] = AssetManager::LoadTexture("mDie4", "Assets/Enemy/MushroomDie/MushroomDie4.png");
-		mushroomDieTexture[5] = AssetManager::LoadTexture("mDie5", "Assets/Enemy/MushroomDie/MushroomDie5.png");
-		mushroomDieTexture[6] = AssetManager::LoadTexture("mDie6", "Assets/Enemy/MushroomDie/MushroomDie6.png");
-		mushroomDieTexture[7] = AssetManager::LoadTexture("mDie7", "Assets/Enemy/MushroomDie/MushroomDie7.png");
-		mushroomDieTexture[8] = AssetManager::LoadTexture("mDie8", "Assets/Enemy/MushroomDie/MushroomDie8.png");
-
-		// Loading of assets for mushroomHit
-		mushroomHitTexture[0] = AssetManager::LoadTexture("mHit0", "Assets/Enemy/MushroomHit/MushroomHit0.png");
-		mushroomHitTexture[1] = AssetManager::LoadTexture("mHit1", "Assets/Enemy/MushroomHit/MushroomHit1.png");
-		mushroomHitTexture[2] = AssetManager::LoadTexture("mHit2", "Assets/Enemy/MushroomHit/MushroomHit2.png");
-		mushroomHitTexture[3] = AssetManager::LoadTexture("mHit3", "Assets/Enemy/MushroomHit/MushroomHit3.png");
-		mushroomHitTexture[4] = AssetManager::LoadTexture("mHit4", "Assets/Enemy/MushroomHit/MushroomHit4.png");
-
-		// Loading of assets for mushroomIdle
-		mushroomIdleTexture[0] = AssetManager::LoadTexture("mIdle0", "Assets/Enemy/MushroomIdle/MushroomIdle0.png");
-		mushroomIdleTexture[1] = AssetManager::LoadTexture("mIdle1", "Assets/Enemy/MushroomIdle/MushroomIdle1.png");
-		mushroomIdleTexture[2] = AssetManager::LoadTexture("mIdle2", "Assets/Enemy/MushroomIdle/MushroomIdle2.png");
-		mushroomIdleTexture[3] = AssetManager::LoadTexture("mIdle3", "Assets/Enemy/MushroomIdle/MushroomIdle3.png");
-		mushroomIdleTexture[4] = AssetManager::LoadTexture("mIdle4", "Assets/Enemy/MushroomIdle/MushroomIdle4.png");
-		mushroomIdleTexture[5] = AssetManager::LoadTexture("mIdle5", "Assets/Enemy/MushroomIdle/MushroomIdle5.png");
-		mushroomIdleTexture[6] = AssetManager::LoadTexture("mIdle6", "Assets/Enemy/MushroomIdle/MushroomIdle6.png");
-		mushroomIdleTexture[7] = AssetManager::LoadTexture("mIdle7", "Assets/Enemy/MushroomIdle/MushroomIdle7.png");
-		mushroomIdleTexture[8] = AssetManager::LoadTexture("mIdle8", "Assets/Enemy/MushroomIdle/MushroomIdle8.png");
 	}
 
 	void ui() {

@@ -96,16 +96,12 @@ void Tutorial_Initialize()
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
-	AssetManager::BuildSqrMesh(MESH_ENEMY);
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_PLAYER);
-	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
-	AssetManager::BuildSqrMesh(MESH_UI);
-	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
-	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
-	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
-	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
-	uiMesh         = AssetManager::GetMesh(MESH_UI);
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	enemyMesh      = AssetManager::GetMesh(MESH_QUAD);
+	platformMesh   = AssetManager::GetMesh(MESH_QUAD);
+	pMesh          = AssetManager::GetMesh(MESH_QUAD);
+	projectileMesh = AssetManager::GetMesh(MESH_QUAD);
+	uiMesh         = AssetManager::GetMesh(MESH_QUAD);
 
 	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
@@ -156,22 +152,15 @@ void Tutorial_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
 	// Build animated mesh for melee enemy (3 cols x 2 rows spritesheet)
-	{
-		AEGfxVertexList* meleeEnemyMesh = nullptr;
-		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
-	}
+	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
 	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
 
 	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
-	// Free any existing doorMesh first to avoid leaking if re-initialized.
-	AEGfxVertexList* tempDoorMesh = nullptr;
-	animSystem::buildMesh(&tempDoorMesh, 1, 7);
-	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
-	doorMesh = tempDoorMesh;
+	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);
+	doorMesh = AssetManager::GetMesh(MESH_DOOR);
 
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");

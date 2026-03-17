@@ -100,21 +100,13 @@ void Level2_Initialize()
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
-	//=============CREATE TEXTURED MESH FOR WALLS==================//
-	// This mesh is used by draw.cpp for rendering walls
-	AEGfxVertexList* meleeEnemyMesh = nullptr;
-	animSystem::buildMesh(&meleeEnemyMesh, 2, 3); // 3 rows, 3 columns
-	AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
-
-	// BUILD MESHES
-	AssetManager::BuildSqrMesh(MESH_ENEMY);
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_PLAYER);
-	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
-	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
-	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
-	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
-	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
+	//=============CREATE TEXTURED MESHES==================//
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
+	enemyMesh      = AssetManager::GetMesh(MESH_QUAD);
+	platformMesh   = AssetManager::GetMesh(MESH_QUAD);
+	pMesh          = AssetManager::GetMesh(MESH_QUAD);
+	projectileMesh = AssetManager::GetMesh(MESH_QUAD);
 
 	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
 		printf("Could not import file");
@@ -168,10 +160,8 @@ void Level2_Initialize()
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// Custom door mesh via AssetManager
-	AEGfxVertexList* tempDoorMesh = nullptr;
-	animSystem::buildMesh(&tempDoorMesh, 1, 7);
-	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
-	doorMesh = tempDoorMesh;
+	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);
+	doorMesh = AssetManager::GetMesh(MESH_DOOR);
 	pickup::initDrops(L2Drop, MAX_ENEMIES, PlayerScale);
 }
 

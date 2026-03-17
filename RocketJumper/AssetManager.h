@@ -89,14 +89,9 @@ enum TextureID {
 
 // Define all meshes here
 enum MeshID {
-    MESH_PLAYER,
-    MESH_PLATFORM,
-    MESH_PROJECTILE,
-    MESH_ENEMY,
-    MESH_DOOR,
-    MESH_UI,
-    MESH_MELEE_ENEMY, // animated melee enemy mesh (built by animSystem::buildMesh)
-    MESH_TEST,        // pTestMesh used in Level1
+    MESH_QUAD,        // single reusable 1x1 quad for all standard static objects
+    MESH_MELEE_ENEMY, // animated melee enemy mesh (spritesheet-sliced)
+    MESH_DOOR,        // animated door mesh (spritesheet-sliced)
     // Add new meshes above this line
     MESH_MAX
 };
@@ -125,8 +120,10 @@ public:
     // Meshes  (built procedurally, not loaded from a file)
     // -------------------------------------------------------------------------
 
-    // Creates a 1x1 mesh and automatically stores it in the cache.
-    static void BuildSqrMesh(MeshID id);
+    // Creates a square mesh and automatically stores it in the cache.
+    // When rows/cols are 1 (default), builds a standard 1x1 quad.
+    // When rows/cols > 1, slices UVs for spritesheet animation frames.
+    static void BuildSqrMesh(MeshID id, int rows = 1, int cols = 1);
 
     // Registers a mesh pointer under name. 
     static void StoreMesh(MeshID id, AEGfxVertexList* pMesh);

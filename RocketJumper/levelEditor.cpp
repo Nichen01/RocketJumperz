@@ -55,10 +55,9 @@ void LevelEditor_Load() {
 
 void LevelEditor_Initialize() {
 
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_UI);
-	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
-	uiMesh       = AssetManager::GetMesh(MESH_UI);
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	platformMesh = AssetManager::GetMesh(MESH_QUAD);
+	uiMesh       = AssetManager::GetMesh(MESH_QUAD);
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	switch (level) {

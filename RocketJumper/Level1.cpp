@@ -155,13 +155,11 @@ void Level1_Initialize()
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
-	//=============CREATE TEXTURED MESH FOR PLAYER==================//
-	AssetManager::BuildSqrMesh(MESH_PLAYER);
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_TEST);
-	pMesh        = AssetManager::GetMesh(MESH_PLAYER);
-	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
-	pTestMesh    = AssetManager::GetMesh(MESH_TEST);
+	//=============CREATE TEXTURED MESH FOR ALL STANDARD OBJECTS==================//
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	pMesh        = AssetManager::GetMesh(MESH_QUAD);
+	platformMesh = AssetManager::GetMesh(MESH_QUAD);
+	pTestMesh    = AssetManager::GetMesh(MESH_QUAD);
 	
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
@@ -211,16 +209,12 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -100.0f, -200.0f);
 
 	//MUSHROOM ANIM TEST
-	{
-		AEGfxVertexList* meleeEnemyMesh = nullptr;
-		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
-	}
+	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
-	animSystem::buildMesh(&doorMesh, 1, 7);
-	AssetManager::StoreMesh(MESH_DOOR, doorMesh);
+	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);
+	doorMesh = AssetManager::GetMesh(MESH_DOOR);
 	
 	if (!doorTex)
 		printf("DOOR TEXTURE NOT FOUND!\n");
@@ -406,7 +400,7 @@ void Level1_Draw()
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
 		AssetManager::GetMesh(MESH_MELEE_ENEMY),
-		AssetManager::GetMesh(MESH_TEST),
+		AssetManager::GetMesh(MESH_QUAD),
 		AssetManager::GetTexture(TEX_MUSHROOM_IDLE_SHEET),
 		AssetManager::GetTexture(TEX_RANGED_ENEMY),
 		animSystem::getUOffset(meleeAnim),
@@ -416,7 +410,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	pickup::drawDrops(L1Drop, MAX_ENEMIES);
 
@@ -436,7 +430,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
