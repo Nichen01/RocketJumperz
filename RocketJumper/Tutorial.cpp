@@ -14,8 +14,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "pch.h"
-#include "Level1.h"
 #include "AssetManager.h"
+#include "Level1.h"
 #include "aimingInterface.h"
 #include "drops.h"
 
@@ -25,7 +25,7 @@ static int y = 9;
 static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
-const float PlayerScale = 45.0f;
+const float PlayerScale = 80.0f;
 
 static s8 font = -1;
 
@@ -40,6 +40,9 @@ static Enemy enemies[MAX_ENEMIES];
 static Projectile enemyProjectiles[MAX_PROJECTILES];
 static AEGfxTexture* meleeEnemyTexture = nullptr;
 static AEGfxTexture* rangedEnemyTexture = nullptr;
+
+// Mushroom animation state (mesh/textures owned by AssetManager)
+static SpriteAnimation meleeAnim;
 
 //==== sound and volume
 static f32 bgVolume = 1.f;
@@ -62,7 +65,7 @@ void Tutorial_Load()
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
-	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/MeleeEnemy.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 
 	// Sync the extern pointers so other files can use them directly
@@ -116,7 +119,7 @@ void Tutorial_Initialize()
 
 	for (int row{}; row < y; ++row) {
 		for (int col{}; col < x; col++) {
-			map[row * x + col] = MapData[row][col];
+			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
 
@@ -151,6 +154,15 @@ void Tutorial_Initialize()
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
+
+	// Build animated mesh for melee enemy (3 cols x 2 rows spritesheet)
+	{
+		AEGfxVertexList* meleeEnemyMesh = nullptr;
+		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
+		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
+	}
+	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
+	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// DOOR
 
@@ -209,14 +221,14 @@ void Tutorial_Update()
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
-	if (movement::bulletCount) {
-		projectileSystem::fireProjectiles(
-			static_cast<s32>(worldMouseX),
-			static_cast<s32>(worldMouseY),
-			objectinfoTut[player],
-			Projectiles,
-			MAX_PROJECTILES);
-	}
+	if (movement::bulletCount) {projectileSystem::fireProjectiles(
+		static_cast<s32>(worldMouseX),
+		static_cast<s32>(worldMouseY),
+		objectinfoTut[player],
+		Projectiles,
+		MAX_PROJECTILES,
+		LaserBlast,
+		soundEffects);}
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
@@ -249,13 +261,14 @@ void Tutorial_Update()
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfoTut[player]);
 
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfoTut[player], 15);
+	// If player health < 0, go to death screen
+	if (objectinfoTut[player].health <= 0) {
+		next = GS_DEATH;
+	}
 
-	/*gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&objectinfoTut[player], map, x, s, 15);*/
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&objectinfoTut[player], map, x, s, 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -291,6 +304,9 @@ void Tutorial_Update()
 			}
 		}
 	}
+
+	// MUSHROOM ANIMATION
+	animSystem::update(meleeAnim, dt);
 	aiming::updateAiming(objectinfoTut[player]);
 }
 
@@ -334,8 +350,12 @@ void Tutorial_Draw()
 	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	// ==== ENEMIES RENDER =======//
-	enemySystem::renderEnemies(enemies, MAX_ENEMIES, enemyMesh, projectileMesh,
-		meleeEnemyTexture, rangedEnemyTexture);
+	enemySystem::renderEnemies(enemies, MAX_ENEMIES,
+		AssetManager::GetMesh(MESH_MELEE_ENEMY),
+		projectileMesh,
+		meleeEnemyTexture, rangedEnemyTexture,
+		animSystem::getUOffset(meleeAnim),
+		animSystem::getVOffset(meleeAnim));
 
 	// Render enemy projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

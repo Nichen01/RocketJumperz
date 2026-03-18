@@ -17,24 +17,6 @@ int COLLISION_RIGHT = 0x00000002;	//0010
 int COLLISION_TOP = 0x00000004;	//0100
 int COLLISION_BOTTOM = 0x00000008;	//1000
 
-namespace {
-	// Calculate corners of player object relative to the tilemap.
-	// mapX = number of tile columns, mapS = tile size in pixels.
-	void calcCorners(int map[], int mapX, int mapS, objectsquares* player1) {
-
-		// Determines coordinates in 2D array
-		player1->leftX = (int)((player1->xPos - (player1->xScale / 2.0)) + 800) / mapS;
-		player1->rightX = (int)((player1->xPos + (player1->xScale / 2.0)) + 800) / mapS;
-		player1->topY = -((int)((player1->yPos + (player1->yScale / 2.0)) - 450) / mapS);
-		player1->bottomY = -((int)((player1->yPos - (player1->yScale / 2.0)) - 450) / mapS);
-
-		// Determine data in corners: top-right, top-left, bottom-right, bottom-left
-		player1->TR = map[player1->topY * mapX + player1->rightX];
-		player1->TL = map[player1->topY * mapX + player1->leftX];
-		player1->BR = map[player1->bottomY * mapX + player1->rightX];
-		player1->BL = map[player1->bottomY * mapX + player1->leftX];
-	}
-}
 
 namespace gamelogic {
 
@@ -183,7 +165,6 @@ namespace gamelogic {
 	
 		int index1 = (int)y1 * mapX + (int)x1;
 		int index2 = (int)y2 * mapX + (int)x2;
-
 		if (map[index1] == index || map[index2] == index) {
 			flag = flag | COLLISION_RIGHT;
 		}
@@ -268,46 +249,5 @@ namespace gamelogic {
 		}
 	}
 
-	// Resolve object-to-tilemap collision. 'index' specifies which tile value
-	// counts as solid (e.g., pass 1 for standard walls).
-	// Uses our parameterized mapS via calcCorners (not hardcoded tile size).
-	void OBJ_to_map(int map[], int x, int s, objectsquares* object, int index) {
-		object->xPos += object->velocityX;
-
-		calcCorners(map, x, s, object);
-
-		int boolTR = (object->TR == index);
-		int boolTL = (object->TL == index);
-		int boolBR = (object->BR == index);
-		int boolBL = (object->BL == index);
-
-		if (object->velocityX > 0 && (boolTR || boolBR)) {
-			object->xPos = ((float)((object->rightX * s) - (object->xScale / 2.0) - 0.001f - 800.0f));
-			object->velocityX = 0;
-		}
-
-		if (object->velocityX < 0 && (boolTL || boolBL)) {
-			object->xPos = ((float)(((object->rightX) * s) + (object->xScale / 2.0) + 0.001f - 800.0f));
-			object->velocityX = 0;
-		}
-
-		object->yPos += object->velocityY;
-
-		calcCorners(map, x, s, object);
-
-		boolTR = (object->TR == index);
-		boolTL = (object->TL == index);
-		boolBR = (object->BR == index);
-		boolBL = (object->BL == index);
-
-		if (object->velocityY < 0 && (boolBL || boolBR)) {
-			object->yPos = 450.0f - ((float)((object->bottomY * s) - (object->yScale / 2.0) - 0.001f));
-			object->velocityY = 0;
-		}
-
-		if (object->velocityY > 0 && (boolTL || boolTR)) {
-			object->yPos = 450.0f - ((float)((object->bottomY * s) + (object->yScale / 2.0) + 0.001f));
-			object->velocityY = 0;
-		}
-	}
+	
 }
