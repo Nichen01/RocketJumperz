@@ -380,16 +380,9 @@ void Level1_Update()
 	keyObj.xScale = key.size;
 	keyObj.yScale = key.size;
 
-	if (gamelogic::static_collision(&objectinfo[player], &keyObj)) {
+	if (key.active && gamelogic::static_collision(&objectinfo[player], &keyObj)) {
 		key.active = false;
-	}
-
-	if (!key.active) {
 		keycardCollected = true;
-		keycardCollectedAudio = true;
-
-	}
-	if (keycardCollectedAudio) {
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 }
