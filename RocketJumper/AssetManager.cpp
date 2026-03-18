@@ -96,7 +96,7 @@ void AssetManager::UnloadAllTextures() {
  * @param cols        Number of columns in the spritesheet (default 1)
  * @return VOID
  ***************************************************************************/
-void AssetManager::BuildSqrMesh(MeshID id, int rows, int cols) {
+void AssetManager::BuildSqrMesh(MeshID id, int rows, int cols, u32 vertexColor) {
     // check if the mesh id is valid
     if (id < 0 || id >= MESH_MAX) return;
 
@@ -116,14 +116,14 @@ void AssetManager::BuildSqrMesh(MeshID id, int rows, int cols) {
     //build square mesh with 2 triangles
     AEGfxMeshStart();
     AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, vMax,
-        0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
-        -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f
+        -0.5f, -0.5f, vertexColor, 0.0f, vMax,
+        0.5f, -0.5f, vertexColor, uMax, vMax,
+        -0.5f, 0.5f, vertexColor, 0.0f, 0.0f
     );
     AEGfxTriAdd(
-        0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
-        0.5f, 0.5f, 0xFFFFFFFF, uMax, 0.0f,
-        -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f
+        0.5f, -0.5f, vertexColor, uMax, vMax,
+        0.5f, 0.5f, vertexColor, uMax, 0.0f,
+        -0.5f, 0.5f, vertexColor, 0.0f, 0.0f
     );
 
     // assign mesh to the array id

@@ -77,6 +77,10 @@ enum TextureID {
     TEX_MUSHROOM_IDLE5,
     TEX_MUSHROOM_IDLE6,
 
+    // Main Menu textures
+    TEX_MAIN_MENU_BG,
+    TEX_TITLE,
+
     // Level editor: static door thumbnail
     TEX_STATIC_DOOR,
 
@@ -92,6 +96,7 @@ enum MeshID {
     MESH_QUAD,        // single reusable 1x1 quad for all standard static objects
     MESH_MELEE_ENEMY, // animated melee enemy mesh (spritesheet-sliced)
     MESH_DOOR,        // animated door mesh (spritesheet-sliced)
+    MESH_MENU_BUTTON, // unit quad with black vertex color for color-mode button rendering
     // Add new meshes above this line
     MESH_MAX
 };
@@ -123,7 +128,7 @@ public:
     // Creates a square mesh and automatically stores it in the cache.
     // When rows/cols are 1 (default), builds a standard 1x1 quad.
     // When rows/cols > 1, slices UVs for spritesheet animation frames.
-    static void BuildSqrMesh(MeshID id, int rows = 1, int cols = 1);
+    static void BuildSqrMesh(MeshID id, int rows = 1, int cols = 1, u32 vertexColor = 0xFFFFFFFF);
 
     // Registers a mesh pointer under name. 
     static void StoreMesh(MeshID id, AEGfxVertexList* pMesh);
