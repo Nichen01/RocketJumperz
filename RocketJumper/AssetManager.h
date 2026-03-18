@@ -83,7 +83,7 @@ enum TextureID {
     // Mushroom idle sheet (spritesheet used by animation system)
     TEX_MUSHROOM_IDLE_SHEET,
 
-    // Key textuer
+    // Key texture
     TEX_KEYCARD,
 
     // Error prompt
@@ -99,6 +99,10 @@ enum TextureID {
     TEX_PROMPT9,
     TEX_REDBUTTON,
     TEX_GREENBUTTON,
+
+    // Inventory texture
+    TEX_INVENTORY,
+    TEX_KEYCARDINVENTORY,
     // Add new textures above this line
     TEX_MAX
 };

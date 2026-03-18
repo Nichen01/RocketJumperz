@@ -16,7 +16,8 @@ extern AEGfxTexture* platform1, * platform2, *platform3, *platform4, *platform5,
 extern AEGfxTexture* glass0, * glass1, * glass2, * glass3, * glass4;
 extern AEGfxTexture* keyTexture;
 extern AEGfxTexture* errorPromptMenu, * redButton, * greenButton;
-extern 	AEGfxTexture* prompt1, * prompt2, * prompt3, * prompt4, * prompt5, * prompt6, * prompt7, * prompt8, * prompt9;
+extern AEGfxTexture* prompt1, * prompt2, * prompt3, * prompt4, * prompt5, * prompt6, * prompt7, * prompt8, * prompt9;
+extern AEGfxTexture* inventory, * keycardInventory;
 
 extern int keyX, keyY;
 

@@ -16,6 +16,7 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	AEGfxTexture* keyTexture = NULL;
 	AEGfxTexture* errorPromptMenu = NULL, * redButton = NULL, * greenButton = NULL;
 	AEGfxTexture* prompt1 = NULL, * prompt2 = NULL, * prompt3 = NULL, * prompt4 = NULL, * prompt5 = NULL, * prompt6 = NULL, * prompt7 = NULL, * prompt8 = NULL, * prompt9 = NULL;
+	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
 
 	int keyX{}, keyY{};
 
@@ -180,6 +181,8 @@ namespace load {
 		AssetManager::LoadTexture(TEX_BUTTON2, "Assets/UI/2Button.png");
 		AssetManager::LoadTexture(TEX_BUTTON3, "Assets/UI/3Button.png");
 		AssetManager::LoadTexture(TEX_SPACEBAR, "Assets/UI/spacebar.png");
+		AssetManager::LoadTexture(TEX_INVENTORY, "Assets/UI/inventory.png");
+		AssetManager::LoadTexture(TEX_KEYCARDINVENTORY, "Assets/UI/keycardInventory.png");
 
 		// Sync the extern pointers so other files can use them directly
 		ctrl1 = AssetManager::GetTexture(TEX_CTRL1);
@@ -196,6 +199,8 @@ namespace load {
 		button2 = AssetManager::GetTexture(TEX_BUTTON2);
 		button3 = AssetManager::GetTexture(TEX_BUTTON3);
 		spacebar = AssetManager::GetTexture(TEX_SPACEBAR);
+		inventory = AssetManager::GetTexture(TEX_INVENTORY);
+		keycardInventory = AssetManager::GetTexture(TEX_KEYCARDINVENTORY);
 	}
 
 	void key() {

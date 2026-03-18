@@ -232,6 +232,10 @@ void LevelEditor_Update() {
 		level = 2;
 		next = GS_RESTART;
 	}
+	else if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_3)) {
+		level = 3;
+		next = GS_RESTART;
+	}
 	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : GS_LEVEL2;
 
 	if (showDoorPrompt) {
@@ -318,13 +322,16 @@ void LevelEditor_Update() {
 	// Check if there's a keycard when left click
 	if (currentTileIndex == 10 && AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (level == 1 && keyCountLevel1 >= 1) {
+			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 			std::cout << "Keycard already exists" << std::endl;
 		}
 		else if (level == 2 && keyCountLevel2 >= 1) {
 			std::cout << "Keycard already exists" << std::endl;
+			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 		}
 		else if (level == 3 && keyCountLevel3 >= 1) {
 			std::cout << "Keycard already exists" << std::endl;
+			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 		}
 	}
 }
