@@ -248,13 +248,14 @@ void Tutorial_Update()
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfoTut[player]);
-	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfoTut[player], 15);*/
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 15);
+	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 15);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfoTut[player], 15);
+
+	/*gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 15);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 15);
-	gamelogic::Collision_movement(&objectinfoTut[player], map, x, s, 15);
+	gamelogic::Collision_movement(&objectinfoTut[player], map, x, s, 15);*/
 
 	// -----------------------------------------------------------------------
 	// Door animation

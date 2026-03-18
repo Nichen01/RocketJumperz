@@ -36,6 +36,7 @@
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="traps.cpp" />
     <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="VictoryScreen.cpp" />
   </ItemGroup>
@@ -66,6 +67,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="traps.h" />
     <ClInclude Include="Tutorial.h" />
     <ClInclude Include="VictoryScreen.h" />
   </ItemGroup>

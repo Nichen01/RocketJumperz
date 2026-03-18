@@ -19,6 +19,7 @@ namespace pickup {
 			else if (gamelogic::static_collision(&player, &instance[i].info)) {
 				instance[i].info.flag = 0;
 				movement::bulletCount += 25;
+				player.health += 50;
 
 			}
 		}

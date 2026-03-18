@@ -275,6 +275,8 @@ void Level1_Update()
 	movement::updatePlayerPhysics(objectinfo[player]);
 	aiming::updateAiming(objectinfo[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo[player]);
+	int test = gamelogic::CheckInstanceBinaryMapCollision(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale, map, 50, x);
+	printf("\n\ncontact:%d\n\n", test);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -323,9 +325,9 @@ void Level1_Update()
 		next = GS_MAINMENU;
 	}
 
-	gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
+	/*gamelogic::OBJ_to_map(map, x, s, &enemies[0].shape, 1);
 	gamelogic::OBJ_to_map(map, x, s, &enemies[1].shape, 1);
-	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);
+	gamelogic::OBJ_to_map(map, x, s, &objectinfo[player], 1);*/
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
