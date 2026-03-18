@@ -12,6 +12,7 @@ struct DoorLink {
     int row, col;
     float worldX, worldY;
     bool isOpen = false;
+    bool isLocked;
     SpriteAnimation anim;
 };
 

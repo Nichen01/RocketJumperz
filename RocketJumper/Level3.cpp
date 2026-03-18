@@ -1,17 +1,3 @@
-/* Start Header ************************************************************************/
-/*!
-\file		  Level1.cpp
-\author       Ivan Chong, i.chong, 2503476
-\par          i.chong@digipen.edu
-\date         January, 16, 2026
-\brief        Contain functions called by GameStateManager.cpp
-
-Copyright (C) 2026 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
-*/
-/* End Header **************************************************************************/
 
 // External libraries are included in header file
 #include "Level3.h"
@@ -25,7 +11,7 @@ static int s = 80;
 const float PlayerScale = 80.0f;
 
 extern objectsquares objectinfo3[2] = { 0 };
-drop L1Drop[MAX_ENEMIES] = { 0 };
+drop L3Drop[MAX_ENEMIES] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -63,6 +49,7 @@ static bool playerNear;
 
 // bool for keycard in inventory
 static bool keycardCollected;
+static bool keycardCollectedAudio = false;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -164,11 +151,13 @@ void Level3_Initialize()
 	AssetManager::BuildSqrMesh(MESH_PLAYER);
 	AssetManager::BuildSqrMesh(MESH_PLATFORM);
 	AssetManager::BuildSqrMesh(MESH_TEST);
+	AssetManager::BuildSqrMesh(MESH_UI);
 	pMesh = AssetManager::GetMesh(MESH_PLAYER);
 	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
 	pTestMesh = AssetManager::GetMesh(MESH_TEST);
+	uiMesh = AssetManager::GetMesh(MESH_UI);
 
-	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
+	if (!ImportMapDataFromFile("Assets/Map/Level3_Map.txt")) {
 		printf("Could not import file");
 		return;
 	}
@@ -186,9 +175,15 @@ void Level3_Initialize()
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	for (auto& door : doors) {
+		// Lock all doors except for Tutorial -> Level 1
+		door.isLocked = true;
+		if (door.id == 21) {
+			door.isLocked = false;
+		}
+
 		if (door.id == playerEnteredDoorId) {
 			objectinfo3[player].xPos = door.worldX;
-			objectinfo3[player].yPos = door.worldY; // slight offset so player isn't inside door
+			objectinfo3[player].yPos = door.worldY;
 			spawnSet = true;
 			break;
 		}
@@ -227,7 +222,7 @@ void Level3_Initialize()
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
-	pickup::initDrops(L1Drop, MAX_ENEMIES, PlayerScale);
+	pickup::initDrops(L3Drop, MAX_ENEMIES, PlayerScale);
 }
 
 void Level3_Update()
@@ -271,7 +266,7 @@ void Level3_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo3[player]);
 	aiming::updateAiming(objectinfo3[player]);
-	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo3[player]);
+	pickup::updateDrops(L3Drop, MAX_ENEMIES, objectinfo3[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -295,7 +290,7 @@ void Level3_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfo3[player], L1Drop,
+		objectinfo3[player], L3Drop,
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -355,12 +350,19 @@ void Level3_Update()
 
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
-				playerEnteredDoorId = door.id; // remember which door was used
-				switch (toLevel) {
-				case 0: next = GS_TUTORIAL; break;
-				case 1: next = GS_LEVEL1;   break;
-				case 2: next = GS_LEVEL2;   break;
+				if (door.isLocked && !keycardCollected) {
+					std::cout << "Door is locked!" << std::endl;
+					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+				}
+				else {
+					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+					playerEnteredDoorId = door.id; // remember which door was used
+					switch (toLevel) {
+					case 0: next = GS_TUTORIAL; break;
+					case 1: next = GS_LEVEL1;   break;
+					case 2: next = GS_LEVEL2;   break;
+					case 3: next = GS_LEVEL3;   break;
+					}
 				}
 			}
 		}
@@ -391,12 +393,10 @@ void Level3_Update()
 	keyObj.xScale = key.size;
 	keyObj.yScale = key.size;
 
-	if (gamelogic::static_collision(&objectinfo3[player], &keyObj)) {
+	if (key.active && gamelogic::static_collision(&objectinfo3[player], &keyObj)) {
 		key.active = false;
-	}
-
-	if (!key.active) {
 		keycardCollected = true;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 }
 
@@ -430,7 +430,7 @@ void Level3_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
-	pickup::drawDrops(L1Drop, MAX_ENEMIES);
+	pickup::drawDrops(L3Drop, MAX_ENEMIES);
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
@@ -476,10 +476,17 @@ void Level3_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfo3[player].xPos, objectinfo3[player].yPos + 60.f, eButton, 50.f);
 	}
-
+	// ====== PLACEHOLDER INVENTORY FOR WIRES ====== //
+	renderlogic::drawTexture(-650.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {
-
+		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
+	}
+	else {
+		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
 }
 
@@ -487,8 +494,6 @@ void Level3_Free()
 {
 	// Unload all AssetManager-tracked textures
 	AssetManager::FreeAllMeshes();
-
-
 
 	if (map) {
 		delete[] map;

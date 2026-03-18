@@ -10,8 +10,8 @@ static int s = 80;
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
 const float PlayerScale = 80.0f;
 
-extern objectsquares objectinfo[2] = { 0 };
-drop L3Drop[MAX_ENEMIES] = { 0 };
+extern objectsquares objectinfo1[2] = { 0 };
+drop L1Drop[MAX_ENEMIES] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
@@ -142,7 +142,7 @@ void Level1_Initialize()
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
-	movement::initPlayerMovement(objectinfo[player]);
+	movement::initPlayerMovement(objectinfo1[player]);
 
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
@@ -175,23 +175,29 @@ void Level1_Initialize()
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	for (auto& door : doors) {
+		// Lock all doors except for Tutorial -> Level 1
+		door.isLocked = true;
+		if (door.id == 21) {
+			door.isLocked = false;
+		}
+
 		if (door.id == playerEnteredDoorId) {
-			objectinfo[player].xPos = door.worldX;
-			objectinfo[player].yPos = door.worldY;
+			objectinfo1[player].xPos = door.worldX;
+			objectinfo1[player].yPos = door.worldY;
 			spawnSet = true;
 			break;
 		}
 	}
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
-		objectinfo[player].xPos = 0.f;
-		objectinfo[player].yPos = 0.f;
+		objectinfo1[player].xPos = 0.f;
+		objectinfo1[player].yPos = 0.f;
 	}
-	objectinfo[player].xScale = PlayerScale;
-	objectinfo[player].yScale = PlayerScale;
+	objectinfo1[player].xScale = PlayerScale;
+	objectinfo1[player].yScale = PlayerScale;
 
 	// Initialize player health to 100 HP with no invincibility active
-	InitPlayerHealth(objectinfo[player]);
+	InitPlayerHealth(objectinfo1[player]);
 
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
@@ -216,7 +222,7 @@ void Level1_Initialize()
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
-	pickup::initDrops(L3Drop, MAX_ENEMIES,PlayerScale);
+	pickup::initDrops(L1Drop, MAX_ENEMIES,PlayerScale);
 }
 
 void Level1_Update()
@@ -250,7 +256,7 @@ void Level1_Update()
 
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
-	movement::physicsInput(objectinfo[player]);
+	movement::physicsInput(objectinfo1[player]);
 
 	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
@@ -258,9 +264,9 @@ void Level1_Update()
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
-	movement::updatePlayerPhysics(objectinfo[player]);
-	aiming::updateAiming(objectinfo[player]);
-	pickup::updateDrops(L3Drop, MAX_ENEMIES, objectinfo[player]);
+	movement::updatePlayerPhysics(objectinfo1[player]);
+	aiming::updateAiming(objectinfo1[player]);
+	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -268,7 +274,7 @@ void Level1_Update()
 		projectileSystem::fireProjectiles(
 			static_cast<s32>(worldMouseX),
 			static_cast<s32>(worldMouseY),
-			objectinfo[player],
+			objectinfo1[player],
 			Projectiles,
 			MAX_PROJECTILES,
 			LaserBlast, 
@@ -284,7 +290,7 @@ void Level1_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfo[player], L3Drop,
+		objectinfo1[player], L1Drop,
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -292,7 +298,7 @@ void Level1_Update()
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// Tick down the player's invincibility timer each frame
-	UpdatePlayerInvincibility(objectinfo[player], dt);
+	UpdatePlayerInvincibility(objectinfo1[player], dt);
 
 	// Check player projectiles hitting enemies
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
@@ -300,20 +306,20 @@ void Level1_Update()
 
 	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
 	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
-		objectinfo[player], Punch, soundEffects);
+		objectinfo1[player], Punch, soundEffects);
 
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
-		enemyProjectiles, MAX_PROJECTILES, objectinfo[player]);
+		enemyProjectiles, MAX_PROJECTILES, objectinfo1[player]);
 
 	// If player health < 0, go to death screen
-	if (objectinfo[player].health <= 0) {
+	if (objectinfo1[player].health <= 0) {
 		next = GS_DEATH;
 	}
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&objectinfo[player], map, x, s, 1);
+	gamelogic::Collision_movement(&objectinfo1[player], map, x, s, 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -326,8 +332,8 @@ void Level1_Update()
 		if (door.entranceLevel != 1 && door.exitLevel != 1)
 			continue;
 
-		f32 dx = objectinfo[player].xPos - door.worldX;
-		f32 dy = objectinfo[player].yPos - door.worldY;
+		f32 dx = objectinfo1[player].xPos - door.worldX;
+		f32 dy = objectinfo1[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
 
 		bool nearThisDoor = (dist <= doorTriggerRadius);
@@ -344,12 +350,19 @@ void Level1_Update()
 
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
-				playerEnteredDoorId = door.id; // remember which door was used
-				switch (toLevel) {
-				case 0: next = GS_TUTORIAL; break;
-				case 1: next = GS_LEVEL1;   break;
-				case 2: next = GS_LEVEL2;   break;
+				if (door.isLocked && !keycardCollected) {
+					std::cout << "Door is locked!" << std::endl;
+					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+				}
+				else {
+					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+					playerEnteredDoorId = door.id; // remember which door was used
+					switch (toLevel) {
+					case 0: next = GS_TUTORIAL; break;
+					case 1: next = GS_LEVEL1;   break;
+					case 2: next = GS_LEVEL2;   break;
+					case 3: next = GS_LEVEL3;   break;
+					}
 				}
 			}
 		}
@@ -380,7 +393,7 @@ void Level1_Update()
 	keyObj.xScale = key.size;
 	keyObj.yScale = key.size;
 
-	if (key.active && gamelogic::static_collision(&objectinfo[player], &keyObj)) {
+	if (key.active && gamelogic::static_collision(&objectinfo1[player], &keyObj)) {
 		key.active = false;
 		keycardCollected = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
@@ -417,7 +430,7 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
 
-	pickup::drawDrops(L3Drop, MAX_ENEMIES);
+	pickup::drawDrops(L1Drop, MAX_ENEMIES);
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
@@ -426,8 +439,8 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
-	renderlogic::drawSquare(objectinfo[player].xPos, objectinfo[player].yPos,
-		objectinfo[player].xScale, objectinfo[player].yScale);
+	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
+		objectinfo1[player].xScale, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
 
@@ -443,7 +456,7 @@ void Level1_Draw()
 	if (fontLevel1 >= 0)
 	{
 		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo[player].health);
+		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo1[player].health);
 
 		// Prepare render state for font (font uses a glyph texture atlas)
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -461,13 +474,16 @@ void Level1_Draw()
 
 	// ====== FLASHING E BUTTON WHEN PLAYER IS NEAR A DOOR ====== //
 	if (playerNear) {
-		renderlogic::flashingTexture(objectinfo[player].xPos, objectinfo[player].yPos + 60.f, eButton, 50.f);
+		renderlogic::flashingTexture(objectinfo1[player].xPos, objectinfo1[player].yPos + 60.f, eButton, 50.f);
 	}
 	// ====== PLACEHOLDER INVENTORY FOR WIRES ====== //
 	renderlogic::drawTexture(-650.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
 	}
 	else {
 		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
