@@ -244,9 +244,9 @@ namespace load {
 	}
 
 	void brokenDoor() {
-		AssetManager::LoadTexture(TEX_BROKENDOOR0, "Assets/UI/brokenDoor0.png");
-		AssetManager::LoadTexture(TEX_BROKENDOOR1, "Assets/UI/brokenDoor1.png");
-		AssetManager::LoadTexture(TEX_BROKENDOOR2, "Assets/UI/brokenDoor2.png");
+		AssetManager::LoadTexture(TEX_BROKENDOOR0, "Assets/Platform/brokenDoor0.png");
+		AssetManager::LoadTexture(TEX_BROKENDOOR1, "Assets/Platform/brokenDoor1.png");
+		AssetManager::LoadTexture(TEX_BROKENDOOR2, "Assets/Platform/brokenDoor2.png");
 		brokenDoor0 = AssetManager::GetTexture(TEX_BROKENDOOR0);
 		brokenDoor1 = AssetManager::GetTexture(TEX_BROKENDOOR1);
 		brokenDoor2 = AssetManager::GetTexture(TEX_BROKENDOOR2);

@@ -57,6 +57,7 @@ void Level3_Load()
 {
 	audio::loadsound();
 
+	load::wireInventory();
 	load::brokenDoor();	// Load broken door(s) for final door
 	load::platform();	// Load platform tile textures
 	load::ui();			// Load UI textures (eButton used by flashing door prompt in Draw)

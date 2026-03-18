@@ -3,7 +3,7 @@
 
 // ==================== GLOBAL RESOURCES ==================== //
 static AEGfxTexture* door;
-static AEGfxTexture* tileTextures[11];
+static AEGfxTexture* tileTextures[12];
 static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
 static const char* pText3{ "Level 3" };
@@ -35,6 +35,8 @@ static const f32 BUTTON_SCALE_NORMAL = 1.0f;
 static const f32 BUTTON_SCALE_HOVER = 1.15f;
 static const f32 BUTTON_SCALE_SPEED = 0.15f;
 static std::vector<doorButton> buttonArr;
+
+static bool placeFinalDoor = false;
 
 static bool isMouseOverDoorButton(const doorButton& button) {
 	s32 mouseX, mouseY;
@@ -152,6 +154,7 @@ void LevelEditor_Load() {
 	load::ui();
 	load::errorPrompt();
 	load::redButtonOption();
+	load::brokenDoor();
 	// Load sound
 	audio::loadsound();
 
@@ -179,11 +182,10 @@ void LevelEditor_Load() {
 	tileTextures[8] = AssetManager::GetTexture(TEX_PLATFORM9);
 	tileTextures[9] = AssetManager::GetTexture(TEX_STATIC_DOOR);
 	tileTextures[10] = AssetManager::GetTexture(TEX_KEYCARD);
+	tileTextures[11] = AssetManager::GetTexture(TEX_BROKENDOOR0);
 }
 
 void LevelEditor_Initialize() {
-
-
 
 	AssetManager::BuildSqrMesh(MESH_PLATFORM);
 	AssetManager::BuildSqrMesh(MESH_UI);
@@ -289,12 +291,12 @@ void LevelEditor_Update() {
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex++;
-		if (currentTileIndex >= 11) currentTileIndex = 0;
+		if (currentTileIndex >= 12) currentTileIndex = 0;
 	}
 	else if (AEInputCheckTriggered(AEVK_LEFT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex--;
-		if (currentTileIndex < 0) currentTileIndex = 10;
+		if (currentTileIndex < 0) currentTileIndex = 11;
 	}
 
 	// undo
@@ -320,7 +322,7 @@ void LevelEditor_Update() {
 	}
 
 	// Check if there's a keycard when left click
-	if (currentTileIndex == 10 && AEInputCheckTriggered(AEVK_LBUTTON)) {
+	if (currentTileIndex == 10 && AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (level == 1 && keyCountLevel1 >= 1) {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 			std::cout << "Keycard already exists" << std::endl;
@@ -334,6 +336,31 @@ void LevelEditor_Update() {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 		}
 	}
+	//if (currentTileIndex == 11 && AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
+	//	if (level != 3) {
+	//		std::cout << "Final Door can only be placed in Level 3!" << std::endl;
+	//		AEAudioPlay(Error, soundEffects, 1, 1, 0);
+	//	}
+	//	else {
+	//		if (finalDoorCount >= 1) {
+	//			std::cout << "Final Door already exists in this level!" << std::endl;
+	//			AEAudioPlay(Error, soundEffects, 1, 1, 0);
+	//		}
+	//		else {
+	//			TileAction action;
+	//			action.row = promptRow;
+	//			action.col = promptCol;
+	//			action.prevValue = MapData[promptRow][promptCol];
+	//			action.newValue = 69; // final door tile ID
+
+	//			MapData[promptRow][promptCol] = action.newValue;
+	//			actionHistory.push_back(action);
+
+	//			finalDoorCount = 1; // only one allowed
+	//		}
+	//	}
+	//}
+
 }
 
 void LevelEditor_Draw() {
@@ -360,6 +387,10 @@ void LevelEditor_Draw() {
 	else if (level == 2) {
 		AEGfxGetPrintSize(font, pText2, 1.f, &levelWidth, &levelHeight);
 		AEGfxPrint(font, pText2, -1.f + offsetX, -1.f + offsetY, 1, 1, 1, 1, 1);
+	}
+	else if (level == 3) {
+		AEGfxGetPrintSize(font, pText3, 1.f, &levelWidth, &levelHeight);
+		AEGfxPrint(font, pText3, -1.f + offsetX, -1.f + offsetY, 1, 1, 1, 1, 1);
 	}
 
 	// display level in a grid system
@@ -420,6 +451,30 @@ void LevelEditor_Draw() {
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
 					}
+					else if (currentTileIndex == 11) {
+						if (level != 3) {
+							std::cout << "Final Door can only be placed in Level 3!" << std::endl;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						}
+						else {
+							if (finalDoorCount == 0) {
+								TileAction action;
+								action.row = row;
+								action.col = col;
+								action.prevValue = MapData[row][col];
+								action.newValue = 69; // final door tile ID
+
+								MapData[row][col] = action.newValue;
+								actionHistory.push_back(action);
+
+								finalDoorCount = 1;
+							}
+							else {
+								std::cout << "Final Door already exists in this level!" << std::endl;
+								AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+							}
+						}
+					}
 
 
 				}
@@ -435,6 +490,9 @@ void LevelEditor_Draw() {
 						else if (level == 2) keyCountLevel2 = 0;
 						else if (level == 3) keyCountLevel3 = 0;
 					}
+					else if (MapData[row][col] == 69) {
+						finalDoorCount = 0;
+					}
 
 					MapData[row][col] = action.newValue;
 					actionHistory.push_back(action);
@@ -448,6 +506,9 @@ void LevelEditor_Draw() {
 			}
 			else if (MapData[row][col] == 67) { // key
 				AEGfxSetColorToMultiply(0.49f, 0.36f, 0.37f, 1.f);
+			}
+			else if (MapData[row][col] == 69) { // broken door
+				AEGfxSetColorToMultiply(0.5f, 0.41f, 0.65f, 1.f);
 			}
 			else {
 				AEGfxSetColorToMultiply(0.8f, 0.8f, 0.8f, 1.0f); // default light gray
@@ -481,22 +542,23 @@ void LevelEditor_Draw() {
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Door", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 67) { // key
+			else if (isGridHovered && MapData[row][col] == 67) { // key
 				// normalize tile center
 				AEGfxGetPrintSize(font, "Key", 0.4f, &textW, &textH);
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Key", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
-			else if (MapData[row][col] == 69) { // final door
+			else if (isGridHovered && MapData[row][col] == 69) { // final door
 				// normalize tile center
 				AEGfxGetPrintSize(font, "Final", 0.4f, &textW, &textH);
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
-				AEGfxPrint(font, "Final", normX, normY + 0.1f, 0.4f, 1, 1, 1, 1);
-				AEGfxPrint(font, "Door", normX, normY - 0.1f, 0.4f, 1, 1, 1, 1);
+				AEGfxPrint(font, "Final", normX, normY + 0.02f, 0.4f, 1, 1, 1, 1);
+				AEGfxGetPrintSize(font, "Door", 0.4f, &textW, &textH);
+				AEGfxPrint(font, "Door", normX, normY - 0.03f, 0.4f, 1, 1, 1, 1);
 			}
-			if (!isGridHovered && (MapData[row][col] == 11 || MapData[row][col] == 21)) {
+			else if (!isGridHovered && (MapData[row][col] == 11 || MapData[row][col] == 21)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "1", normX, normY, 0.5f, 1, 1, 1, 1);
@@ -554,7 +616,7 @@ void LevelEditor_Draw() {
 	AEMtx33Concat(&tileTransf, &tileTransl, &tileTransf);
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	if (currentTileIndex >= 0 && currentTileIndex < 11 && tileTextures[currentTileIndex]) {
+	if (currentTileIndex >= 0 && currentTileIndex < 12 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);
 	}
 
@@ -609,6 +671,10 @@ void LevelEditor_Draw() {
 	case 10:
 		sprintf_s(strBuffer, "Key");
 		AEGfxPrint(font, strBuffer, -0.17f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 11:
+		sprintf_s(strBuffer, "Final Door");
+		AEGfxPrint(font, strBuffer, -0.23f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	}
 

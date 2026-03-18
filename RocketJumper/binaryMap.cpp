@@ -40,6 +40,7 @@ Key key{};
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int keyCountLevel3 = 0;
+int finalDoorCount = 0;
 
 int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
@@ -142,6 +143,7 @@ int ImportMapDataFromFile(const char* FileName)
 				finalDoor.worldX = (col * tileSize + tileSize / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				finalDoor.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.f);
 				finalDoor.state = 0;
+				finalDoorCount = 1;
 			}
 
 			// check the counts of door in one level
