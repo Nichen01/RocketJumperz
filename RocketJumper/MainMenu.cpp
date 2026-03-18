@@ -45,7 +45,7 @@ static MenuState currentMenuState = MENU_MAIN;
 
 // Credits scroll position -- expressed as a proportion of screen height at init
 static f32 creditsScrollY   = 0.0f;
-static const f32 CREDITS_SCROLL_SPEED = 1.0f;
+static const f32 CREDITS_SCROLL_SPEED = 2.5f;
 
 // ==================== BUTTON DEFINITIONS ====================
 // Main Menu Buttons
@@ -177,6 +177,12 @@ void MainMenu_Load() {
         printf("Warning: Title.png not found. Title banner will not render.\n");
     }
 
+    // DigiPen logo for credits screen
+    AssetManager::LoadTexture(TEX_DIGIPEN_LOGO, "Assets/UI/Menus/DigiPenWhite.png");
+    if (!AssetManager::GetTexture(TEX_DIGIPEN_LOGO)) {
+        printf("Warning: DigiPenWhite.png not found. Credits logo will not render.\n");
+    }
+
     // Load font
     menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 48);
     if (menuFont < 0) {
@@ -292,11 +298,14 @@ void UpdateCreditsMenu() {
     // Update back button
     MenuHelpers::updateButtonHover(backButton);
 
-    // Scroll credits upward
+    // Scroll credits upward each frame
     creditsScrollY += CREDITS_SCROLL_SPEED;
 
-    // Reset scroll when credits have moved fully past the top of the screen
-    if (creditsScrollY > scrH * 0.889f) {
+    // The credits content is tall (~28 lines). Once it scrolls far enough past the
+    // top of the screen, wrap back to the starting position below the viewport.
+    // Total content height is roughly 28 lines * lineSpacing (~60px) = ~1680px,
+    // so we allow scrolling up to about 2x screen height before resetting.
+    if (creditsScrollY > scrH * 2.2f) {
         creditsScrollY = -scrH * 0.667f;
     }
 
@@ -456,42 +465,120 @@ void DrawInstructionsMenu() {
 }
 
 void DrawCreditsMenu() {
-    // Draw title near top of screen
-    f32 titleY = halfH * 0.778f; // ~350 / 450
+    // ---- Fixed "CREDITS" header at the top of the screen ----
+    /*
+    f32 titleY = halfH * 0.778f; // near top
     if (menuFont >= 0) {
         MenuHelpers::drawTextCentered("CREDITS", 0.0f, titleY, 1.3f, menuFont);
     }
+    */
 
-    // Draw scrolling credits -- spacing is relative to screen height
+    // ---- Scrolling credits body ----
+    // All Y positions are offset by creditsScrollY so the text rolls upward.
+    // lineSpacing controls vertical distance between individual lines.
+    // sectionGap adds extra space between logical sections.
     if (menuFont >= 0) {
-        f32 baseY          = creditsScrollY;
-        f32 lineSpacing    = scrH * 0.067f;   // ~60  / 900
-        f32 sectionSpacing = scrH * 0.1f;      // ~90  / 900
+        f32 y              = creditsScrollY;       // current scroll origin
+        f32 lineSpacing    = scrH * 0.080f;        // ~54px at 900p
+        f32 sectionGap     = scrH * 0.100f;        // ~90px gap between sections
+        f32 headerScale    = 1.0f;                 // scale for section headings
+        f32 nameScale      = 0.75f;                // scale for individual names
+        f32 smallScale     = 0.65f;                // scale for copyright / fine print
 
-        // Team Section
-        MenuHelpers::drawTextCentered("DEVELOPMENT TEAM", 0.0f, baseY, 1.0f, menuFont);
-        MenuHelpers::drawTextCentered("Ivan Chong",       0.0f, baseY - lineSpacing,       0.8f, menuFont);
-        MenuHelpers::drawTextCentered("Chan Joraye",      0.0f, baseY - lineSpacing * 2.0f, 0.8f, menuFont);
+        // ---------- Team Name ----------
+        MenuHelpers::drawTextCentered("A Game by Team RocketJumperz", 0.0f, y, headerScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Dead Weight", 0.0f, y, nameScale, menuFont);
 
-        // Engine Section
-        f32 engineY = baseY - sectionSpacing * 2.0f;
-        MenuHelpers::drawTextCentered("GAME ENGINE",                   0.0f, engineY,                  1.0f, menuFont);
-        MenuHelpers::drawTextCentered("Alpha Engine",                  0.0f, engineY - lineSpacing,     0.8f, menuFont);
-        MenuHelpers::drawTextCentered("DigiPen Institute of Technology", 0.0f, engineY - lineSpacing * 2.0f, 0.8f, menuFont);
+        // ---------- Development Team ----------
+        y -= sectionGap;
+        MenuHelpers::drawTextCentered("DEVELOPMENT TEAM", 0.0f, y, headerScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Ivan",      0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Nicholas",  0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Joraye",    0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Jeremiah",  0.0f, y, nameScale, menuFont);
 
-        // Special Thanks
-        f32 thanksY = baseY - sectionSpacing * 3.5f;
-        MenuHelpers::drawTextCentered("SPECIAL THANKS",   0.0f, thanksY,                  1.0f, menuFont);
-        MenuHelpers::drawTextCentered("DigiPen Faculty",   0.0f, thanksY - lineSpacing,     0.8f, menuFont);
-        MenuHelpers::drawTextCentered("Playtesters",       0.0f, thanksY - lineSpacing * 2.0f, 0.8f, menuFont);
+        // ---------- Faculty and Advisors ----------
+        y -= sectionGap;
+        MenuHelpers::drawTextCentered("FACULTY AND ADVISORS", 0.0f, y, headerScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Gerald Wong",    0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Soroor Malekmohammadi Faradounbeh", 0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Tommy Tan",      0.0f, y, nameScale, menuFont);
 
-        // Copyright
-        f32 copyrightY = baseY - sectionSpacing * 5.0f;
-        MenuHelpers::drawTextCentered("Copyright (C) 2026",             0.0f, copyrightY,                       0.7f, menuFont);
-        MenuHelpers::drawTextCentered("DigiPen Institute of Technology", 0.0f, copyrightY - lineSpacing * 0.8f, 0.7f, menuFont);
+        // ---------- DigiPen Logo (drawn as a textured quad) ----------
+        y -= sectionGap;
+        AEGfxTexture*    logoTex  = AssetManager::GetTexture(TEX_DIGIPEN_LOGO);
+        AEGfxVertexList* quadMesh = AssetManager::GetMesh(MESH_QUAD);
+        if (logoTex && quadMesh) {
+            // Logo dimensions: roughly 20% of screen width, keeping a ~3:1 aspect ratio
+            f32 logoW = scrW * 0.20f;
+            f32 logoH = logoW * 0.33f;   // wide banner shape
+
+            AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+            AEGfxTextureSet(logoTex, 0.0f, 0.0f);
+            AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+            AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+            AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+            AEGfxSetTransparency(1.0f);
+
+            AEMtx33 logoScale, logoTrans, logoXform;
+            AEMtx33Scale(&logoScale, logoW, logoH);
+            AEMtx33Trans(&logoTrans, 0.0f, y);
+            AEMtx33Concat(&logoXform, &logoTrans, &logoScale);
+            AEGfxSetTransform(logoXform.m);
+            AEGfxMeshDraw(quadMesh, AE_GFX_MDM_TRIANGLES);
+        }
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Created at DigiPen Institute of Technology", 0.0f, y, nameScale, menuFont);
+
+        // ---------- President ----------
+        y -= sectionGap;
+        MenuHelpers::drawTextCentered("PRESIDENT", 0.0f, y, headerScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Claude Comair", 0.0f, y, nameScale, menuFont);
+
+        // ---------- Executives ----------
+        y -= sectionGap;
+        MenuHelpers::drawTextCentered("EXECUTIVES", 0.0f, y, headerScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Jason Chu",          0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Samir Abou Samra",   0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Michele Comair",     0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Angela Kugler",      0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Erik Mohrmann",      0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Benjamin Ellinger",  0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Melvin Gonsalvez",   0.0f, y, nameScale, menuFont);
+
+        // ---------- Additional Credits ----------
+        y -= sectionGap;
+        MenuHelpers::drawTextCentered("ADDITIONAL CREDITS", 0.0f, y, headerScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Sprite Assets: Craftpix, itch.io creators", 0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("Game Engine: Alpha Engine", 0.0f, y, nameScale, menuFont);
+
+        // ---------- Copyright ----------
+        y -= sectionGap;
+        MenuHelpers::drawTextCentered("All content (C) 2026 DigiPen Institute of Technology Singapore",
+                                       0.0f, y, smallScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("All Rights Reserved", 0.0f, y, smallScale, menuFont);
     }
 
-    // Draw back button
+    // ---- Fixed "BACK" button at the bottom of the screen ----
     AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_MENU_BUTTON);
     MenuHelpers::drawButton(backButton, btnMesh, menuFont);
 }

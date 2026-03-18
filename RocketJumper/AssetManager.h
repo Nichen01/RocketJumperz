@@ -80,6 +80,7 @@ enum TextureID {
     // Main Menu textures
     TEX_MAIN_MENU_BG,
     TEX_TITLE,
+    TEX_DIGIPEN_LOGO,   // DigiPenWhite.png used on the credits screen
 
     // Level editor: static door thumbnail
     TEX_STATIC_DOOR,
