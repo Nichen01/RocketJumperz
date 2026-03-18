@@ -103,6 +103,16 @@ enum TextureID {
     // Inventory texture
     TEX_INVENTORY,
     TEX_KEYCARDINVENTORY,
+
+    // Broken door(s)
+    TEX_BROKENDOOR0,
+    TEX_BROKENDOOR1,
+    TEX_BROKENDOOR2,
+
+    // Wire Inventory
+    TEX_WIREINVENTORY0,
+    TEX_WIREINVENTORY1,
+    TEX_WIREINVENTORY2,
     // Add new textures above this line
     TEX_MAX
 };

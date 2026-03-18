@@ -55,6 +55,8 @@ struct Key {
 	bool active{ true };
 };
 
+extern f32 tileSize; // Global tile size
+extern brokenDoor finalDoor;
 extern Key key;
 extern int keyCountLevel1; // one level can only have one key
 extern int keyCountLevel2;

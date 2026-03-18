@@ -17,6 +17,8 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	AEGfxTexture* errorPromptMenu = NULL, * redButton = NULL, * greenButton = NULL;
 	AEGfxTexture* prompt1 = NULL, * prompt2 = NULL, * prompt3 = NULL, * prompt4 = NULL, * prompt5 = NULL, * prompt6 = NULL, * prompt7 = NULL, * prompt8 = NULL, * prompt9 = NULL;
 	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
+	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
+	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
 
 	int keyX{}, keyY{};
 
@@ -238,7 +240,24 @@ namespace load {
 
 	void greenButtonOption() {
 		AssetManager::LoadTexture(TEX_GREENBUTTON, "Assets/UI/greenButton.png");
-
 		greenButton = AssetManager::GetTexture(TEX_GREENBUTTON);
+	}
+
+	void brokenDoor() {
+		AssetManager::LoadTexture(TEX_BROKENDOOR0, "Assets/UI/brokenDoor0.png");
+		AssetManager::LoadTexture(TEX_BROKENDOOR1, "Assets/UI/brokenDoor1.png");
+		AssetManager::LoadTexture(TEX_BROKENDOOR2, "Assets/UI/brokenDoor2.png");
+		brokenDoor0 = AssetManager::GetTexture(TEX_BROKENDOOR0);
+		brokenDoor1 = AssetManager::GetTexture(TEX_BROKENDOOR1);
+		brokenDoor2 = AssetManager::GetTexture(TEX_BROKENDOOR2);
+	}
+
+	void wireInventory() {
+		AssetManager::LoadTexture(TEX_WIREINVENTORY0, "Assets/UI/wireInventory0.png");
+		AssetManager::LoadTexture(TEX_WIREINVENTORY1, "Assets/UI/wireInventory1.png");
+		AssetManager::LoadTexture(TEX_WIREINVENTORY2, "Assets/UI/wireInventory2.png");
+		wireInventory0 = AssetManager::GetTexture(TEX_WIREINVENTORY0);
+		wireInventory1 = AssetManager::GetTexture(TEX_WIREINVENTORY1);
+		wireInventory2 = AssetManager::GetTexture(TEX_WIREINVENTORY2);
 	}
 } 

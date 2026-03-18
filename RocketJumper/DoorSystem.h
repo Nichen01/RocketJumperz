@@ -16,6 +16,12 @@ struct DoorLink {
     SpriteAnimation anim;
 };
 
+struct brokenDoor {
+    f32 worldX;
+    f32 worldY;
+    int state;
+};
+
 extern std::vector<DoorLink> doors;
 
 DoorLink* findLinkedDoor(int id, int currentLevel);

@@ -152,7 +152,12 @@ namespace renderlogic {
 						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					}
 					break;
-
+				case 69: // final door
+					AEGfxTextureSet(platform9, 0, 0);
+					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					break;
 				default: //defaults to playable area
 					break;
 				}
@@ -251,6 +256,33 @@ namespace renderlogic {
 		AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxTextureSet(textureAsset, 0, 0);
+		AEGfxSetTransform(uiTransf.m);
+		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
+	void drawWireInventory(int wire) {
+		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
+		AEMtx33Scale(&uiScl, 100.f, 100.f);
+		AEMtx33Rot(&uiRot, 0);
+
+		AEMtx33Trans(&uiTransl, -650.f, -400.f);
+		AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
+		AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+		if (wire == 0) {
+			AEGfxTextureSet(inventory, 0, 0);
+		}
+		else if (wire == 1) {
+			AEGfxTextureSet(wireInventory0, 0, 0);
+		}
+		else if (wire == 2) {
+			AEGfxTextureSet(wireInventory1, 0, 0);
+		}
+		else if (wire == 3) {
+			AEGfxTextureSet(wireInventory2, 0, 0);
+		}
+		
 		AEGfxSetTransform(uiTransf.m);
 		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
 	}

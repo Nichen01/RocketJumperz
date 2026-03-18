@@ -18,8 +18,11 @@ extern AEGfxTexture* keyTexture;
 extern AEGfxTexture* errorPromptMenu, * redButton, * greenButton;
 extern AEGfxTexture* prompt1, * prompt2, * prompt3, * prompt4, * prompt5, * prompt6, * prompt7, * prompt8, * prompt9;
 extern AEGfxTexture* inventory, * keycardInventory;
+extern AEGfxTexture* brokenDoor0, * brokenDoor1, * brokenDoor2;
+extern AEGfxTexture* wireInventory0, * wireInventory1, * wireInventory2;
 
 extern int keyX, keyY;
+extern int brokenDoorX, brokenDoorY;
 
 namespace init {
 	void enemy();
@@ -37,4 +40,6 @@ namespace load {
 	void errorPrompt();
 	void redButtonOption();
 	void greenButtonOption();
+	void brokenDoor();
+	void wireInventory();
 }

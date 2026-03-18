@@ -5,7 +5,6 @@
 static s32* map = nullptr;
 static int x;
 static int y;
-static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
 const float PlayerScale = 80.0f;
@@ -46,6 +45,7 @@ static s8 fontLevel1 = -1;
 
 // bool for checking player proximity with door
 static bool playerNear;
+static bool playerNearBrokenDoor;
 
 // bool for keycard in inventory
 static bool keycardCollected;
@@ -57,11 +57,9 @@ void Level3_Load()
 {
 	audio::loadsound();
 
-	// Load platform tile textures
-	load::platform();
-
-	// Load UI textures (eButton used by flashing door prompt in Draw)
-	load::ui();
+	load::brokenDoor();	// Load broken door(s) for final door
+	load::platform();	// Load platform tile textures
+	load::ui();			// Load UI textures (eButton used by flashing door prompt in Draw)
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
@@ -317,9 +315,9 @@ void Level3_Update()
 		next = GS_DEATH;
 	}
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&objectinfo3[player], map, x, s, 1);
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, static_cast<int>(tileSize), 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
+	gamelogic::Collision_movement(&objectinfo3[player], map, x, static_cast<int>(tileSize), 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -374,6 +372,14 @@ void Level3_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
+	// Check if player is near the broken door
+		f32 dx = objectinfo3[player].xPos - finalDoor.worldX;
+		f32 dy = objectinfo3[player].yPos - finalDoor.worldY;
+		f32 dist = sqrtf(dx * dx + dy * dy);
+
+		playerNearBrokenDoor = (dist <= doorTriggerRadius);
+
+
 	// After loop, set global flag for rendering
 	playerNear = nearAnyDoor;
 
@@ -398,6 +404,27 @@ void Level3_Update()
 		keycardCollected = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
+
+	//========== DOOR RENDERING BASED ON STATE ==========//
+	if (finalDoor.state == 0) {
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
+	}
+	else if (finalDoor.state == 1) {
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
+	}
+	else {
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
+	}
+
+	//========== PLAYER FIXING BROKEN DOOR ==========//
+	if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor && wireCount > 0) {
+		finalDoor.state = wireCount - 1;
+		wireCount--;
+	}
+
+	if (playerNearBrokenDoor && wireCount <= 0) {
+		AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+	}
 }
 
 void Level3_Draw()
@@ -412,7 +439,7 @@ void Level3_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	// ===== RENDER WALLS ======= //
-	renderlogic::drawMapWallFloor(map, x, y, s);
+	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
@@ -476,17 +503,23 @@ void Level3_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfo3[player].xPos, objectinfo3[player].yPos + 60.f, eButton, 50.f);
 	}
+
 	// ====== PLACEHOLDER INVENTORY FOR WIRES ====== //
-	renderlogic::drawTexture(-650.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+	renderlogic::drawWireInventory(wireCount);
+
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
 		for (auto& door : doors) {
 			door.isLocked = false;
-		}
+		}	
 	}
 	else {
 		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+	}
+
+	if (playerNearBrokenDoor) {
+		renderlogic::flashingTexture(finalDoor.worldX, finalDoor.worldY + 60.f, eButton, 50.f);
 	}
 }
 

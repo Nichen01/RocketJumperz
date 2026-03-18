@@ -5,7 +5,6 @@
 static s32* map = nullptr;
 static int x;
 static int y;
-static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
 const float PlayerScale = 80.0f;
@@ -317,9 +316,9 @@ void Level1_Update()
 		next = GS_DEATH;
 	}
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&objectinfo1[player], map, x, s, 1);
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, static_cast<int>(tileSize), 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
+	gamelogic::Collision_movement(&objectinfo1[player], map, x, static_cast<int>(tileSize), 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -412,7 +411,7 @@ void Level1_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	// ===== RENDER WALLS ======= //
-	renderlogic::drawMapWallFloor(map, x, y, s);
+	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,

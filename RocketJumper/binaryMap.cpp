@@ -43,6 +43,10 @@ int keyCountLevel3 = 0;
 
 int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
+brokenDoor finalDoor{};
+
+f32 tileSize = 80.f;
+
 // ----------------------------------------------------------------------------
 //
 //	This function opens the file name "FileName" and retrieves all the map data.
@@ -105,32 +109,39 @@ int ImportMapDataFromFile(const char* FileName)
 	BinaryCollisionArray = new int* [BINARY_MAP_HEIGHT];
 	glassMap = new int* [BINARY_MAP_HEIGHT];   // allocate glassMap rows
 
-	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
-		MapData[i] = new int[BINARY_MAP_WIDTH];
-		BinaryCollisionArray[i] = new int[BINARY_MAP_WIDTH];
-		glassMap[i] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
+	for (int row = 0; row < BINARY_MAP_HEIGHT; row++) {
+		MapData[row] = new int[BINARY_MAP_WIDTH];
+		BinaryCollisionArray[row] = new int[BINARY_MAP_WIDTH];
+		glassMap[row] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
 	}
 
-	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
-		for (int j = 0; j < BINARY_MAP_WIDTH; j++) {
+	for (int row = 0; row < BINARY_MAP_HEIGHT; row++) {
+		for (int col = 0; col < BINARY_MAP_WIDTH; col++) {
 			int value;
 			ifs >> value;
-			MapData[i][j] = value;
+			MapData[row][col] = value;
 			if (value == 40) {
-				BinaryCollisionArray[i][j] = 0;
+				BinaryCollisionArray[row][col] = 0;
 			}
 			else {
-				BinaryCollisionArray[i][j] = (value / 10 == 1) ? 1 : 0;
+				BinaryCollisionArray[row][col] = (value / 10 == 1) ? 1 : 0;
 			}
 			// to save coordinates of the key
 			if (value == 67) {
-				key.row = i;
-				key.col = j;
-				key.worldX = (j * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
-				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (i * key.size + key.size / 2.0f);
+				key.row = row;
+				key.col = col;
+				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
 				if (currentGameLevel == 1) keyCountLevel1 = 1;
 				else if (currentGameLevel == 2) keyCountLevel2 = 1;
 				else if (currentGameLevel == 3) keyCountLevel3 = 1;
+			}
+
+			// to save coordinates of brokenDoor
+			if (value == 69) {
+				finalDoor.worldX = (col * tileSize + tileSize / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+				finalDoor.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.f);
+				finalDoor.state = 0;
 			}
 
 			// check the counts of door in one level
@@ -149,10 +160,10 @@ int ImportMapDataFromFile(const char* FileName)
 
 			// assign random glass type if tile is "air"
 			if (value == 0 || (value >= 31 && value <= 39) || value == 67) {
-				glassMap[i][j] = rand() % 5;
+				glassMap[row][col] = rand() % 5;
 			}
 			else {
-				glassMap[i][j] = -1;
+				glassMap[row][col] = -1;
 			}
 		}
 	}

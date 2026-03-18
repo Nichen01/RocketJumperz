@@ -15,6 +15,7 @@ namespace renderlogic {
 	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
 	void drawGlass(int row, int col, int mapS, AEGfxVertexList* platformMesh);
 	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
+	void drawWireInventory(int);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp

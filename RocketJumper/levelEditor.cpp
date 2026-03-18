@@ -363,14 +363,14 @@ void LevelEditor_Draw() {
 	}
 
 	// display level in a grid system
-	const float tileSize = 65.f;
+	const float tileSizeLE = 65.f;
 	const float gap = 3.f;
 	for (s32 row = 0; row < BINARY_MAP_HEIGHT; ++row) {
 		for (s32 col = 0; col < BINARY_MAP_WIDTH; ++col) {
 
-			float xPos = col * tileSize - 750.f;
-			float yPos = -row * tileSize + 410.f;
-			float halfSize = (tileSize - gap) / 2.f;
+			float xPos = col * tileSizeLE - 750.f;
+			float yPos = -row * tileSizeLE + 410.f;
+			float halfSize = (tileSizeLE - gap) / 2.f;
 
 			bool isGridHovered = (worldMouseX >= xPos - halfSize && worldMouseX <= xPos + halfSize &&
 				worldMouseY >= yPos - halfSize && worldMouseY <= yPos + halfSize);
@@ -455,7 +455,7 @@ void LevelEditor_Draw() {
 
 
 			AEMtx33 scl, rot, transl, transf;
-			AEMtx33Scale(&scl, tileSize - gap, tileSize - gap);
+			AEMtx33Scale(&scl, tileSizeLE - gap, tileSizeLE - gap);
 			AEMtx33Rot(&rot, 0);
 			AEMtx33Trans(&transl, xPos, yPos);
 
@@ -487,6 +487,14 @@ void LevelEditor_Draw() {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Key", normX, normY, 0.4f, 1, 1, 1, 1);
+			}
+			else if (MapData[row][col] == 69) { // final door
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Final", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Final", normX, normY + 0.1f, 0.4f, 1, 1, 1, 1);
+				AEGfxPrint(font, "Door", normX, normY - 0.1f, 0.4f, 1, 1, 1, 1);
 			}
 			if (!isGridHovered && (MapData[row][col] == 11 || MapData[row][col] == 21)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
