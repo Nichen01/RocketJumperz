@@ -88,6 +88,13 @@ enum TextureID {
     // Mushroom idle sheet (spritesheet used by animation system)
     TEX_MUSHROOM_IDLE_SHEET,
 
+    // Ranged enemy state spritesheets
+    TEX_RANGED_IDLE,    // RangedMove.png frame 0 (reused as idle)
+    TEX_RANGED_MOVE,    // RangedMove.png   (1 row, 4 cols)
+    TEX_RANGED_ATTACK,  // RangedAttack.png (1 row, 6 cols)
+    TEX_RANGED_DEATH,   // RangedDeath.png  (1 row, 4 cols)
+    TEX_RANGED_HURT,    // RangedHurt.png   (1 row, 2 cols)
+
     // Add new textures above this line
     TEX_MAX
 };
@@ -98,6 +105,10 @@ enum MeshID {
     MESH_MELEE_ENEMY, // animated melee enemy mesh (spritesheet-sliced)
     MESH_DOOR,        // animated door mesh (spritesheet-sliced)
     MESH_MENU_BUTTON, // unit quad with black vertex color for color-mode button rendering
+    MESH_RANGED_MOVE,   // spritesheet mesh (1 row, 4 cols)
+    MESH_RANGED_ATTACK, // spritesheet mesh (1 row, 6 cols)
+    MESH_RANGED_DEATH,  // spritesheet mesh (1 row, 4 cols)
+    MESH_RANGED_HURT,   // spritesheet mesh (1 row, 2 cols)
     // Add new meshes above this line
     MESH_MAX
 };

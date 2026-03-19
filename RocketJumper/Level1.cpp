@@ -81,6 +81,13 @@ void Level1_Load()
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 
+	// Ranged enemy state spritesheets (1 row each, variable columns)
+	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
+	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
+	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
+	AssetManager::LoadTexture(TEX_RANGED_HURT,    "Assets/Enemy/RangedHurt.png");
+	// TEX_RANGED_IDLE reuses TEX_RANGED_MOVE (no separate idle sheet)
+
 	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
 	base5test        = AssetManager::GetTexture(TEX_BASE5TEST);
@@ -211,6 +218,12 @@ void Level1_Initialize()
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
+
+	// Build spritesheet meshes for ranged enemy states (rows, cols)
+	AssetManager::BuildSqrMesh(MESH_RANGED_MOVE,   1, 4);  // RangedMove.png   1x4
+	AssetManager::BuildSqrMesh(MESH_RANGED_ATTACK,  1, 6);  // RangedAttack.png 1x6
+	AssetManager::BuildSqrMesh(MESH_RANGED_DEATH,   1, 4);  // RangedDeath.png  1x4
+	AssetManager::BuildSqrMesh(MESH_RANGED_HURT,    1, 2);  // RangedHurt.png   1x2
 
 	// DOOR
 	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);

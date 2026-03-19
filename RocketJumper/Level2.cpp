@@ -71,6 +71,10 @@ void Level2_Load()
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
+	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
+	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
+	AssetManager::LoadTexture(TEX_RANGED_HURT,    "Assets/Enemy/RangedHurt.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
 
 	// Sync the extern pointers so other files can use them directly
@@ -158,6 +162,12 @@ void Level2_Initialize()
 
 	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
+
+	// Build spritesheet meshes for ranged enemy states (rows, cols)
+	AssetManager::BuildSqrMesh(MESH_RANGED_MOVE,   1, 4);
+	AssetManager::BuildSqrMesh(MESH_RANGED_ATTACK,  1, 6);
+	AssetManager::BuildSqrMesh(MESH_RANGED_DEATH,   1, 4);
+	AssetManager::BuildSqrMesh(MESH_RANGED_HURT,    1, 2);
 
 	// Custom door mesh via AssetManager
 	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);

@@ -16,11 +16,84 @@ Technology is prohibited.
 #include "Collision.h"
 #include "Draw.h"
 #include "Player.h"
+#include "AssetManager.h"
 #include <cmath>
 
 namespace enemySystem {
     // Note: Audio resources are loaded and managed by Level files, not here.
     // They are passed in as parameters to updateEnemies().
+
+    // -----------------------------------------------------------------------
+    // Animation frame-rate constants for ranged enemy spritesheets
+    // -----------------------------------------------------------------------
+    const f32 kRangedFrameDelay = 0.12f;  // Seconds per frame (~8 fps)
+
+    // Spritesheet dimensions (rows x cols) per state
+    const int kRangedIdleCols   = 4;  // Reuses RangedMove.png, frozen on frame 0
+    const int kRangedIdleRows   = 1;
+    const int kRangedMoveCols   = 4;  // RangedMove.png   (1 row, 4 columns)
+    const int kRangedMoveRows   = 1;
+    const int kRangedAttackCols = 6;  // RangedAttack.png (1 row, 6 columns)
+    const int kRangedAttackRows = 1;
+    const int kRangedDeathCols  = 4;  // RangedDeath.png  (1 row, 4 columns)
+    const int kRangedDeathRows  = 1;
+    const int kRangedHurtCols   = 2;  // RangedHurt.png   (1 row, 2 columns)
+    const int kRangedHurtRows   = 1;
+
+    /*!*************************************************************************
+     * SET ENEMY STATE
+     * @brief Transitions a ranged enemy into a new animation state.
+     *        Re-initializes the per-enemy SpriteAnimation when the state
+     *        actually changes so the new spritesheet plays from frame 0.
+     *
+     * @param enemy       Reference to the enemy whose state is changing
+     * @param newState    The target EnemyState to transition into
+     * @return VOID
+     ***************************************************************************/
+    void SetEnemyState(Enemy& enemy, EnemyState newState)
+    {
+        // Early-return: do nothing if already in the requested state
+        if (enemy.state == newState) return;
+
+        enemy.state = newState;
+
+        // Re-init the SpriteAnimation based on the new state's spritesheet
+        switch (newState)
+        {
+        case STATE_IDLE:
+            // Idle reuses the move sheet but stays on frame 0 (ANIM_IDLE)
+            animSystem::init(enemy.anim,
+                kRangedIdleCols, kRangedIdleRows,
+                kRangedIdleCols * kRangedIdleRows,  // totalFrames = 4
+                kRangedFrameDelay,
+                ANIM_IDLE, 0);
+            break;
+
+        case STATE_MOVING:
+            animSystem::init(enemy.anim,
+                kRangedMoveCols, kRangedMoveRows,
+                kRangedMoveCols * kRangedMoveRows,  // totalFrames = 4
+                kRangedFrameDelay,
+                ANIM_LOOP, 0);
+            break;
+
+        case STATE_ATTACK:
+            animSystem::init(enemy.anim,
+                kRangedAttackCols, kRangedAttackRows,
+                kRangedAttackCols * kRangedAttackRows,  // totalFrames = 6
+                kRangedFrameDelay,
+                ANIM_PLAY_ONCE, 0);
+            break;
+
+        case STATE_DEATH:
+            animSystem::init(enemy.anim,
+                kRangedDeathCols, kRangedDeathRows,
+                kRangedDeathCols * kRangedDeathRows,  // totalFrames = 4
+                kRangedFrameDelay,
+                ANIM_PLAY_ONCE, 0);
+            break;
+        }
+    }
 
     /*!*************************************************************************
      * INIT ENEMIES
@@ -47,8 +120,13 @@ namespace enemySystem {
             enemies[i].detectionRange = 0.0f;
             enemies[i].attackRange = 0.0f;
             enemies[i].moveSpeed = 0.0f;
-            enemies[i].isActive = 0; // so to inactive so it wont update/render unless instructed to 
+            enemies[i].isActive = 0; // so to inactive so it wont update/render unless instructed to
             enemies[i].hasLineOfSight = 0;
+
+            // Zero-init the per-enemy animation state
+            enemies[i].state = STATE_IDLE;
+            enemies[i].facingRight = 1;  // default facing right
+            animSystem::reset(enemies[i].anim);
         }
     }
 
@@ -110,6 +188,16 @@ namespace enemySystem {
             enemies[foundSlot].detectionRange = RANGED_DETECTION_RANGE;
             enemies[foundSlot].attackRange = RANGED_ATTACK_RANGE;
             enemies[foundSlot].moveSpeed = RANGED_MOVE_SPEED;
+
+            // Default ranged enemies to idle animation state
+            enemies[foundSlot].facingRight = 1;
+            enemies[foundSlot].state = STATE_IDLE;
+            // Init with idle sheet (move sheet, frozen on frame 0)
+            animSystem::init(enemies[foundSlot].anim,
+                kRangedIdleCols, kRangedIdleRows,
+                kRangedIdleCols * kRangedIdleRows,
+                kRangedFrameDelay,
+                ANIM_IDLE, 0);
         }
 
         // Debugging
@@ -280,8 +368,56 @@ namespace enemySystem {
                 enemies[i].shape.velocityY = 0.0f;
             }
 
-            // Check if enemy is dead
-            if (enemies[i].health <= 0.0f)
+            // ==============================================================
+            // STATE MACHINE + ANIMATION UPDATE (ranged enemies only)
+            // ==============================================================
+            if (enemies[i].type == ENEMY_RANGED)
+            {
+                // --- Update facing direction based on horizontal velocity ---
+                if (enemies[i].shape.velocityX > 0.1f)
+                    enemies[i].facingRight = 1;
+                else if (enemies[i].shape.velocityX < -0.1f)
+                    enemies[i].facingRight = 0;
+
+                // --- State transitions (highest priority first) ---
+                if (enemies[i].health <= 0.0f)
+                {
+                    // Transition to death state, stop all movement
+                    SetEnemyState(enemies[i], STATE_DEATH);
+                    enemies[i].shape.velocityX = 0.0f;
+                    enemies[i].shape.velocityY = 0.0f;
+
+                    // Only despawn once the death animation finishes
+                    if (enemies[i].anim.justFinished)
+                    {
+                        enemies[i].isActive = 0;
+                        loot[i].info.xPos = enemies[i].shape.xPos;
+                        loot[i].info.yPos = enemies[i].shape.yPos;
+                        loot[i].info.flag = 1;
+                        printf("Enemy %d defeated!\n", i);
+                    }
+                }
+                else if (enemies[i].attackCooldown > (RANGED_ATTACK_COOLDOWN - kRangedFrameDelay * kRangedAttackCols))
+                {
+                    // Enemy just fired -- play attack anim for attack-anim duration
+                    SetEnemyState(enemies[i], STATE_ATTACK);
+                }
+                else if (fabsf(enemies[i].shape.velocityX) > 0.1f)
+                {
+                    SetEnemyState(enemies[i], STATE_MOVING);
+                }
+                else
+                {
+                    SetEnemyState(enemies[i], STATE_IDLE);
+                }
+
+                // Advance this enemy's individual animation each frame
+                animSystem::update(enemies[i].anim, deltaTime);
+            }
+            // ==============================================================
+            // NON-RANGED (melee) death check -- unchanged behavior
+            // ==============================================================
+            else if (enemies[i].health <= 0.0f)
             {
                 enemies[i].isActive = 0;
                 loot[i].info.xPos = enemies[i].shape.xPos;
@@ -327,8 +463,14 @@ namespace enemySystem {
                 AEGfxVertexList* mesh = nullptr;
                 f32 uOffset = 0.0f;
                 f32 vOffset = 0.0f;
+
+                // Scale values -- may be negated for sprite flipping
+                f32 renderScaleX = enemies[i].shape.xScale;
+                f32 renderScaleY = enemies[i].shape.yScale;
+
                 if (enemies[i].type == ENEMY_MELEE)
                 {
+                    // Melee enemies keep their original single-texture behavior
                     texture = meleeTexture;
                     mesh = meleeMesh;
                     uOffset = meleeUOffset;
@@ -336,9 +478,53 @@ namespace enemySystem {
                 }
                 else if (enemies[i].type == ENEMY_RANGED)
                 {
-                    texture = rangedTexture;
-                    mesh = rangedMesh;
+                    // -------------------------------------------------------
+                    // RANGED: pick texture + mesh based on current state
+                    // -------------------------------------------------------
+                    switch (enemies[i].state)
+                    {
+                    case STATE_ATTACK:
+                        texture = AssetManager::GetTexture(TEX_RANGED_ATTACK);
+                        mesh    = AssetManager::GetMesh(MESH_RANGED_ATTACK);
+                        break;
+                    case STATE_DEATH:
+                        texture = AssetManager::GetTexture(TEX_RANGED_DEATH);
+                        mesh    = AssetManager::GetMesh(MESH_RANGED_DEATH);
+                        break;
+                    case STATE_MOVING:
+                        texture = AssetManager::GetTexture(TEX_RANGED_MOVE);
+                        mesh    = AssetManager::GetMesh(MESH_RANGED_MOVE);
+                        break;
+                    case STATE_IDLE:
+                    default:
+                        // Idle reuses the move sheet frozen on frame 0
+                        texture = AssetManager::GetTexture(TEX_RANGED_MOVE);
+                        mesh    = AssetManager::GetMesh(MESH_RANGED_MOVE);
+                        break;
+                    }
+
+                    // UV offsets come from the enemy's own SpriteAnimation
+                    uOffset = animSystem::getUOffset(enemies[i].anim);
+                    vOffset = animSystem::getVOffset(enemies[i].anim);
+
+                    // Sprite flipping: if the default sprite faces RIGHT and
+                    // the enemy is facing LEFT, negate X scale to mirror it.
+                    if (!enemies[i].facingRight)
+                    {
+                        renderScaleX = -enemies[i].shape.xScale;
+                    }
+
+                    // Fallback: if state-specific assets aren't loaded yet,
+                    // fall back to the legacy ranged texture passed in.
+                    if (!texture)
+                    {
+                        texture = rangedTexture;
+                        mesh    = rangedMesh;
+                        uOffset = 0.0f;
+                        vOffset = 0.0f;
+                    }
                 }
+
                 // prevent crash if mesh isn't loaded
                 if (!mesh) continue;
 
@@ -354,9 +540,9 @@ namespace enemySystem {
                     AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
                 }
 
-                // Draw enemy using coordinates and the bound mesh
+                // Draw enemy -- renderScaleX may be negative for flipped sprites
                 renderlogic::drawSquare(enemies[i].shape.xPos, enemies[i].shape.yPos,
-                    enemies[i].shape.xScale, enemies[i].shape.yScale);
+                    renderScaleX, renderScaleY);
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
             }
         }
