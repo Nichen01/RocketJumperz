@@ -77,6 +77,14 @@ void GSM_Update()
 		fpFree = Tutorial_Free;
 		fpUnload = Tutorial_Unload;
 		break;
+	case GS_SPLASH:
+		fpLoad = SplashScreen_Load;
+		fpInitialize = SplashScreen_Init;
+		fpUpdate = SplashScreen_Update;
+		fpDraw = SplashScreen_Draw;
+		fpFree = SplashScreen_Free;
+		fpUnload = SplashScreen_Unload;
+		break;
 	case GS_RESTART:
 		break;
 	case GS_QUIT:

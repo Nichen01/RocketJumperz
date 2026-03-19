@@ -13,7 +13,6 @@ Technology is prohibited.
 /* End Header **************************************************************************/\
 #include "pch.h"
 #include "MainMenu.h"
-#include "ProjectileTest.h"
 #include "GameStateList.h"
 #include "Level1.h"
 #include "Level2.h"
@@ -21,6 +20,7 @@ Technology is prohibited.
 #include "Tutorial.h"
 #include "VictoryScreen.h"
 #include "DeathScreen.h"
+#include "SplashScreen.h"
 
 #pragma once
 extern bool firstTimeLevel1;

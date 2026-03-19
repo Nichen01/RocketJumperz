@@ -19,8 +19,8 @@ namespace projectileSystem {
         {
             projectiles[i].shape.xPos = 0.0f;
             projectiles[i].shape.yPos = 0.0f;
-            projectiles[i].shape.xScale = 10.0f;
-            projectiles[i].shape.yScale = 10.0f;
+            projectiles[i].shape.xScale = 20.0f;
+            projectiles[i].shape.yScale = 20.0f;
             projectiles[i].shape.velocityX = 0.0f;
             projectiles[i].shape.velocityY = 0.0f;
             projectiles[i].isActive = 0;
@@ -133,7 +133,6 @@ namespace projectileSystem {
         if (!texture)
         {
             printf("TEXTURE IS NULL!\n");
-            
         }
 
         for (int i = 0; i < maxCount; i++)
