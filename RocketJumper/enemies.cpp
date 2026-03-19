@@ -110,8 +110,6 @@ namespace enemySystem {
             enemies[foundSlot].detectionRange = RANGED_DETECTION_RANGE;
             enemies[foundSlot].attackRange = RANGED_ATTACK_RANGE;
             enemies[foundSlot].moveSpeed = RANGED_MOVE_SPEED;
-            //enemies[foundSlot].shape.xScale = 80.0f;
-            //enemies[foundSlot].shape.yScale = 80.0f;
         }
 
         // Debugging
@@ -252,8 +250,8 @@ namespace enemySystem {
                                 // init projectile position at enemy position and init size
                                 enemyProjectiles[p].shape.xPos = enemies[i].shape.xPos;
                                 enemyProjectiles[p].shape.yPos = enemies[i].shape.yPos;
-                                enemyProjectiles[p].shape.xScale = 10.0f;
-                                enemyProjectiles[p].shape.yScale = 10.0f;
+                                enemyProjectiles[p].shape.xScale = 20.0f;
+                                enemyProjectiles[p].shape.yScale = 20.0f;
 
                                 // set projectile velocity using normalized direction vector to player
                                 f32 projectileSpeed = 8.0f;
