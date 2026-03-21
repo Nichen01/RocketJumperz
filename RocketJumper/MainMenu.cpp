@@ -57,6 +57,7 @@ static MenuButton quitButton;
 // Back button for sub-menus
 static MenuButton backButton;
 
+
 // Animation constants
 static const f32 BUTTON_SCALE_NORMAL = 1.0f;
 static const f32 BUTTON_SCALE_HOVER  = 1.15f;
@@ -595,6 +596,11 @@ void MainMenu_Free() {
 void MainMenu_Unload() {
     // Textures are managed by AssetManager -- unload through the centralized system
     AssetManager::UnloadAllTextures();
+
+    if (titleTexture) {
+        AEGfxTextureUnload(titleTexture);
+        titleTexture = nullptr;
+    }
 
     if (menuFont >= 0) {
         AEGfxDestroyFont(menuFont);
