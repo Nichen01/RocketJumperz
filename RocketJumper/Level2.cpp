@@ -268,7 +268,7 @@ void Level2_Update()
 		next = GS_DEATH;
 	}
 
-	traps::updateTraps(enemies, objectinfo2, map, x, (float)s);
+	traps::updateTraps(enemies, objectinfo2, map, x,y, (float)s);
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 1);

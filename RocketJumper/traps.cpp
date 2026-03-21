@@ -14,7 +14,7 @@ namespace traps {
 		nearTrap = 0;
 		AEVec2Zero(&nearestTrap);
 	}
-	AEVec2 checkNearestTrap(float NposX,float NposY, int* map, int x) {
+	AEVec2 checkNearestTrap(float NposX,float NposY, int* map, int x,int y) {
 		nearTrap = 0;
 		AEVec2 temp = {};
 		for (int dx = -trapRange; dx <= trapRange; ++dx) {
@@ -23,7 +23,9 @@ namespace traps {
 				int checkY = static_cast<int>(NposY + dy);
 				if (checkX < 0) checkX = 0;
 				if (checkY < 0) checkY = 0;
-				if (map[checkY*x+checkX] == 2) {
+				if (checkX >= x) checkX = x-1;
+				if (checkY >= y) checkY = y-1;
+				if (MapData[checkY][checkX] == 51) {
 					nearTrap = 1;
 					AEVec2Set(&temp, static_cast<f32>(checkX), static_cast<f32>(checkY));
 					return temp;
@@ -42,13 +44,13 @@ namespace traps {
 		player.velocityY -= dy / dist * trapSuction;
 		
 	}
-	void updateTraps(Enemy enemies[],objectsquares objectinfo[],int* map,int x, float s) {
+	void updateTraps(Enemy enemies[],objectsquares objectinfo[],int* map,int x, int y, float s) {
 		trapInstanceCooldown -= 1;
 		float NposX = gamelogic::posX_to_index(objectinfo[player].xPos+ objectinfo[player].velocityX, s);
 		float NposY = gamelogic::posY_to_index(objectinfo[player].yPos + objectinfo[player].velocityY, s);
 		float NScaleX = objectinfo[player].xScale / s;
 		float NScaleY = objectinfo[player].yScale / s;
-		nearestTrap = checkNearestTrap(NposX, NposY, map, x);
+		nearestTrap = checkNearestTrap(NposX, NposY, map, x,y);
 		if (nearTrap) suckPlayer(objectinfo[player], nearestTrap, s);
 		if (gamelogic::CheckInstanceBinaryMapCollision(NposX, NposY, NScaleX, NScaleY, map, 2, x)) {
 			if (trapInstanceCooldown <= 0.0f)
