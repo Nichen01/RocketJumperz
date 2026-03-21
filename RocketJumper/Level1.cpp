@@ -15,6 +15,7 @@ Technology is prohibited.
 
 // External libraries are included in header file
 #include "Level1.h"
+#include "traps.h"
 
 static s32* map = nullptr;
 static int x;
@@ -328,7 +329,8 @@ void Level1_Update()
 
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&objectinfo[player], map, x, s, 1);
+	gamelogic::Collision_movement(&objectinfo[player], map, x, s, 1);	
+	traps::updateTraps(enemies, objectinfo, map, x, s);
 
 	// -----------------------------------------------------------------------
 	// Door animation
