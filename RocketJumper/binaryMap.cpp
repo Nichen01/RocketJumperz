@@ -106,6 +106,7 @@ int ImportMapDataFromFile(const char* FileName)
 			ifs >> value;
 			MapData[i][j] = value;
 			BinaryCollisionArray[i][j] = (value/10 == 1) ? 1 : 0;
+			if (value == 50) BinaryCollisionArray[i][j] = 1;
 
 
 			// assign random glass type if tile is "air"
