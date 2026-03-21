@@ -13,7 +13,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "binaryMap.h"
+#include "BinaryMap.h"
 #include <iostream>
 #include <fstream>
 #include <AEEngine.h>
