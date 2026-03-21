@@ -231,6 +231,7 @@ void Level1_Initialize()
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
 	pickup::initDrops(L1Drop, MAX_ENEMIES,PlayerScale);
+	traps::initTraps();
 }
 
 void Level1_Update()
@@ -275,8 +276,6 @@ void Level1_Update()
 	movement::updatePlayerPhysics(objectinfo[player]);
 	aiming::updateAiming(objectinfo[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo[player]);
-	int test = gamelogic::CheckInstanceBinaryMapCollision(objectinfo[player].xPos, objectinfo[player].yPos, objectinfo[player].xScale, objectinfo[player].yScale, map, 50, x);
-	printf("\n\ncontact:%d\n\n", test);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -330,8 +329,7 @@ void Level1_Update()
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&objectinfo[player], map, x, s, 1);	
-	traps::updateTraps(enemies, objectinfo, map, x, s);
-
+	traps::updateTraps(enemies, objectinfo, map, x, (float)s);
 	// -----------------------------------------------------------------------
 	// Door animation
 	// -----------------------------------------------------------------------

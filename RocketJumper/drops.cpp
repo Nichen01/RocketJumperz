@@ -36,5 +36,6 @@ namespace pickup {
 			}
 		}
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0, 0, 0, 0);
 	}
 }

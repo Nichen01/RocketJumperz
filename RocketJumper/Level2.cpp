@@ -15,6 +15,7 @@ Technology is prohibited.
 
 // External libraries included in header file
 #include "Level2.h"
+#include "traps.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -173,6 +174,7 @@ void Level2_Initialize()
 	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
 	doorMesh = tempDoorMesh;
 	pickup::initDrops(L2Drop, MAX_ENEMIES, PlayerScale);
+	traps::initTraps();
 }
 
 void Level2_Update()
@@ -266,7 +268,7 @@ void Level2_Update()
 		next = GS_DEATH;
 	}
 
-
+	traps::updateTraps(enemies, objectinfo2, map, x, (float)s);
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
 	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 1);

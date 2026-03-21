@@ -150,6 +150,13 @@ namespace gamelogic {
 		return -((pos - 450) / (float)MS);
 	}
 
+	float index_to_posX(float pos, float MS) {
+		return (pos * MS - 800);
+	}
+
+	float index_to_posY(float pos, float MS) {
+		return -(pos*MS-450);
+	}
 
 	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX)
 	{
