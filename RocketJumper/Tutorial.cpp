@@ -216,6 +216,7 @@ void Tutorial_Update()
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfoTut[player]);
+	movement::UpdatePlayerFacing(objectinfoTut[player]);
 	pickup::updateDrops(TutDrop, MAX_ENEMIES, objectinfoTut[player]);
 	//===================================================//
 
@@ -370,8 +371,12 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
+	// Flip sprite horizontally when the player is aiming left.
+	f32 playerDrawScaleX = movement::playerFacingLeft
+		? -objectinfoTut[player].xScale
+		:  objectinfoTut[player].xScale;
 	renderlogic::drawSquare(objectinfoTut[player].xPos, objectinfoTut[player].yPos,
-		objectinfoTut[player].xScale, objectinfoTut[player].yScale);
+		playerDrawScaleX, objectinfoTut[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render player projectiles with plasma texture

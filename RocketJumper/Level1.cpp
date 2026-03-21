@@ -279,6 +279,7 @@ void Level1_Update()
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo[player]);
+	movement::UpdatePlayerFacing(objectinfo[player]);
 	aiming::updateAiming(objectinfo[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo[player]);
 	//===================================================//
@@ -434,8 +435,13 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
+	// Flip sprite horizontally when the player is aiming left.
+	// Negating xScale mirrors the quad along the Y axis.
+	f32 playerDrawScaleX = movement::playerFacingLeft
+		? -objectinfo[player].xScale
+		:  objectinfo[player].xScale;
 	renderlogic::drawSquare(objectinfo[player].xPos, objectinfo[player].yPos,
-		objectinfo[player].xScale, objectinfo[player].yScale);
+		playerDrawScaleX, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
 

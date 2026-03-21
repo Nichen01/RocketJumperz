@@ -214,6 +214,7 @@ void Level2_Update()
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo2[player]);
+	movement::UpdatePlayerFacing(objectinfo2[player]);
 	aiming::updateAiming(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	//===================================================//
@@ -370,8 +371,12 @@ void Level2_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
+	// Flip sprite horizontally when the player is aiming left.
+	f32 playerDrawScaleX = movement::playerFacingLeft
+		? -objectinfo2[player].xScale
+		:  objectinfo2[player].xScale;
 	renderlogic::drawSquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
-		objectinfo2[player].xScale, objectinfo2[player].yScale);
+		playerDrawScaleX, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
 
