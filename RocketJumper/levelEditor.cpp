@@ -203,6 +203,8 @@ void LevelEditor_Draw() {
     AEGfxSetBlendMode(AE_GFX_BM_NONE);
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	// Reset additive color to prevent leftover tint from other draw functions
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// getting mouse coordinates
 	s32 mouseX, mouseY;
@@ -361,6 +363,9 @@ void LevelEditor_Draw() {
 	AEMtx33Concat(&tileTransf, &tileRot, &tileScl);
 	AEMtx33Concat(&tileTransf, &tileTransl, &tileTransf);
 
+	// Reset color modifiers before rendering textured tile preview
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	if (currentTileIndex >= 0 && currentTileIndex < 10 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);

@@ -548,6 +548,9 @@ namespace enemySystem {
                 AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
             }
         }
+
+        // Reset color state so subsequent draw calls are not tinted
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
     /*!*************************************************************************

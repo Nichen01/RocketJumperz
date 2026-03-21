@@ -86,6 +86,10 @@ void DeathScreen_Draw() {
 
     AEGfxGetPrintSize(deathfont, "DEATH", 1.f, &width, &height);
     AEGfxPrint(deathfont, "DEATH", -width / 2, 0.60f - height / 2, 1, 1, 1, 1, 1);
+
+    // Reset color state so subsequent draw calls are not tinted
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+    AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 }
 void DeathScreen_Free() {
     if (buttonMesh) {

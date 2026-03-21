@@ -463,6 +463,10 @@ void DrawInstructionsMenu() {
 
     // Draw back button
     MenuHelpers::drawButton(backButton, btnMesh, menuFont);
+
+    // Reset color state so subsequent draw calls are not tinted
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+    AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void DrawCreditsMenu() {
@@ -597,10 +601,12 @@ void MainMenu_Unload() {
     // Textures are managed by AssetManager -- unload through the centralized system
     AssetManager::UnloadAllTextures();
 
+    /*
     if (titleTexture) {
         AEGfxTextureUnload(titleTexture);
         titleTexture = nullptr;
     }
+    */
 
     if (menuFont >= 0) {
         AEGfxDestroyFont(menuFont);

@@ -35,6 +35,8 @@ namespace pickup {
 				printf("\n\ndrawn drop:%d\n\n", i);
 			}
 		}
+		// Reset color state so subsequent draw calls are not tinted green
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	}
 }

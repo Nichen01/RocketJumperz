@@ -89,7 +89,9 @@ void VictoryScreen_Draw() {
     AEGfxGetPrintSize(victoryfont, "VICTORY", 1.f, &width, &height);
     AEGfxPrint(victoryfont, "VICTORY", -width / 2, 0.60f - height / 2, 1, 1, 1, 1, 1);
 
-
+    // Reset color state so subsequent draw calls are not tinted
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+    AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 }
 void VictoryScreen_Free() {
     if (buttonMesh) {
