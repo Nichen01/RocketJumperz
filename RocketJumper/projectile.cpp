@@ -30,7 +30,7 @@ namespace projectileSystem {
     /*!*************************************************************************
      * FIRE PROJECTILES
      * @brief Finds an inactive projectile slot and fires it from the player's
-     * position. Calculates direction vector away from the mouse cursor
+     * position. Calculates direction vector toward the mouse cursor
      * and sets the projectile's velocity.
      * Usage: projectileSystem::fireProjectiles(mouseX, mouseY, playerObj, Projectiles, MAX_PROJECTILES);
      *
@@ -70,9 +70,9 @@ namespace projectileSystem {
                 projectiles[foundSlot].shape.xPos = player.xPos;
                 projectiles[foundSlot].shape.yPos = player.yPos + 5.0f;
 
-                // Calculate direction vector AWAY from mouse (rocket-jumper: fire opposite to aim)
-                f32 dx = player.xPos - static_cast<f32>(worldMouseX);
-                f32 dy = player.yPos - static_cast<f32>(worldMouseY);
+                // Calculate direction vector TOWARD the mouse cursor
+                f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
+                f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
 
                 // Normalize direction vector
                 f32 length = sqrtf(dx * dx + dy * dy);
@@ -106,9 +106,9 @@ namespace projectileSystem {
         {
             if (projectiles[i].isActive == 1)
             {
-                // Move projectile along its velocity vector (away from mouse)
-                projectiles[i].shape.xPos -= projectiles[i].shape.velocityX;
-                projectiles[i].shape.yPos -= projectiles[i].shape.velocityY;
+                // Move projectile along its velocity vector (toward mouse)
+                projectiles[i].shape.xPos += projectiles[i].shape.velocityX;
+                projectiles[i].shape.yPos += projectiles[i].shape.velocityY;
 
                 // Check if projectile is off-screen
                 if (projectiles[i].shape.xPos > 800.0f || projectiles[i].shape.xPos < -800.0f ||
