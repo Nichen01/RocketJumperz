@@ -44,8 +44,13 @@ namespace weaponSprite {
     // Module-level state
     // ====================================================================
 
-    // Cached gun texture pointer (owned by AssetManager, not freed here)
-    static AEGfxTexture* gunTexture = nullptr;
+    // Cached texture pointers (owned by AssetManager, not freed here)
+    static AEGfxTexture* plasmaTexture  = nullptr;
+    static AEGfxTexture* shotgunTexture = nullptr;
+
+    // Points to whichever texture matches the player's currentWeapon.
+    // Updated every frame in Update() so the Draw() call is simple.
+    static AEGfxTexture* activeTexture  = nullptr;
 
     // The final world-space transform matrix, rebuilt every frame in Update
     static AEMtx33 gunTransform = { 0 };
@@ -55,11 +60,20 @@ namespace weaponSprite {
     // ====================================================================
     void Load()
     {
+        // Load both weapon textures into AssetManager
         AssetManager::LoadTexture(TEX_PLASMA_GUN, "Assets/Weapons/plasmaGun.png");
-        gunTexture = AssetManager::GetTexture(TEX_PLASMA_GUN);
+        AssetManager::LoadTexture(TEX_SHOTGUN,    "Assets/Weapons/shotGun.png");
 
-        if (!gunTexture)
+        plasmaTexture  = AssetManager::GetTexture(TEX_PLASMA_GUN);
+        shotgunTexture = AssetManager::GetTexture(TEX_SHOTGUN);
+
+        // Default to plasma texture (matches WEAPON_PLASMA default)
+        activeTexture = plasmaTexture;
+
+        if (!plasmaTexture)
             printf("WeaponSprite: Failed to load plasmaGun.png!\n");
+        if (!shotgunTexture)
+            printf("WeaponSprite: Failed to load shotGun.png!\n");
     }
 
     // ====================================================================
@@ -67,8 +81,15 @@ namespace weaponSprite {
     // ====================================================================
     void Update(const objectsquares& playerObj)
     {
-        // Refresh the texture pointer in case AssetManager reloaded it
-        gunTexture = AssetManager::GetTexture(TEX_PLASMA_GUN);
+        // Refresh texture pointers in case AssetManager reloaded them
+        plasmaTexture  = AssetManager::GetTexture(TEX_PLASMA_GUN);
+        shotgunTexture = AssetManager::GetTexture(TEX_SHOTGUN);
+
+        // Swap the active texture to match the player's equipped weapon
+        if (playerObj.currentWeapon == WEAPON_SHOTGUN)
+            activeTexture = shotgunTexture;
+        else
+            activeTexture = plasmaTexture;
 
         // ----------------------------------------------------------------
         // 1. Calculate aim angle: direction from player center to mouse
@@ -137,7 +158,7 @@ namespace weaponSprite {
     // ====================================================================
     void Draw()
     {
-        if (!gunTexture || !pMesh)
+        if (!activeTexture || !pMesh)
             return;
 
         // Set up render state for the gun sprite
@@ -147,8 +168,8 @@ namespace weaponSprite {
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxSetTransparency(1.0f);
 
-        // Bind the gun texture (no UV offset -- single image, not a spritesheet)
-        AEGfxTextureSet(gunTexture, 0.0f, 0.0f);
+        // Bind the active weapon texture (swapped in Update based on currentWeapon)
+        AEGfxTextureSet(activeTexture, 0.0f, 0.0f);
 
         // Apply the cached transform and draw
         AEGfxSetTransform(gunTransform.m);
@@ -161,8 +182,10 @@ namespace weaponSprite {
     void Unload()
     {
         // The texture memory itself is freed by AssetManager::UnloadAllTextures()
-        // which each level already calls. We just null our local pointer.
-        gunTexture = nullptr;
+        // which each level already calls. We just null our local pointers.
+        plasmaTexture  = nullptr;
+        shotgunTexture = nullptr;
+        activeTexture  = nullptr;
     }
 
 }

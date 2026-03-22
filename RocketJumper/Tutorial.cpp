@@ -146,6 +146,9 @@ void Tutorial_Initialize()
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfoTut[player]);
 
+	// Start with the plasma gun equipped (default weapon)
+	objectinfoTut[player].currentWeapon = WEAPON_PLASMA;
+
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
@@ -208,11 +211,21 @@ void Tutorial_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfoTut[player]);
 
+	// ---- Weapon Toggle (Q key) ----
+	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
 	if (AEInputCheckTriggered(AEVK_Q)) {
-		next = GS_QUIT;
+		if (objectinfoTut[player].currentWeapon == WEAPON_PLASMA) {
+			objectinfoTut[player].currentWeapon = WEAPON_SHOTGUN;
+			printf("Weapon switched to: SHOTGUN\n");
+		}
+		else {
+			objectinfoTut[player].currentWeapon = WEAPON_PLASMA;
+			printf("Weapon switched to: PLASMA\n");
+		}
 	}
+
 	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next= GS_MAINMENU;
+		next = GS_MAINMENU;
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
@@ -223,14 +236,31 @@ void Tutorial_Update()
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
-	if (movement::bulletCount) {projectileSystem::fireProjectiles(
-		static_cast<s32>(worldMouseX),
-		static_cast<s32>(worldMouseY),
-		objectinfoTut[player],
-		Projectiles,
-		MAX_PROJECTILES,
-		LaserBlast,
-		soundEffects);}
+	// Fire using the currently equipped weapon (toggled with Q)
+	if (movement::bulletCount) {
+		if (objectinfoTut[player].currentWeapon == WEAPON_SHOTGUN) {
+			// Shotgun: 5-pellet cone spread
+			projectileSystem::FireShotgun(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfoTut[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+		else {
+			// Plasma (default): single shot toward mouse
+			projectileSystem::fireProjectiles(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfoTut[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+	}
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
@@ -349,6 +379,9 @@ void Tutorial_Draw()
 	sprintf_s(strBuffer, "Spacebar to Jump");
 	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
+	sprintf_s(strBuffer, "Q to Switch Weapon");
+	AEGfxPrint(font, strBuffer, 0.0f, -0.78f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
 	sprintf_s(strBuffer, "E to Enter");
 	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
@@ -404,6 +437,12 @@ void Tutorial_Draw()
 
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+
+		// Show the currently equipped weapon below the health display
+		const char* weaponName = (objectinfoTut[player].currentWeapon == WEAPON_SHOTGUN)
+			? "Weapon: Shotgun"
+			: "Weapon: Plasma";
+		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
 	// ===== RENDERING OF THE FLASHING 'E' ===== //

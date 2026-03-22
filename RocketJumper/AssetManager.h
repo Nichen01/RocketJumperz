@@ -97,6 +97,7 @@ enum TextureID {
 
     // Weapon textures
     TEX_PLASMA_GUN,     // Assets/Weapons/plasmaGun.png
+    TEX_SHOTGUN,        // Assets/Weapons/shotGun.png
 
     // Add new textures above this line
     TEX_MAX

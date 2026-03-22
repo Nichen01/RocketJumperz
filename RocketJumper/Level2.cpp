@@ -151,6 +151,9 @@ void Level2_Initialize()
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo2[player]);
 
+	// Start with the plasma gun equipped (default weapon)
+	objectinfo2[player].currentWeapon = WEAPON_PLASMA;
+
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
@@ -209,8 +212,20 @@ void Level2_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo2[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
+	}
+
+	// ---- Weapon Toggle (Q key) ----
+	if (AEInputCheckTriggered(AEVK_Q)) {
+		if (objectinfo2[player].currentWeapon == WEAPON_PLASMA) {
+			objectinfo2[player].currentWeapon = WEAPON_SHOTGUN;
+			printf("Weapon switched to: SHOTGUN\n");
+		}
+		else {
+			objectinfo2[player].currentWeapon = WEAPON_PLASMA;
+			printf("Weapon switched to: PLASMA\n");
+		}
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
@@ -223,15 +238,28 @@ void Level2_Update()
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
+	// Fire using the currently equipped weapon (toggled with Q)
 	if (movement::bulletCount) {
-		projectileSystem::fireProjectiles(
-			static_cast<s32>(worldMouseX),
-			static_cast<s32>(worldMouseY),
-			objectinfo2[player],
-			Projectiles,
-			MAX_PROJECTILES,
-			LaserBlast,
-			soundEffects);
+		if (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN) {
+			projectileSystem::FireShotgun(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo2[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+		else {
+			projectileSystem::fireProjectiles(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo2[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
 	}
 
 	// Update all active projectiles

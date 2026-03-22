@@ -4,7 +4,8 @@
 #include "AEAudio.h"
 
 // max number of projectiles that can be active at once
-constexpr s32 MAX_PROJECTILES = 5;
+// Increased from 5 to 20 to support the shotgun (fires 5 pellets per shot)
+constexpr s32 MAX_PROJECTILES = 20;
 
 // Projectile structure containing all data for a single projectile
 struct Projectile
@@ -37,4 +38,15 @@ namespace projectileSystem {
     // Check if any projectiles hit the obstacle
     void checkProjectileCollisions(Projectile projectiles[], s32 maxCount,
         objectsquares& obstacle);
+
+    // Fire a shotgun spread: 5 pellets in a cone toward the mouse position.
+    // Each pellet is rotated slightly from the base direction, with random
+    // speed variance so the spread looks organic.
+    void FireShotgun(s32 worldMouseX,
+        s32 worldMouseY,
+        objectsquares& player,
+        Projectile projectiles[],
+        s32 maxCount,
+        AEAudio attackSound,
+        AEAudioGroup sfxGroup);
 }

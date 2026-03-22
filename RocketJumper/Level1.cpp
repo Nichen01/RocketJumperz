@@ -206,6 +206,9 @@ void Level1_Initialize()
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo[player]);
 
+	// Start with the plasma gun equipped (default weapon)
+	objectinfo[player].currentWeapon = WEAPON_PLASMA;
+
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
@@ -274,8 +277,23 @@ void Level1_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
+	
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
+	}
+	
+
+	// ---- Weapon Toggle (Q key) ----
+	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
+	if (AEInputCheckTriggered(AEVK_Q)) {
+		if (objectinfo[player].currentWeapon == WEAPON_PLASMA) {
+			objectinfo[player].currentWeapon = WEAPON_SHOTGUN;
+			printf("Weapon switched to: SHOTGUN\n");
+		}
+		else {
+			objectinfo[player].currentWeapon = WEAPON_PLASMA;
+			printf("Weapon switched to: PLASMA\n");
+		}
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
@@ -288,15 +306,30 @@ void Level1_Update()
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
+	// Fire using the currently equipped weapon (toggled with Q)
 	if (movement::bulletCount) {
-		projectileSystem::fireProjectiles(
-			static_cast<s32>(worldMouseX),
-			static_cast<s32>(worldMouseY),
-			objectinfo[player],
-			Projectiles,
-			MAX_PROJECTILES,
-			LaserBlast, 
-			soundEffects);
+		if (objectinfo[player].currentWeapon == WEAPON_SHOTGUN) {
+			// Shotgun: 5-pellet cone spread
+			projectileSystem::FireShotgun(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+		else {
+			// Plasma (default): single shot toward mouse
+			projectileSystem::fireProjectiles(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
 	}
 
 	// Update all active projectiles
@@ -472,6 +505,11 @@ void Level1_Draw()
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
+		// Show the currently equipped weapon below the health display
+		const char* weaponName = (objectinfo[player].currentWeapon == WEAPON_SHOTGUN)
+			? "Weapon: Shotgun"
+			: "Weapon: Plasma";
+		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //
