@@ -18,7 +18,7 @@ AEGfxVertexList* doorMesh;
 bool doorIsOpen = false; // tracks fully-open state
 AEGfxTexture* doorTex;
 
-static f32 pi = 3.14159;
+static f32 pi = static_cast<f32>(3.14159);
 
 namespace renderlogic {
 

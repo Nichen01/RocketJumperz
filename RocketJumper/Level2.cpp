@@ -410,7 +410,7 @@ void Level2_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	// ===== RENDER WALLS ======= //
-	renderlogic::drawMapWallFloor(map, x, y, tileSize);
+	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,

@@ -321,7 +321,7 @@ void LevelEditor_Update() {
 		}
 	}
 
-	// Check if there's a keycard when left click
+	// Check if there's a keycard when left click & error plays when there's  more than one keycard
 	if (currentTileIndex == 10 && AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (level == 1 && keyCountLevel1 >= 1) {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
@@ -336,31 +336,6 @@ void LevelEditor_Update() {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 		}
 	}
-	//if (currentTileIndex == 11 && AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
-	//	if (level != 3) {
-	//		std::cout << "Final Door can only be placed in Level 3!" << std::endl;
-	//		AEAudioPlay(Error, soundEffects, 1, 1, 0);
-	//	}
-	//	else {
-	//		if (finalDoorCount >= 1) {
-	//			std::cout << "Final Door already exists in this level!" << std::endl;
-	//			AEAudioPlay(Error, soundEffects, 1, 1, 0);
-	//		}
-	//		else {
-	//			TileAction action;
-	//			action.row = promptRow;
-	//			action.col = promptCol;
-	//			action.prevValue = MapData[promptRow][promptCol];
-	//			action.newValue = 69; // final door tile ID
-
-	//			MapData[promptRow][promptCol] = action.newValue;
-	//			actionHistory.push_back(action);
-
-	//			finalDoorCount = 1; // only one allowed
-	//		}
-	//	}
-	//}
-
 }
 
 void LevelEditor_Draw() {
@@ -445,10 +420,6 @@ void LevelEditor_Draw() {
 							if (level == 1) keyCountLevel1++;
 							else if (level == 2) keyCountLevel2++;
 							else if (level == 3) keyCountLevel3++;
-						}
-						else {
-							std::cout << "Keycard already exists in this level!" << std::endl;
-							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
 					}
 					else if (currentTileIndex == 11) {
