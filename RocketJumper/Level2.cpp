@@ -15,6 +15,7 @@ Technology is prohibited.
 
 // External libraries included in header file
 #include "Level2.h"
+#include "WeaponSprite.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -64,6 +65,7 @@ SpriteAnimation meleeAnim;
 void Level2_Load()
 {
 	aiming::loadAiming();
+	weaponSprite::Load();
 	audio::loadsound();
 
 	// LOADING TEXTURES
@@ -216,6 +218,7 @@ void Level2_Update()
 	movement::updatePlayerPhysics(objectinfo2[player]);
 	movement::UpdatePlayerFacing(objectinfo2[player]);
 	aiming::updateAiming(objectinfo2[player]);
+	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	//===================================================//
 
@@ -379,6 +382,7 @@ void Level2_Draw()
 		playerDrawScaleX, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
+	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -455,4 +459,5 @@ void Level2_Unload()
 	// Unload ALL audio resources that were loaded in Load
 	audio::unloadsound();
 	aiming::unloadAiming();
+	weaponSprite::Unload();
 }

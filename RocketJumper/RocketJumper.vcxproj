@@ -38,6 +38,7 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="VictoryScreen.cpp" />
+    <ClCompile Include="WeaponSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AimingInterface.h" />
@@ -69,6 +70,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Tutorial.h" />
     <ClInclude Include="VictoryScreen.h" />
+    <ClInclude Include="WeaponSprite.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

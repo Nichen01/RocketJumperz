@@ -95,6 +95,9 @@ enum TextureID {
     TEX_RANGED_DEATH,   // RangedDeath.png  (1 row, 4 cols)
     TEX_RANGED_HURT,    // RangedHurt.png   (1 row, 2 cols)
 
+    // Weapon textures
+    TEX_PLASMA_GUN,     // Assets/Weapons/plasmaGun.png
+
     // Add new textures above this line
     TEX_MAX
 };

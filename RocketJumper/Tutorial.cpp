@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "AssetManager.h"
 #include "Level1.h"
 #include "aimingInterface.h"
+#include "WeaponSprite.h"
 #include "drops.h"
 
 static s32* map = nullptr;
@@ -86,6 +87,7 @@ void Tutorial_Load()
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
+	weaponSprite::Load();
 }
 
 void Tutorial_Initialize()
@@ -308,6 +310,7 @@ void Tutorial_Update()
 	// MUSHROOM ANIMATION
 	animSystem::update(meleeAnim, dt);
 	aiming::updateAiming(objectinfoTut[player]);
+	weaponSprite::Update(objectinfoTut[player]);
 }
 
 void Tutorial_Draw()
@@ -408,6 +411,7 @@ void Tutorial_Draw()
 		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
 	}
 	aiming::drawAiming();
+	weaponSprite::Draw();
 	pickup::drawDrops(TutDrop, MAX_ENEMIES);
 }
 
@@ -433,6 +437,7 @@ void Tutorial_Unload()
 		glassMap = nullptr;
 	}
 	aiming::unloadAiming();
+	weaponSprite::Unload();
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 

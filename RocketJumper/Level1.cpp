@@ -15,6 +15,7 @@ Technology is prohibited.
 
 // External libraries are included in header file
 #include "Level1.h"
+#include "WeaponSprite.h"
 
 static s32* map = nullptr;
 static int x;
@@ -141,6 +142,7 @@ void Level1_Load()
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
+	weaponSprite::Load();
 }
 
 void Level1_Initialize()
@@ -281,6 +283,7 @@ void Level1_Update()
 	movement::updatePlayerPhysics(objectinfo[player]);
 	movement::UpdatePlayerFacing(objectinfo[player]);
 	aiming::updateAiming(objectinfo[player]);
+	weaponSprite::Update(objectinfo[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo[player]);
 	//===================================================//
 
@@ -444,6 +447,7 @@ void Level1_Draw()
 		playerDrawScaleX, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
+	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -505,6 +509,7 @@ void Level1_Unload()
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
 	aiming::unloadAiming();
+	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
 	if (glassMap) {
