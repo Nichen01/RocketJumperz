@@ -11,6 +11,7 @@ static MenuButton tomenuButton;
 static AEGfxVertexList* buttonMesh = nullptr;
 
 static AEGfxTexture* menutex;
+static AEGfxTexture* buttontex;
 
 void Pause_Load() {
 	AEGfxMeshStart();
@@ -28,6 +29,7 @@ void Pause_Load() {
 	buttonMesh = AEGfxMeshEnd();
 
 	menutex = AEGfxTextureLoad("Assets/UI/Menus/Menu.png");
+	buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
 	
 	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
@@ -71,9 +73,9 @@ void Pause_Draw() {
 	AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
 	AEGfxPrint(pausefont, "PAUSE", -0.06-width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
 
-	MenuHelpers::drawButton(resumeButton, buttonMesh, pausefont);
-	MenuHelpers::drawButton(tomenuButton, buttonMesh, pausefont);
-	MenuHelpers::drawButton(exitButton, buttonMesh, pausefont);
+	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttontex);
+	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttontex);
+	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttontex);
 }
 
 void Pause_Free() {
@@ -85,4 +87,5 @@ void Pause_Free() {
 void Pause_Unload() {
 	if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
 	if (menutex != nullptr) { AEGfxTextureUnload(menutex); };
+	if (buttontex != nullptr) { AEGfxTextureUnload(buttontex); };
 }

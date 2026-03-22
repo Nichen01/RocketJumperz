@@ -126,6 +126,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				Pause_Unload();
 			}
 			fpUnload();
+			pause = false;
 			previous = current;
 		}
 		canpause = true;
