@@ -20,6 +20,7 @@ namespace renderlogic {
 
 // Declare these as extern - they will be defined in Level1.cpp
 extern AEGfxVertexList* pMesh;
+
 extern AEGfxTexture* characterPictest;
 extern AEGfxTexture* platformTex1;
 extern AEGfxTexture* platformTex2;

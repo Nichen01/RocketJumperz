@@ -28,7 +28,7 @@ static SpriteAnimation meleeAnim;
 static AEGfxTexture* base5test = nullptr;
 
 // Font handle for in-game text -- UNUSED, kept for reference only.
-// The active font handle is fontLevel1 (declared below), which is
+// The active font handle is fontLevel2 (declared below), which is
 // created in Initialize and destroyed in Unload.
 
 // Sound and volume
@@ -41,7 +41,7 @@ static s32  DOOR_FRAME_COUNT = 7;
 static f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
 
 // Font resource (must be destroyed in Unload to avoid leak)
-static s8 fontLevel1 = -1;
+static s8 fontLevel2 = -1;
 
 // bool for checking player proximity with door
 static bool playerNear;
@@ -122,7 +122,7 @@ void Level2_Load()
 	}
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
 }
 
@@ -138,7 +138,7 @@ void Level2_Initialize()
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo2[player]);
@@ -244,7 +244,6 @@ void Level2_Update()
 			bgVolume = 0.f;
 		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
-
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -452,7 +451,7 @@ void Level2_Draw()
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
-	if (fontLevel1 >= 0)
+	if (fontLevel2 >= 0)
 	{
 		char healthText[32];
 		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo2[player].health);
@@ -464,7 +463,7 @@ void Level2_Draw()
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
 		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel2, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 	}
 
@@ -522,7 +521,7 @@ void Level2_Unload()
 	}
 
 	// Destroy the font created in Load
-	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+	if (fontLevel2 != -1) { AEGfxDestroyFont(fontLevel2); fontLevel2 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
 

@@ -28,7 +28,7 @@ void Pause_Load() {
 	buttonMesh = AEGfxMeshEnd();
 
 	menutex = AEGfxTextureLoad("Assets/UI/Menus/Menu.png");
-
+	
 	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 
@@ -64,12 +64,12 @@ void Pause_Draw() {
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxTextureSet(menutex, 0, 0);
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); 
 	renderlogic::drawSquare(0.0f, 0.0f, 500.0f, 640.0f);
 	AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
 
 	AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
-	AEGfxPrint(pausefont, "PAUSE", -0.06 - width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
+	AEGfxPrint(pausefont, "PAUSE", -0.06-width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
 
 	MenuHelpers::drawButton(resumeButton, buttonMesh, pausefont);
 	MenuHelpers::drawButton(tomenuButton, buttonMesh, pausefont);

@@ -261,6 +261,10 @@ void Level1_Update()
 		next = GS_QUIT;
 	}
 
+	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
+		next = GS_QUIT;
+	}
+
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo1[player]);
