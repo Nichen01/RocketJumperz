@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "GameStateList.h"
 #include "Level1.h"
 #include "Level2.h"
+#include "Level3.h"
 #include "LevelEditor.h"
 #include "Tutorial.h"
 #include "VictoryScreen.h"
