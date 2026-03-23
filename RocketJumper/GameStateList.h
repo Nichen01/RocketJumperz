@@ -16,8 +16,6 @@ Technology is prohibited.
 enum GS_STATES
 {
 	GS_SPLASH = 0,
-	GS_TEST,
-	GS_PROJECTILE_TEST,
 	GS_MAINMENU,
 	GS_TUTORIAL,
 	GS_LEVEL1,
