@@ -41,7 +41,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 
+<<<<<<< Updated upstream
 	GSM_Initialize(GS_DEATH);
+=======
+	GSM_Initialize(GS_TUTORIAL);
+>>>>>>> Stashed changes
 
 	while (current != GS_QUIT)
 	{
