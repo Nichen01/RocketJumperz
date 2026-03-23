@@ -79,9 +79,6 @@
     <ClCompile Include="VictoryScreen.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="traps.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="drops.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -181,7 +178,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Level3.h">
-    <ClInclude Include="traps.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

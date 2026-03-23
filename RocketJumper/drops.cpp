@@ -31,10 +31,12 @@ namespace pickup {
 			else {
 				renderlogic::drawSquare(instance[i].info.xPos, instance[i].info.yPos, instance[i].info.xScale, instance[i].info.xScale);
 				AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-				//printf("\n\ndrawn drop:%d\n\n", i);
+				printf("\n\ndrawn drop:%d\n\n", i);
 			}
 		}
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToAdd(0, 0, 0, 0);
+		AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
+
 	}
 }

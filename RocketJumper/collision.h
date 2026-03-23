@@ -49,10 +49,6 @@ namespace gamelogic {
 
 	float posY_to_index(float pos, float MS);
 
-	float index_to_posX(float pos, float MS);
-
-	float index_to_posY(float pos, float MS);
-
 	// Hotspot check and binary map collision
 	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX);
 

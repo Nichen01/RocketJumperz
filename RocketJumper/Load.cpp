@@ -19,7 +19,6 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
 	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
 	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
-	AEGfxTexture* trap1 = NULL, * trap2 = NULL, * trapBeam = NULL;
 
 	int keyX{}, keyY{};
 
@@ -47,9 +46,6 @@ namespace load {
 		AssetManager::LoadTexture(TEX_GLASS2, "Assets/Platform/glass2.jpg");
 		AssetManager::LoadTexture(TEX_GLASS3, "Assets/Platform/glass3.jpg");
 		AssetManager::LoadTexture(TEX_GLASS4, "Assets/Platform/glass4.jpg");
-		AssetManager::LoadTexture(TEX_TRAP1, "Assets/spike.png");
-		AssetManager::LoadTexture(TEX_TRAP2, "Assets/eye.png");
-		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
 
 		// Sync the extern pointers so draw.cpp can use them directly
 		platform1 = AssetManager::GetTexture(TEX_PLATFORM1);
@@ -66,9 +62,6 @@ namespace load {
 		glass2 = AssetManager::GetTexture(TEX_GLASS2);
 		glass3 = AssetManager::GetTexture(TEX_GLASS3);
 		glass4 = AssetManager::GetTexture(TEX_GLASS4);
-		trap1 = AssetManager::GetTexture(TEX_TRAP1);
-		trap2 = AssetManager::GetTexture(TEX_TRAP2);
-		trapBeam = AssetManager::GetTexture(TEX_TRAPBEAM);
 	}
 
 	void ui() {
