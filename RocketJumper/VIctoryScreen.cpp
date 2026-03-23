@@ -12,6 +12,10 @@ static MenuButton tomenuButton;
 
 static AEGfxVertexList* buttonMesh = nullptr;
 static AEGfxVertexList* backgroundMesh = nullptr;
+
+static AEGfxTexture* menutex;
+static AEGfxTexture* buttontex;
+
 void VictoryScreen_Load() {
     AEGfxMeshStart();
 
@@ -41,6 +45,8 @@ void VictoryScreen_Load() {
 
     backgroundMesh = AEGfxMeshEnd();
 
+    menutex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
+    buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
     backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
@@ -49,9 +55,11 @@ void VictoryScreen_Load() {
     victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void VictoryScreen_Init() {
-    restartButton = { 0.0f, 0.0f, 375.0f, 80.0f, 1.0f, 1.0f, "RESTART", false };
-    tomenuButton = { 0.0f, -120.0f, 375.0f, 80.0f, 1.0f, 1.0f, "MAIN MENU", false };
-    exitButton = { 0.0f, -240.0f, 375.0f, 80.0f, 1.0f, 1.0f, "EXIT", false };
+    float buttonwidth = 390.0f;
+    float buttonlength = 80.0f;
+    restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESUME", false };
+    tomenuButton = { 0.0f, -120.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
+    exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
 void VictoryScreen_Update() {
     MenuHelpers::updateButtonHover(restartButton);
@@ -61,7 +69,7 @@ void VictoryScreen_Update() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
-            next = GS_LEVEL1;  // Change to test file if needed
+            next = GS_TUTORIAL;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {
@@ -77,18 +85,20 @@ void VictoryScreen_Update() {
 void VictoryScreen_Draw() {
 	VDrawBackground();
 
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-    AEGfxSetColorToAdd(0.3f, 0.3f, 0.3f, 0.8f);  // Bright blue when hovered
-    renderlogic::drawSquare(0.0f, 0.0f, 500.0f, 640.0f);
+    float multi = 1.3f;
+    AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+    AEGfxTextureSet(menutex, 0, 0);
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+    renderlogic::drawSquare(0.0f, 247.0f, 285.0f*multi, 115.0f * multi);
     AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
-
-    MenuHelpers::drawButton(restartButton, buttonMesh, victoryfont);
-    MenuHelpers::drawButton(tomenuButton, buttonMesh, victoryfont);
-    MenuHelpers::drawButton(exitButton, buttonMesh, victoryfont);
 
     AEGfxGetPrintSize(victoryfont, "VICTORY", 1.f, &width, &height);
     AEGfxPrint(victoryfont, "VICTORY", -width / 2, 0.60f - height / 2, 1, 1, 1, 1, 1);
 
+
+    MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttontex);
+    MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttontex);
+    MenuHelpers::TexdrawButton(exitButton, buttonMesh, victoryfont, buttontex);
 
 }
 void VictoryScreen_Free() {
@@ -108,6 +118,8 @@ void VictoryScreen_Unload() {
     }
 
     if (victoryfont != -1) { AEGfxDestroyFont(victoryfont); victoryfont = -1; }
+    if (menutex != nullptr) { AEGfxTextureUnload(menutex); };
+    if (buttontex != nullptr) { AEGfxTextureUnload(buttontex); };
 }
 
 void VDrawBackground() {

@@ -96,6 +96,30 @@ namespace MenuHelpers {
             }
         }
     }
+    void TexdrawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture) {
+        // Draw button background
+        AEMtx33 scale, translate, transform;
+        AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+        AEMtx33Trans(&translate, button.x, button.y);
+        AEMtx33Concat(&transform, &translate, &scale);
+
+        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+        // Color based on hover state
+        if (button.isHovered) {
+            AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
+        }
+        else {
+            AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); 
+        }
+
+        AEGfxTextureSet(texture, 0, 0);
+        AEGfxSetTransform(transform.m);
+        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+        // Draw button text
+        drawTextCentered(button.text, button.x, button.y, button.scale*0.7, fontID);
+    }
 
     void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID) {
         // Draw button background
