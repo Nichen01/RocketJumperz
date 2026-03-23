@@ -20,6 +20,7 @@ extern AEGfxTexture* prompt1, * prompt2, * prompt3, * prompt4, * prompt5, * prom
 extern AEGfxTexture* inventory, * keycardInventory;
 extern AEGfxTexture* brokenDoor0, * brokenDoor1, * brokenDoor2;
 extern AEGfxTexture* wireInventory0, * wireInventory1, * wireInventory2;
+extern AEGfxTexture* trap1, * trap2, * trapBeam;
 
 extern int keyX, keyY;
 extern int brokenDoorX, brokenDoorY;

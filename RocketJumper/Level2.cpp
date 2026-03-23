@@ -1,6 +1,7 @@
 
 // External libraries are included in header file
 #include "Level2.h"
+#include "traps.h"
 
 static s32* map = nullptr;
 static int x;
@@ -256,6 +257,7 @@ void Level2_Initialize()
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
 	pickup::initDrops(L2Drop, MAX_ENEMIES, PlayerScale);
+	traps::initTraps();
 }
 
 void Level2_Update()
@@ -349,10 +351,11 @@ void Level2_Update()
 	if (objectinfo2[player].health <= 0) {
 		next = GS_DEATH;
 	}
-
+	traps::updateTraps(enemies, objectinfo2, map, x,y, (float)s);
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo2[player], map, x, static_cast<int>(tileSize), 1);
+
 
 	// -----------------------------------------------------------------------
 	// Door animation

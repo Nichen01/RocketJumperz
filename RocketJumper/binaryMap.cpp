@@ -121,12 +121,17 @@ int ImportMapDataFromFile(const char* FileName)
 			int value;
 			ifs >> value;
 			MapData[row][col] = value;
-			if (value == 40) {
-				BinaryCollisionArray[row][col] = 0;
+			// assign random glass type if tile is "air"
+			if (value == 0) {
+				glassMap[i][j] = rand() % 5;
 			}
 			else {
 				BinaryCollisionArray[row][col] = (value / 10 == 1) ? 1 : 0;
 			}
+			if (value == 40) {
+				BinaryCollisionArray[row][col] = 0;}
+			if (value/50 == 1) BinaryCollisionArray[i][j] = 2;
+			//if (value == 51) BinaryCollisionArray[i][j] = 3;
 			// to save coordinates of the key
 			if (value == 67) {
 				key.row = row;
