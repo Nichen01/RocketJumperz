@@ -88,6 +88,36 @@ enum TextureID {
     // Mushroom idle sheet (spritesheet used by animation system)
     TEX_MUSHROOM_IDLE_SHEET,
 
+    // Key texture
+    TEX_KEYCARD,
+
+    // Error prompt
+    TEX_ERRORPROMPT,
+    TEX_PROMPT1,
+    TEX_PROMPT2,
+    TEX_PROMPT3,
+    TEX_PROMPT4,
+    TEX_PROMPT5,
+    TEX_PROMPT6,
+    TEX_PROMPT7,
+    TEX_PROMPT8,
+    TEX_PROMPT9,
+    TEX_REDBUTTON,
+    TEX_GREENBUTTON,
+
+    // Inventory texture
+    TEX_INVENTORY,
+    TEX_KEYCARDINVENTORY,
+
+    // Broken door(s)
+    TEX_BROKENDOOR0,
+    TEX_BROKENDOOR1,
+    TEX_BROKENDOOR2,
+
+    // Wire Inventory
+    TEX_WIREINVENTORY0,
+    TEX_WIREINVENTORY1,
+    TEX_WIREINVENTORY2,
     // Add new textures above this line
     TEX_MAX
 };

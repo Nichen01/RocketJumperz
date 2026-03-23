@@ -88,6 +88,9 @@
     <ClCompile Include="drops.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Level3.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collision.h">
@@ -181,6 +184,7 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="traps.h">
+    <ClInclude Include="Level3.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

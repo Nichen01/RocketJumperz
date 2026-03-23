@@ -13,6 +13,18 @@ struct TileAction {
 	s32 newValue;
 };
 
+struct doorButton {
+	f32 x;
+	f32 y;
+	f32 width;
+	f32 height;
+	f32 scale;
+	f32 targetScale;
+	const char* text;
+	bool isHovered;
+	int id;
+};
+
 void LevelEditor_Load();
 
 void LevelEditor_Initialize();

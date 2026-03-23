@@ -26,7 +26,6 @@ namespace pickup {
 	}
 	void drawDrops(drop instance[], int max) {
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-		AEGfxSetColorToAdd(0, 1, 0, 1);
 		for (int i{};i < max;i++) {
 			if (instance[i].info.flag == 0) continue;
 			else {
