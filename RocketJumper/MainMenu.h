@@ -50,6 +50,7 @@ void MainMenu_Unload();
 namespace MenuHelpers {
     bool isMouseOverButton(const MenuButton& button);
     void updateButtonHover(MenuButton& button);
+    void TexdrawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture);
     void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID);
     void drawTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
 }
