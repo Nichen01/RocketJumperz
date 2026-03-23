@@ -25,17 +25,8 @@ extern AEGfxTexture* wireInventory0, * wireInventory1, * wireInventory2;
 extern int keyX, keyY;
 extern int brokenDoorX, brokenDoorY;
 
-namespace init {
-	void enemy();
-	void platform();
-	void player();
-	void projectile();
-	void ui();
-}
-
 namespace load {
 	void platform();
-	void mushroom();
 	void ui();
 	void key();
 	void errorPrompt();

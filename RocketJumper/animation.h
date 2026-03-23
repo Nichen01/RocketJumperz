@@ -8,7 +8,7 @@
               Handles HORIZONTAL sprite strips only (one row of frames).
 
               Usage:
-                1. Call animSystem::buildMesh() once at load time to create a
+                1. Call AssetManager::BuildSqrMesh() once at load time to create a
                    mesh whose UVs span exactly one frame of your strip.
                 2. Embed a SpriteAnimation in any struct that needs animation.
                 3. Call animSystem::update() once per frame.
@@ -78,9 +78,5 @@ namespace animSystem
     // Pass the return value directly to AEGfxTextureSet(tex, getUOffset(anim), 0.f)
     f32  getUOffset(const SpriteAnimation& anim);
     f32  getVOffset(const SpriteAnimation& anim);
-
-    // Build a mesh whose UVs span exactly one frame of a horizontal strip.
-    // Call once at load time; free with AEGfxMeshFree().
-    void buildMesh(AEGfxVertexList** outMesh, int rows, int cols);
 
 } // namespace animSystem

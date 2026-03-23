@@ -45,14 +45,6 @@ void GSM_Update()
 		fpFree = Level3_Free;
 		fpUnload = Level3_Unload;
 		break;
-	case GS_PROJECTILE_TEST:
-		fpLoad = ProjectileTest_Load;
-		fpInitialize = ProjectileTest_Initialize;
-		fpUpdate = ProjectileTest_Update;
-		fpDraw = ProjectileTest_Draw;
-		fpFree = ProjectileTest_Free;
-		fpUnload = ProjectileTest_Unload;
-		break;
 	case GS_MAINMENU:
 		fpLoad = MainMenu_Load;
 		fpInitialize = MainMenu_Init;
@@ -92,6 +84,14 @@ void GSM_Update()
 		fpDraw = Tutorial_Draw;
 		fpFree = Tutorial_Free;
 		fpUnload = Tutorial_Unload;
+		break;
+	case GS_SPLASH:
+		fpLoad = SplashScreen_Load;
+		fpInitialize = SplashScreen_Init;
+		fpUpdate = SplashScreen_Update;
+		fpDraw = SplashScreen_Draw;
+		fpFree = SplashScreen_Free;
+		fpUnload = SplashScreen_Unload;
 		break;
 	case GS_RESTART:
 		break;

@@ -32,14 +32,15 @@
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="ProjectileTest.cpp" />
     <ClCompile Include="Load.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="SplashScreen.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="traps.cpp" />
     <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="VictoryScreen.cpp" />
+    <ClCompile Include="WeaponSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AimingInterface.h" />
@@ -68,10 +69,12 @@
     <ClInclude Include="Load.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Sound.h" />
+    <ClInclude Include="SplashScreen.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="traps.h" />
     <ClInclude Include="Tutorial.h" />
     <ClInclude Include="VictoryScreen.h" />
+    <ClInclude Include="WeaponSprite.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

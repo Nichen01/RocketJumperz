@@ -45,6 +45,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	while (current != GS_QUIT)
 	{
+		if (current == GS_SPLASH) {
+			canpause = false;
+		}
 		if (current == GS_MAINMENU) {
 			canpause = false;
 		}

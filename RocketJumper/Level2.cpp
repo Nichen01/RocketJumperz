@@ -2,6 +2,7 @@
 // External libraries are included in header file
 #include "Level2.h"
 #include "traps.h"
+#include "WeaponSprite.h"
 
 static s32* map = nullptr;
 static int x;
@@ -55,9 +56,28 @@ static bool keycardCollectedAudio = false;
 
 void Level2_Load()
 {
+	aiming::loadAiming();
+	weaponSprite::Load();
 	audio::loadsound();
 
-	// Load platform tile textures
+	// LOADING TEXTURES
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
+	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
+	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
+	AssetManager::LoadTexture(TEX_RANGED_HURT,    "Assets/Enemy/RangedHurt.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+
+	// Sync the extern pointers so other files can use them directly
+	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
+	plasma            = AssetManager::GetTexture(TEX_PLASMA);
+	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
+	doorTex           = AssetManager::GetTexture(TEX_DOOR);
+
 	load::platform();
 
 	// Load UI textures (eButton used by flashing door prompt in Draw)
@@ -147,15 +167,13 @@ void Level2_Initialize()
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
-	//=============CREATE TEXTURED MESH FOR PLAYER==================//
-	AssetManager::BuildSqrMesh(MESH_PLAYER);
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_TEST);
-	AssetManager::BuildSqrMesh(MESH_UI);
-	pMesh = AssetManager::GetMesh(MESH_PLAYER);
-	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
-	pTestMesh = AssetManager::GetMesh(MESH_TEST);
-	uiMesh = AssetManager::GetMesh(MESH_UI);
+	//=============CREATE TEXTURED MESHES==================//
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
+	enemyMesh      = AssetManager::GetMesh(MESH_QUAD);
+	platformMesh   = AssetManager::GetMesh(MESH_QUAD);
+	pMesh          = AssetManager::GetMesh(MESH_QUAD);
+	projectileMesh = AssetManager::GetMesh(MESH_QUAD);
 
 	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
 		printf("Could not import file");
@@ -199,6 +217,9 @@ void Level2_Initialize()
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo2[player]);
 
+	// Start with the plasma gun equipped (default weapon)
+	objectinfo2[player].currentWeapon = WEAPON_PLASMA;
+
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
@@ -216,12 +237,18 @@ void Level2_Initialize()
 	}
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
+	// Build spritesheet meshes for ranged enemy states (rows, cols)
+	AssetManager::BuildSqrMesh(MESH_RANGED_MOVE,   1, 4);
+	AssetManager::BuildSqrMesh(MESH_RANGED_ATTACK,  1, 6);
+	AssetManager::BuildSqrMesh(MESH_RANGED_DEATH,   1, 4);
+	AssetManager::BuildSqrMesh(MESH_RANGED_HURT,    1, 2);
 	// DOOR
 	animSystem::buildMesh(&doorMesh, 1, 7);
 	AssetManager::StoreMesh(MESH_DOOR, doorMesh);
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
+
 	pickup::initDrops(L2Drop, MAX_ENEMIES, PlayerScale);
 	traps::initTraps();
 }
@@ -258,27 +285,54 @@ void Level2_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo2[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q) || AEInputCheckTriggered(AEVK_ESCAPE)) {
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
+	}
+
+	// ---- Weapon Toggle (Q key) ----
+	if (AEInputCheckTriggered(AEVK_Q)) {
+		if (objectinfo2[player].currentWeapon == WEAPON_PLASMA) {
+			objectinfo2[player].currentWeapon = WEAPON_SHOTGUN;
+			printf("Weapon switched to: SHOTGUN\n");
+		}
+		else {
+			objectinfo2[player].currentWeapon = WEAPON_PLASMA;
+			printf("Weapon switched to: PLASMA\n");
+		}
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo2[player]);
+	movement::UpdatePlayerFacing(objectinfo2[player]);
 	aiming::updateAiming(objectinfo2[player]);
+	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
+	// Fire using the currently equipped weapon (toggled with Q)
 	if (movement::bulletCount) {
-		projectileSystem::fireProjectiles(
-			static_cast<s32>(worldMouseX),
-			static_cast<s32>(worldMouseY),
-			objectinfo2[player],
-			Projectiles,
-			MAX_PROJECTILES,
-			LaserBlast,
-			soundEffects);
+		if (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN) {
+			projectileSystem::FireShotgun(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo2[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+		else {
+			projectileSystem::fireProjectiles(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo2[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
 	}
 
 	// Update all active projectiles
@@ -440,10 +494,15 @@ void Level2_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
+	// Flip sprite horizontally when the player is aiming left.
+	f32 playerDrawScaleX = movement::playerFacingLeft
+		? -objectinfo2[player].xScale
+		:  objectinfo2[player].xScale;
 	renderlogic::drawSquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
-		objectinfo2[player].xScale, objectinfo2[player].yScale);
+		playerDrawScaleX, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
+	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -529,4 +588,6 @@ void Level2_Unload()
 	// Unload ALL audio resources that were loaded in Load
 
 	audio::unloadsound();
+	aiming::unloadAiming();
+	weaponSprite::Unload();
 }

@@ -15,11 +15,19 @@ namespace movement {
     constexpr f32 GRAVITY = 0.2f;
     extern int bulletCount;
 
+    // True when the player's aim direction points to the left (mouse is left of player).
+    // Updated each frame by UpdatePlayerFacing(). Used by draw code to flip the sprite.
+    extern bool playerFacingLeft;
+
     // Initialize player velocities (call in Load)
     void initPlayerMovement(objectsquares& player);
 
     //updates directionVector with unit vector based on mouse position from player
     AEVec2 getMouse(objectsquares& player);
+
+    // Recalculate which way the player is facing based on current mouse position.
+    // Call once per frame in the Update function, before Draw.
+    void UpdatePlayerFacing(objectsquares& player);
 
     // update physics based on character input
     void physicsInput(objectsquares& player);

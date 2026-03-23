@@ -2,6 +2,7 @@
 // External libraries are included in header file
 #include "Level1.h"
 #include "traps.h"
+#include "WeaponSprite.h"
 
 static s32* map = nullptr;
 static int x;
@@ -72,6 +73,13 @@ void Level1_Load()
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 
+	// Ranged enemy state spritesheets (1 row each, variable columns)
+	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
+	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
+	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
+	AssetManager::LoadTexture(TEX_RANGED_HURT,    "Assets/Enemy/RangedHurt.png");
+	// TEX_RANGED_IDLE reuses TEX_RANGED_MOVE (no separate idle sheet)
+
 	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
 	base5test        = AssetManager::GetTexture(TEX_BASE5TEST);
@@ -125,6 +133,7 @@ void Level1_Load()
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
+	weaponSprite::Load();
 }
 
 void Level1_Initialize()
@@ -147,15 +156,11 @@ void Level1_Initialize()
 	// Added after obstacle initialization:
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
-	//=============CREATE TEXTURED MESH FOR PLAYER==================//
-	AssetManager::BuildSqrMesh(MESH_PLAYER);
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_TEST);
-	AssetManager::BuildSqrMesh(MESH_UI);
-	pMesh        = AssetManager::GetMesh(MESH_PLAYER);
-	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
-	pTestMesh    = AssetManager::GetMesh(MESH_TEST);
-	uiMesh		 = AssetManager::GetMesh(MESH_UI);
+	//=============CREATE TEXTURED MESH FOR ALL STANDARD OBJECTS==================//
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	pMesh        = AssetManager::GetMesh(MESH_QUAD);
+	platformMesh = AssetManager::GetMesh(MESH_QUAD);
+	pTestMesh    = AssetManager::GetMesh(MESH_QUAD);
 	
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
@@ -199,6 +204,9 @@ void Level1_Initialize()
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfo1[player]);
 
+	// Start with the plasma gun equipped (default weapon)
+	objectinfo[player].currentWeapon = WEAPON_PLASMA;
+
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
@@ -209,16 +217,23 @@ void Level1_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -100.0f, -200.0f);
 
 	//MUSHROOM ANIM TEST
-	{
-		AEGfxVertexList* meleeEnemyMesh = nullptr;
-		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
-	}
+	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
+	// Build spritesheet meshes for ranged enemy states (rows, cols)
+	AssetManager::BuildSqrMesh(MESH_RANGED_MOVE,   1, 4);  // RangedMove.png   1x4
+	AssetManager::BuildSqrMesh(MESH_RANGED_ATTACK,  1, 6);  // RangedAttack.png 1x6
+	AssetManager::BuildSqrMesh(MESH_RANGED_DEATH,   1, 4);  // RangedDeath.png  1x4
+	AssetManager::BuildSqrMesh(MESH_RANGED_HURT,    1, 2);  // RangedHurt.png   1x2
+
 	// DOOR
-	animSystem::buildMesh(&doorMesh, 1, 7);
-	AssetManager::StoreMesh(MESH_DOOR, doorMesh);
+	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);
+	doorMesh = AssetManager::GetMesh(MESH_DOOR);
+	
+	if (!doorTex)
+		printf("DOOR TEXTURE NOT FOUND!\n");
+	else
+		printf("DOOR OK\n");
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
@@ -263,27 +278,59 @@ void Level1_Update()
 		next = GS_QUIT;
 	}
 
-	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
+	
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
+	}
+	
+
+	// ---- Weapon Toggle (Q key) ----
+	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
+	if (AEInputCheckTriggered(AEVK_Q)) {
+		if (objectinfo[player].currentWeapon == WEAPON_PLASMA) {
+			objectinfo[player].currentWeapon = WEAPON_SHOTGUN;
+			printf("Weapon switched to: SHOTGUN\n");
+		}
+		else {
+			objectinfo[player].currentWeapon = WEAPON_PLASMA;
+			printf("Weapon switched to: PLASMA\n");
+		}
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
-	movement::updatePlayerPhysics(objectinfo1[player]);
-	aiming::updateAiming(objectinfo1[player]);
-	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
+	movement::updatePlayerPhysics(objectinfo[player]);
+	movement::UpdatePlayerFacing(objectinfo[player]);
+	aiming::updateAiming(objectinfo[player]);
+	weaponSprite::Update(objectinfo[player]);
+	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
+	// Fire using the currently equipped weapon (toggled with Q)
 	if (movement::bulletCount) {
-		projectileSystem::fireProjectiles(
-			static_cast<s32>(worldMouseX),
-			static_cast<s32>(worldMouseY),
-			objectinfo1[player],
-			Projectiles,
-			MAX_PROJECTILES,
-			LaserBlast, 
-			soundEffects);
+		if (objectinfo[player].currentWeapon == WEAPON_SHOTGUN) {
+			// Shotgun: 5-pellet cone spread
+			projectileSystem::FireShotgun(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+		else {
+			// Plasma (default): single shot toward mouse
+			projectileSystem::fireProjectiles(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfo[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
 	}
 
 	// Update all active projectiles
@@ -423,7 +470,7 @@ void Level1_Draw()
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
 		AssetManager::GetMesh(MESH_MELEE_ENEMY),
-		AssetManager::GetMesh(MESH_TEST),
+		AssetManager::GetMesh(MESH_QUAD),
 		AssetManager::GetTexture(TEX_MUSHROOM_IDLE_SHEET),
 		AssetManager::GetTexture(TEX_RANGED_ENEMY),
 		animSystem::getUOffset(meleeAnim),
@@ -433,7 +480,7 @@ void Level1_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	pickup::drawDrops(L1Drop, MAX_ENEMIES);
 
@@ -444,16 +491,22 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
-	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
-		objectinfo1[player].xScale, objectinfo1[player].yScale);
+	// Flip sprite horizontally when the player is aiming left.
+	// Negating xScale mirrors the quad along the Y axis.
+	f32 playerDrawScaleX = movement::playerFacingLeft
+		? -objectinfo[player].xScale
+		:  objectinfo[player].xScale;
+	renderlogic::drawSquare(objectinfo[player].xPos, objectinfo[player].yPos,
+		playerDrawScaleX, objectinfo[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
+	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
@@ -472,6 +525,11 @@ void Level1_Draw()
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
+		// Show the currently equipped weapon below the health display
+		const char* weaponName = (objectinfo[player].currentWeapon == WEAPON_SHOTGUN)
+			? "Weapon: Shotgun"
+			: "Weapon: Plasma";
+		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //
@@ -519,6 +577,7 @@ void Level1_Unload()
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
 	aiming::unloadAiming();
+	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
 	if (glassMap) {

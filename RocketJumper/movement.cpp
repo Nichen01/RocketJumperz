@@ -10,6 +10,7 @@ namespace movement {
     f32 mouseDistance;
     AEVec2 directionVector;
     int bulletCount = 10;
+    bool playerFacingLeft = false; // starts facing right
     void initPlayerMovement(objectsquares& player)
     {
         player.velocityX = 0.0f;
@@ -30,6 +31,16 @@ namespace movement {
             directionVector.y = mouseY / mouseDistance;
         }
         return directionVector;
+    }
+
+    // Determines which direction the player sprite should face based on the
+    // mouse cursor position relative to the player. Call once per frame in Update.
+    void UpdatePlayerFacing(objectsquares& player)
+    {
+        // getMouse() returns a normalized vector from the player toward the cursor.
+        // We only care about the x-component: negative means the mouse is to the left.
+        AEVec2 aimDir = getMouse(player);
+        playerFacingLeft = (aimDir.x < 0.0f);
     }
 
     void physicsInput(objectsquares& player)

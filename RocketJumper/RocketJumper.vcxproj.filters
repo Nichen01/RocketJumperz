@@ -52,9 +52,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="ProjectileTest.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Load.cpp">
       <Filter>Source</Filter>
     </ClCompile>

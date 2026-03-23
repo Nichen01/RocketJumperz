@@ -228,36 +228,5 @@ namespace animSystem
     }
 
 
-    /*!*************************************************************************
-     * BUILD MESH
-     * @brief Constructs an Alpha Engine mesh scoped exactly to one sprite frame
-     *
-     * @param outMesh             Pointer to hold the generated vertex list
-     * @param rows                Number of rows in the spritesheet
-     * @param cols                Number of columns in the spritesheet
-     * @return VOID
-     ***************************************************************************/
-    void buildMesh(AEGfxVertexList** outMesh, int rows, int cols)
-    {
-        // guard: for nullptr and prevent division by zero
-        if (!outMesh || cols <= 0 || rows <= 0) return;
-
-        // UVs span exactly one frame: [0.0, 1/totalFrames]
-        // AEGfxTextureSet's UV offset then slides this window to the right frame.
-        f32 uMax = 1.f / static_cast<f32>(cols);
-        f32 vMax = 1.f / static_cast<f32>(rows);
-
-        AEGfxMeshStart();
-        AEGfxTriAdd(
-            -0.5f, -0.5f, 0xFFFFFFFF, 0.f, vMax,
-            0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
-            -0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.f);
-        AEGfxTriAdd(
-            0.5f, -0.5f, 0xFFFFFFFF, uMax, vMax,
-            0.5f, 0.5f, 0xFFFFFFFF, uMax, 0.f,
-            -0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.f);
-        *outMesh = AEGfxMeshEnd();
-    }
-
 
 } // namespace animSystem

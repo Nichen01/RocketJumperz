@@ -1,6 +1,13 @@
 #pragma once
 #include "AEEngine.h"
 
+// ---- Weapon Types ----
+// The player can toggle between these weapons using the Q key.
+enum WeaponType {
+	WEAPON_PLASMA,   // Single-shot plasma bolt (default)
+	WEAPON_SHOTGUN   // 5-pellet spread shot
+};
+
 struct BB
 {
 	AEVec2	min;
@@ -45,6 +52,9 @@ struct objectsquares {
 	// ---- Player Health System ----
 	int health;                  // Current health points (0 to maxHealth)
 	f32 invincibilityTimer;      // Seconds of invincibility remaining after a hit
+
+	// ---- Weapon System ----
+	WeaponType currentWeapon;    // Which weapon the player currently has equipped
 };
 
 // Maximum health the player can have

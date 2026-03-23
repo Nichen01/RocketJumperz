@@ -82,6 +82,11 @@ enum TextureID {
     TEX_MUSHROOM_IDLE5,
     TEX_MUSHROOM_IDLE6,
 
+    // Main Menu textures
+    TEX_MAIN_MENU_BG,
+    TEX_TITLE,
+    TEX_DIGIPEN_LOGO,   // DigiPenWhite.png used on the credits screen
+
     // Level editor: static door thumbnail
     TEX_STATIC_DOOR,
 
@@ -118,20 +123,31 @@ enum TextureID {
     TEX_WIREINVENTORY0,
     TEX_WIREINVENTORY1,
     TEX_WIREINVENTORY2,
+    // Ranged enemy state spritesheets
+    TEX_RANGED_IDLE,    // RangedMove.png frame 0 (reused as idle)
+    TEX_RANGED_MOVE,    // RangedMove.png   (1 row, 4 cols)
+    TEX_RANGED_ATTACK,  // RangedAttack.png (1 row, 6 cols)
+    TEX_RANGED_DEATH,   // RangedDeath.png  (1 row, 4 cols)
+    TEX_RANGED_HURT,    // RangedHurt.png   (1 row, 2 cols)
+
+    // Weapon textures
+    TEX_PLASMA_GUN,     // Assets/Weapons/plasmaGun.png
+    TEX_SHOTGUN,        // Assets/Weapons/shotGun.png
+
     // Add new textures above this line
     TEX_MAX
 };
 
 // Define all meshes here
 enum MeshID {
-    MESH_PLAYER,
-    MESH_PLATFORM,
-    MESH_PROJECTILE,
-    MESH_ENEMY,
-    MESH_DOOR,
-    MESH_UI,
-    MESH_MELEE_ENEMY, // animated melee enemy mesh (built by animSystem::buildMesh)
-    MESH_TEST,        // pTestMesh used in Level1
+    MESH_QUAD,        // single reusable 1x1 quad for all standard static objects
+    MESH_MELEE_ENEMY, // animated melee enemy mesh (spritesheet-sliced)
+    MESH_DOOR,        // animated door mesh (spritesheet-sliced)
+    MESH_MENU_BUTTON, // unit quad with black vertex color for color-mode button rendering
+    MESH_RANGED_MOVE,   // spritesheet mesh (1 row, 4 cols)
+    MESH_RANGED_ATTACK, // spritesheet mesh (1 row, 6 cols)
+    MESH_RANGED_DEATH,  // spritesheet mesh (1 row, 4 cols)
+    MESH_RANGED_HURT,   // spritesheet mesh (1 row, 2 cols)
     // Add new meshes above this line
     MESH_MAX
 };
@@ -160,8 +176,10 @@ public:
     // Meshes  (built procedurally, not loaded from a file)
     // -------------------------------------------------------------------------
 
-    // Creates a 1x1 mesh and automatically stores it in the cache.
-    static void BuildSqrMesh(MeshID id);
+    // Creates a square mesh and automatically stores it in the cache.
+    // When rows/cols are 1 (default), builds a standard 1x1 quad.
+    // When rows/cols > 1, slices UVs for spritesheet animation frames.
+    static void BuildSqrMesh(MeshID id, int rows = 1, int cols = 1, u32 vertexColor = 0xFFFFFFFF);
 
     // Registers a mesh pointer under name. 
     static void StoreMesh(MeshID id, AEGfxVertexList* pMesh);

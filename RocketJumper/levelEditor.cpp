@@ -187,10 +187,9 @@ void LevelEditor_Load() {
 
 void LevelEditor_Initialize() {
 
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_UI);
-	platformMesh = AssetManager::GetMesh(MESH_PLATFORM);
-	uiMesh       = AssetManager::GetMesh(MESH_UI);
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	platformMesh = AssetManager::GetMesh(MESH_QUAD);
+	uiMesh       = AssetManager::GetMesh(MESH_QUAD);
 
 	// ideally should be separated into loading the imported file, and initialising the map from the file
 	buttonArr.clear();
@@ -344,6 +343,8 @@ void LevelEditor_Draw() {
     AEGfxSetBlendMode(AE_GFX_BM_NONE);
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	// Reset additive color to prevent leftover tint from other draw functions
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// getting mouse coordinates
 	s32 mouseX, mouseY;
@@ -586,6 +587,9 @@ void LevelEditor_Draw() {
 	AEMtx33Concat(&tileTransf, &tileRot, &tileScl);
 	AEMtx33Concat(&tileTransf, &tileTransl, &tileTransf);
 
+	// Reset color modifiers before rendering textured tile preview
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	if (currentTileIndex >= 0 && currentTileIndex < 12 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);
