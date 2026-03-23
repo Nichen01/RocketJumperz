@@ -143,9 +143,12 @@ namespace MenuHelpers {
 
         // Draw button text
         drawTextCentered(button.text, button.x, button.y, button.scale, fontID);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
     }
 
     void drawTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID) {
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
         if (fontID < 0) {
             printf("FONT IS NOT LOADED."); return;
         }

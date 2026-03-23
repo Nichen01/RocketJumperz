@@ -30,7 +30,6 @@ void Pause_Load() {
 
 	menutex = AEGfxTextureLoad("Assets/UI/Menus/Menu.png");
 	buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
-	
 	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 
