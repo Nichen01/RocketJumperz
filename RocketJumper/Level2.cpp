@@ -56,28 +56,9 @@ static bool keycardCollectedAudio = false;
 
 void Level2_Load()
 {
-	aiming::loadAiming();
-	weaponSprite::Load();
 	audio::loadsound();
 
-	// LOADING TEXTURES
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
-	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
-	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
-	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
-	AssetManager::LoadTexture(TEX_RANGED_HURT,    "Assets/Enemy/RangedHurt.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
-
-	// Sync the extern pointers so other files can use them directly
-	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
-	plasma            = AssetManager::GetTexture(TEX_PLASMA);
-	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
-	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
-	doorTex           = AssetManager::GetTexture(TEX_DOOR);
-
+	// Load platform tile textures
 	load::platform();
 
 	// Load UI textures (eButton used by flashing door prompt in Draw)
@@ -91,6 +72,12 @@ void Level2_Load()
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
+
+	// Ranged enemy state spritesheets (1 row each, variable columns)
+	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
+	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
+	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
+	AssetManager::LoadTexture(TEX_RANGED_HURT,    "Assets/Enemy/RangedHurt.png");
 
 	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
@@ -145,6 +132,7 @@ void Level2_Load()
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
+	weaponSprite::Load();
 }
 
 void Level2_Initialize()
@@ -154,7 +142,7 @@ void Level2_Initialize()
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
 	doorTex = AssetManager::GetTexture(TEX_DOOR);
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
-	currentGameLevel = 1;
+	currentGameLevel = 2;
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
@@ -174,6 +162,7 @@ void Level2_Initialize()
 	platformMesh   = AssetManager::GetMesh(MESH_QUAD);
 	pMesh          = AssetManager::GetMesh(MESH_QUAD);
 	projectileMesh = AssetManager::GetMesh(MESH_QUAD);
+	uiMesh         = AssetManager::GetMesh(MESH_QUAD);
 
 	if (!ImportMapDataFromFile("Assets/Map/Level2_Map.txt")) {
 		printf("Could not import file");
@@ -230,11 +219,7 @@ void Level2_Initialize()
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -100.0f, -200.0f);
 
 	//MUSHROOM ANIM TEST
-	{
-		AEGfxVertexList* meleeEnemyMesh = nullptr;
-		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
-	}
+	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// Build spritesheet meshes for ranged enemy states (rows, cols)
@@ -243,8 +228,8 @@ void Level2_Initialize()
 	AssetManager::BuildSqrMesh(MESH_RANGED_DEATH,   1, 4);
 	AssetManager::BuildSqrMesh(MESH_RANGED_HURT,    1, 2);
 	// DOOR
-	animSystem::buildMesh(&doorMesh, 1, 7);
-	AssetManager::StoreMesh(MESH_DOOR, doorMesh);
+	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);
+	doorMesh = AssetManager::GetMesh(MESH_DOOR);
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
@@ -384,7 +369,7 @@ void Level2_Update()
 
 	for (auto& door : doors) {
 		// Only process doors connected to this level
-		if (door.entranceLevel != 1 && door.exitLevel != 1)
+		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
 
 		f32 dx = objectinfo2[player].xPos - door.worldX;
@@ -473,7 +458,7 @@ void Level2_Draw()
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
 		AssetManager::GetMesh(MESH_MELEE_ENEMY),
-		AssetManager::GetMesh(MESH_TEST),
+		AssetManager::GetMesh(MESH_QUAD),
 		AssetManager::GetTexture(TEX_MUSHROOM_IDLE_SHEET),
 		AssetManager::GetTexture(TEX_RANGED_ENEMY),
 		animSystem::getUOffset(meleeAnim),
@@ -483,7 +468,7 @@ void Level2_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	pickup::drawDrops(L2Drop, MAX_ENEMIES);
 
@@ -508,7 +493,7 @@ void Level2_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
@@ -574,6 +559,7 @@ void Level2_Unload()
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
 	aiming::unloadAiming();
+	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
 	if (glassMap) {
@@ -588,6 +574,4 @@ void Level2_Unload()
 	// Unload ALL audio resources that were loaded in Load
 
 	audio::unloadsound();
-	aiming::unloadAiming();
-	weaponSprite::Unload();
 }

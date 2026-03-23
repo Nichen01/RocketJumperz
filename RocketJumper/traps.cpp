@@ -15,6 +15,7 @@ namespace traps {
 		AEVec2Zero(&nearestTrap);
 	}
 	AEVec2 checkNearestTrap(float NposX,float NposY, int* map, int x,int y) {
+		(void)map;
 		nearTrap = 0;
 		AEVec2 temp = {};
 		for (int dx = -trapRange; dx <= trapRange; ++dx) {
@@ -61,8 +62,10 @@ namespace traps {
 				}
 			}
 		}
-		gamelogic::Collision_movement(&enemies[0].shape, map, x, (int)s, 2);
-		gamelogic::Collision_movement(&enemies[1].shape, map, x, (int)s, 2);
-		gamelogic::Collision_movement(&objectinfo[player], map, x, (int)s, 2);
+		// Trap-tile collision resolution is handled by the level's own
+		// Collision_movement calls (index=1 for walls already keeps entities
+		// in bounds).  Calling Collision_movement here with index=2 caused a
+		// double-move per frame (velocity applied twice), which could push
+		// entities out of the map and trigger access violations.
 	}
 }

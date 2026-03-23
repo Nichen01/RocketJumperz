@@ -71,7 +71,7 @@ void Pause_Draw() {
 	AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
 
 	AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
-	AEGfxPrint(pausefont, "PAUSE", -0.06-width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
+	AEGfxPrint(pausefont, "PAUSE", -0.06f-width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
 
 	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttontex);
 	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttontex);

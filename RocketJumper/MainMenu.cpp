@@ -124,7 +124,7 @@ namespace MenuHelpers {
         AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 
         // Draw button text
-        drawTextCentered(button.text, button.x, button.y, button.scale*0.7, fontID);
+        drawTextCentered(button.text, button.x, button.y, button.scale*0.7f, fontID);
     }
 
     void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID) {

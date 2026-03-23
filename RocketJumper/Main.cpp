@@ -58,7 +58,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			canpause = false;
 		}
 		if (current == GS_LEVELEDITOR) {
-			canpause = false;
+			canpause = false;	
 		}
 
 		if (current != GS_RESTART) {

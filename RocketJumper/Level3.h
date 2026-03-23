@@ -30,6 +30,7 @@ Technology is prohibited.
 #include "Sound.h"
 #include "AssetManager.h"
 #include "Drops.h"
+#include "WeaponSprite.h"
 
 void Level3_Load();
 

@@ -161,7 +161,8 @@ void Level1_Initialize()
 	pMesh        = AssetManager::GetMesh(MESH_QUAD);
 	platformMesh = AssetManager::GetMesh(MESH_QUAD);
 	pTestMesh    = AssetManager::GetMesh(MESH_QUAD);
-	
+	uiMesh       = AssetManager::GetMesh(MESH_QUAD);
+
 	if (!ImportMapDataFromFile("Assets/Map/Level1_Map.txt")) {
 		printf("Could not import file");
 		return;
@@ -274,15 +275,9 @@ void Level1_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo1[player]);
 
-	if (AEInputCheckTriggered(AEVK_Q)|| AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next = GS_QUIT;
-	}
-
-	
 	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
 		next = GS_QUIT;
 	}
-	
 
 	// ---- Weapon Toggle (Q key) ----
 	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
@@ -381,7 +376,7 @@ void Level1_Update()
 
 	for (auto& door : doors) {
 		// Only process doors connected to this level
-		if (door.entranceLevel != 1 && door.exitLevel != 1)
+		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
 
 		f32 dx = objectinfo1[player].xPos - door.worldX;
