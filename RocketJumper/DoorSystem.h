@@ -7,19 +7,12 @@ extern int playerEnteredDoorId;
 
 struct DoorLink {
     int id;
-    int entranceLevel;
-    int exitLevel;
+    int firstLevel;
+    int secondLevel;
     int row, col;
     float worldX, worldY;
     bool isOpen = false;
-    bool isLocked;
     SpriteAnimation anim;
-};
-
-struct brokenDoor {
-    f32 worldX;
-    f32 worldY;
-    int state;
 };
 
 extern std::vector<DoorLink> doors;

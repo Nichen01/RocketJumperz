@@ -57,9 +57,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (current == GS_DEATH) {
 			canpause = false;
 		}
-		if (current == GS_LEVELEDITOR) {
-			canpause = false;
-		}
 
 		if (current != GS_RESTART) {
 			GSM_Update();

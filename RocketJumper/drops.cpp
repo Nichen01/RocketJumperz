@@ -26,6 +26,7 @@ namespace pickup {
 	}
 	void drawDrops(drop instance[], int max) {
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetColorToAdd(0, 1, 0, 1);
 		for (int i{};i < max;i++) {
 			if (instance[i].info.flag == 0) continue;
 			else {
@@ -37,8 +38,5 @@ namespace pickup {
 		// Reset color state so subsequent draw calls are not tinted green
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
-		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
-
 	}
 }

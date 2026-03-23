@@ -13,7 +13,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "BinaryMap.h"
+#include "binaryMap.h"
 #include <iostream>
 #include <fstream>
 #include <AEEngine.h>
@@ -34,19 +34,6 @@ int** MapData;
 //cell
 int** BinaryCollisionArray;
 int** glassMap;
-
-// extern key obj
-Key key{};
-int keyCountLevel1 = 0;
-int keyCountLevel2 = 0;
-int keyCountLevel3 = 0;
-int finalDoorCount = 0;
-
-int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
-
-brokenDoor finalDoor{};
-
-f32 tileSize = 80.f;
 
 // ----------------------------------------------------------------------------
 //
@@ -97,9 +84,6 @@ int ImportMapDataFromFile(const char* FileName)
 {
 	doors.clear();
 
-	keyCountLevel1 = 0, keyCountLevel2 = 0, keyCountLevel3 = 0;
-	tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
-
 	std::ifstream ifs(FileName, std::ios::in);
 	if (!ifs) return 0;
 
@@ -110,62 +94,26 @@ int ImportMapDataFromFile(const char* FileName)
 	BinaryCollisionArray = new int* [BINARY_MAP_HEIGHT];
 	glassMap = new int* [BINARY_MAP_HEIGHT];   // allocate glassMap rows
 
-	for (int row = 0; row < BINARY_MAP_HEIGHT; row++) {
-		MapData[row] = new int[BINARY_MAP_WIDTH];
-		BinaryCollisionArray[row] = new int[BINARY_MAP_WIDTH];
-		glassMap[row] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
+		MapData[i] = new int[BINARY_MAP_WIDTH];
+		BinaryCollisionArray[i] = new int[BINARY_MAP_WIDTH];
+		glassMap[i] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
 	}
 
-	for (int row = 0; row < BINARY_MAP_HEIGHT; row++) {
-		for (int col = 0; col < BINARY_MAP_WIDTH; col++) {
+	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
+		for (int j = 0; j < BINARY_MAP_WIDTH; j++) {
 			int value;
 			ifs >> value;
-			MapData[row][col] = value;
-			if (value == 40) {
-				BinaryCollisionArray[row][col] = 0;
-			}
-			else {
-				BinaryCollisionArray[row][col] = (value / 10 == 1) ? 1 : 0;
-			}
-			// to save coordinates of the key
-			if (value == 67) {
-				key.row = row;
-				key.col = col;
-				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
-				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
-				if (currentGameLevel == 1) keyCountLevel1 = 1;
-				else if (currentGameLevel == 2) keyCountLevel2 = 1;
-				else if (currentGameLevel == 3) keyCountLevel3 = 1;
-			}
+			MapData[i][j] = value;
+			BinaryCollisionArray[i][j] = (value/10 == 1) ? 1 : 0;
 
-			// to save coordinates of brokenDoor
-			if (value == 69) {
-				finalDoor.worldX = (col * tileSize + tileSize / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
-				finalDoor.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.f);
-				finalDoor.state = 0;
-				finalDoorCount = 1;
-			}
-
-			// check the counts of door in one level
-			if (value == 21) {
-				tutDoorCount = 1;
-			}
-			else if (value == 22) {
-				door1Count = 1;
-			}
-			else if (value == 23) {
-				door2Count = 1;
-			}
-			else if (value == 24) {
-				door3Count = 1;
-			}
 
 			// assign random glass type if tile is "air"
-			if (value == 0 || (value >= 31 && value <= 39) || value == 67) {
-				glassMap[row][col] = rand() % 5;
+			if (value == 0) {
+				glassMap[i][j] = rand() % 5;
 			}
 			else {
-				glassMap[row][col] = -1;
+				glassMap[i][j] = -1;
 			}
 		}
 	}
@@ -175,19 +123,22 @@ int ImportMapDataFromFile(const char* FileName)
 			int tile = MapData[row][col];
 			if (tile >= 21 && tile <= 29) {
 				DoorLink door;
-				door.id = tile; // door ID
+				door.id = tile;       // door ID
 				door.row = row;
 				door.col = col;
 				door.worldX = (col * 80) + 40 - 800.0f;
 				door.worldY = 450.0f - (row * 80 + 40);
 
 				switch (tile) {
-				case 21: door.entranceLevel = 0; door.exitLevel = 1; break;
-				case 22: door.entranceLevel = 1; door.exitLevel = 2; break;
-				case 23: door.entranceLevel = 2; door.exitLevel = 3; break;
-				default: door.entranceLevel = 0; door.exitLevel = 0; break;
+				case 21: door.firstLevel = 0; door.secondLevel = 1; break;
+				case 22: door.firstLevel = 1; door.secondLevel = 2; break;
+				case 23: door.firstLevel = 2; door.secondLevel = 3; break;
+				default: door.firstLevel = 0; door.secondLevel = 0; break;
 				}
 
+				// Initialize animation for this door.
+			// The door sprite is a 7-frame horizontal strip (1 row, 7 columns).
+			// animSystem::init parameter order (per .cpp): cols, rows -- so pass 7, 1.
 			animSystem::init(door.anim, 7, 1, 7, 0.08f, ANIM_IDLE);
 
 				doors.push_back(door);

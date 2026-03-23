@@ -69,9 +69,6 @@ enum objecttype {
 	enemy
 };
 
-// Counter for the WIRE to fix FINAL DOOR
-extern int wireCount;
-
 extern objectsquares objectinfo2[2];
 
 // ---- Player Health Functions ----

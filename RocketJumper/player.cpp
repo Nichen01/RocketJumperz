@@ -2,8 +2,6 @@
 #include "Collision.h"
 #include <cstdio>
 
-int wireCount = 0;
-
 // ---------------------------------------------------------------------------
 // InitPlayerHealth
 // Sets the player's health to the maximum and clears the invincibility timer.

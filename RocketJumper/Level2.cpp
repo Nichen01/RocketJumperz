@@ -1,38 +1,53 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Level1.cpp
+\author       Ivan Chong, i.chong, 2503476
+\par          i.chong@digipen.edu
+\date         January, 16, 2026
+\brief        Contain functions called by GameStateManager.cpp
 
-// External libraries are included in header file
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
+// External libraries included in header file
 #include "Level2.h"
 #include "WeaponSprite.h"
 
 static s32* map = nullptr;
-static int x;
-static int y;
+static int x = 16;
+static int y = 9;
+static int s = 80;
 
 // Player sprite render size in world units (half a tile -- proportional to 30x30 enemies)
 const float PlayerScale = 80.0f;
 
-extern objectsquares objectinfo2[2] = { 0 };
+// Font handle for in-game text rendering 
+static s8 font = -1;
+
+objectsquares objectinfo2[2] = { 0 };
 drop L2Drop[MAX_ENEMIES] = { 0 };
 
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
 
-static AEGfxVertexList* pTestMesh = nullptr;
-
 // ENEMY DATA
-static Projectile enemyProjectiles[MAX_PROJECTILES];
 static Enemy enemies[MAX_ENEMIES];
+static Projectile enemyProjectiles[MAX_PROJECTILES];
+static AEGfxTexture* meleeEnemyTexture = nullptr;
+static AEGfxTexture* rangedEnemyTexture = nullptr;
+static AEGfxTexture* doorTexture = nullptr;
 
-// Mushroom animation state (mesh/textures owned by AssetManager)
-static SpriteAnimation meleeAnim;
+// Font resource (must be destroyed in Unload to avoid leak)
+static s8 fontLevel1 = -1;
 
-// Base texture loaded via AssetManager (no extern in draw.h, Level1-only)
-static AEGfxTexture* base5test = nullptr;
+// Tracks whether the player is near a door (used in Draw for flashing E prompt)
+static bool playerNear = false;
 
-// Font handle for in-game text -- UNUSED, kept for reference only.
-// The active font handle is fontLevel2 (declared below), which is
-// created in Initialize and destroyed in Unload.
-
-// Sound and volume
+//==== sound and volume
 static f32 bgVolume = 1.f;
 
 // Door variables (doorX, doorY, doorAnim, doorMesh, doorIsOpen, doorTex)
@@ -41,15 +56,9 @@ static f32 bgVolume = 1.f;
 static s32  DOOR_FRAME_COUNT = 7;
 static f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
 
-// Font resource (must be destroyed in Unload to avoid leak)
-static s8 fontLevel2 = -1;
 
-// bool for checking player proximity with door
-static bool playerNear;
-
-// bool for keycard in inventory
-static bool keycardCollected;
-static bool keycardCollectedAudio = false;
+//ANIMATION
+SpriteAnimation meleeAnim;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -77,89 +86,19 @@ void Level2_Load()
 	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
 	doorTex           = AssetManager::GetTexture(TEX_DOOR);
 
-	// Load platform tile textures
 	load::platform();
-
-	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
 
-	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
-	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
-	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
-	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
-
-	// Sync the extern pointers so other files (draw.cpp etc.) can use them directly
-	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
-	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
-	plasma = AssetManager::GetTexture(TEX_PLASMA);
-	doorTex = AssetManager::GetTexture(TEX_DOOR);
-
-	// Loading of assets for mushroomDie using AssetManager
-	{
-		const TextureID dieIDs[9] = {
-			TEX_MUSHROOM_DIE0, TEX_MUSHROOM_DIE1, TEX_MUSHROOM_DIE2,
-			TEX_MUSHROOM_DIE3, TEX_MUSHROOM_DIE4, TEX_MUSHROOM_DIE5,
-			TEX_MUSHROOM_DIE6, TEX_MUSHROOM_DIE7, TEX_MUSHROOM_DIE8
-		};
-		for (int i = 0; i < 9; ++i) {
-			char path[128];
-			sprintf_s(path, "Assets/Enemy/MushroomDie/MushroomDie%d.png", i);
-			AssetManager::LoadTexture(dieIDs[i], path);
-			mushroomDieTexture[i] = AssetManager::GetTexture(dieIDs[i]);
-		}
-	}
-
-	// Loading of assets for mushroomHit using AssetManager
-	{
-		const TextureID hitIDs[5] = {
-			TEX_MUSHROOM_HIT0, TEX_MUSHROOM_HIT1, TEX_MUSHROOM_HIT2,
-			TEX_MUSHROOM_HIT3, TEX_MUSHROOM_HIT4
-		};
-		for (int i = 0; i < 5; ++i) {
-			char path[128];
-			sprintf_s(path, "Assets/Enemy/MushroomHit/MushroomHit%d.png", i);
-			AssetManager::LoadTexture(hitIDs[i], path);
-			mushroomHitTexture[i] = AssetManager::GetTexture(hitIDs[i]);
-		}
-	}
-
-	// Loading of assets for mushroomIdle using AssetManager
-	{
-		const TextureID idleIDs[7] = {
-			TEX_MUSHROOM_IDLE0, TEX_MUSHROOM_IDLE1, TEX_MUSHROOM_IDLE2,
-			TEX_MUSHROOM_IDLE3, TEX_MUSHROOM_IDLE4, TEX_MUSHROOM_IDLE5,
-			TEX_MUSHROOM_IDLE6
-		};
-		for (int i = 0; i < 7; ++i) {
-			char path[128];
-			sprintf_s(path, "Assets/Enemy/MushroomIdle/MushroomIdle%d.png", i);
-			AssetManager::LoadTexture(idleIDs[i], path);
-			mushroomIdleTexture[i] = AssetManager::GetTexture(idleIDs[i]);
-		}
-	}
-
-	// Create font for gameover text (stored so we can destroy it in Unload)
-	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	// Create font for HUD text (stored so we can destroy it in Unload)
+	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 
 void Level2_Initialize()
 {
-	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
-	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
-	plasma = AssetManager::GetTexture(TEX_PLASMA);
-	doorTex = AssetManager::GetTexture(TEX_DOOR);
-	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
-	currentGameLevel = 1;
+	currentGameLevel = 2;
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
-	// Create font for HUD text (stored so we can destroy it in Unload)
-	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo2[player]);
@@ -190,18 +129,13 @@ void Level2_Initialize()
 			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
+
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	for (auto& door : doors) {
-		// Lock all doors except for Tutorial -> Level 1
-		door.isLocked = true;
-		if (door.id == 21) {
-			door.isLocked = false;
-		}
-
 		if (door.id == playerEnteredDoorId) {
 			objectinfo2[player].xPos = door.worldX;
-			objectinfo2[player].yPos = door.worldY;
+			objectinfo2[player].yPos = door.worldY; // slight offset so player isn't inside door
 			spawnSet = true;
 			break;
 		}
@@ -225,16 +159,13 @@ void Level2_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
+	
+
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -100.0f, -200.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
 
-	//MUSHROOM ANIM TEST
-	{
-		AEGfxVertexList* meleeEnemyMesh = nullptr;
-		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
-	}
+	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
 	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
 
 	// Build spritesheet meshes for ranged enemy states (rows, cols)
@@ -256,7 +187,7 @@ void Level2_Update()
 		next = GS_LEVELEDITOR;
 	}
 
-	//====== AUDIO CONTROLS ======//
+	// ====== AUDIO CONTROLS ====== //
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
 		if (bgVolume <= 0.f)
@@ -340,7 +271,7 @@ void Level2_Update()
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
-		objectinfo2[player], L2Drop,
+		objectinfo2[player],L2Drop,
 		enemyProjectiles, MAX_PROJECTILES,
 		dt, LaserBlast, soundEffects);
 
@@ -367,9 +298,10 @@ void Level2_Update()
 		next = GS_DEATH;
 	}
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, static_cast<int>(tileSize), 1);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
-	gamelogic::Collision_movement(&objectinfo2[player], map, x, static_cast<int>(tileSize), 1);
+
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
+	gamelogic::Collision_movement(&objectinfo2[player], map, x, s, 1);
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -379,7 +311,7 @@ void Level2_Update()
 
 	for (auto& door : doors) {
 		// Only process doors connected to this level
-		if (door.entranceLevel != 1 && door.exitLevel != 1)
+		if (door.firstLevel != 1 && door.secondLevel != 1)
 			continue;
 
 		f32 dx = objectinfo2[player].xPos - door.worldX;
@@ -400,19 +332,12 @@ void Level2_Update()
 
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				if (door.isLocked && !keycardCollected) {
-					std::cout << "Door is locked!" << std::endl;
-					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
-				}
-				else {
-					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
-					playerEnteredDoorId = door.id; // remember which door was used
-					switch (toLevel) {
-					case 0: next = GS_TUTORIAL; break;
-					case 1: next = GS_LEVEL1;   break;
-					case 2: next = GS_LEVEL2;   break;
-					case 3: next = GS_LEVEL3;   break;
-					}
+				int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
+				playerEnteredDoorId = door.id; // remember which door was used
+				switch (toLevel) {
+				case 0: next = GS_TUTORIAL; break;
+				case 1: next = GS_LEVEL1;   break;
+				case 2: next = GS_LEVEL2;   break;
 				}
 			}
 		}
@@ -435,19 +360,6 @@ void Level2_Update()
 
 	// MUSHROOM ANIMATION
 	animSystem::update(meleeAnim, dt);
-
-	// Checks if player is on the keycard
-	objectsquares keyObj;
-	keyObj.xPos = key.worldX;
-	keyObj.yPos = key.worldY;
-	keyObj.xScale = key.size;
-	keyObj.yScale = key.size;
-
-	if (key.active && gamelogic::static_collision(&objectinfo2[player], &keyObj)) {
-		key.active = false;
-		keycardCollected = true;
-		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
-	}
 }
 
 void Level2_Draw()
@@ -462,15 +374,16 @@ void Level2_Draw()
 	AEGfxSetTransparency(1.0f);
 
 	// ===== RENDER WALLS ======= //
-	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
+	renderlogic::drawMapWallFloor(map, x, y, s);
 
 	// ==== ENEMIES RENDER =======//
+	// Render enemies
 	enemySystem::renderEnemies(enemies,
 		MAX_ENEMIES,
 		AssetManager::GetMesh(MESH_MELEE_ENEMY),
-		AssetManager::GetMesh(MESH_TEST),
-		AssetManager::GetTexture(TEX_MUSHROOM_IDLE_SHEET),
-		AssetManager::GetTexture(TEX_RANGED_ENEMY),
+		projectileMesh,
+		meleeEnemyTexture,
+		rangedEnemyTexture,
 		animSystem::getUOffset(meleeAnim),
 		animSystem::getVOffset(meleeAnim));
 
@@ -478,7 +391,7 @@ void Level2_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
 	pickup::drawDrops(L2Drop, MAX_ENEMIES);
 
@@ -503,12 +416,12 @@ void Level2_Draw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_TEST));
+	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
-	// ====== HUD: Player Health Display ======//
+	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
-	if (fontLevel2 >= 0)
+	if (fontLevel1 >= 0)
 	{
 		char healthText[32];
 		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo2[player].health);
@@ -520,35 +433,26 @@ void Level2_Draw()
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
 		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel2, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 	}
-
-	// ====== HARDCODED TILES AT THE BOTTOM ====== //
 	renderlogic::drawTileArray();
 
-	// ====== FLASHING E BUTTON WHEN PLAYER IS NEAR A DOOR ====== //
+	// ===== RENDERING OF THE FLASHING 'E' ===== //
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfo2[player].xPos, objectinfo2[player].yPos + 60.f, eButton, 50.f);
-	}
-	// ====== PLACEHOLDER INVENTORY FOR WIRES ====== //
-	renderlogic::drawTexture(-650.f, -400.f, inventory, uiMesh, 100.f, 100.f);
-	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected) {
-		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
-		for (auto& door : doors) {
-			door.isLocked = false;
-		}
-	}
-	else {
-		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
 }
 
 void Level2_Free()
 {
-	// Unload all AssetManager-tracked textures
 	AssetManager::FreeAllMeshes();
+
+	doorMesh = nullptr;
+	pMesh = nullptr;
+	platformMesh = nullptr;
+	enemyMesh = nullptr;
+	projectileMesh = nullptr;
 
 	if (map) {
 		delete[] map;
@@ -560,16 +464,15 @@ void Level2_Free()
 
 void Level2_Unload()
 {
-	// Unload all AssetManager-tracked textures, then null the shared extern pointers.
+	// Unload ALL textures that were loaded in Initialize
 	AssetManager::UnloadAllTextures();
 
-
-	// Safely null out mushroom textures (AssetManager already freed the memory)
-	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
-	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
-	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
-	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
+	characterPictest = nullptr;
+	plasma = nullptr;
+	meleeEnemyTexture = nullptr;
+	rangedEnemyTexture = nullptr;
+	doorTex = nullptr;
+	
 
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
@@ -577,11 +480,11 @@ void Level2_Unload()
 		glassMap = nullptr;
 	}
 
-	// Destroy the font created in Load
-	if (fontLevel2 != -1) { AEGfxDestroyFont(fontLevel2); fontLevel2 = -1; }
+
+	// Destroy the font created in Initialize
+	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
-
 	audio::unloadsound();
 	aiming::unloadAiming();
 	weaponSprite::Unload();

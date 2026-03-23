@@ -10,7 +10,7 @@ DoorLink* findLinkedDoor(int id, int currentLevel) {
     for (auto& d : doors) {
         if (d.id == id) {
             // return this door if currentLevel is one of its connected levels
-            if (d.entranceLevel == currentLevel || d.exitLevel == currentLevel)
+            if (d.firstLevel == currentLevel || d.secondLevel == currentLevel)
                 return &d;
         }
     }

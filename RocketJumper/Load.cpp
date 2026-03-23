@@ -13,14 +13,7 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
 	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
 	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
-	AEGfxTexture* keyTexture = NULL;
-	AEGfxTexture* errorPromptMenu = NULL, * redButton = NULL, * greenButton = NULL;
-	AEGfxTexture* prompt1 = NULL, * prompt2 = NULL, * prompt3 = NULL, * prompt4 = NULL, * prompt5 = NULL, * prompt6 = NULL, * prompt7 = NULL, * prompt8 = NULL, * prompt9 = NULL;
-	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
-	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
-	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
 
-	int keyX{}, keyY{};
 
 // define the mesh
 AEGfxVertexList* platformMesh = nullptr;
@@ -40,7 +33,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_PLATFORM6, "Assets/Platform/platform6.png");
 		AssetManager::LoadTexture(TEX_PLATFORM7, "Assets/Platform/platform7.png");
 		AssetManager::LoadTexture(TEX_PLATFORM8, "Assets/Platform/platform8.png");
-		AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
+		AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform0.png");
 		AssetManager::LoadTexture(TEX_GLASS0, "Assets/Platform/glass0.jpg");
 		AssetManager::LoadTexture(TEX_GLASS1, "Assets/Platform/glass1.jpg");
 		AssetManager::LoadTexture(TEX_GLASS2, "Assets/Platform/glass2.jpg");
@@ -79,8 +72,6 @@ namespace load {
 		AssetManager::LoadTexture(TEX_BUTTON2, "Assets/UI/2Button.png");
 		AssetManager::LoadTexture(TEX_BUTTON3, "Assets/UI/3Button.png");
 		AssetManager::LoadTexture(TEX_SPACEBAR, "Assets/UI/spacebar.png");
-		AssetManager::LoadTexture(TEX_INVENTORY, "Assets/UI/inventory.png");
-		AssetManager::LoadTexture(TEX_KEYCARDINVENTORY, "Assets/UI/keycardInventory.png");
 
 		// Sync the extern pointers so other files can use them directly
 		ctrl1 = AssetManager::GetTexture(TEX_CTRL1);
@@ -97,63 +88,5 @@ namespace load {
 		button2 = AssetManager::GetTexture(TEX_BUTTON2);
 		button3 = AssetManager::GetTexture(TEX_BUTTON3);
 		spacebar = AssetManager::GetTexture(TEX_SPACEBAR);
-		inventory = AssetManager::GetTexture(TEX_INVENTORY);
-		keycardInventory = AssetManager::GetTexture(TEX_KEYCARDINVENTORY);
-	}
-
-	void key() {
-		AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
-		keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
-	}
-
-	void errorPrompt() {
-		AssetManager::LoadTexture(TEX_ERRORPROMPT, "Assets/UI/menu.png");
-		AssetManager::LoadTexture(TEX_PROMPT1, "Assets/UI/prompt1.png");
-		AssetManager::LoadTexture(TEX_PROMPT2, "Assets/UI/prompt2.png");
-		AssetManager::LoadTexture(TEX_PROMPT3, "Assets/UI/prompt3.png");
-		AssetManager::LoadTexture(TEX_PROMPT4, "Assets/UI/prompt4.png");
-		AssetManager::LoadTexture(TEX_PROMPT5, "Assets/UI/prompt5.png");
-		AssetManager::LoadTexture(TEX_PROMPT6, "Assets/UI/prompt6.png");
-		AssetManager::LoadTexture(TEX_PROMPT7, "Assets/UI/prompt7.png");
-		AssetManager::LoadTexture(TEX_PROMPT8, "Assets/UI/prompt8.png");
-		AssetManager::LoadTexture(TEX_PROMPT9, "Assets/UI/prompt9.png");
-		errorPromptMenu = AssetManager::GetTexture(TEX_ERRORPROMPT);
-		prompt1 = AssetManager::GetTexture(TEX_PROMPT1);
-		prompt2 = AssetManager::GetTexture(TEX_PROMPT2);
-		prompt3 = AssetManager::GetTexture(TEX_PROMPT3);
-		prompt4 = AssetManager::GetTexture(TEX_PROMPT4);
-		prompt5 = AssetManager::GetTexture(TEX_PROMPT5);
-		prompt6 = AssetManager::GetTexture(TEX_PROMPT6);
-		prompt7 = AssetManager::GetTexture(TEX_PROMPT7);
-		prompt8 = AssetManager::GetTexture(TEX_PROMPT8);
-		prompt9 = AssetManager::GetTexture(TEX_PROMPT9);
-	}
-
-	void redButtonOption() {
-		AssetManager::LoadTexture(TEX_REDBUTTON, "Assets/UI/redButton.png");
-		redButton = AssetManager::GetTexture(TEX_REDBUTTON);
-	}
-
-	void greenButtonOption() {
-		AssetManager::LoadTexture(TEX_GREENBUTTON, "Assets/UI/greenButton.png");
-		greenButton = AssetManager::GetTexture(TEX_GREENBUTTON);
-	}
-
-	void brokenDoor() {
-		AssetManager::LoadTexture(TEX_BROKENDOOR0, "Assets/Platform/brokenDoor0.png");
-		AssetManager::LoadTexture(TEX_BROKENDOOR1, "Assets/Platform/brokenDoor1.png");
-		AssetManager::LoadTexture(TEX_BROKENDOOR2, "Assets/Platform/brokenDoor2.png");
-		brokenDoor0 = AssetManager::GetTexture(TEX_BROKENDOOR0);
-		brokenDoor1 = AssetManager::GetTexture(TEX_BROKENDOOR1);
-		brokenDoor2 = AssetManager::GetTexture(TEX_BROKENDOOR2);
-	}
-
-	void wireInventory() {
-		AssetManager::LoadTexture(TEX_WIREINVENTORY0, "Assets/UI/wireInventory0.png");
-		AssetManager::LoadTexture(TEX_WIREINVENTORY1, "Assets/UI/wireInventory1.png");
-		AssetManager::LoadTexture(TEX_WIREINVENTORY2, "Assets/UI/wireInventory2.png");
-		wireInventory0 = AssetManager::GetTexture(TEX_WIREINVENTORY0);
-		wireInventory1 = AssetManager::GetTexture(TEX_WIREINVENTORY1);
-		wireInventory2 = AssetManager::GetTexture(TEX_WIREINVENTORY2);
 	}
 } 

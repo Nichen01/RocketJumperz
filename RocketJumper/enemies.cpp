@@ -524,6 +524,8 @@ namespace enemySystem {
                         vOffset = 0.0f;
                     }
                 }
+                // prevent crash if mesh isn't loaded
+                if (!mesh) continue;
 
                 // prevent crash if mesh isn't loaded
                 if (!mesh) continue;

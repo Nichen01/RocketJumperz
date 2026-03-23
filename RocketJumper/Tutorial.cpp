@@ -18,7 +18,7 @@ Technology is prohibited.
 #include "Level1.h"
 #include "aimingInterface.h"
 #include "WeaponSprite.h"
-#include "Drops.h"
+#include "drops.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -154,6 +154,8 @@ void Tutorial_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
+	
+
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
@@ -182,6 +184,8 @@ void Tutorial_Initialize()
 
 void Tutorial_Update()
 {
+
+	if (AEInputCheckTriggered(AEVK_L)) next = GS_LEVELEDITOR;
 	//====== AUDIO CONTROLS ======
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
@@ -304,7 +308,7 @@ void Tutorial_Update()
 
 	for (auto& door : doors) {
 
-		if (door.entranceLevel != 0 && door.exitLevel != 0) continue;
+		if (door.firstLevel != 0 && door.secondLevel != 0) continue;
 		f32 dx = objectinfoTut[player].xPos - door.worldX;
 		f32 dy = objectinfoTut[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
@@ -323,7 +327,7 @@ void Tutorial_Update()
 
 		// E key transition -- inside the loop so door and playerNear are in scope
 		if (playerNear && door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-			int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+			int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
 			playerEnteredDoorId = door.id;  // remember which door was used
 			switch (toLevel) {
 			case 0: next = GS_TUTORIAL; break;

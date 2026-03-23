@@ -1,21 +1,14 @@
 #pragma once
-#include "pch.h"
 #include "AEEngine.h"
 #include "Animation.h"
 #include "Level1.h"
-#include "AEGraphics.h"
-#include "BinaryMap.h"
-#include "Enemies.h"
 
 namespace renderlogic {
 	void drawSquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
 	void drawMapWallFloor(int map[], int mapX, int mapY, int mapS);
 	void drawTileArray();
-	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX = 40.f, f32 scaleY = 40.f);
+	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale = 40.f);
 	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
-	void drawGlass(int row, int col, int mapS, AEGfxVertexList* platformMesh);
-	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
-	void drawWireInventory(int);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp
