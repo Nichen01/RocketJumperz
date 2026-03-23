@@ -322,10 +322,10 @@ void Level1_Update()
 		next = GS_DEATH;
 	}
 
-	gamelogic::Collision_movement(&enemies[0].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&enemies[1].shape, map, x, s, 1);
-	gamelogic::Collision_movement(&objectinfo[player], map, x, s, 1);	
-	traps::updateTraps(enemies, objectinfo, map, x,y, (float)s);
+	gamelogic::Collision_movement(&enemies[0].shape, map, x, static_cast<int>(tileSize), 1);
+	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
+	gamelogic::Collision_movement(&objectinfo1[player], map, x, static_cast<int>(tileSize), 1);
+	traps::updateTraps(enemies, objectinfo1, map, x,y, tileSize);
 	// -----------------------------------------------------------------------
 	// Door animation
 	// -----------------------------------------------------------------------

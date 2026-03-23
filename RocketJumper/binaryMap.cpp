@@ -123,6 +123,7 @@ int ImportMapDataFromFile(const char* FileName)
 			// assign random glass type if tile is "air"
 			if (value == 0) {
 				glassMap[row][col] = rand() % 5;
+			}
 			MapData[row][col] = value;
 			if (value == 40) {
 				BinaryCollisionArray[row][col] = 0;
@@ -211,8 +212,7 @@ int ImportMapDataFromFile(const char* FileName)
 //	function
 //
 // ----------------------------------------------------------------------------
-void FreeMapData(void)
-{
+void FreeMapData(void){
 	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
 		delete[] MapData[i];
 		delete[] BinaryCollisionArray[i];
@@ -235,7 +235,7 @@ void FreeMapData(void)
 //	Add spaces and end lines at convenient places
 //
 // ----------------------------------------------------------------------------
-void PrintRetrievedInformation(void)
+void PrintRetrievedInformation()
 {
 	std::cout << "Width " << BINARY_MAP_WIDTH << std::endl;
 	std::cout << "Height " << BINARY_MAP_HEIGHT << std::endl;
