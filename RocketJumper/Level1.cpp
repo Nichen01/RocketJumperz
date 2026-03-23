@@ -205,7 +205,7 @@ void Level1_Initialize()
 	InitPlayerHealth(objectinfo1[player]);
 
 	// Start with the plasma gun equipped (default weapon)
-	objectinfo[player].currentWeapon = WEAPON_PLASMA;
+	objectinfo1[player].currentWeapon = WEAPON_PLASMA;
 
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
@@ -287,34 +287,34 @@ void Level1_Update()
 	// ---- Weapon Toggle (Q key) ----
 	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
 	if (AEInputCheckTriggered(AEVK_Q)) {
-		if (objectinfo[player].currentWeapon == WEAPON_PLASMA) {
-			objectinfo[player].currentWeapon = WEAPON_SHOTGUN;
+		if (objectinfo1[player].currentWeapon == WEAPON_PLASMA) {
+			objectinfo1[player].currentWeapon = WEAPON_SHOTGUN;
 			printf("Weapon switched to: SHOTGUN\n");
 		}
 		else {
-			objectinfo[player].currentWeapon = WEAPON_PLASMA;
+			objectinfo1[player].currentWeapon = WEAPON_PLASMA;
 			printf("Weapon switched to: PLASMA\n");
 		}
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
-	movement::updatePlayerPhysics(objectinfo[player]);
-	movement::UpdatePlayerFacing(objectinfo[player]);
-	aiming::updateAiming(objectinfo[player]);
-	weaponSprite::Update(objectinfo[player]);
-	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo[player]);
+	movement::updatePlayerPhysics(objectinfo1[player]);
+	movement::UpdatePlayerFacing(objectinfo1[player]);
+	aiming::updateAiming(objectinfo1[player]);
+	weaponSprite::Update(objectinfo1[player]);
+	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	// Fire using the currently equipped weapon (toggled with Q)
 	if (movement::bulletCount) {
-		if (objectinfo[player].currentWeapon == WEAPON_SHOTGUN) {
+		if (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN) {
 			// Shotgun: 5-pellet cone spread
 			projectileSystem::FireShotgun(
 				static_cast<s32>(worldMouseX),
 				static_cast<s32>(worldMouseY),
-				objectinfo[player],
+				objectinfo1[player],
 				Projectiles,
 				MAX_PROJECTILES,
 				LaserBlast,
@@ -325,7 +325,7 @@ void Level1_Update()
 			projectileSystem::fireProjectiles(
 				static_cast<s32>(worldMouseX),
 				static_cast<s32>(worldMouseY),
-				objectinfo[player],
+				objectinfo1[player],
 				Projectiles,
 				MAX_PROJECTILES,
 				LaserBlast,
@@ -494,10 +494,10 @@ void Level1_Draw()
 	// Flip sprite horizontally when the player is aiming left.
 	// Negating xScale mirrors the quad along the Y axis.
 	f32 playerDrawScaleX = movement::playerFacingLeft
-		? -objectinfo[player].xScale
-		:  objectinfo[player].xScale;
-	renderlogic::drawSquare(objectinfo[player].xPos, objectinfo[player].yPos,
-		playerDrawScaleX, objectinfo[player].yScale);
+		? -objectinfo1[player].xScale
+		:  objectinfo1[player].xScale;
+	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
+		playerDrawScaleX, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	aiming::drawAiming();
 	weaponSprite::Draw();
@@ -526,7 +526,7 @@ void Level1_Draw()
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// Show the currently equipped weapon below the health display
-		const char* weaponName = (objectinfo[player].currentWeapon == WEAPON_SHOTGUN)
+		const char* weaponName = (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN)
 			? "Weapon: Shotgun"
 			: "Weapon: Plasma";
 		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
