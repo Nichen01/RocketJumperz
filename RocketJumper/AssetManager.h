@@ -119,6 +119,9 @@ enum TextureID {
     TEX_BROKENDOOR1,
     TEX_BROKENDOOR2,
 
+    // Wire (world drop item)
+    TEX_WIRE,
+
     // Wire Inventory
     TEX_WIREINVENTORY0,
     TEX_WIREINVENTORY1,

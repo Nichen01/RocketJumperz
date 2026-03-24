@@ -12,6 +12,9 @@ const float PlayerScale = 80.0f;
 extern objectsquares objectinfo3[2] = { 0 };
 drop L3Drop[MAX_ENEMIES] = { 0 };
 
+// Wire drops -- one wire can drop per level from enemy deaths
+static WireDrop wireDrops[MAX_ENEMIES] = { 0 };
+
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
 
@@ -57,6 +60,8 @@ void Level3_Load()
 {
 	audio::loadsound();
 
+	// Load wire item texture (world drop) and wire inventory textures
+	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
 	load::wireInventory();
 	load::brokenDoor();	// Load broken door(s) for final door
 	load::platform();	// Load platform tile textures
@@ -231,6 +236,10 @@ void Level3_Initialize()
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
 	pickup::initDrops(L3Drop, MAX_ENEMIES, PlayerScale);
+
+	// Wire drops: reset per-level tracker and initialize wire drop array
+	pickup::ResetWireDropTracker();
+	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 }
 
 void Level3_Update()
@@ -290,6 +299,7 @@ void Level3_Update()
 	aiming::updateAiming(objectinfo3[player]);
 	weaponSprite::Update(objectinfo3[player]);
 	pickup::updateDrops(L3Drop, MAX_ENEMIES, objectinfo3[player]);
+	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo3[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -326,11 +336,12 @@ void Level3_Update()
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 
-	// Update enemies
+	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo3[player], L3Drop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects);
+		dt, LaserBlast, soundEffects,
+		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
@@ -447,32 +458,31 @@ void Level3_Update()
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
-	//========== DOOR RENDERING BASED ON STATE ==========//
-	if (finalDoor.state == 0) {
+	//========== DOOR RENDERING BASED ON WIRE COUNT ==========//
+	// Show progressively repaired door as the player collects wires
+	if (wireCount <= 0) {
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
 	}
-	else if (finalDoor.state == 1) {
+	else if (wireCount == 1) {
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
 	}
 	else {
+		// 2 or 3 wires: show most-repaired door texture
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
 	}
 
-	// Player tries to fix broken door
+	// Player tries to use the final broken door.
+	// The door requires exactly 3 wires to be accessible.
+	// If the player has fewer than 3, play an error sound.
 	if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor) {
-		if (finalDoor.state < 2) {
-			if (wireCount > 0) {
-				finalDoor.state++;
-				wireCount--;
-				std::cout << finalDoor.state << " " << wireCount << std::endl;
-			}
-			else {
-				AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
-			}
+		if (wireCount >= 3) {
+			// Door is accessible -- transition to victory
+			next = GS_VICTORY;
 		}
 		else {
-			// Door is fully repaired, pressing E now exits
-			next = GS_VICTORY;
+			// Not enough wires -- play error sound to inform the player
+			AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+			printf("Need 3 wires to open the final door! Current: %d\n", wireCount);
 		}
 	}
 
@@ -493,14 +503,15 @@ void Level3_Draw()
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
 
-	// ====== DRAW FINAL DOOR BASED ON STATE ====== //
-	if (finalDoor.state == 0) {
+	// ====== DRAW FINAL DOOR BASED ON WIRE COUNT ====== //
+	// Visual repair progress tied to global wireCount
+	if (wireCount <= 0) {
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
 	}
-	else if (finalDoor.state == 1) {
+	else if (wireCount == 1) {
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
 	}
-	else if (finalDoor.state == 2) {
+	else {
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
 	}
 
@@ -521,6 +532,7 @@ void Level3_Draw()
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	pickup::drawDrops(L3Drop, MAX_ENEMIES);
+	pickup::DrawWireDrops(wireDrops, MAX_ENEMIES);
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
@@ -573,8 +585,19 @@ void Level3_Draw()
 		renderlogic::flashingTexture(objectinfo3[player].xPos, objectinfo3[player].yPos + 60.f, eButton, 50.f);
 	}
 
-	// ====== PLACEHOLDER INVENTORY FOR WIRES ====== //
+	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
+
+	// Draw wire count text at the bottom-right of the wire inventory box
+	if (fontLevel1 >= 0) {
+		char wireText[16];
+		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel1, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
+	}
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {

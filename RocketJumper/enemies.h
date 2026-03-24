@@ -83,11 +83,13 @@ namespace enemySystem {
     s8 spawnEnemy(Enemy enemies[], s32 maxCount,
         EnemyType type, f32 xPos, f32 yPos);
 
-    // Update all active enemies (AI, movement, attacks)
+    // Update all active enemies (AI, movement, attacks).
+    // wireDrops/wireDropMax: array for wire item drops on enemy death.
     void updateEnemies(Enemy enemies[], s32 maxCount,
         objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
-        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup);
+        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup,
+        WireDrop wireDrops[] = nullptr, s32 wireDropMax = 0);
 
     // Render all active enemies
     void renderEnemies(Enemy enemies[],
