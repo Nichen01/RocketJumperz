@@ -144,6 +144,8 @@ enum TextureID {
     TEX_MENU,
     TEX_BUTTON,
 
+    TEX_BACKGROUND,
+
     // Add new textures above this line
     TEX_MAX
 };

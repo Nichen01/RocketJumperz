@@ -22,6 +22,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
 	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
 	AEGfxTexture* menuTex = NULL, * buttonTex = NULL;
+	AEGfxTexture* backgroundTex = NULL;
 
 	int keyX{}, keyY{};
 
@@ -187,5 +188,10 @@ namespace load {
 		AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");
 		menuTex = AssetManager::GetTexture(TEX_MENU);
 		buttonTex = AssetManager::GetTexture(TEX_BUTTON);
+	}
+	
+	void background() {
+		AssetManager::LoadTexture(TEX_BACKGROUND, "Assets/Map/background.jpg");
+		backgroundTex = AssetManager::GetTexture(TEX_BACKGROUND);
 	}
 } 

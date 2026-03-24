@@ -63,6 +63,7 @@ void Level3_Load()
 	load::ui();			// Load UI textures (eButton used by flashing door prompt in Draw)
 	weaponSprite::Load();
 	load::cooldownBar();
+	load::background();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
@@ -479,7 +480,8 @@ void Level3_Update()
 
 void Level3_Draw()
 {
-	AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
+	//AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
+	renderlogic::drawTexture(0.f, 0.f, backgroundTex, uiMesh, AEGfxGetWindowWidth(), AEGfxGetWindowHeight());
 
 	// Setup for textured rendering
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
