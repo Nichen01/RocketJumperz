@@ -71,8 +71,10 @@ namespace movement {
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX += directionVector.x * ABSOLUTE_RECOIL * static_cast<f32>(screenLength) / screenWidth;
-            player.velocityY += directionVector.y * ABSOLUTE_RECOIL * static_cast<f32>(screenWidth) / screenLength;
+            // Recoil pushes the player AWAY from the firing direction (opposite of aim).
+            // directionVector points toward the mouse, so we subtract to move away.
+            player.velocityX -= directionVector.x * ABSOLUTE_RECOIL * static_cast<f32>(screenLength) / screenWidth;
+            player.velocityY -= directionVector.y * ABSOLUTE_RECOIL * static_cast<f32>(screenWidth) / screenLength;
             printf("Bullet fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
             bulletCount -= 1;
         }
