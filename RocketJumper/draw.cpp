@@ -148,6 +148,7 @@ namespace renderlogic {
 					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					break; // Prevent fall-through into case 67 (keycard)
 				case 67: // key
 					drawGlass(row, col, mapS, platformMesh);
 

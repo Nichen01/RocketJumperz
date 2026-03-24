@@ -40,8 +40,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// reset the system modules
 	AESysReset();
 	printf("Team project test\n");
-
-	GSM_Initialize(GS_VICTORY);
+	
+	GSM_Initialize(GS_LEVEL3);
 
 	while (current != GS_QUIT)
 	{
