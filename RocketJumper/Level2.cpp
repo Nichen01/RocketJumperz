@@ -191,7 +191,7 @@ void Level2_Initialize()
 	for (auto& door : doors) {
 		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
-		if (door.id == 21) {
+		if (door.id == 21||door.id==23) {
 			door.isLocked = false;
 		}
 
