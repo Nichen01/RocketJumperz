@@ -66,9 +66,11 @@ static const f32 BUTTON_SCALE_SPEED  = 0.15f;
 // ==================== HELPER FUNCTIONS ======================================================================================
 namespace MenuHelpers {
     bool isMouseOverButton(const MenuButton& button) {
+        f32 halfW = static_cast<f32>(screenWidth) / 2.0f;
+        f32 halfH = static_cast<f32>(screenLength) / 2.0f;
+
         s32 mouseX, mouseY;
         AEInputGetCursorPosition(&mouseX, &mouseY);
-
         // Convert pixel cursor position to world coordinates using cached screen values
         f32 worldMouseX = static_cast<f32>(mouseX) - halfW;
         f32 worldMouseY = halfH - static_cast<f32>(mouseY);
@@ -125,6 +127,7 @@ namespace MenuHelpers {
 
         // Draw button text
         drawTextCentered(button.text, button.x, button.y, button.scale*0.7f, fontID);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
     void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID) {
@@ -158,6 +161,8 @@ namespace MenuHelpers {
         if (fontID < 0) {
             printf("FONT IS NOT LOADED."); return;
         }
+        f32 halfW = static_cast<f32>(screenWidth) / 2.0f;
+        f32 halfH = static_cast<f32>(screenLength) / 2.0f;
 
         // Get text dimensions in normalized units (0 to 2 range per AE docs)
         f32 textWidth, textHeight;

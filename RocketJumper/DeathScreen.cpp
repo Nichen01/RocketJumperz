@@ -14,6 +14,7 @@ static AEGfxVertexList* backgroundMesh = nullptr;
 
 static AEGfxTexture* menutex;
 static AEGfxTexture* buttontex;
+
 void DeathScreen_Load() {
     AEGfxMeshStart();
 
@@ -46,9 +47,6 @@ void DeathScreen_Load() {
     menutex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
     backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
-    if (!backgroundTexture) {
-        printf("Warning: MenuBackground.png not found. Using solid color background.\n");
-    }
 
     deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }

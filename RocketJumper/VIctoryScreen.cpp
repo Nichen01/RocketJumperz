@@ -48,6 +48,7 @@ void VictoryScreen_Load() {
     menutex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
     backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
+
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
     }
@@ -95,6 +96,7 @@ void VictoryScreen_Draw() {
     AEGfxGetPrintSize(victoryfont, "VICTORY", 1.f, &width, &height);
     AEGfxPrint(victoryfont, "VICTORY", -width / 2, 0.60f - height / 2, 1, 1, 1, 1, 1);
 
+   
 
     MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttontex);
     MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttontex);
