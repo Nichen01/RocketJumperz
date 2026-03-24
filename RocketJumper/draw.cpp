@@ -170,6 +170,9 @@ namespace renderlogic {
 						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					}
 					break;
+				case 81: case 82: // enemy
+					drawGlass(row, col, mapS, platformMesh);
+					break;
 				default: //defaults to playable area
 					break;
 				}

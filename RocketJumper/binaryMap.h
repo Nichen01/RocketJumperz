@@ -68,6 +68,8 @@ extern int door3Count; // Level 3 Door
 
 extern int finalDoorCount; // Final Door Count
 
+extern f32 enemy1X, enemy1Y, enemy2X, enemy2Y;
+
 int		GetCellValue(int X, int Y);
 void	SnapToCell(float *Coordinate);
 int		ImportMapDataFromFile(const char *FileName);

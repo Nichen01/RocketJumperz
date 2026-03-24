@@ -677,6 +677,14 @@ void LevelEditor_Draw() {
 		sprintf_s(strBuffer, "Final Door");
 		AEGfxPrint(font, strBuffer, -0.23f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
+	case 12:
+		sprintf_s(strBuffer, "Trap: Pulls Player towards it");
+		AEGfxPrint(font, strBuffer, -0.23f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 13:
+		sprintf_s(strBuffer, "Trap: Damages Player");
+		AEGfxPrint(font, strBuffer, -0.23f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
 	}
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

@@ -45,6 +45,8 @@ int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
 brokenDoor finalDoor{};
 
+f32 enemy1X, enemy1Y, enemy2X, enemy2Y;
+
 f32 tileSize = 80.f;
 
 // ----------------------------------------------------------------------------
@@ -163,9 +165,19 @@ int ImportMapDataFromFile(const char* FileName)
 			else if (value == 24) {
 				door3Count = 1;
 			}
+			
+			else if (value == 81) {
+				enemy1X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+				enemy1Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+			}
+			else if (value == 82) {
+				enemy2X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+				enemy2Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+			}
+
 
 			// assign random glass type if tile is "air"
-			if (value == 0 || (value >= 31 && value <= 39) || value == 67) {
+			if (value == 0 || (value >= 31 && value <= 39) || value == 67 || value == 81 || value == 82) {
 				glassMap[row][col] = rand() % 5;
 			}
 			else {

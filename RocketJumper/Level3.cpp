@@ -481,7 +481,7 @@ void Level3_Update()
 void Level3_Draw()
 {
 	//AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
-	renderlogic::drawTexture(0.f, 0.f, backgroundTex, uiMesh, AEGfxGetWindowWidth(), AEGfxGetWindowHeight());
+	renderlogic::drawTexture(0.f, 0.f, backgroundTex, uiMesh, static_cast<f32>(AEGfxGetWindowWidth()), static_cast<f32>(AEGfxGetWindowHeight()));
 
 	// Setup for textured rendering
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
