@@ -359,6 +359,8 @@ void Level3_Update()
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo3[player], map, x, static_cast<int>(tileSize), 1);
 
+	if (AEInputCheckCurr(AEVK_3)) wireCount = 3;
+
 	// -----------------------------------------------------------------------
 	// Door animation
 	// -----------------------------------------------------------------------
@@ -457,14 +459,30 @@ void Level3_Update()
 	}
 
 	//========== PLAYER FIXING BROKEN DOOR ==========//
-	if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor && wireCount > 0) {
-		finalDoor.state = wireCount - 1;
-		wireCount--;
+	//if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor && wireCount > 0) {
+	//	finalDoor.state = wireCount - 1;
+	//	wireCount--;
+	//}
+
+	// Player tries to fix broken door
+	if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor) {
+		if (finalDoor.state < 2) {
+			if (wireCount > 0) {
+				finalDoor.state++;
+				wireCount--;
+				std::cout << finalDoor.state << " " << wireCount << std::endl;
+			}
+			else {
+				AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+			}
+		}
+		else {
+			// Door is fully repaired, pressing E now exits
+			next = GS_VICTORY;
+		}
 	}
 
-	if (playerNearBrokenDoor && wireCount <= 0) {
-		AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
-	}
+
 }
 
 void Level3_Draw()
@@ -480,6 +498,17 @@ void Level3_Draw()
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
+
+	// ====== DRAW FINAL DOOR BASED ON STATE ====== //
+	if (finalDoor.state == 0) {
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
+	}
+	else if (finalDoor.state == 1) {
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
+	}
+	else if (finalDoor.state == 2) {
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
+	}
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
