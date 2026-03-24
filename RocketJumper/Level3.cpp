@@ -62,6 +62,7 @@ void Level3_Load()
 	load::platform();	// Load platform tile textures
 	load::ui();			// Load UI textures (eButton used by flashing door prompt in Draw)
 	weaponSprite::Load();
+	load::cooldownBar();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
@@ -231,12 +232,15 @@ void Level3_Initialize()
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
 	pickup::initDrops(L3Drop, MAX_ENEMIES, PlayerScale);
+
+	keycardCollected = false;
 }
 
 void Level3_Update()
 {
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
+		level = 3;
 		next = GS_LEVELEDITOR;
 	}
 
@@ -441,12 +445,6 @@ void Level3_Update()
 	keyObj.xScale = key.size;
 	keyObj.yScale = key.size;
 
-	if (key.active && gamelogic::static_collision(&objectinfo3[player], &keyObj)) {
-		key.active = false;
-		keycardCollected = true;
-		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
-	}
-
 	//========== DOOR RENDERING BASED ON STATE ==========//
 	if (finalDoor.state == 0) {
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
@@ -540,6 +538,9 @@ void Level3_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
+
+	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
+	renderlogic::drawCooldownHUD(objectinfo3[player].xPos, objectinfo3[player].yPos - 40.f);
 
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.

@@ -8,28 +8,16 @@ static f32 width, height;
 static MenuButton resumeButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
-static AEGfxVertexList* buttonMesh = nullptr;
 
 static AEGfxTexture* menutex;
 static AEGfxTexture* buttontex;
 
 void Pause_Load() {
-	AEGfxMeshStart();
 
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+	AssetManager::BuildSqrMesh(MESH_BUTTON);
+	buttonMesh = AssetManager::GetMesh(MESH_QUAD);
 
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
-	buttonMesh = AEGfxMeshEnd();
-
-	menutex = AEGfxTextureLoad("Assets/UI/Menus/Menu.png");
-	buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
+	load::pauseMenu();
 	
 	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
@@ -79,13 +67,9 @@ void Pause_Draw() {
 }
 
 void Pause_Free() {
-	if (buttonMesh) {
-		AEGfxMeshFree(buttonMesh);
-		buttonMesh = nullptr;
-	}
+
+	AssetManager::FreeAllMeshes();
 }
 void Pause_Unload() {
-	if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
-	if (menutex != nullptr) { AEGfxTextureUnload(menutex); };
-	if (buttontex != nullptr) { AEGfxTextureUnload(buttontex); };
+	AssetManager::UnloadAllTextures();
 }

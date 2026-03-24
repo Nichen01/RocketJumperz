@@ -1,8 +1,7 @@
 
 // External libraries are included in header file
 #include "Level1.h"
-#include "traps.h"
-#include "WeaponSprite.h"
+
 
 static s32* map = nullptr;
 static int x;
@@ -63,6 +62,7 @@ void Level1_Load()
 
 	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
+	load::cooldownBar();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
@@ -246,6 +246,7 @@ void Level1_Update()
 {
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
+		level = 1;
 		next = GS_LEVELEDITOR;
 	}
 
@@ -503,6 +504,9 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
+	renderlogic::drawCooldownHUD(objectinfo1[player].xPos, objectinfo1[player].yPos - 40.f);
+
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
@@ -534,8 +538,10 @@ void Level1_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfo1[player].xPos, objectinfo1[player].yPos + 60.f, eButton, 50.f);
 	}
+
 	// ====== PLACEHOLDER INVENTORY FOR WIRES ====== //
 	renderlogic::drawTexture(-650.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
@@ -546,6 +552,8 @@ void Level1_Draw()
 	else {
 		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
+
+	
 }
 
 void Level1_Free()

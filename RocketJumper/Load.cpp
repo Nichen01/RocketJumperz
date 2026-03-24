@@ -6,6 +6,7 @@
 AEGfxTexture* mushroomDieTexture[9] = { nullptr };
 AEGfxTexture* mushroomHitTexture[5] = { nullptr };
 AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
+AEGfxTexture* cooldownFrame[6] = { nullptr };
 
 // define textures
 
@@ -20,6 +21,7 @@ AEGfxTexture* mushroomIdleTexture[9] = { nullptr };
 	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
 	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
 	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
+	AEGfxTexture* menuTex = NULL, * buttonTex = NULL;
 
 	int keyX{}, keyY{};
 
@@ -29,6 +31,7 @@ AEGfxVertexList* enemyMesh = nullptr;
 AEGfxVertexList* pMesh = nullptr;
 AEGfxVertexList* projectileMesh = nullptr;
 AEGfxVertexList* uiMesh = nullptr;
+AEGfxVertexList* buttonMesh = nullptr;
 
 namespace load {
 
@@ -162,5 +165,27 @@ namespace load {
 		wireInventory0 = AssetManager::GetTexture(TEX_WIREINVENTORY0);
 		wireInventory1 = AssetManager::GetTexture(TEX_WIREINVENTORY1);
 		wireInventory2 = AssetManager::GetTexture(TEX_WIREINVENTORY2);
+	}
+
+	void cooldownBar() {
+		AssetManager::LoadTexture(TEX_COOLDOWNBAR0, "Assets/Cooldown/cooldownBar0.png");
+		AssetManager::LoadTexture(TEX_COOLDOWNBAR1, "Assets/Cooldown/cooldownBar1.png");
+		AssetManager::LoadTexture(TEX_COOLDOWNBAR2, "Assets/Cooldown/cooldownBar2.png");
+		AssetManager::LoadTexture(TEX_COOLDOWNBAR3, "Assets/Cooldown/cooldownBar3.png");
+		AssetManager::LoadTexture(TEX_COOLDOWNBAR4, "Assets/Cooldown/cooldownBar4.png");
+		AssetManager::LoadTexture(TEX_COOLDOWNBAR5, "Assets/Cooldown/cooldownBar5.png");
+		cooldownFrame[0] = AssetManager::GetTexture(TEX_COOLDOWNBAR0);
+		cooldownFrame[1] = AssetManager::GetTexture(TEX_COOLDOWNBAR1);
+		cooldownFrame[2] = AssetManager::GetTexture(TEX_COOLDOWNBAR2);
+		cooldownFrame[3] = AssetManager::GetTexture(TEX_COOLDOWNBAR3);
+		cooldownFrame[4] = AssetManager::GetTexture(TEX_COOLDOWNBAR4);
+		cooldownFrame[5] = AssetManager::GetTexture(TEX_COOLDOWNBAR5);
+	}
+
+	void pauseMenu() {
+		AssetManager::LoadTexture(TEX_MENU, "Assets/UI/Menus/Menu.png");
+		AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");
+		menuTex = AssetManager::GetTexture(TEX_MENU);
+		buttonTex = AssetManager::GetTexture(TEX_BUTTON);
 	}
 } 

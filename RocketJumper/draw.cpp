@@ -148,7 +148,7 @@ namespace renderlogic {
 					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-					break; // Prevent fall-through into case 67 (keycard)
+					break;
 				case 67: // key
 					drawGlass(row, col, mapS, platformMesh);
 
@@ -170,13 +170,6 @@ namespace renderlogic {
 						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					}
 					break;
-
-				//case 69: // final door
-				//	AEGfxTextureSet(brokenDoor0, 0, 0);
-				//	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-				//	renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
-				//	AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
-				//	break;
 				default: //defaults to playable area
 					break;
 				}
@@ -205,6 +198,7 @@ namespace renderlogic {
 	}
 
 	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX, f32 scaleY) {
+		if (!textureAsset) return;
 		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
 		AEMtx33Scale(&uiScl, scaleX, scaleY);
 		AEMtx33Rot(&uiRot, 0);
@@ -306,6 +300,15 @@ namespace renderlogic {
 		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
 	}
 
+	void drawCooldownHUD(f32 x, f32 y) {
+		int totalFrames = 40;
+		int numImages = 6;
+
+		int frameIndex = (movement::jetPackCooldown * numImages) / totalFrames;
+		if (frameIndex >= numImages) frameIndex = numImages - 1;
+
+		renderlogic::drawTexture(x, y, cooldownFrame[frameIndex], uiMesh, 100.f, 100.f);
+	}
 }
 
 

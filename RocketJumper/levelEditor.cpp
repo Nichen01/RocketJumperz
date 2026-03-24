@@ -3,7 +3,7 @@
 
 // ==================== GLOBAL RESOURCES ==================== //
 static AEGfxTexture* door;
-static AEGfxTexture* tileTextures[12];
+static AEGfxTexture* tileTextures[14];
 static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
 static const char* pText3{ "Level 3" };
@@ -170,6 +170,8 @@ void LevelEditor_Load() {
 	AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
 	AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
+	AssetManager::LoadTexture(TEX_TRAP1, "Assets/Items/eye.png");
+	AssetManager::LoadTexture(TEX_TRAP2, "Assets/Items/spike.png");
 
 	tileTextures[0] = AssetManager::GetTexture(TEX_PLATFORM1);
 	tileTextures[1] = AssetManager::GetTexture(TEX_PLATFORM2);
@@ -183,6 +185,8 @@ void LevelEditor_Load() {
 	tileTextures[9] = AssetManager::GetTexture(TEX_STATIC_DOOR);
 	tileTextures[10] = AssetManager::GetTexture(TEX_KEYCARD);
 	tileTextures[11] = AssetManager::GetTexture(TEX_BROKENDOOR0);
+	tileTextures[12] = AssetManager::GetTexture(TEX_TRAP1);
+	tileTextures[13] = AssetManager::GetTexture(TEX_TRAP2);
 }
 
 void LevelEditor_Initialize() {
@@ -237,7 +241,7 @@ void LevelEditor_Update() {
 		level = 3;
 		next = GS_RESTART;
 	}
-	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : GS_LEVEL2;
+	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : (level == 2) ? GS_LEVEL2 : GS_LEVEL3;
 
 	if (showDoorPrompt) {
 		for (doorButton& currentButton : buttonArr) {
@@ -290,12 +294,12 @@ void LevelEditor_Update() {
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex++;
-		if (currentTileIndex >= 12) currentTileIndex = 0;
+		if (currentTileIndex >= 14) currentTileIndex = 0;
 	}
 	else if (AEInputCheckTriggered(AEVK_LEFT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex--;
-		if (currentTileIndex < 0) currentTileIndex = 11;
+		if (currentTileIndex < 0) currentTileIndex = 13;
 	}
 
 	// undo
@@ -327,10 +331,6 @@ void LevelEditor_Update() {
 			std::cout << "Keycard already exists" << std::endl;
 		}
 		else if (level == 2 && keyCountLevel2 >= 1) {
-			std::cout << "Keycard already exists" << std::endl;
-			AEAudioPlay(Error, soundEffects, 1, 1, 0);
-		}
-		else if (level == 3 && keyCountLevel3 >= 1) {
 			std::cout << "Keycard already exists" << std::endl;
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 		}
@@ -405,7 +405,6 @@ void LevelEditor_Draw() {
 						bool placeKey = false;
 						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
 						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
-						else if (level == 3 && keyCountLevel3 == 0) placeKey = true;
 
 						if (placeKey) {
 							TileAction action;
@@ -420,7 +419,6 @@ void LevelEditor_Draw() {
 							// increment the counter right here
 							if (level == 1) keyCountLevel1++;
 							else if (level == 2) keyCountLevel2++;
-							else if (level == 3) keyCountLevel3++;
 						}
 					}
 					else if (currentTileIndex == 11) {
@@ -447,7 +445,26 @@ void LevelEditor_Draw() {
 							}
 						}
 					}
+					else if (currentTileIndex == 12) {
+						TileAction action;
+						action.row = row;
+						action.col = col;
+						action.prevValue = MapData[row][col];
+						action.newValue = 50;
 
+						MapData[row][col] = action.newValue;
+						actionHistory.push_back(action);
+					}
+					else if (currentTileIndex == 13) {
+						TileAction action;
+						action.row = row;
+						action.col = col;
+						action.prevValue = MapData[row][col];
+						action.newValue = 51;
+
+						MapData[row][col] = action.newValue;
+						actionHistory.push_back(action);
+					}
 
 				}
 				if (AEInputCheckTriggered(AEVK_RBUTTON)) {
@@ -460,7 +477,6 @@ void LevelEditor_Draw() {
 					if (MapData[row][col] == 67) {
 						if (level == 1) keyCountLevel1 = 0;
 						else if (level == 2) keyCountLevel2 = 0;
-						else if (level == 3) keyCountLevel3 = 0;
 					}
 					else if (MapData[row][col] == 69) {
 						finalDoorCount = 0;
@@ -477,10 +493,13 @@ void LevelEditor_Draw() {
 				AEGfxSetColorToMultiply(0.5f, 0.8f, 0.5f, 1.f);
 			}
 			else if (MapData[row][col] == 67) { // key
-				AEGfxSetColorToMultiply(0.49f, 0.36f, 0.37f, 1.f);
+				AEGfxSetColorToMultiply(0.49f, 0.5f, 0.45f, 1.f);
 			}
 			else if (MapData[row][col] == 69) { // broken door
 				AEGfxSetColorToMultiply(0.5f, 0.41f, 0.65f, 1.f);
+			}
+			else if (MapData[row][col] == 50 || MapData[row][col] == 51) {
+				AEGfxSetColorToMultiply(0.3f, 0.f, 0.f, 1.f);
 			}
 			else {
 				AEGfxSetColorToMultiply(0.8f, 0.8f, 0.8f, 1.0f); // default light gray
@@ -529,6 +548,13 @@ void LevelEditor_Draw() {
 				AEGfxPrint(font, "Final", normX, normY + 0.02f, 0.4f, 1, 1, 1, 1);
 				AEGfxGetPrintSize(font, "Door", 0.4f, &textW, &textH);
 				AEGfxPrint(font, "Door", normX, normY - 0.03f, 0.4f, 1, 1, 1, 1);
+			}
+			else if (isGridHovered && (MapData[row][col] == 50 || MapData[row][col] == 51)) { // traps
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Trap", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Trap", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
 			else if (!isGridHovered && (MapData[row][col] == 11 || MapData[row][col] == 21)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
@@ -591,7 +617,7 @@ void LevelEditor_Draw() {
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	if (currentTileIndex >= 0 && currentTileIndex < 12 && tileTextures[currentTileIndex]) {
+	if (currentTileIndex >= 0 && currentTileIndex < 14 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);
 	}
 

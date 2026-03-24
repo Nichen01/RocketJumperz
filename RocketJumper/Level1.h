@@ -29,7 +29,9 @@ Technology is prohibited.
 #include "Animation.h"
 #include "Sound.h"
 #include "AssetManager.h"
-#include "drops.h"
+#include "Drops.h"
+#include "Traps.h"
+#include "WeaponSprite.h"
 
 void Level1_Load();
 

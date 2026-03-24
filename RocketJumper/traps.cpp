@@ -41,11 +41,12 @@ namespace traps {
 		f32 dx = player.xPos - trapX;
 		f32 dy = player.yPos - trapY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		player.velocityX -= dx / dist * trapSuction;
-		player.velocityY -= dy / dist * trapSuction;
+		player.velocityX -= dx / dist * (trapSuction * 0.2f);
+		player.velocityY -= dy / dist * (trapSuction * 0.2f);
 		
 	}
 	void updateTraps(Enemy enemies[],objectsquares objectinfo[],int* map,int x, int y, float s) {
+		enemies = enemies;
 		trapInstanceCooldown -= 1;
 		float NposX = gamelogic::posX_to_index(objectinfo[player].xPos+ objectinfo[player].velocityX, s);
 		float NposY = gamelogic::posY_to_index(objectinfo[player].yPos + objectinfo[player].velocityY, s);

@@ -83,6 +83,7 @@ void Tutorial_Load()
 	// Load platform assets
 	load::platform();
 	load::ui();
+	load::cooldownBar();
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -416,6 +417,9 @@ void Tutorial_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
+
+	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
+	renderlogic::drawCooldownHUD(objectinfoTut[player].xPos, objectinfoTut[player].yPos - 40.f);
 
 	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.
