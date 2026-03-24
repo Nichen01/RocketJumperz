@@ -359,8 +359,6 @@ void Level3_Update()
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo3[player], map, x, static_cast<int>(tileSize), 1);
 
-	if (AEInputCheckCurr(AEVK_3)) wireCount = 3;
-
 	// -----------------------------------------------------------------------
 	// Door animation
 	// -----------------------------------------------------------------------
@@ -457,12 +455,6 @@ void Level3_Update()
 	else {
 		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
 	}
-
-	//========== PLAYER FIXING BROKEN DOOR ==========//
-	//if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor && wireCount > 0) {
-	//	finalDoor.state = wireCount - 1;
-	//	wireCount--;
-	//}
 
 	// Player tries to fix broken door
 	if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor) {
