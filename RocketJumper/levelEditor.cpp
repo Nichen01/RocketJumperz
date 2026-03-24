@@ -3,7 +3,7 @@
 
 // ==================== GLOBAL RESOURCES ==================== //
 static AEGfxTexture* door;
-static AEGfxTexture* tileTextures[14];
+static AEGfxTexture* tileTextures[16];
 static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
 static const char* pText3{ "Level 3" };
@@ -172,6 +172,8 @@ void LevelEditor_Load() {
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 	AssetManager::LoadTexture(TEX_TRAP1, "Assets/Items/eye.png");
 	AssetManager::LoadTexture(TEX_TRAP2, "Assets/Items/spike.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 
 	tileTextures[0] = AssetManager::GetTexture(TEX_PLATFORM1);
 	tileTextures[1] = AssetManager::GetTexture(TEX_PLATFORM2);
@@ -187,6 +189,8 @@ void LevelEditor_Load() {
 	tileTextures[11] = AssetManager::GetTexture(TEX_BROKENDOOR0);
 	tileTextures[12] = AssetManager::GetTexture(TEX_TRAP1);
 	tileTextures[13] = AssetManager::GetTexture(TEX_TRAP2);
+	tileTextures[14] = AssetManager::GetTexture(TEX_RANGED_ENEMY);
+	tileTextures[15] = AssetManager::GetTexture(TEX_MELEE_ENEMY);
 }
 
 void LevelEditor_Initialize() {
