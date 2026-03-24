@@ -359,6 +359,8 @@ void Level3_Update()
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo3[player], map, x, static_cast<int>(tileSize), 1);
 
+	if (AEInputCheckCurr(AEVK_3)) wireCount = 3;
+
 	// -----------------------------------------------------------------------
 	// Door animation
 	// -----------------------------------------------------------------------
