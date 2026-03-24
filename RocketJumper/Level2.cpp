@@ -63,6 +63,7 @@ void Level2_Load()
 
 	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
+	load::cooldownBar();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
@@ -242,6 +243,7 @@ void Level2_Update()
 {
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
+		level = 2;
 		next = GS_LEVELEDITOR;
 	}
 
@@ -494,6 +496,9 @@ void Level2_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
+
+	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
+	renderlogic::drawCooldownHUD(objectinfo2[player].xPos, objectinfo2[player].yPos - 40.f);
 
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.

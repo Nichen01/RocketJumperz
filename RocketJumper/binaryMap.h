@@ -60,7 +60,6 @@ extern brokenDoor finalDoor;
 extern Key key;
 extern int keyCountLevel1; // one level can only have one key
 extern int keyCountLevel2;
-extern int keyCountLevel3;
 
 extern int tutDoorCount; // Tutorial Door
 extern int door1Count; // Level 1 Door

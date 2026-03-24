@@ -2,6 +2,9 @@
 //#include "physicsEngine.h"
 #include <cmath>
 
+int totalFrame = 40;
+int numImages = 6;
+
 namespace movement {
     // initialize the velocity 
     bool enableGravity, enableDrag;
@@ -11,6 +14,7 @@ namespace movement {
     AEVec2 directionVector;
     int bulletCount = 10;
     bool playerFacingLeft = false; // starts facing right
+
     void initPlayerMovement(objectsquares& player)
     {
         player.velocityX = 0.0f;
@@ -45,38 +49,58 @@ namespace movement {
 
     void physicsInput(objectsquares& player)
     {
-        (jetPackCooldown <= 0) ? jetPackCooldown-- : jetPackCooldown = 0;
+        // Tick down cooldown each frame if active
+        if (jetPackCooldown > 0) {
+            jetPackCooldown--;
+        }
+
+        // Toggle gravity with G
         if (AEInputCheckTriggered(AEVK_G)) {
-            enableGravity = (enableGravity) ? 0 : 1;
-            printf("%d", enableGravity);
+            enableGravity = !enableGravity;
+            printf("Gravity: %d\n", enableGravity);
         }
+
+        // Toggle drag with D
         if (AEInputCheckTriggered(AEVK_D)) {
-            enableDrag = (enableDrag) ? 0 : 1;
-            printf("%d", enableDrag);
+            enableDrag = !enableDrag;
+            printf("Drag: %d\n", enableDrag);
         }
+
+        // Reload bullets with R
         if (AEInputCheckTriggered(AEVK_R)) {
             bulletCount += 10;
         }
-        // Check if spacebar is pressed
-        if (AEInputCheckTriggered(AEVK_SPACE)/* && (!jetPackCooldown)*/)
+
+        // Jetpack thrust with SPACE (only if cooldown is 0)
+        if (AEInputCheckTriggered(AEVK_SPACE) && jetPackCooldown == 0)
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX += directionVector.x * THRUST_POWER * static_cast<f32>(screenLength)/screenWidth;
+
+            player.velocityX += directionVector.x * THRUST_POWER * static_cast<f32>(screenLength) / screenWidth;
             player.velocityY += directionVector.y * THRUST_POWER * static_cast<f32>(screenWidth) / screenLength;
+
             printf("Jetpack fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
-            jetPackCooldown += 2;
-            }
-        if (AEInputCheckTriggered(AEVK_LBUTTON)&&bulletCount)
+
+            // Set cooldown in frames (e.g. 30 = ~0.5s at 60 FPS)
+            jetPackCooldown = 30;
+        }
+
+        // Fire bullet with left mouse button
+        if (AEInputCheckTriggered(AEVK_LBUTTON) && bulletCount > 0)
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
+
             player.velocityX += directionVector.x * ABSOLUTE_RECOIL * static_cast<f32>(screenLength) / screenWidth;
             player.velocityY += directionVector.y * ABSOLUTE_RECOIL * static_cast<f32>(screenWidth) / screenLength;
+
             printf("Bullet fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
+
             bulletCount -= 1;
         }
     }
+
 
     void updatePlayerPhysics(objectsquares& player)
     {

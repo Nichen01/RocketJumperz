@@ -6,6 +6,7 @@
 #include "AEGraphics.h"
 #include "BinaryMap.h"
 #include "Enemies.h"
+#include "Movement.h"
 
 namespace renderlogic {
 	void drawSquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
@@ -16,6 +17,7 @@ namespace renderlogic {
 	void drawGlass(int row, int col, int mapS, AEGfxVertexList* platformMesh);
 	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
 	void drawWireInventory(int);
+	void drawCooldownHUD(f32, f32);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp

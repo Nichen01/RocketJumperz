@@ -10,7 +10,6 @@ static MenuButton restartButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
 
-static AEGfxVertexList* buttonMesh = nullptr;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
 static AEGfxTexture* menutex;

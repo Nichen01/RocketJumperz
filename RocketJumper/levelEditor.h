@@ -6,6 +6,8 @@
 #include "Draw.h"
 #include "GameStateManager.h"
 
+extern int level;
+
 struct TileAction {
 	s32 row;
 	s32 col;

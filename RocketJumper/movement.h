@@ -6,12 +6,13 @@
 
 extern s32 screenWidth, screenLength;
 namespace movement {
+    extern u8 jetPackCooldown;
     // Movement physics constants
-    constexpr f32 THRUST_POWER = 25.0f;      // Jetpack acceleration force
+    constexpr f32 THRUST_POWER = 10.0f;      // Jetpack acceleration force
     constexpr f32 ABSOLUTE_RECOIL = 10.f;      // Bullet Recoil force
     constexpr f32 DRAG_COEFFICIENT = 0.97f;  // Air drag (0.92 = 8% speed loss per frame)
     constexpr f32 MIN_VELOCITY = 0.1f;       // Velocity threshold to stop completely
-    constexpr f32 TERMINAL_VELOCITY = 5.f;    // Velocity will not increase pass this
+    constexpr f32 TERMINAL_VELOCITY = 10.f;    // Velocity will not increase pass this
     constexpr f32 GRAVITY = 0.2f;
     extern int bulletCount;
 

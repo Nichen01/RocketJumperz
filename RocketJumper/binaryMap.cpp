@@ -39,7 +39,6 @@ int** glassMap;
 Key key{};
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
-int keyCountLevel3 = 0;
 int finalDoorCount = 0;
 
 int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
@@ -97,7 +96,7 @@ int ImportMapDataFromFile(const char* FileName)
 {
 	doors.clear();
 
-	keyCountLevel1 = 0, keyCountLevel2 = 0, keyCountLevel3 = 0;
+	keyCountLevel1 = 0, keyCountLevel2 = 0;
 	tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
 	std::ifstream ifs(FileName, std::ios::in);
@@ -141,7 +140,6 @@ int ImportMapDataFromFile(const char* FileName)
 				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
 				if (currentGameLevel == 1) keyCountLevel1 = 1;
 				else if (currentGameLevel == 2) keyCountLevel2 = 1;
-				else if (currentGameLevel == 3) keyCountLevel3 = 1;
 			}
 
 			// to save coordinates of brokenDoor

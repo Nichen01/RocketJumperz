@@ -134,6 +134,16 @@ enum TextureID {
     TEX_PLASMA_GUN,     // Assets/Weapons/plasmaGun.png
     TEX_SHOTGUN,        // Assets/Weapons/shotGun.png
 
+    TEX_COOLDOWNBAR0,
+    TEX_COOLDOWNBAR1,
+    TEX_COOLDOWNBAR2,
+    TEX_COOLDOWNBAR3,
+    TEX_COOLDOWNBAR4,
+    TEX_COOLDOWNBAR5,
+
+    TEX_MENU,
+    TEX_BUTTON,
+
     // Add new textures above this line
     TEX_MAX
 };
@@ -148,6 +158,7 @@ enum MeshID {
     MESH_RANGED_ATTACK, // spritesheet mesh (1 row, 6 cols)
     MESH_RANGED_DEATH,  // spritesheet mesh (1 row, 4 cols)
     MESH_RANGED_HURT,   // spritesheet mesh (1 row, 2 cols)
+    MESH_BUTTON,
     // Add new meshes above this line
     MESH_MAX
 };
