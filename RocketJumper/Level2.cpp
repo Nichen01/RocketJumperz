@@ -71,6 +71,7 @@ void Level2_Load()
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
 	load::wireInventory();
+	load::background();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");

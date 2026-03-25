@@ -502,8 +502,11 @@ void LevelEditor_Draw() {
 			else if (MapData[row][col] == 69) { // broken door
 				AEGfxSetColorToMultiply(0.5f, 0.41f, 0.65f, 1.f);
 			}
-			else if (MapData[row][col] == 50 || MapData[row][col] == 51) {
-				AEGfxSetColorToMultiply(0.3f, 0.f, 0.f, 1.f);
+			else if (MapData[row][col] == 50 || MapData[row][col] == 51) { // traps
+				AEGfxSetColorToMultiply(0.42f, 0.59f, 0.72f, 1.f);
+			}
+			else if (MapData[row][col] == 80 || MapData[row][col] == 81) { // enemy
+				AEGfxSetColorToMultiply(0.59f, 0.4f, 0.4f, 1.f);
 			}
 			else {
 				AEGfxSetColorToMultiply(0.8f, 0.8f, 0.8f, 1.0f); // default light gray
