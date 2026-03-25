@@ -68,7 +68,7 @@ namespace enemySystem {
     constexpr f32 MELEE_ATTACK_COOLDOWN = 1.0f;  // Seconds between attacks
     constexpr f32 MELEE_DAMAGE = 15.0f;
 
-    constexpr f32 RANGED_DETECTION_RANGE = 700.0f;
+    constexpr f32 RANGED_DETECTION_RANGE = 415.0f;
     constexpr f32 RANGED_ATTACK_RANGE = 600.0f;
     constexpr f32 RANGED_MOVE_SPEED = 1.5f;
     constexpr f32 RANGED_HEALTH = 30.0f;
@@ -96,8 +96,8 @@ namespace enemySystem {
         s32 maxCount,
         AEGfxVertexList* meleeMesh,
         AEGfxVertexList* rangedMesh,
-        AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture,
+        AEGfxTexture* meleeTexture = nullptr,
+        AEGfxTexture* rangedTexture = nullptr,
         f32 meleeUOffset = 0.0f,
         f32 meleeVoffset = 0.0f);
 

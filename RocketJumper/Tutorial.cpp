@@ -52,7 +52,7 @@ void Tutorial_Load()
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
-	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
+	//AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
 	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
@@ -63,7 +63,7 @@ void Tutorial_Load()
 	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
 	plasma            = AssetManager::GetTexture(TEX_PLASMA);
 	doorTex           = AssetManager::GetTexture(TEX_DOOR);
-	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	
 	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
 
 	// Load platform assets
@@ -142,13 +142,12 @@ void Tutorial_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
+	
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -400.0f, 300.0f);
 
 	// Build animated mesh for melee enemy (3 cols x 2 rows spritesheet)
-	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
-	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
-	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
+	
+	
 
 	// Build spritesheet meshes for ranged enemy states (rows, cols)
 	AssetManager::BuildSqrMesh(MESH_RANGED_MOVE,   1, 4);
@@ -268,9 +267,7 @@ void Tutorial_Update()
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
 		Projectiles, MAX_PROJECTILES);
 
-	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
-	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
-		objectinfoTut[player], Punch, soundEffects);
+
 
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
@@ -320,8 +317,7 @@ void Tutorial_Update()
 		}
 	}
 
-	// MUSHROOM ANIMATION
-	animSystem::update(meleeAnim, dt);
+	
 	aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
 }

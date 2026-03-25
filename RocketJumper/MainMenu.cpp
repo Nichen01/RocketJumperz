@@ -200,7 +200,7 @@ void MainMenu_Load() {
     AssetManager::BuildSqrMesh(MESH_MENU_BUTTON, 1, 1, 0xFF000000);  // black vertices
 
     // Load textures through AssetManager for centralized tracking
-    AssetManager::LoadTexture(TEX_MAIN_MENU_BG, "Assets/MainMenu.png");
+    AssetManager::LoadTexture(TEX_MAIN_MENU_BG, "Assets/Map/background.jpg");
     if (!AssetManager::GetTexture(TEX_MAIN_MENU_BG)) {
         printf("Warning: MainMenu.png not found. Using solid color background.\n");
     }
