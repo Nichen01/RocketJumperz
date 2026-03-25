@@ -110,8 +110,8 @@ namespace enemySystem {
         {
             enemies[i].shape.xPos = 0.0f;
             enemies[i].shape.yPos = 0.0f;
-            enemies[i].shape.xScale = 70.0f;  // Default enemy size
-            enemies[i].shape.yScale = 70.0f;
+            enemies[i].shape.xScale = 80.0f;  // Default enemy size
+            enemies[i].shape.yScale = 80.0f;
             enemies[i].type = ENEMY_MELEE;
             enemies[i].shape.velocityX = 0.0f;
             enemies[i].shape.velocityY = 0.0f;
