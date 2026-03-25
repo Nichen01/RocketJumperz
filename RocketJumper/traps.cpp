@@ -3,8 +3,21 @@
 #include "player.h"
 #include "enemies.h"
 #include "binaryMap.h"
+#include "AssetManager.h"
+
+// ---------------------------------------------------------------------------
+// Saw animation constants
+// ---------------------------------------------------------------------------
+static const int   kSawCols       = 6;     // 6 frames in a single row (192px / 32px per frame)
+static const int   kSawRows       = 1;
+static const int   kSawTotalFrames = 6;
+static const f32   kSawFrameDelay  = 0.08f; // ~12 fps spin speed
 
 namespace traps {
+
+	// Saw animation instance -- all saw tiles share the same playback state
+	SpriteAnimation sawAnim;
+
 	s8 trapDamage = 5;
 	s8 trapInstanceCooldown = 0;
 	s8 trapRange = 3;
@@ -12,9 +25,17 @@ namespace traps {
 	AEVec2 nearestTrap = {};
 	f32 angle;
 	AEMtx33 trapTransform;
+
 	void initTraps() {
 		nearTrap = 0;
 		AEVec2Zero(&nearestTrap);
+
+		// Initialize the saw animation to loop continuously from frame 0
+		animSystem::init(sawAnim, kSawCols, kSawRows, kSawTotalFrames,
+			kSawFrameDelay, ANIM_LOOP, 0);
+
+		// Build the spritesheet mesh for the saw (1 row, 7 columns)
+		AssetManager::BuildSqrMesh(MESH_SAW, kSawRows, kSawCols);
 	}
 	AEVec2 checkNearestTrap(float NposX,float NposY, int* map, int x,int y) {
 		(void)map;
@@ -96,4 +117,14 @@ namespace traps {
 		AEGfxSetColorToMultiply(1, 1, 1, 1);
 		AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 	}*/
+
+	// Advance the saw spin animation by one frame's worth of delta time
+	void UpdateSawAnim(f32 deltaTime) {
+		animSystem::update(sawAnim, deltaTime);
+	}
+
+	// Return the current horizontal UV offset for the saw spritesheet
+	f32 GetSawUOffset() {
+		return animSystem::getUOffset(sawAnim);
+	}
 }

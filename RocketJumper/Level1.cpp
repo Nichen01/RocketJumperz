@@ -387,6 +387,7 @@ void Level1_Update()
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo1[player], map, x, static_cast<int>(tileSize), 1);
 	traps::updateTraps(enemies, objectinfo1, map, x,y, tileSize);
+	traps::UpdateSawAnim(dt);
 
 	// -----------------------------------------------------------------------
 	// Door animation

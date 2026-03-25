@@ -151,6 +151,9 @@ enum TextureID {
 
     TEX_BACKGROUND,
 
+    // Saw trap spritesheet (1 row, 7 columns)
+    TEX_SAW,
+
     // Add new textures above this line
     TEX_MAX
 };
@@ -166,6 +169,7 @@ enum MeshID {
     MESH_RANGED_DEATH,  // spritesheet mesh (1 row, 4 cols)
     MESH_RANGED_HURT,   // spritesheet mesh (1 row, 2 cols)
     MESH_BUTTON,
+    MESH_SAW,       // spritesheet mesh (1 row, 7 cols) for saw trap animation
     // Add new meshes above this line
     MESH_MAX
 };

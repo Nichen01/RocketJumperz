@@ -55,7 +55,10 @@ namespace load {
 		AssetManager::LoadTexture(TEX_TRAP1, "Assets/Items/spike.png");
 		AssetManager::LoadTexture(TEX_TRAP2, "Assets/Items/eye.png");
 		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
-		AssetManager::LoadTexture(TEX_DROP, "Assets/ammo.jpeg");
+		AssetManager::LoadTexture(TEX_DROP, "Assets/bullets.png");
+
+		// Saw trap spritesheet (1 row, 7 cols spinning saw blade)
+		AssetManager::LoadTexture(TEX_SAW, "Assets/Traps/saw.png");
 
 		// Sync the extern pointers so draw.cpp can use them directly
 		platform1 = AssetManager::GetTexture(TEX_PLATFORM1);

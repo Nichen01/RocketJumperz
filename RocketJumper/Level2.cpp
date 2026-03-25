@@ -374,6 +374,7 @@ void Level2_Update()
 	}
 
 	traps::updateTraps(enemies, objectinfo2, map, x,y, tileSize);
+	traps::UpdateSawAnim(dt);
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo2[player], map, x, static_cast<int>(tileSize), 1);

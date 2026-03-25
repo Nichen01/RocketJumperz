@@ -1,5 +1,6 @@
 #include "Draw.h"
-
+#include "traps.h"
+#include "AssetManager.h"
 
 // Global texture pointers -- declared extern in draw.h, defined here
 AEGfxTexture* characterPictest = NULL;
@@ -143,14 +144,27 @@ namespace renderlogic {
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 					break;
-				case 51: //trap2
+				case 51: //trap2 -- animated saw blade
+				{
 					drawGlass(row, col, mapS, platformMesh);
-					AEGfxTextureSet(trap2, 0, 0);
-					//AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
-					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
-					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
-					//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+					// Get the saw spritesheet texture and mesh from AssetManager
+					AEGfxTexture*    sawTex  = AssetManager::GetTexture(TEX_SAW);
+					AEGfxVertexList* sawMesh = AssetManager::GetMesh(MESH_SAW);
+
+					// Fall back to static trap2 texture if saw assets aren't loaded yet
+					if (sawTex && sawMesh) {
+						AEGfxTextureSet(sawTex, traps::GetSawUOffset(), 0.0f);
+						renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+						AEGfxMeshDraw(sawMesh, AE_GFX_MDM_TRIANGLES);
+					}
+					else {
+						AEGfxTextureSet(trap2, 0, 0);
+						renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					}
 					break;
+				}
 				case 67: // key
 					drawGlass(row, col, mapS, platformMesh);
 
