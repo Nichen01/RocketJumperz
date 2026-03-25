@@ -66,6 +66,7 @@ void Level1_Load()
 
 	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
+	load::cooldownBar();
 
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
@@ -517,6 +518,9 @@ void Level1_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
+
+	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
+	renderlogic::drawCooldownHUD(objectinfo1[player].xPos, objectinfo1[player].yPos - 40.f);
 
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
