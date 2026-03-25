@@ -257,7 +257,8 @@ namespace enemySystem {
     void updateEnemies(Enemy enemies[], s32 maxCount,
         objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
-        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup)
+        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup,
+        WireDrop wireDrops[], s32 wireDropMax)
     {
         // iterate through enemy slots 
         for (int i = 0; i < maxCount; i++)
@@ -394,6 +395,14 @@ namespace enemySystem {
                         loot[i].info.xPos = enemies[i].shape.xPos;
                         loot[i].info.yPos = enemies[i].shape.yPos;
                         loot[i].info.flag = 1;
+
+                        // Attempt to spawn a wire drop at the enemy's death position.
+                        // The wire drop tracker handles the first-kill chance /
+                        // second-kill guarantee logic internally.
+                        if (wireDrops && wireDropMax > 0)
+                            pickup::TrySpawnWireDrop(wireDrops, wireDropMax,
+                                enemies[i].shape.xPos, enemies[i].shape.yPos);
+
                         printf("Enemy %d defeated!\n", i);
                     }
                 }
@@ -423,6 +432,11 @@ namespace enemySystem {
                 loot[i].info.xPos = enemies[i].shape.xPos;
                 loot[i].info.yPos = enemies[i].shape.yPos;
                 loot[i].info.flag = 1;
+
+                // Attempt to spawn a wire drop at the melee enemy's death position.
+                if (wireDrops && wireDropMax > 0)
+                    pickup::TrySpawnWireDrop(wireDrops, wireDropMax,
+                        enemies[i].shape.xPos, enemies[i].shape.yPos);
 
                 printf("Enemy %d defeated!\n", i);
             }
