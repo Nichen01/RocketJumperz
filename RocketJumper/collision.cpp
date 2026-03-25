@@ -179,8 +179,8 @@ namespace gamelogic {
 		x2 = PosX + scaleX / 2.0f;
 		y2 = PosY - scaleY / 4.0f;
 
-		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) == index ||
-			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) == index) {
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_RIGHT;
 		}
 
@@ -191,8 +191,8 @@ namespace gamelogic {
 		x2 = PosX - scaleX / 2.0f;
 		y2 = PosY + scaleY / 4.0f;
 
-		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) == index ||
-			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) == index) {
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_LEFT;
 		}
 
@@ -203,8 +203,8 @@ namespace gamelogic {
 		x2 = PosX + scaleX / 4.0f;
 		y2 = PosY + scaleY / 2.0f;
 
-		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) == index ||
-			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) == index) {
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_TOP;
 		}
 
@@ -215,8 +215,8 @@ namespace gamelogic {
 		x2 = PosX + scaleX / 4.0f;
 		y2 = PosY - scaleY / 2.0f;
 
-		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) == index ||
-			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) == index) {
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_BOTTOM;
 		}
 

@@ -129,8 +129,8 @@ int ImportMapDataFromFile(const char* FileName)
 			if (value / 10 == 1) {
 				BinaryCollisionArray[row][col] = 1;
 			}
-			else if (value / 50 == 1) {
-				BinaryCollisionArray[row][col] = value%50;
+			else if (value / 10 == 5) {
+				BinaryCollisionArray[row][col] = 2;
 			}
 			else {
 				BinaryCollisionArray[row][col] = 0;

@@ -187,6 +187,7 @@ void Level1_Initialize()
 			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
+	PrintRetrievedInformation();
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	for (auto& door : doors) {
