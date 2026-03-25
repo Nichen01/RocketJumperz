@@ -10,6 +10,8 @@ namespace traps {
 	s8 trapRange = 3;
 	bool nearTrap = 0;
 	AEVec2 nearestTrap = {};
+	f32 angle;
+	AEMtx33 trapTransform;
 	void initTraps() {
 		nearTrap = 0;
 		AEVec2Zero(&nearestTrap);
@@ -53,7 +55,26 @@ namespace traps {
 		float NScaleX = objectinfo[player].xScale / s;
 		float NScaleY = objectinfo[player].yScale / s;
 		nearestTrap = checkNearestTrap(NposX, NposY, map, x,y);
-		if (nearTrap) suckPlayer(objectinfo[player], nearestTrap, s);
+		if (nearTrap) {
+			suckPlayer(objectinfo[player], nearestTrap, s);
+			/*
+			//Drawing tentacle
+			AEMtx33 scale = { 0 };
+			AEMtx33Scale(&scale, objectinfo[player].xScale * 3, objectinfo[player].yScale * 3);
+
+			AEMtx33 rotate = { 0 };
+			//angle = movement::getMouse(player).y/ movement::getMouse(player).x;
+			angle = static_cast<f32>(atan2(movement::getMouse(objectinfo[player]).y, movement::getMouse(objectinfo[player]).x));
+			angle += 5 * PI / 4;
+			AEMtx33Rot(&rotate, angle);
+
+			AEMtx33 translate = { 0 };
+			AEMtx33Trans(&translate, objectinfo[player].xPos, objectinfo[player].yPos);
+
+			trapTransform = { 0 };
+			AEMtx33Concat(&trapTransform, &rotate, &scale);
+			AEMtx33Concat(&trapTransform, &translate, &trapTransform);*/
+		}
 		if (gamelogic::CheckInstanceBinaryMapCollision(NposX, NposY, NScaleX, NScaleY, map, 2, x)) {
 			if (trapInstanceCooldown <= 0.0f)
 			{
@@ -62,11 +83,17 @@ namespace traps {
 					trapInstanceCooldown = trapCooldown;
 				}
 			}
+			// Trap-tile collision resolution is handled by the level's own
+			// Collision_movement calls (index=1 for walls already keeps entities
+			// in bounds).  Calling Collision_movement here with index=2 caused a
+			// double-move per frame (velocity applied twice), which could push
+			// entities out of the map and trigger access violations.
 		}
-		// Trap-tile collision resolution is handled by the level's own
-		// Collision_movement calls (index=1 for walls already keeps entities
-		// in bounds).  Calling Collision_movement here with index=2 caused a
-		// double-move per frame (velocity applied twice), which could push
-		// entities out of the map and trigger access violations.
 	}
+	/*void drawTraps() {
+		AEGfxTextureSet(trapBeam, 0, 0);
+		AEGfxSetTransform(trapTransform.m);
+		AEGfxSetColorToMultiply(1, 1, 1, 1);
+		AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	}*/
 }

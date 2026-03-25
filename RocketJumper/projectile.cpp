@@ -99,6 +99,57 @@ namespace projectileSystem {
                 printf("No available projectile slots! Max: %d\n", maxCount);
             }
         }
+        if (AEInputCheckTriggered(AEVK_RBUTTON))
+        {
+            s32 foundSlot = -1;
+
+            // Find first inactive projectile slot in projectiles array
+            for (int i = 0; i < maxCount; i++)
+            {
+                if (projectiles[i].isActive == 0)
+                {
+                    foundSlot = i; // set potential slot to proj index
+                    break;  // Exit loop early when we find a slot
+                }
+            }
+
+            // if slot available, fire the projectile
+            if (foundSlot != -1)
+            {
+                // Set projectile starting pos to player pos
+                projectiles[foundSlot].shape.xPos = player.xPos;
+                projectiles[foundSlot].shape.yPos = player.yPos + 5.0f;
+
+                // Calculate direction vector TOWARD the mouse cursor
+                f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
+                f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
+
+                // Normalize direction vector
+                f32 length = sqrtf(dx * dx + dy * dy);
+                if (length > 0.0f)
+                {
+                    dx /= length;
+                    dy /= length;
+                }
+
+                dx = -dx;
+                dy = -dy;
+
+                // Set velocity
+                f32 speed = 15.0f;
+                projectiles[foundSlot].shape.velocityX = dx * speed;
+                projectiles[foundSlot].shape.velocityY = dy * speed;
+
+                // Activate projectile
+                projectiles[foundSlot].isActive = 1;
+                AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
+                printf("Projectile slot %d fired!\n", foundSlot);
+            }
+            else
+            {
+                printf("No available projectile slots! Max: %d\n", maxCount);
+            }
+        }
     }
 
     // UPDATE ALL ACTIVE PROJECTILES (MOVEMENT AND BOUNDING)
@@ -208,7 +259,7 @@ namespace projectileSystem {
         AEAudio attackSound,
         AEAudioGroup sfxGroup)
     {
-        if (!AEInputCheckTriggered(AEVK_LBUTTON))
+        if (!(AEInputCheckTriggered(AEVK_LBUTTON)||AEInputCheckTriggered(AEVK_RBUTTON)))
             return;
 
         // ---- Constants for the shotgun spread ----
@@ -234,7 +285,10 @@ namespace projectileSystem {
             dx = 1.0f;
             dy = 0.0f;
         }
-
+        if (AEInputCheckTriggered(AEVK_RBUTTON)) {
+            dx=-dx;
+            dy=-dy;
+        }
         bool playedSound = false;
 
         // Spawn each pellet with a slightly different angle
