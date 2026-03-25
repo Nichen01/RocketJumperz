@@ -402,9 +402,6 @@ void Level2_Update()
 			if (!door.isOpen && door.anim.playMode == ANIM_IDLE)
 				animSystem::play(door.anim, ANIM_PLAY_ONCE);
 
-			if (door.isOpen && door.anim.playMode == ANIM_IDLE)
-				animSystem::play(door.anim, ANIM_PLAY_REVERSE);
-
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
 				if (door.isLocked && !keycardCollected) {
@@ -422,6 +419,10 @@ void Level2_Update()
 					}
 				}
 			}
+		}
+		else {
+			if (door.isOpen && door.anim.playMode == ANIM_IDLE)
+				animSystem::play(door.anim, ANIM_PLAY_REVERSE);
 		}
 
 		// Always update animation state

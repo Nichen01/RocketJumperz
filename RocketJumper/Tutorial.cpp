@@ -145,8 +145,6 @@ void Tutorial_Initialize()
 	// SPAWN test enemies
 	
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -400.0f, 300.0f);
-
-	// Build animated mesh for melee enemy (3 cols x 2 rows spritesheet)
 	
 	
 

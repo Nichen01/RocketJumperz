@@ -42,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 	
-	GSM_Initialize(GS_TUTORIAL);
+	GSM_Initialize(GS_LEVEL3);
 
 	while (current != GS_QUIT)
 	{

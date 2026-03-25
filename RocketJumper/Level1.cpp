@@ -387,10 +387,10 @@ void Level1_Update()
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo1[player], map, x, static_cast<int>(tileSize), 1);
 	traps::updateTraps(enemies, objectinfo1, map, x,y, tileSize);
+
 	// -----------------------------------------------------------------------
 	// Door animation
 	// -----------------------------------------------------------------------
-
 	bool nearAnyDoor = false; // track if player is near at least one door
 
 	for (auto& door : doors) {
@@ -398,22 +398,21 @@ void Level1_Update()
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
 
+		// get distance of player to door
 		f32 dx = objectinfo1[player].xPos - door.worldX;
 		f32 dy = objectinfo1[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
 
 		bool nearThisDoor = (dist <= doorTriggerRadius);
 
-		if (nearThisDoor) {
-			nearAnyDoor = true; // accumulate result
+		if (nearThisDoor) { // when player in range
+			nearAnyDoor = true; 
 
-			// Handle door animation when player approaches/leaves
-			if (!door.isOpen && door.anim.playMode == ANIM_IDLE)
+			// open door if closed and not animating
+			if (!door.isOpen && door.anim.playMode == ANIM_IDLE) {
 				animSystem::play(door.anim, ANIM_PLAY_ONCE);
-
-			if (door.isOpen && door.anim.playMode == ANIM_IDLE)
-				animSystem::play(door.anim, ANIM_PLAY_REVERSE);
-
+			}
+				
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
 				if (door.isLocked && !keycardCollected) {
@@ -431,11 +430,16 @@ void Level1_Update()
 					}
 				}
 			}
+		} 
+		else {
+			// close door when player not in range
+			if (door.isOpen && door.anim.playMode == ANIM_IDLE) {
+				animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+			}
 		}
 
 		// Always update animation state
 		animSystem::update(door.anim, dt);
-
 		if (door.anim.justFinished)
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
