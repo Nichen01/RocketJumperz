@@ -28,7 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		return 0;
 	}
-	//AESysSetFullScreen(1);
+	AESysSetFullScreen(1);
 	// Using custom window procedure
 	//int gGameRunning = 1;
 
@@ -65,7 +65,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			GSM_Update();
 			fpLoad();
 			if (canpause) {
-				Pause_Load();			
+				Pause_Load();	
 			}
 		}
 		else {

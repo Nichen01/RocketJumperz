@@ -126,13 +126,16 @@ int ImportMapDataFromFile(const char* FileName)
 				glassMap[row][col] = rand() % 5;
 			}
 			MapData[row][col] = value;
-			if (value == 40) {
-				BinaryCollisionArray[row][col] = 0;
+			if (value / 10 == 1) {
+				BinaryCollisionArray[row][col] = 1;
+			}
+			else if (value / 50 == 1) {
+				BinaryCollisionArray[row][col] = value%50;
 			}
 			else {
-				BinaryCollisionArray[row][col] = (value / 10 == 1) ? 1 : 0;
+				BinaryCollisionArray[row][col] = 0;
 			}
-			if (value/50 == 1) BinaryCollisionArray[row][col] = 2;
+
 			//if (value == 51) BinaryCollisionArray[i][j] = 3;
 			// to save coordinates of the key
 			if (value == 67) {
@@ -252,7 +255,7 @@ void PrintRetrievedInformation()
 
 	for (int i{}; i < BINARY_MAP_HEIGHT; i++) {
 		for (int j{}; j < BINARY_MAP_WIDTH; j++) {
-			std::cout << MapData[i][j] << " ";
+			std::cout << BinaryCollisionArray[i][j] << " ";
 		}
 		std::cout << std::endl;
 	}
