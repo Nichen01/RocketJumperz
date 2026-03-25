@@ -190,18 +190,20 @@ void Level1_Initialize()
 	PrintRetrievedInformation();
 	// Spawn player at the door they came from
 	bool spawnSet = false;
-	for (auto& door : doors) {
-		// Lock all doors except for Tutorial -> Level 1
-		door.isLocked = true;
-		if (door.id == 21) {
-			door.isLocked = false;
-		}
+	if (playerEnteredDoorId != -1) {
+		for (auto& door : doors) {
+			// Lock all doors
+			door.isLocked = true;
+			if (door.id == 21) {
+				door.isLocked = false;
+			}
 
-		if (door.id == playerEnteredDoorId) {
-			objectinfo1[player].xPos = door.worldX;
-			objectinfo1[player].yPos = door.worldY;
-			spawnSet = true;
-			break;
+			if (door.id == playerEnteredDoorId) {
+				objectinfo1[player].xPos = door.worldX;
+				objectinfo1[player].yPos = door.worldY;
+				spawnSet = true;
+				break;
+			}
 		}
 	}
 	// fallback if no door found (first time loading)
