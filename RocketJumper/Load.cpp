@@ -23,6 +23,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
 	AEGfxTexture* menuTex = NULL, * buttonTex = NULL;
 	AEGfxTexture* backgroundTex = NULL;
+	AEGfxTexture* ammoDrop = NULL;
 
 	int keyX{}, keyY{};
 
@@ -54,6 +55,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_TRAP1, "Assets/spike.png");
 		AssetManager::LoadTexture(TEX_TRAP2, "Assets/eye.png");
 		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
+		AssetManager::LoadTexture(TEX_DROP, "Assets/ammo.jpeg");
 
 		// Sync the extern pointers so draw.cpp can use them directly
 		platform1 = AssetManager::GetTexture(TEX_PLATFORM1);
@@ -73,6 +75,7 @@ namespace load {
 		trap1 = AssetManager::GetTexture(TEX_TRAP1);
 		trap2 = AssetManager::GetTexture(TEX_TRAP2);
 		trapBeam = AssetManager::GetTexture(TEX_TRAPBEAM);
+		ammoDrop= AssetManager::GetTexture(TEX_DROP);
 	}
 
 	void ui() {

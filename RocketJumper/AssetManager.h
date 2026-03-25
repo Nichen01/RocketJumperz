@@ -126,6 +126,8 @@ enum TextureID {
     TEX_WIREINVENTORY0,
     TEX_WIREINVENTORY1,
     TEX_WIREINVENTORY2,
+    //ammo drop
+    TEX_DROP,
     // Ranged enemy state spritesheets
     TEX_RANGED_IDLE,    // RangedMove.png frame 0 (reused as idle)
     TEX_RANGED_MOVE,    // RangedMove.png   (1 row, 4 cols)
