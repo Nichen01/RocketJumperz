@@ -1,5 +1,6 @@
 #include "DeathScreen.h"
 #include "Draw.h"
+#include "movement.h"
 static s8 deathfont = -1;
 static f32 width, height;
 
@@ -63,6 +64,7 @@ void DeathScreen_Update() {
 
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
+            movement::bulletCount = 10;
             next = GS_TUTORIAL;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");
         }

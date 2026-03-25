@@ -290,6 +290,7 @@ void UpdateMainMenu() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (playButton.isHovered) {
+            movement::bulletCount = 10;
             next = GS_TUTORIAL;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");
         }
