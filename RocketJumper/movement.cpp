@@ -91,18 +91,28 @@ namespace movement {
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX -= directionVector.x * ABSOLUTE_RECOIL * static_cast<f32>(screenLength) / screenWidth;
-            player.velocityY -= directionVector.y * ABSOLUTE_RECOIL * static_cast<f32>(screenWidth) / screenLength;
-            //printf("Bullet fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
+
+            // Shotgun kicks harder than the plasma gun (1.6x recoil)
+            f32 recoil = ABSOLUTE_RECOIL;
+            if (player.currentWeapon == WEAPON_SHOTGUN)
+                recoil *= SHOTGUN_RECOIL_MULTIPLIER;
+
+            player.velocityX -= directionVector.x * recoil * static_cast<f32>(screenLength) / screenWidth;
+            player.velocityY -= directionVector.y * recoil * static_cast<f32>(screenWidth) / screenLength;
             bulletCount -= 1;
         }
         if (AEInputCheckTriggered(AEVK_RBUTTON) && bulletCount)
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
-            player.velocityX += directionVector.x * ABSOLUTE_RECOIL * static_cast<f32>(screenLength) / screenWidth;
-            player.velocityY += directionVector.y * ABSOLUTE_RECOIL * static_cast<f32>(screenWidth) / screenLength;
-            //printf("Bullet fired! Velocity: (%.2f, %.2f)\n", player.velocityX, player.velocityY);
+
+            // Shotgun kicks harder than the plasma gun (1.6x recoil)
+            f32 recoil = ABSOLUTE_RECOIL;
+            if (player.currentWeapon == WEAPON_SHOTGUN)
+                recoil *= SHOTGUN_RECOIL_MULTIPLIER;
+
+            player.velocityX += directionVector.x * recoil * static_cast<f32>(screenLength) / screenWidth;
+            player.velocityY += directionVector.y * recoil * static_cast<f32>(screenWidth) / screenLength;
 
             bulletCount -= 1;
         }
