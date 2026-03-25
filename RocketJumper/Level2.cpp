@@ -14,6 +14,9 @@ const float PlayerScale = 80.0f;
 extern objectsquares objectinfo2[2] = { 0 };
 drop L2Drop[MAX_ENEMIES] = { 0 };
 
+// Wire drops -- one wire can drop per level from enemy deaths
+static WireDrop wireDrops[MAX_ENEMIES] = { 0 };
+
 // Local variables for projectile test level
 static Projectile Projectiles[MAX_PROJECTILES];
 
@@ -64,6 +67,10 @@ void Level2_Load()
 	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
 	load::cooldownBar();
+
+	// Load wire item texture (world drop) and wire inventory textures
+	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
+	load::wireInventory();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
@@ -185,7 +192,7 @@ void Level2_Initialize()
 	for (auto& door : doors) {
 		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
-		if (door.id == 21) {
+		if (door.id == 21||door.id==23) {
 			door.isLocked = false;
 		}
 
@@ -236,6 +243,11 @@ void Level2_Initialize()
 	doorIsOpen = false;
 
 	pickup::initDrops(L2Drop, MAX_ENEMIES, PlayerScale);
+
+	// Wire drops: reset per-level tracker and initialize wire drop array
+	pickup::ResetWireDropTracker();
+	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
+
 	traps::initTraps();
 }
 
@@ -295,6 +307,7 @@ void Level2_Update()
 	aiming::updateAiming(objectinfo2[player]);
 	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
+	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo2[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -329,11 +342,12 @@ void Level2_Update()
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 
-	// Update enemies
+	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo2[player], L2Drop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects);
+		dt, LaserBlast, soundEffects,
+		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
@@ -473,6 +487,7 @@ void Level2_Draw()
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
 	pickup::drawDrops(L2Drop, MAX_ENEMIES);
+	pickup::DrawWireDrops(wireDrops, MAX_ENEMIES);
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
@@ -526,8 +541,19 @@ void Level2_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfo2[player].xPos, objectinfo2[player].yPos + 60.f, eButton, 50.f);
 	}
-	// ====== PLACEHOLDER INVENTORY FOR WIRES ====== //
-	renderlogic::drawTexture(-650.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
+	renderlogic::drawWireInventory(wireCount);
+
+	// Draw wire count text at the bottom-right of the wire inventory box
+	if (fontLevel2 >= 0) {
+		char wireText[16];
+		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel2, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
+	}
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);

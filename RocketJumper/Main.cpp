@@ -28,7 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		return 0;
 	}
-	AESysSetFullScreen(0);
+	AESysSetFullScreen(1);
 	// Using custom window procedure
 	//int gGameRunning = 1;
 
