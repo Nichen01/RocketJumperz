@@ -2,6 +2,7 @@
 #include "Draw.h"
 #include "Main.h"
 
+
 static s8 pausefont = -1;
 static f32 width, height;
 
@@ -9,8 +10,6 @@ static MenuButton resumeButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
 
-static AEGfxTexture* menutex;
-static AEGfxTexture* buttontex;
 
 void Pause_Load() {
 
@@ -64,9 +63,9 @@ void Pause_Draw() {
 	AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
 	AEGfxPrint(pausefont, "PAUSE", -0.06f-width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
 
-	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttontex);
-	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttontex);
-	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttontex);
+	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttonTex);
+	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttonTex);
+	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttonTex);
 }
 
 void Pause_Free() {

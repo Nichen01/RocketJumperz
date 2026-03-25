@@ -278,6 +278,7 @@ void Tutorial_Update()
 
 	// If player health < 0, go to death screen
 	if (objectinfoTut[player].health <= 0) {
+		movement::bulletCount = 10;
 		next = GS_DEATH;
 	}
 

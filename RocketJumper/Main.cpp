@@ -13,6 +13,7 @@
 
 bool pause = false;
 bool canpause = true;
+
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,

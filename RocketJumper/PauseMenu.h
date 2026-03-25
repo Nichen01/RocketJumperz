@@ -1,7 +1,7 @@
 #pragma once
 #include "AEEngine.h"
 #include "MainMenu.h"
-
+#include "load.h"
 
 void Pause_Load();
 
