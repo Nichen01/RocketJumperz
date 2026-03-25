@@ -122,10 +122,9 @@ int ImportMapDataFromFile(const char* FileName)
 			int value;
 			ifs >> value;
 			// assign random glass type if tile is "air"
-			if (value == 0) {
-				glassMap[row][col] = rand() % 5;
-			}
+
 			MapData[row][col] = value;
+			// FOR BINARY COLLIISION
 			if (value / 10 == 1) {
 				BinaryCollisionArray[row][col] = 1;
 			}
@@ -136,7 +135,6 @@ int ImportMapDataFromFile(const char* FileName)
 				BinaryCollisionArray[row][col] = 0;
 			}
 
-			//if (value == 51) BinaryCollisionArray[i][j] = 3;
 			// to save coordinates of the key
 			if (value == 67) {
 				key.row = row;
@@ -169,6 +167,7 @@ int ImportMapDataFromFile(const char* FileName)
 				door3Count = 1;
 			}
 			
+			// SAVING THE COORDINATES OF THE ENEMIES
 			else if (value == 81) {
 				enemy1X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				enemy1Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
@@ -180,7 +179,7 @@ int ImportMapDataFromFile(const char* FileName)
 
 
 			// assign random glass type if tile is "air"
-			if (value == 0 || (value >= 31 && value <= 39) || value == 67 || value == 81 || value == 82) {
+			if (value == 0 || (value >= 31 && value <= 39) || value == 67 || value == 81 || value == 82 || value == 50 || value == 51) {
 				glassMap[row][col] = rand() % 5;
 			}
 			else {

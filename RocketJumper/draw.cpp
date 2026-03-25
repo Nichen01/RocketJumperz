@@ -112,7 +112,7 @@ namespace renderlogic {
 					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					break;
-				case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29:
+				case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29: // door
 				{
 					if (!doorMesh || !doorTex) break;  // safety guard
 					// Find the matching door for this tile position
@@ -136,6 +136,7 @@ namespace renderlogic {
 					break;
 				}
 				case 50: //trap1
+					drawGlass(row, col, mapS, platformMesh);
 					AEGfxTextureSet(trap1, 0, 0);
 					//AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
 					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
@@ -143,6 +144,7 @@ namespace renderlogic {
 					//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 					break;
 				case 51: //trap2
+					drawGlass(row, col, mapS, platformMesh);
 					AEGfxTextureSet(trap2, 0, 0);
 					//AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
 					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
