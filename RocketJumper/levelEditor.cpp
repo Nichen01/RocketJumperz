@@ -560,6 +560,13 @@ void LevelEditor_Draw() {
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Trap", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
+			else if (isGridHovered && (MapData[row][col] == 80 || MapData[row][col] == 81)) { // enemy
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Enemy", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Enemy", normX, normY, 0.4f, 1, 1, 1, 1);
+			}
 			else if (!isGridHovered && (MapData[row][col] == 11 || MapData[row][col] == 21)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
@@ -796,34 +803,34 @@ void LevelEditor_Draw() {
 						showDoorPrompt = false;
 						doorPromptAlpha = 0.f;
 
-						AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-						AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-						//========== ERROR PROMPT ==========//
-						renderlogic::drawTexture(-250.f, 200.f, prompt1, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(-150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(-50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(250.f, 200.f, prompt3, uiMesh, 100.f, 100.f);
+						//AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+						//AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+						////========== ERROR PROMPT ==========//
+						//renderlogic::drawTexture(-250.f, 200.f, prompt1, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(250.f, 200.f, prompt3, uiMesh, 100.f, 100.f);
 
-						renderlogic::drawTexture(-250.f, 100.f, prompt4, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(-150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(-50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(250.f, 100.f, prompt6, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-250.f, 100.f, prompt4, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(250.f, 100.f, prompt6, uiMesh, 100.f, 100.f);
 
-						renderlogic::drawTexture(-250.f, 0.f, prompt7, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(-150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(-50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						renderlogic::drawTexture(250.f, 0.f, prompt9, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-250.f, 0.f, prompt7, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(-50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
+						//renderlogic::drawTexture(250.f, 0.f, prompt9, uiMesh, 100.f, 100.f);
 
-						AEGfxPrint(font, "ERROR", -0.1f, 0.3f, 0.9f, 1, 1, 1, 1);
-						AEGfxPrint(font, "Door already exists!", -0.25f, 0.1f, 0.8f, 1, 1, 1, 1);
-						renderlogic::drawTexture(0.f, -50.f, redButton, uiMesh, 200.f, 73.f);
-						AEGfxPrint(font, "Close", -0.07f, -0.14f, 0.8f, 1, 1, 1, 1);
+						//AEGfxPrint(font, "ERROR", -0.1f, 0.3f, 0.9f, 1, 1, 1, 1);
+						//AEGfxPrint(font, "Door already exists!", -0.25f, 0.1f, 0.8f, 1, 1, 1, 1);
+						//renderlogic::drawTexture(0.f, -50.f, redButton, uiMesh, 200.f, 73.f);
+						//AEGfxPrint(font, "Close", -0.07f, -0.14f, 0.8f, 1, 1, 1, 1);
 					}
 					break;
 				}
