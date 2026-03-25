@@ -31,7 +31,7 @@ static SpriteAnimation meleeAnim;
 static AEGfxTexture* base5test = nullptr;
 
 // Font handle for in-game text -- UNUSED, kept for reference only.
-// The active font handle is fontLevel1 (declared below), which is
+// The active font handle is fontLevel3 (declared below), which is
 // created in Initialize and destroyed in Unload.
 
 // Sound and volume
@@ -44,7 +44,7 @@ static s32  DOOR_FRAME_COUNT = 7;
 static f32  DOOR_FRAME_DELAY = 0.08f;   // ~12 fps
 
 // Font resource (must be destroyed in Unload to avoid leak)
-static s8 fontLevel1 = -1;
+static s8 fontLevel3 = -1;
 
 // bool for checking player proximity with door
 static bool playerNear;
@@ -136,7 +136,7 @@ void Level3_Load()
 	}
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	fontLevel3 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
 }
 
@@ -152,7 +152,7 @@ void Level3_Initialize()
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
 	// Create font for HUD text (stored so we can destroy it in Unload)
-	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	fontLevel3 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo3[player]);
@@ -563,7 +563,7 @@ void Level3_Draw()
 	// ====== HUD: Player Health Display ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
-	if (fontLevel1 >= 0)
+	if (fontLevel3 >= 0)
 	{
 		char healthText[32];
 		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo3[player].health);
@@ -575,13 +575,13 @@ void Level3_Draw()
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
 		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel3, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// Show the currently equipped weapon below the health display
 		const char* weaponName = (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN)
 			? "Weapon: Shotgun"
 			: "Weapon: Plasma";
-		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel3, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //
@@ -596,14 +596,14 @@ void Level3_Draw()
 	renderlogic::drawWireInventory(wireCount);
 
 	// Draw wire count text at the bottom-right of the wire inventory box
-	if (fontLevel1 >= 0) {
+	if (fontLevel3 >= 0) {
 		char wireText[16];
 		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel1, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel3, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
@@ -656,7 +656,7 @@ void Level3_Unload()
 	}
 
 	// Destroy the font created in Load
-	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+	if (fontLevel3 != -1) { AEGfxDestroyFont(fontLevel3); fontLevel3 = -1; }
 
 	// Unload ALL audio resources that were loaded in Load
 
