@@ -154,6 +154,9 @@ enum TextureID {
     // Saw trap spritesheet (1 row, 7 columns)
     TEX_SAW,
 
+    // Instructions menu full-screen image
+    TEX_INSTRUCTIONS_MENU,
+
     // Add new textures above this line
     TEX_MAX
 };

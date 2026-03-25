@@ -155,8 +155,8 @@ void Level2_Initialize()
 
 	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
 
-	// Create font for HUD text (stored so we can destroy it in Unload)
-	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+	// Font is already created in Level2_Load -- do NOT recreate here.
+	// Recreating would leak the previous font handle each time the level reinitializes.
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfo2[player]);

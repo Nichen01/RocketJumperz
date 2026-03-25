@@ -6,6 +6,7 @@ AEAudio Punch;
 AEAudio Error;
 AEAudio Pickup;
 AEAudio ArrowSound;
+AEAudio MainMenu;
 AEAudioGroup bgm;
 AEAudioGroup soundEffects;
 
@@ -13,6 +14,7 @@ namespace audio {
 	void loadsound() {
 		// Load the music file once when the level loads
 		Level = AEAudioLoadMusic("Assets/Sounds/L1_bgm.mp3");
+		MainMenu = AEAudioLoadMusic("Assets/Sounds/mainmenu.mp3");
 
 		// Create the audio group
 		bgm = AEAudioCreateGroup();
@@ -36,6 +38,7 @@ namespace audio {
 		AEAudioUnloadAudio(Error);
 		AEAudioUnloadAudio(Pickup);
 		AEAudioUnloadAudio(ArrowSound);
+		AEAudioUnloadAudio(MainMenu);
 		AEAudioUnloadAudioGroup(bgm);
 		AEAudioUnloadAudioGroup(soundEffects);
 	}

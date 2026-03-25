@@ -194,6 +194,10 @@ namespace MenuHelpers {
 
 // ==================== INITIALIZATION FUNCTIONS ========================================================================
 void MainMenu_Load() {
+    // load audio for the menu
+    audio::loadsound();
+
+
     // Build meshes via AssetManager instead of manually creating them here.
     // MESH_QUAD = white-vertex unit quad (used for textured background & title).
     // MESH_MENU_BUTTON = black-vertex unit quad (used for color-mode button rects).
@@ -224,14 +228,23 @@ void MainMenu_Load() {
         printf("(UI) Warning: MenuFont.ttf not found. Text will not render.\n");
     }
 
-    // for menu buttons 
+    // for menu buttons
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");
+
+    // Instructions screen image (full panel showing controls / objectives)
+    AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/instructionsMenu.png");
+    if (!AssetManager::GetTexture(TEX_INSTRUCTIONS_MENU)) {
+        printf("Warning: instructionsMenu.png not found. Instructions screen will fall back to text.\n");
+    }
 
     printf("MainMenu_Load: Resources loaded!\n");
 }
 
 void MainMenu_Init() {
+    AEAudioPlay(MainMenu, bgm, 0.5f, 1.f, -1);
+
+
     // Cache screen dimensions as floats so every layout calc can use them directly.
     // These come from the global extern ints defined in Main.cpp.
     scrW  = static_cast<f32>(screenWidth);
@@ -460,51 +473,36 @@ void DrawMainMenu() {
 }
 
 void DrawInstructionsMenu() {
-    // Draw title -- positioned near top of screen
-    f32 titleY = halfH * 0.778f; // ~350 / 450
-    if (menuFont >= 0) {
-        MenuHelpers::drawTextCentered("INSTRUCTIONS", 0.0f, titleY, 1.3f, menuFont);
+    // Retrieve the instructions image loaded in MainMenu_Load
+    AEGfxTexture*    instrTex  = AssetManager::GetTexture(TEX_INSTRUCTIONS_MENU);
+    AEGfxVertexList* quadMesh  = AssetManager::GetMesh(MESH_QUAD);
+
+    if (instrTex && quadMesh) {
+        // The source image is roughly 4:3. Size it to fill ~80% of screen
+        // width while keeping the aspect ratio readable and centered.
+        // Image natural aspect ratio is approx 600:440 (~1.36:1).
+        f32 imgW = scrW * 0.75f;                   // 75% of screen width
+        f32 imgH = imgW / 1.36f;                    // maintain ~1.36:1 aspect ratio
+        f32 imgY = scrH * 0.06f;                    // nudge slightly above centre so the back button has room
+
+        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+        AEGfxTextureSet(instrTex, 0.0f, 0.0f);
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+        AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+        AEGfxSetTransparency(1.0f);
+
+        AEMtx33 imgScale, imgTrans, imgXform;
+        AEMtx33Scale(&imgScale, imgW, imgH);
+        AEMtx33Trans(&imgTrans, 0.0f, imgY);
+        AEMtx33Concat(&imgXform, &imgTrans, &imgScale);
+        AEGfxSetTransform(imgXform.m);
+        AEGfxMeshDraw(quadMesh, AE_GFX_MDM_TRIANGLES);
     }
 
-    // Draw instruction panel background using the button mesh (color mode)
+    // Draw back button at the bottom of the screen
     AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_BUTTON);
-    AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
-
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-    AEGfxSetColorToAdd(0.2f, 0.2f, 0.3f, 0.85f);
-
-    // Panel dimensions relative to screen size
-    f32 panelW = scrW * 0.375f;   // ~600 / 1600
-    f32 panelH = scrH * 0.556f;   // ~500 / 900
-    f32 panelY = scrH * 0.056f;   // ~50  / 900
-
-    AEMtx33 scale, translate, transform;
-    AEMtx33Scale(&scale, panelW, panelH);
-    AEMtx33Trans(&translate, 0.0f, panelY);
-    AEMtx33Concat(&transform, &translate, &scale);
-    AEGfxSetTransform(transform.m);
-    AEGfxMeshDraw(btnMesh, AE_GFX_MDM_TRIANGLES);
-
-    // Draw instruction text
-    if (menuFont >= 0) {
-        f32 baseY       = halfH * 0.444f;   // ~200 / 450
-        f32 lineSpacing = scrH * 0.056f;     // ~50  / 900
-        f32 textScale   = 0.7f;
-
-        MenuHelpers::drawTextCentered("CONTROLS", 0.0f, baseY, 0.9f, menuFont);
-
-        MenuHelpers::drawTextCentered("SPACEBAR - Jetpack Thrust",   0.0f, baseY - lineSpacing * 1.0f, textScale, menuFont);
-        MenuHelpers::drawTextCentered("LEFT CLICK - Fire Projectile", 0.0f, baseY - lineSpacing * 2.0f, textScale, menuFont);
-        MenuHelpers::drawTextCentered("MOUSE - Aim Direction",        0.0f, baseY - lineSpacing * 3.0f, textScale, menuFont);
-        MenuHelpers::drawTextCentered("ESC - Pause/Quit",             0.0f, baseY - lineSpacing * 4.0f, textScale, menuFont);
-
-        f32 objectiveY = baseY - lineSpacing * 5.5f;
-        MenuHelpers::drawTextCentered("OBJECTIVE", 0.0f, objectiveY, 0.9f, menuFont);
-        MenuHelpers::drawTextCentered("Use your jetpack and projectiles",        0.0f, objectiveY - lineSpacing, textScale, menuFont);
-        MenuHelpers::drawTextCentered("to navigate levels and defeat enemies!",  0.0f, objectiveY - lineSpacing * 2.0f, textScale, menuFont);
-    }
-
-    // Draw back button
+    AEGfxTexture*    btnTex  = AssetManager::GetTexture(TEX_BUTTON);
     MenuHelpers::TexdrawButton(backButton, btnMesh, menuFont, btnTex);
 
     // Reset color state so subsequent draw calls are not tinted
@@ -636,6 +634,8 @@ void MainMenu_Free() {
 void MainMenu_Unload() {
     // Textures are managed by AssetManager -- unload through the centralized system
     AssetManager::UnloadAllTextures();
+
+    audio::unloadsound();
 
     /*
     if (titleTexture) {

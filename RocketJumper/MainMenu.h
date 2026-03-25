@@ -14,6 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "AEEngine.h"
+#include "Sound.h"
 #include <iostream>
 
 extern int screenWidth;
