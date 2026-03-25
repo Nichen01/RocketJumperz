@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "AssetManager.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
+#include "Load.h"
 
 // ==================== TIMING CONSTANTS ====================
 // All durations are in seconds. Total splash duration = fade in + hold + fade out.
@@ -232,6 +233,7 @@ void SplashScreen_Free() {
 // Unloads textures and destroys fonts. Called when leaving this game state.
 void SplashScreen_Unload() {
     AssetManager::UnloadAllTextures();
+    load::NullExternPointers();
 
     if (splashFont >= 0) {
         AEGfxDestroyFont(splashFont);

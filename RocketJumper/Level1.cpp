@@ -74,7 +74,7 @@ void Level1_Load()
 	load::background();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
 	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
@@ -603,8 +603,11 @@ void Level1_Free()
 void Level1_Unload()
 {
 	// Unload all AssetManager-tracked textures, then null the shared extern pointers.
-	AssetManager::UnloadAllTextures(); 
+	AssetManager::UnloadAllTextures();
 
+	// Null every extern texture/mesh pointer so nothing dangles after the
+	// AssetManager has freed the GPU resources (fixes trap textures rendering black).
+	load::NullExternPointers();
 
 	// Safely null out mushroom textures (AssetManager already freed the memory)
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }

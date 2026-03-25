@@ -31,8 +31,8 @@ namespace weaponSprite {
 
     // How large the gun sprite is rendered (world units).
     // Roughly half the player's 80-unit tile so the gun isn't enormous.
-    const f32 kGunScaleX = 60.0f;
-    const f32 kGunScaleY = 30.0f;
+    const f32 kGunScaleX = 75.0f;
+    const f32 kGunScaleY = 45.0f;
 
     // Offset from the player's center to the "hand" position.
     // Positive X = forward (gun side), positive Y = upward.

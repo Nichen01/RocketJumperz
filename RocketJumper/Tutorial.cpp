@@ -49,7 +49,7 @@ void Tutorial_Load()
 	audio::loadsound();
 
 	// Load textures via AssetManager (enum-based IDs)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
 	//AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
@@ -451,7 +451,11 @@ void Tutorial_Free()
 void Tutorial_Unload()
 {
 	AssetManager::UnloadAllTextures();
-	
+
+	// Null every extern texture/mesh pointer so nothing dangles after the
+	// AssetManager has freed the GPU resources (fixes trap textures rendering black).
+	load::NullExternPointers();
+
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
 		delete[] glassMap;

@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "AEEngine.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
+#include "Load.h"
 #include <cmath>
 
 // ==================== FORWARD DECLARATIONS ====================
@@ -222,6 +223,10 @@ void MainMenu_Load() {
         menuFont = AEGfxCreateFont("Arial.ttf", 48);
         printf("(UI) Warning: MenuFont.ttf not found. Text will not render.\n");
     }
+
+    // for menu buttons 
+    AssetManager::BuildSqrMesh(MESH_BUTTON);
+    AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");
 
     printf("MainMenu_Load: Resources loaded!\n");
 }
@@ -445,10 +450,13 @@ void DrawMainMenu() {
 
     // Draw all buttons using the black-vertex button mesh from AssetManager
     AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_MENU_BUTTON);
-    MenuHelpers::drawButton(playButton,         btnMesh, menuFont);
-    MenuHelpers::drawButton(instructionsButton,  btnMesh, menuFont);
-    MenuHelpers::drawButton(creditsButton,       btnMesh, menuFont);
-    MenuHelpers::drawButton(quitButton,          btnMesh, menuFont);
+    AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
+    
+    // draw the textured buttons
+    MenuHelpers::TexdrawButton(playButton, btnMesh, menuFont, btnTex);
+    MenuHelpers::TexdrawButton(instructionsButton, btnMesh, menuFont, btnTex);
+    MenuHelpers::TexdrawButton(creditsButton, btnMesh, menuFont, btnTex);
+    MenuHelpers::TexdrawButton(quitButton, btnMesh, menuFont, btnTex);
 }
 
 void DrawInstructionsMenu() {
@@ -459,7 +467,8 @@ void DrawInstructionsMenu() {
     }
 
     // Draw instruction panel background using the button mesh (color mode)
-    AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_MENU_BUTTON);
+    AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_BUTTON);
+    AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
     AEGfxSetColorToAdd(0.2f, 0.2f, 0.3f, 0.85f);
@@ -496,7 +505,7 @@ void DrawInstructionsMenu() {
     }
 
     // Draw back button
-    MenuHelpers::drawButton(backButton, btnMesh, menuFont);
+    MenuHelpers::TexdrawButton(backButton, btnMesh, menuFont, btnTex);
 
     // Reset color state so subsequent draw calls are not tinted
     AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -504,14 +513,6 @@ void DrawInstructionsMenu() {
 }
 
 void DrawCreditsMenu() {
-    // ---- Fixed "CREDITS" header at the top of the screen ----
-    /*
-    f32 titleY = halfH * 0.778f; // near top
-    if (menuFont >= 0) {
-        MenuHelpers::drawTextCentered("CREDITS", 0.0f, titleY, 1.3f, menuFont);
-    }
-    */
-
     // ---- Scrolling credits body ----
     // All Y positions are offset by creditsScrollY so the text rolls upward.
     // lineSpacing controls vertical distance between individual lines.
@@ -618,8 +619,9 @@ void DrawCreditsMenu() {
     }
 
     // ---- Fixed "BACK" button at the bottom of the screen ----
-    AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_MENU_BUTTON);
-    MenuHelpers::drawButton(backButton, btnMesh, menuFont);
+    AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_BUTTON);
+    AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
+    MenuHelpers::TexdrawButton(backButton, btnMesh, menuFont, btnTex);
 }
 
 // ==================== CLEANUP FUNCTIONS ====================
@@ -634,6 +636,7 @@ void MainMenu_Free() {
 void MainMenu_Unload() {
     // Textures are managed by AssetManager -- unload through the centralized system
     AssetManager::UnloadAllTextures();
+    load::NullExternPointers();
 
     /*
     if (titleTexture) {
