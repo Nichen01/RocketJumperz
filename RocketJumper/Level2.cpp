@@ -584,12 +584,8 @@ void Level2_Free()
 
 void Level2_Unload()
 {
-	// Unload all AssetManager-tracked textures, then null the shared extern pointers.
+	// Unload all AssetManager-tracked textures (auto-nulls internal sTextures[]).
 	AssetManager::UnloadAllTextures();
-
-	// Null every extern texture/mesh pointer so nothing dangles after the
-	// AssetManager has freed the GPU resources (fixes trap textures rendering black).
-	load::NullExternPointers();
 
 	// Safely null out mushroom textures (AssetManager already freed the memory)
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }

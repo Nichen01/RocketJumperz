@@ -41,9 +41,4 @@ namespace load {
 	void cooldownBar();
 	void pauseMenu();
 	void background();
-
-	// Null all extern texture and mesh pointers after AssetManager has
-	// freed the underlying GPU resources.  Prevents dangling-pointer
-	// reads (which cause textures to render as black).
-	void NullExternPointers();
 }

@@ -636,7 +636,6 @@ void MainMenu_Free() {
 void MainMenu_Unload() {
     // Textures are managed by AssetManager -- unload through the centralized system
     AssetManager::UnloadAllTextures();
-    load::NullExternPointers();
 
     /*
     if (titleTexture) {

@@ -855,7 +855,6 @@ void LevelEditor_Unload() {
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
 	AssetManager::UnloadAllTextures();
-	load::NullExternPointers();
 
 	// Null out the pointers safely
 	for (int i = 0; i < 10; i++)

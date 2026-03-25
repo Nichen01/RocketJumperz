@@ -52,8 +52,8 @@ namespace load {
 		AssetManager::LoadTexture(TEX_GLASS2, "Assets/Platform/glass2.jpg");
 		AssetManager::LoadTexture(TEX_GLASS3, "Assets/Platform/glass3.jpg");
 		AssetManager::LoadTexture(TEX_GLASS4, "Assets/Platform/glass4.jpg");
-		AssetManager::LoadTexture(TEX_TRAP1, "Assets/spike.png");
-		AssetManager::LoadTexture(TEX_TRAP2, "Assets/eye.png");
+		AssetManager::LoadTexture(TEX_TRAP1, "Assets/Items/spike.png");
+		AssetManager::LoadTexture(TEX_TRAP2, "Assets/Items/eye.png");
 		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
 		AssetManager::LoadTexture(TEX_DROP, "Assets/ammo.jpeg");
 
@@ -198,69 +198,4 @@ namespace load {
 		backgroundTex = AssetManager::GetTexture(TEX_BACKGROUND);
 	}
 
-	// Null every extern texture/mesh pointer so they don't dangle after
-	// AssetManager::UnloadAllTextures() / FreeAllMeshes() have freed the
-	// underlying GPU resources.  Call this in each level's Unload function.
-	void NullExternPointers() {
-		// --- Platform textures ---
-		platform1 = nullptr;  platform2 = nullptr;  platform3 = nullptr;
-		platform4 = nullptr;  platform5 = nullptr;  platform6 = nullptr;
-		platform7 = nullptr;  platform8 = nullptr;  platform9 = nullptr;
-
-		// --- Glass textures ---
-		glass0 = nullptr;  glass1 = nullptr;  glass2 = nullptr;
-		glass3 = nullptr;  glass4 = nullptr;
-
-		// --- Trap textures (the original bug: these were never nulled) ---
-		trap1 = nullptr;
-		trap2 = nullptr;
-		trapBeam = nullptr;
-
-		// --- UI textures ---
-		ctrl1 = nullptr;      ctrl2 = nullptr;
-		leftArrow = nullptr;  rightArrow = nullptr;
-		leftClick = nullptr;  rightClick = nullptr;
-		eButton = nullptr;    gButton = nullptr;
-		sButton = nullptr;    zButton = nullptr;
-		button1 = nullptr;    button2 = nullptr;
-		button3 = nullptr;    spacebar = nullptr;
-		inventory = nullptr;  keycardInventory = nullptr;
-
-		// --- Key ---
-		keyTexture = nullptr;
-
-		// --- Error prompt / buttons ---
-		errorPromptMenu = nullptr;
-		redButton = nullptr;
-		greenButton = nullptr;
-
-		// --- Prompt textures ---
-		prompt1 = nullptr;  prompt2 = nullptr;  prompt3 = nullptr;
-		prompt4 = nullptr;  prompt5 = nullptr;  prompt6 = nullptr;
-		prompt7 = nullptr;  prompt8 = nullptr;  prompt9 = nullptr;
-
-		// --- Broken door textures ---
-		brokenDoor0 = nullptr;  brokenDoor1 = nullptr;  brokenDoor2 = nullptr;
-
-		// --- Wire inventory textures ---
-		wireInventory0 = nullptr;  wireInventory1 = nullptr;  wireInventory2 = nullptr;
-
-		// --- Menu textures ---
-		menuTex = nullptr;  buttonTex = nullptr;
-
-		// --- Background / drops ---
-		backgroundTex = nullptr;
-		ammoDrop = nullptr;
-
-		// --- Cooldown bar frames ---
-		for (int i = 0; i < 6; ++i) { cooldownFrame[i] = nullptr; }
-
-		// --- Meshes ---
-		platformMesh = nullptr;
-		enemyMesh = nullptr;
-		pMesh = nullptr;
-		projectileMesh = nullptr;
-		uiMesh = nullptr;
-		buttonMesh = nullptr;
-	}
 }

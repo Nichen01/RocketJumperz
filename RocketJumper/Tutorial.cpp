@@ -452,10 +452,6 @@ void Tutorial_Unload()
 {
 	AssetManager::UnloadAllTextures();
 
-	// Null every extern texture/mesh pointer so nothing dangles after the
-	// AssetManager has freed the GPU resources (fixes trap textures rendering black).
-	load::NullExternPointers();
-
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
 		delete[] glassMap;

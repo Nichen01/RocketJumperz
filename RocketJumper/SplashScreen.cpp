@@ -233,7 +233,6 @@ void SplashScreen_Free() {
 // Unloads textures and destroys fonts. Called when leaving this game state.
 void SplashScreen_Unload() {
     AssetManager::UnloadAllTextures();
-    load::NullExternPointers();
 
     if (splashFont >= 0) {
         AEGfxDestroyFont(splashFont);

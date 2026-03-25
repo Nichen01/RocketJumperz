@@ -74,5 +74,4 @@ void Pause_Free() {
 }
 void Pause_Unload() {
 	AssetManager::UnloadAllTextures();
-	load::NullExternPointers();
 }
