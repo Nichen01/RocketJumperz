@@ -1,22 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="AimingInterface.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="BinaryMap.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Projectile.cpp">
+    <ClCompile Include="DeathScreen.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Movement.cpp">
+    <ClCompile Include="DoorSystem.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="aimingInterface.cpp">
+    <ClCompile Include="Draw.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
+    <ClCompile Include="Drops.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="Enemies.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameover.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="GameStateManager.cpp">
@@ -25,84 +40,90 @@
     <ClCompile Include="Level1.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Draw.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemies.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="AimingInterface.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="BinaryMap.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Gameover.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Level2.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="LevelEditor.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Load.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="MainMenu.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Tutorial.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="DoorSystem.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="DeathScreen.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="PauseMenu.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="VictoryScreen.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="traps.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="drops.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Level3.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="LevelEditor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Load.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Movement.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseMenu.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="SplashScreen.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="traps.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Tutorial.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="VictoryScreen.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponSprite.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AimingInterface.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="BinaryMap.h">
+      <Filter>Header</Filter>
+    </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Movement.h">
+    <ClInclude Include="DeathScreen.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Projectile.h">
+    <ClInclude Include="DoorSystem.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="aimingInterface.h">
+    <ClInclude Include="Draw.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="player.h">
+    <ClInclude Include="Drops.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemies.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameover.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="GameStateList.h">
@@ -114,83 +135,64 @@
     <ClInclude Include="Level1.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Draw.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Enemies.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AimingInterface.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Load.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="BinaryMap.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Gameover.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Level2.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Main.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="ProjectileTest.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="MainMenu.h">
+    <ClInclude Include="Level3.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="LevelEditor.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Tutorial.h">
+    <ClInclude Include="Load.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="DoorSystem.h">
+    <ClInclude Include="Main.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="MainMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="AssetManager.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="DeathScreen.h">
+    <ClInclude Include="Movement.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="PauseMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="VictoryScreen.h">
+    <ClInclude Include="pch.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="drops.h">
+    <ClInclude Include="Player.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="SplashScreen.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="traps.h">
-    <ClInclude Include="Level3.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Tutorial.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="VictoryScreen.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponSprite.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Source">
-      <UniqueIdentifier>{775f9c68-a5f5-415a-81e7-584cc572af59}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header">
-      <UniqueIdentifier>{e9d790a9-e561-4702-a9e0-e08ba7778563}</UniqueIdentifier>
+      <UniqueIdentifier>{54d379a1-621d-4be2-a883-2226222dac9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{d5c432fb-5b8d-4584-9dc9-42cfd15a94a4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

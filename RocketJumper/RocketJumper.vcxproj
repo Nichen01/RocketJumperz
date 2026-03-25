@@ -65,7 +65,6 @@
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
-    <ClInclude Include="ProjectileTest.h" />
     <ClInclude Include="Load.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Sound.h" />
