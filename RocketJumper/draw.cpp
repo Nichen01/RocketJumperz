@@ -136,7 +136,7 @@ namespace renderlogic {
 					AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
 					break;
 				}
-				case 50: //trap1
+				case 50: // suction trap
 					drawGlass(row, col, mapS, platformMesh);
 					AEGfxTextureSet(trap2, 0, 0);
 					//AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
@@ -144,7 +144,7 @@ namespace renderlogic {
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 					break;
-				case 51: //trap2 -- animated saw blade
+				case 51: // animated saw blade
 				{
 					drawGlass(row, col, mapS, platformMesh);
 
