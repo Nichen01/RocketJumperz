@@ -353,16 +353,16 @@ namespace renderlogic {
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
 		if (wire == 0) {
-			AEGfxTextureSet(inventory, 0, 0);
-		}
-		else if (wire == 1) {
 			AEGfxTextureSet(wireInventory0, 0, 0);
 		}
-		else if (wire == 2) {
+		else if (wire == 1) {
 			AEGfxTextureSet(wireInventory1, 0, 0);
 		}
-		else if (wire == 3) {
+		else if (wire == 2) {
 			AEGfxTextureSet(wireInventory2, 0, 0);
+		}
+		else if (wire == 3) {
+			AEGfxTextureSet(wireInventory3, 0, 0);
 		}
 		
 		AEGfxSetTransform(uiTransf.m);

@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "AssetManager.h"
 #include "Level1.h"
-#include "aimingInterface.h"
+#include "AimingInterface.h"
 #include "WeaponSprite.h"
 #include "Drops.h"
 
