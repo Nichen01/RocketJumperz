@@ -69,9 +69,14 @@ namespace MenuHelpers {
     bool isMouseOverButton(const MenuButton& button) {
         s32 mouseX, mouseY;
         AEInputGetCursorPosition(&mouseX, &mouseY);
-        // Convert pixel cursor position to world coordinates using cached screen values
-        f32 worldMouseX = static_cast<f32>(mouseX) - halfW;
-        f32 worldMouseY = halfH - static_cast<f32>(mouseY);
+        // Convert pixel cursor position to world coordinates.
+        // Read from the global screen-size externs so this works from ANY
+        // game state (MainMenu, DeathScreen, VictoryScreen, etc.), not just
+        // when MainMenu_Init has run and populated the static locals.
+        f32 currentHalfW = static_cast<f32>(screenWidth)  / 2.0f;
+        f32 currentHalfH = static_cast<f32>(screenLength) / 2.0f;
+        f32 worldMouseX = static_cast<f32>(mouseX) - currentHalfW;
+        f32 worldMouseY = currentHalfH - static_cast<f32>(mouseY);
 
         f32 bHalfWidth  = (button.width  * button.scale) / 2.0f;
         f32 bHalfHeight = (button.height * button.scale) / 2.0f;
@@ -167,8 +172,11 @@ namespace MenuHelpers {
         // Convert world coordinates to normalized coordinates for AEGfxPrint.
         // AEGfxPrint uses [-1, 1] range where (-1,-1) = bottom-left, (1,1) = top-right.
         // Our world coords have (0,0) = center, so dividing by half-screen gives normalized.
-        f32 normalizedX = x / halfW;
-        f32 normalizedY = y / halfH;
+        // Read from the global externs so this works from any game state.
+        f32 currentHalfW = static_cast<f32>(screenWidth)  / 2.0f;
+        f32 currentHalfH = static_cast<f32>(screenLength) / 2.0f;
+        f32 normalizedX = x / currentHalfW;
+        f32 normalizedY = y / currentHalfH;
 
         // Center the text by offsetting half the text dimensions
         f32 printX = normalizedX - textWidth  / 2.0f;

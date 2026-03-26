@@ -347,7 +347,7 @@ void Level1_Update()
 	}
 
 	// Update all active projectiles
-	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
@@ -361,7 +361,7 @@ void Level1_Update()
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
-	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	// Tick down the player's invincibility timer each frame
 	UpdatePlayerInvincibility(objectinfo1[player], dt);
@@ -508,10 +508,29 @@ void Level1_Draw()
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	if (objectinfo1[player].invincibilityTimer > 0.0f) {
+		// Tint the player red. (Red=1.0, Green=0.2, Blue=0.2 for a nice hit flash)
+		//AEGfxSetColorToMultiply(1.0f, 0.2f, 0.2f, 1.0f);
+
+		// Optional: If you want it to rapidly blink red and normal, you can use sin() math instead!
+		 if (sinf(objectinfo1[player].invincibilityTimer * 40.0f) > 0.0f) {
+		     AEGfxSetColorToMultiply(1.0f, 0.2f, 0.2f, 1.0f);
+		 } else {
+		     AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		 }
+	}
+	else {
+		// Normal color
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	AEGfxTextureSet(characterPictest, 0, 0);
+
+
 	// Flip sprite horizontally when the player is aiming left.
 	// Negating xScale mirrors the quad along the Y axis.
 	f32 playerDrawScaleX = movement::playerFacingLeft

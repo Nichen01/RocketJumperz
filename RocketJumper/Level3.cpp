@@ -333,7 +333,7 @@ void Level3_Update()
 	}
 
 	// Update all active projectiles
-	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
@@ -347,7 +347,7 @@ void Level3_Update()
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
-	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	// Tick down the player's invincibility timer each frame
 	UpdatePlayerInvincibility(objectinfo3[player], dt);

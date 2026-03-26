@@ -19,9 +19,6 @@
     <ClCompile Include="Drops.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Enemies.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Gameover.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -40,16 +37,10 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Projectile.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="SplashScreen.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="traps.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="VictoryScreen.cpp">
@@ -90,6 +81,15 @@
     </ClCompile>
     <ClCompile Include="Draw.cpp">
       <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemies.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="traps.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -28,8 +28,12 @@ namespace projectileSystem {
         AEAudio attackSound,
         AEAudioGroup sfxGroup);
 
-    // Update all active projectiles (movement, bounds checking)
-    void UpdateProjectiles(Projectile projectiles[], s32 maxCount);
+    // Update all active projectiles (movement, bounds checking, wall collision)
+    // map      = 1D tile array (same one passed to Collision_movement)
+    // mapX     = number of tile columns
+    // mapS     = tile size in pixels (e.g. 80)
+    void UpdateProjectiles(Projectile projectiles[], s32 maxCount,
+        int map[], int mapX, int mapS);
 
     // Render all active projectiles to screen
     void renderProjectiles(Projectile projectiles[], s32 maxCount, AEGfxTexture* texture,

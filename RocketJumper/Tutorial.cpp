@@ -246,7 +246,7 @@ void Tutorial_Update()
 	}
 
 	// Update all active projectiles
-	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
@@ -259,7 +259,7 @@ void Tutorial_Update()
 		dt, LaserBlast, soundEffects);
 
 	// Update enemy projectiles
-	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	// Tick down the player's invincibility timer each frame
 	UpdatePlayerInvincibility(objectinfoTut[player], dt);
