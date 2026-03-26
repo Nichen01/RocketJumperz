@@ -156,6 +156,9 @@ enum TextureID {
     // Instructions menu full-screen image
     TEX_INSTRUCTIONS_MENU,
 
+    // Health pack drop
+    TEX_HEALTH,
+
     // Add new textures above this line
     TEX_MAX
 };

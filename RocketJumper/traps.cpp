@@ -64,8 +64,8 @@ namespace traps {
 		f32 dx = player.xPos - trapX;
 		f32 dy = player.yPos - trapY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		player.velocityX -= dx / dist * (trapSuction * 0.2f);
-		player.velocityY -= dy / dist * (trapSuction * 0.2f);
+		player.velocityX -= dx / dist * (trapSuction * 0.22f);
+		player.velocityY -= dy / dist * (trapSuction * 0.22f);
 		
 	}
 	void updateTraps(Enemy enemies[],objectsquares objectinfo[],int* map,int x, int y, float s) {

@@ -24,6 +24,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* menuTex = NULL, * buttonTex = NULL;
 	AEGfxTexture* backgroundTex = NULL;
 	AEGfxTexture* ammoDrop = NULL;
+	AEGfxTexture* healthDrop = NULL;
 
 	int keyX{}, keyY{};
 
@@ -56,6 +57,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
 		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
 		AssetManager::LoadTexture(TEX_DROP, "Assets/bullets.png");
+		AssetManager::LoadTexture(TEX_HEALTH, "Assets/health.png");
 
 		// Saw trap spritesheet (1 row, 7 cols spinning saw blade)
 		AssetManager::LoadTexture(TEX_SAW, "Assets/Traps/saw.png");
@@ -78,7 +80,8 @@ namespace load {
 		eyeTrap = AssetManager::GetTexture(TEX_EYETRAP);
 		sawTrap = AssetManager::GetTexture(TEX_SAW);
 		trapBeam = AssetManager::GetTexture(TEX_TRAPBEAM);
-		ammoDrop= AssetManager::GetTexture(TEX_DROP);
+		ammoDrop   = AssetManager::GetTexture(TEX_DROP);
+		healthDrop = AssetManager::GetTexture(TEX_HEALTH);
 	}
 
 	void ui() {

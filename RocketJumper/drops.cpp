@@ -4,17 +4,20 @@
 #include "movement.h"
 #include "AssetManager.h"
 #include "Load.h"
+#include "Sound.h"
 #include <cstdlib>   // rand()
 #include <cmath>     // sinf()
 
 namespace pickup {
 	AEMtx33 dropTransform = { 0 };
+	static const f32 kPi = 3.14159f;
+
 	void initDrops(drop instance[], int max,f32 scale) {
 		for (int i{};i < max;i++) {
 			instance[i].info.xScale = scale;
 			instance[i].info.yScale = scale;
 			instance[i].info.flag = 0;
-
+			instance[i].type = DROP_AMMO;
 		}
 	}
 	void updateDrops(drop instance[],int max,objectsquares& player) {
@@ -22,23 +25,49 @@ namespace pickup {
 			if (instance[i].info.flag == 0) continue;
 			else if (gamelogic::static_collision(&player, &instance[i].info)) {
 				instance[i].info.flag = 0;
-				movement::bulletCount += 25;
-				player.health += 50;
-
+				if (instance[i].type == DROP_HEALTH) {
+					player.health += 50;
+				} else {
+					movement::bulletCount += 25;
+				}
+				AEAudioPlay(Pickup, soundEffects, 1.0f, 1.0f, 0);
 			}
 		}
 	}
 	void drawDrops(drop instance[], int max) {
-		AEGfxTextureSet(ammoDrop, 0, 0);
-		for (int i{};i < max;i++) {
+		static f32 bobTimer = 0.0f;
+		f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+		bobTimer += dt;
+
+		const f32 bobPixels    = 5.0f;
+		const f32 bobFrequency = 1.0f;
+
+		AEGfxTexture* ammoTex   = AssetManager::GetTexture(TEX_DROP);
+		AEGfxTexture* healthTex = AssetManager::GetTexture(TEX_HEALTH);
+
+		for (int i{}; i < max; i++) {
 			if (instance[i].info.flag == 0) continue;
-			else {
-				renderlogic::drawSquare(instance[i].info.xPos, instance[i].info.yPos, instance[i].info.xScale, instance[i].info.xScale);
-				AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-				//printf("\n\ndrawn drop:%d\n\n", i);
-			}
+
+			AEGfxTexture* tex = (instance[i].type == DROP_HEALTH) ? healthTex : ammoTex;
+			if (!tex) continue;
+
+			f32 yOffset = sinf(bobTimer * bobFrequency * 2.0f * kPi) * bobPixels;
+
+			AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+			AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+			AEGfxTextureSet(tex, 0.0f, 0.0f);
+
+			renderlogic::drawSquare(
+				instance[i].info.xPos,
+				instance[i].info.yPos + yOffset,
+				instance[i].info.xScale,
+				instance[i].info.yScale);
+			AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 		}
-		// Reset color state so subsequent draw calls are not tinted green
+
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
 	// ====================================================================
@@ -53,9 +82,6 @@ namespace pickup {
 	// Probability that the FIRST kill drops a wire (50%).
 	// If the first kill misses, the second kill is guaranteed.
 	static const int kWireDropChancePercent = 50;
-
-	// Pi constant for the floating animation
-	static const f32 kPi = 3.14159f;
 
 	// ---- ResetWireDropTracker ----
 	// Call at the start of every level Initialize so the chance logic
@@ -149,6 +175,7 @@ namespace pickup {
 					wireCount++;
 					printf("Wire collected! Total wires: %d / 3\n", wireCount);
 				}
+				AEAudioPlay(Pickup, soundEffects, 1.0f, 1.0f, 0);
 			}
 		}
 	}

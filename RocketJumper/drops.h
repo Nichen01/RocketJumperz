@@ -1,7 +1,14 @@
 #pragma once
 #include "player.h"
+
+enum DropType {
+	DROP_AMMO,
+	DROP_HEALTH
+};
+
 struct drop {
 	objectsquares info;
+	DropType type;
 };
 
 // ---- Wire Drop System ----
