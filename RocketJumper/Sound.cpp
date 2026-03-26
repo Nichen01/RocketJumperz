@@ -6,6 +6,7 @@ AEAudio Punch;
 AEAudio Error;
 AEAudio Pickup;
 AEAudio ArrowSound;
+AEAudio GravityToggle;
 AEAudio MainMenu;
 AEAudioGroup bgm;
 AEAudioGroup soundEffects;
@@ -25,6 +26,7 @@ namespace audio {
 		Error = AEAudioLoadSound("Assets/Sounds/Error.wav");
 		Pickup = AEAudioLoadSound("Assets/Sounds/Pickup.wav");
 		ArrowSound = AEAudioLoadSound("Assets/Sounds/ArrowSound.wav");
+		GravityToggle = AEAudioLoadSound("Assets/Sounds/gravity.mp3");
 		soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
 	}
@@ -38,6 +40,7 @@ namespace audio {
 		AEAudioUnloadAudio(Error);
 		AEAudioUnloadAudio(Pickup);
 		AEAudioUnloadAudio(ArrowSound);
+		AEAudioUnloadAudio(GravityToggle);
 		AEAudioUnloadAudio(MainMenu);
 		AEAudioUnloadAudioGroup(bgm);
 		AEAudioUnloadAudioGroup(soundEffects);

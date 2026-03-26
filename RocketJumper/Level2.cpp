@@ -519,23 +519,66 @@ void Level2_Draw()
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo2[player].xPos, objectinfo2[player].yPos - 40.f);
 
-	// ====== HUD: Player Health Display ======//
+	// ====== HUD: Health, Ammo, Weapon, Gravity ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
 	if (fontLevel2 >= 0)
 	{
-		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo2[player].health);
+		// ---- Health icon + number (top-left) ----
+		f32 halfW = static_cast<f32>(AEGfxGetWindowWidth())  * 0.5f;
+		f32 halfH = static_cast<f32>(AEGfxGetWindowHeight()) * 0.5f;
 
-		// Prepare render state for font (font uses a glyph texture atlas)
+		f32 healthIconX = -halfW + 40.f;
+		f32 healthIconY =  halfH - 40.f;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(healthIconX, healthIconY, healthDrop, uiMesh, 30.f, 30.f);
+
+		char healthText[32];
+		snprintf(healthText, sizeof(healthText), "%d", objectinfo2[player].health);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel2, healthText, -0.88f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
-		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel2, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// ---- Ammo icon + count (right beside health) ----
+		f32 ammoIconX = healthIconX + 130.f;
+		f32 ammoIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(ammoIconX, ammoIconY, ammoDrop, uiMesh, 30.f, 30.f);
 
+		char ammoText[32];
+		snprintf(ammoText, sizeof(ammoText), "%d", movement::bulletCount);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel2, ammoText, -0.72f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+
+		// ---- Current weapon sprite (below health row) ----
+		AEGfxTexture* weaponIcon = (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN)
+			? AssetManager::GetTexture(TEX_SHOTGUN)
+			: AssetManager::GetTexture(TEX_PLASMA_GUN);
+		f32 weaponIconX = healthIconX;
+		f32 weaponIconY = healthIconY - 40.f;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 50.f, 30.f);
+
+		// ---- Gravity indicator (top center) ----
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		if (movement::enableGravity) {
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel2, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+		}
+		else {
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel2, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		}
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //

@@ -141,7 +141,7 @@ void Level1_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
 	weaponSprite::Load();
 }
 
@@ -313,7 +313,7 @@ void Level1_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo1[player]);
 	movement::UpdatePlayerFacing(objectinfo1[player]);
-	aiming::updateAiming(objectinfo1[player]);
+	//aiming::updateAiming(objectinfo1[player]);
 	weaponSprite::Update(objectinfo1[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo1[player]);
@@ -539,7 +539,7 @@ void Level1_Draw()
 	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
 		playerDrawScaleX, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -551,28 +551,74 @@ void Level1_Draw()
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo1[player].xPos, objectinfo1[player].yPos - 40.f);
 
-	// ====== HUD: Player Health Display ======//
+	// ====== HUD: Health, Ammo, Weapon, Gravity ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
 	if (fontLevel1 >= 0)
 	{
-		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo1[player].health);
+		// ---- Health icon + number (top-left) ----
+		// Render a small health sprite to the left of the health number
+		f32 halfW = static_cast<f32>(AEGfxGetWindowWidth())  * 0.5f;
+		f32 halfH = static_cast<f32>(AEGfxGetWindowHeight()) * 0.5f;
 
-		// Prepare render state for font (font uses a glyph texture atlas)
+		// Health icon at top-left (world coords from normalized -0.93, 0.88)
+		f32 healthIconX = -halfW + 40.f;   // 40px from left edge
+		f32 healthIconY =  halfH - 40.f;   // 40px from top edge
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(healthIconX, healthIconY, healthDrop, uiMesh, 30.f, 30.f);
+
+		// Health number text right of the icon
+		char healthText[32];
+		snprintf(healthText, sizeof(healthText), "%d", objectinfo1[player].health);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel1, healthText, -0.88f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
-		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// ---- Ammo icon + count (right beside health) ----
+		f32 ammoIconX = healthIconX + 130.f;  // offset to the right of health
+		f32 ammoIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(ammoIconX, ammoIconY, ammoDrop, uiMesh, 30.f, 30.f);
 
-		// Show the currently equipped weapon below the health display
-		const char* weaponName = (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN)
-			? "Weapon: Shotgun"
-			: "Weapon: Plasma";
-		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// Ammo count text right of the ammo icon
+		char ammoText[32];
+		snprintf(ammoText, sizeof(ammoText), "%d", movement::bulletCount);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel1, ammoText, -0.72f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+
+		// ---- Current weapon sprite (below health row) ----
+		// Show the sprite of the currently equipped weapon
+		AEGfxTexture* weaponIcon = (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN)
+			? AssetManager::GetTexture(TEX_SHOTGUN)
+			: AssetManager::GetTexture(TEX_PLASMA_GUN);
+		f32 weaponIconX = healthIconX;
+		f32 weaponIconY = healthIconY - 40.f;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 50.f, 30.f);
+
+		// ---- Gravity indicator (top center) ----
+		// Text changes colour: Green when gravity is ON, Red when OFF
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		if (movement::enableGravity) {
+			// Green text -- gravity is active
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+		}
+		else {
+			// Red text -- gravity is disabled
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		}
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //
@@ -629,7 +675,7 @@ void Level1_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
+	//aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 

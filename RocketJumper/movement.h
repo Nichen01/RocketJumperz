@@ -17,6 +17,10 @@ namespace movement {
     constexpr f32 GRAVITY = 0.4f;
     extern int bulletCount;
 
+    // True when gravity is currently active (toggled with G key).
+    // Used by the HUD to display red/green gravity indicator.
+    extern bool enableGravity;
+
     // True when the player's aim direction points to the left (mouse is left of player).
     // Updated each frame by UpdatePlayerFacing(). Used by draw code to flip the sprite.
     extern bool playerFacingLeft;
