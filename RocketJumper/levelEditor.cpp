@@ -170,8 +170,8 @@ void LevelEditor_Load() {
 	AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
 	AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
-	AssetManager::LoadTexture(TEX_TRAP1, "Assets/Items/eye.png");
-	AssetManager::LoadTexture(TEX_TRAP2, "Assets/Items/spike.png");
+	AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
+	AssetManager::LoadTexture(TEX_SAW, "Assets/Items/saw.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 
@@ -187,8 +187,8 @@ void LevelEditor_Load() {
 	tileTextures[9] = AssetManager::GetTexture(TEX_STATIC_DOOR);
 	tileTextures[10] = AssetManager::GetTexture(TEX_KEYCARD);
 	tileTextures[11] = AssetManager::GetTexture(TEX_BROKENDOOR0);
-	tileTextures[12] = AssetManager::GetTexture(TEX_TRAP1);
-	tileTextures[13] = AssetManager::GetTexture(TEX_TRAP2);
+	tileTextures[12] = AssetManager::GetTexture(TEX_EYETRAP);
+	tileTextures[13] = AssetManager::GetTexture(TEX_SAW);
 	tileTextures[14] = AssetManager::GetTexture(TEX_RANGED_ENEMY);
 	tileTextures[15] = AssetManager::GetTexture(TEX_MELEE_ENEMY);
 }

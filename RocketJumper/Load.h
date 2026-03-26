@@ -16,7 +16,7 @@ extern AEGfxVertexList* buttonMesh;
 extern AEGfxTexture* ctrl1, *ctrl2, *leftArrow, *rightArrow, *leftClick, *rightClick, *eButton, *gButton, *sButton, *zButton, *button1, *button2, *button3, *spacebar;
 extern AEGfxTexture* platform1, * platform2, *platform3, *platform4, *platform5, *platform6, *platform7, *platform8, *platform9;
 extern AEGfxTexture* glass0, * glass1, * glass2, * glass3, * glass4;
-extern AEGfxTexture* trap1, * trap2, * trapBeam;
+extern AEGfxTexture* eyeTrap, * sawTrap, * trapBeam;
 extern AEGfxTexture* keyTexture;
 extern AEGfxTexture* errorPromptMenu, * redButton, * greenButton;
 extern AEGfxTexture* prompt1, * prompt2, * prompt3, * prompt4, * prompt5, * prompt6, * prompt7, * prompt8, * prompt9;

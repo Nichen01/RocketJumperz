@@ -14,7 +14,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
 	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
 	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
-	AEGfxTexture* trap1 = NULL, * trap2 = NULL, * trapBeam = NULL;
+	AEGfxTexture* eyeTrap = NULL, * sawTrap = NULL, * trapBeam = NULL;
 	AEGfxTexture* keyTexture = NULL;
 	AEGfxTexture* errorPromptMenu = NULL, * redButton = NULL, * greenButton = NULL;
 	AEGfxTexture* prompt1 = NULL, * prompt2 = NULL, * prompt3 = NULL, * prompt4 = NULL, * prompt5 = NULL, * prompt6 = NULL, * prompt7 = NULL, * prompt8 = NULL, * prompt9 = NULL;
@@ -52,8 +52,8 @@ namespace load {
 		AssetManager::LoadTexture(TEX_GLASS2, "Assets/Platform/glass2.jpg");
 		AssetManager::LoadTexture(TEX_GLASS3, "Assets/Platform/glass3.jpg");
 		AssetManager::LoadTexture(TEX_GLASS4, "Assets/Platform/glass4.jpg");
-		AssetManager::LoadTexture(TEX_TRAP1, "Assets/Items/spike.png");
-		AssetManager::LoadTexture(TEX_TRAP2, "Assets/Items/eye.png");
+		AssetManager::LoadTexture(TEX_SAW, "Assets/Items/saw.png");
+		AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
 		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
 		AssetManager::LoadTexture(TEX_DROP, "Assets/bullets.png");
 
@@ -75,8 +75,8 @@ namespace load {
 		glass2 = AssetManager::GetTexture(TEX_GLASS2);
 		glass3 = AssetManager::GetTexture(TEX_GLASS3);
 		glass4 = AssetManager::GetTexture(TEX_GLASS4);
-		trap1 = AssetManager::GetTexture(TEX_TRAP1);
-		trap2 = AssetManager::GetTexture(TEX_TRAP2);
+		eyeTrap = AssetManager::GetTexture(TEX_EYETRAP);
+		sawTrap = AssetManager::GetTexture(TEX_SAW);
 		trapBeam = AssetManager::GetTexture(TEX_TRAPBEAM);
 		ammoDrop= AssetManager::GetTexture(TEX_DROP);
 	}

@@ -36,8 +36,7 @@ enum TextureID {
     TEX_GLASS4,
 
     //trap tile textures
-    TEX_TRAP1,
-    TEX_TRAP2,
+    TEX_EYETRAP,
     TEX_TRAPBEAM,
 
     // UI textures

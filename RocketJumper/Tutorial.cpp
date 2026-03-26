@@ -167,7 +167,9 @@ void Tutorial_Initialize()
 
 void Tutorial_Update()
 {
-	//====== AUDIO CONTROLS ======
+	if (AEInputCheckCurr(AEVK_1)) next = GS_LEVEL1;
+
+	//====== AUDIO CONTROLS ======//
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
 		if (bgVolume <= 0.f)
