@@ -482,7 +482,7 @@ void DrawInstructionsMenu() {
         // width while keeping the aspect ratio readable and centered.
         // Image natural aspect ratio is approx 600:440 (~1.36:1).
         f32 imgW = scrW * 0.75f;                   // 75% of screen width
-        f32 imgH = imgW / 1.36f;                    // maintain ~1.36:1 aspect ratio
+        f32 imgH = imgW / 1.7f;                    // maintain ~1.36:1 aspect ratio
         f32 imgY = scrH * 0.06f;                    // nudge slightly above centre so the back button has room
 
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

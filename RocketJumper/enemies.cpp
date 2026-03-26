@@ -392,16 +392,20 @@ namespace enemySystem {
                     if (enemies[i].anim.justFinished)
                     {
                         enemies[i].isActive = 0;
-                        loot[i].info.xPos = enemies[i].shape.xPos;
-                        loot[i].info.yPos = enemies[i].shape.yPos;
-                        loot[i].info.flag = 1;
 
-                        // Attempt to spawn a wire drop at the enemy's death position.
-                        // The wire drop tracker handles the first-kill chance /
-                        // second-kill guarantee logic internally.
+                        // Attempt wire drop first -- wire takes priority over standard loot.
+                        bool wireDropped = false;
                         if (wireDrops && wireDropMax > 0)
-                            pickup::TrySpawnWireDrop(wireDrops, wireDropMax,
+                            wireDropped = pickup::TrySpawnWireDrop(wireDrops, wireDropMax,
                                 enemies[i].shape.xPos, enemies[i].shape.yPos);
+
+                        // Only spawn standard loot (health/ammo) if no wire was dropped.
+                        if (!wireDropped)
+                        {
+                            loot[i].info.xPos = enemies[i].shape.xPos;
+                            loot[i].info.yPos = enemies[i].shape.yPos;
+                            loot[i].info.flag = 1;
+                        }
 
                         printf("Enemy %d defeated!\n", i);
                     }
@@ -429,14 +433,20 @@ namespace enemySystem {
             else if (enemies[i].health <= 0.0f)
             {
                 enemies[i].isActive = 0;
-                loot[i].info.xPos = enemies[i].shape.xPos;
-                loot[i].info.yPos = enemies[i].shape.yPos;
-                loot[i].info.flag = 1;
 
-                // Attempt to spawn a wire drop at the melee enemy's death position.
+                // Attempt wire drop first -- wire takes priority over standard loot.
+                bool wireDropped = false;
                 if (wireDrops && wireDropMax > 0)
-                    pickup::TrySpawnWireDrop(wireDrops, wireDropMax,
+                    wireDropped = pickup::TrySpawnWireDrop(wireDrops, wireDropMax,
                         enemies[i].shape.xPos, enemies[i].shape.yPos);
+
+                // Only spawn standard loot (health/ammo) if no wire was dropped.
+                if (!wireDropped)
+                {
+                    loot[i].info.xPos = enemies[i].shape.xPos;
+                    loot[i].info.yPos = enemies[i].shape.yPos;
+                    loot[i].info.flag = 1;
+                }
 
                 printf("Enemy %d defeated!\n", i);
             }
