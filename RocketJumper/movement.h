@@ -14,7 +14,7 @@ namespace movement {
     constexpr f32 DRAG_COEFFICIENT = 0.97f;  // Air drag (0.92 = 8% speed loss per frame)
     constexpr f32 MIN_VELOCITY = 0.1f;       // Velocity threshold to stop completely
     constexpr f32 TERMINAL_VELOCITY = 10.f;    // Velocity will not increase pass this
-    constexpr f32 GRAVITY = 0.2f;
+    constexpr f32 GRAVITY = 0.4f;
     extern int bulletCount;
 
     // True when the player's aim direction points to the left (mouse is left of player).

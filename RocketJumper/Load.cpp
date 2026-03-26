@@ -25,6 +25,10 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* backgroundTex = NULL;
 	AEGfxTexture* ammoDrop = NULL;
 	AEGfxTexture* healthDrop = NULL;
+	AEGfxTexture* wallBg1 = NULL;
+	AEGfxTexture* borderTL = NULL, * borderT = NULL, * borderTR = NULL;
+	AEGfxTexture* borderCL = NULL, * borderCR = NULL;
+	AEGfxTexture* borderBL = NULL, * borderB = NULL, * borderBR = NULL;
 
 	int keyX{}, keyY{};
 
@@ -82,6 +86,30 @@ namespace load {
 		trapBeam = AssetManager::GetTexture(TEX_TRAPBEAM);
 		ammoDrop   = AssetManager::GetTexture(TEX_DROP);
 		healthDrop = AssetManager::GetTexture(TEX_HEALTH);
+
+		// Background wall tile (decorative, non-collidable)
+		AssetManager::LoadTexture(TEX_WALL_BG_1, "Assets/WallBackground.png");
+		wallBg1 = AssetManager::GetTexture(TEX_WALL_BG_1);
+
+		// Border tile textures (8 directional variants for wall borders)
+		AssetManager::LoadTexture(TEX_BORDER_TL, "Assets/Platform/borderTL.png");
+		AssetManager::LoadTexture(TEX_BORDER_T,  "Assets/Platform/borderT.png");
+		AssetManager::LoadTexture(TEX_BORDER_TR, "Assets/Platform/borderTR.png");
+		AssetManager::LoadTexture(TEX_BORDER_CL, "Assets/Platform/borderCL.png");
+		AssetManager::LoadTexture(TEX_BORDER_CR, "Assets/Platform/borderCR.png");
+		AssetManager::LoadTexture(TEX_BORDER_BL, "Assets/Platform/borderBL.png");
+		AssetManager::LoadTexture(TEX_BORDER_B,  "Assets/Platform/borderB.png");
+		AssetManager::LoadTexture(TEX_BORDER_BR, "Assets/Platform/borderBR.png");
+
+		// Sync extern pointers for border textures
+		borderTL = AssetManager::GetTexture(TEX_BORDER_TL);
+		borderT  = AssetManager::GetTexture(TEX_BORDER_T);
+		borderTR = AssetManager::GetTexture(TEX_BORDER_TR);
+		borderCL = AssetManager::GetTexture(TEX_BORDER_CL);
+		borderCR = AssetManager::GetTexture(TEX_BORDER_CR);
+		borderBL = AssetManager::GetTexture(TEX_BORDER_BL);
+		borderB  = AssetManager::GetTexture(TEX_BORDER_B);
+		borderBR = AssetManager::GetTexture(TEX_BORDER_BR);
 	}
 
 	void ui() {
@@ -201,6 +229,11 @@ namespace load {
 	
 	void background() {
 		AssetManager::LoadTexture(TEX_BACKGROUND, "Assets/Map/background.jpg");
+		backgroundTex = AssetManager::GetTexture(TEX_BACKGROUND);
+	}
+
+	void background2() {
+		AssetManager::LoadTexture(TEX_BACKGROUND, "Assets/Map/background2.png");
 		backgroundTex = AssetManager::GetTexture(TEX_BACKGROUND);
 	}
 

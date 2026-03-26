@@ -179,7 +179,7 @@ int ImportMapDataFromFile(const char* FileName)
 
 
 			// assign random glass type if tile is "air"
-			if (value == 0 || (value >= 31 && value <= 39) || value == 67 || value == 81 || value == 82 || value == 50 || value == 51) {
+			if (value == 0 || (value >= 31 && value <= 39) || value == 67 || (value >= 70 && value <= 78) || value == 81 || value == 82 || value == 50 || value == 51) {
 				glassMap[row][col] = rand() % 5;
 			}
 			else {

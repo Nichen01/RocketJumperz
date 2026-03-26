@@ -149,6 +149,7 @@ enum TextureID {
     TEX_BUTTON,
 
     TEX_BACKGROUND,
+    TEX_BACKGROUND2,
 
     // Saw trap spritesheet (1 row, 7 columns)
     TEX_SAW,
@@ -158,6 +159,19 @@ enum TextureID {
 
     // Health pack drop
     TEX_HEALTH,
+
+    // Background wall tile (non-collidable, drawn over glass)
+    TEX_WALL_BG_1,
+
+    // Border tile textures (8 directional variants, used for wall borders)
+    TEX_BORDER_TL,  // top-left corner
+    TEX_BORDER_T,   // top edge
+    TEX_BORDER_TR,  // top-right corner
+    TEX_BORDER_CL,  // center-left edge
+    TEX_BORDER_CR,  // center-right edge
+    TEX_BORDER_BL,  // bottom-left corner
+    TEX_BORDER_B,   // bottom edge
+    TEX_BORDER_BR,  // bottom-right corner
 
     // Add new textures above this line
     TEX_MAX

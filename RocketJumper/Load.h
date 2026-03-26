@@ -25,6 +25,10 @@ extern AEGfxTexture* brokenDoor0, * brokenDoor1, * brokenDoor2;
 extern AEGfxTexture* wireInventory0, * wireInventory1, * wireInventory2;
 extern AEGfxTexture* menuTex, *buttonTex;
 extern AEGfxTexture* backgroundTex, * ammoDrop, * healthDrop;
+extern AEGfxTexture* wallBg1;
+extern AEGfxTexture* borderTL, * borderT, * borderTR;
+extern AEGfxTexture* borderCL, * borderCR;
+extern AEGfxTexture* borderBL, * borderB, * borderBR;
 
 extern int keyX, keyY;
 extern int brokenDoorX, brokenDoorY;
@@ -41,4 +45,6 @@ namespace load {
 	void cooldownBar();
 	void pauseMenu();
 	void background();
+	void background2();
+
 }
