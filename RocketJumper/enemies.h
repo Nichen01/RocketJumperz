@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "Player.h"
 #include "Projectile.h"
 #include "drops.h"
+#include "Animation.h"
 
 // Maximum number of enemies that can exist at once
 #define MAX_ENEMIES 10
@@ -25,6 +26,14 @@ Technology is prohibited.
 enum EnemyType {
     ENEMY_MELEE,   // Chases player and damages on contact
     ENEMY_RANGED   // Shoots projectiles at player when in range
+};
+
+// State machine states for enemy animation and behavior
+enum EnemyState {
+    STATE_IDLE,    // Standing still, not moving
+    STATE_MOVING,  // Walking / patrolling
+    STATE_ATTACK,  // Playing attack animation
+    STATE_DEATH    // Playing death animation before despawn
 };
 
 // Enemy structure
@@ -41,8 +50,13 @@ struct Enemy {
     s8 isActive;             // Is this enemy slot active?
     s8 hasLineOfSight;       // Can enemy see player?
 
-    s32 currentFrame;        // current frame index
-    f32 frameTimer;          // timer for frame switching
+    s32 currentFrame;        // current frame index (legacy, kept for melee)
+    f32 frameTimer;          // timer for frame switching (legacy, kept for melee)
+
+    // --- Per-enemy animation state (used by ENEMY_RANGED) ---
+    EnemyState state;        // Current state in the state machine
+    s8 facingRight;          // 1 = facing right, 0 = facing left
+    SpriteAnimation anim;   // Individual animation data for this enemy
 };
 
 namespace enemySystem {
@@ -54,7 +68,7 @@ namespace enemySystem {
     constexpr f32 MELEE_ATTACK_COOLDOWN = 1.0f;  // Seconds between attacks
     constexpr f32 MELEE_DAMAGE = 15.0f;
 
-    constexpr f32 RANGED_DETECTION_RANGE = 700.0f;
+    constexpr f32 RANGED_DETECTION_RANGE = 415.0f;
     constexpr f32 RANGED_ATTACK_RANGE = 600.0f;
     constexpr f32 RANGED_MOVE_SPEED = 1.5f;
     constexpr f32 RANGED_HEALTH = 30.0f;
@@ -69,19 +83,21 @@ namespace enemySystem {
     s8 spawnEnemy(Enemy enemies[], s32 maxCount,
         EnemyType type, f32 xPos, f32 yPos);
 
-    // Update all active enemies (AI, movement, attacks)
+    // Update all active enemies (AI, movement, attacks).
+    // wireDrops/wireDropMax: array for wire item drops on enemy death.
     void updateEnemies(Enemy enemies[], s32 maxCount,
         objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
-        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup);
+        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup,
+        WireDrop wireDrops[] = nullptr, s32 wireDropMax = 0);
 
     // Render all active enemies
     void renderEnemies(Enemy enemies[],
         s32 maxCount,
         AEGfxVertexList* meleeMesh,
         AEGfxVertexList* rangedMesh,
-        AEGfxTexture* meleeTexture,
-        AEGfxTexture* rangedTexture,
+        AEGfxTexture* meleeTexture = nullptr,
+        AEGfxTexture* rangedTexture = nullptr,
         f32 meleeUOffset = 0.0f,
         f32 meleeVoffset = 0.0f);
 
@@ -97,6 +113,10 @@ namespace enemySystem {
     // Check if enemy projectiles hit the player. Returns total damage dealt.
     f32 checkEnemyPlayerProjectileCollision(Projectile enemyProjectiles[],
         s32 maxProjectiles, objectsquares& player);
+
+    // Set the enemy's animation state (ranged only). Re-initializes the
+    // SpriteAnimation when the state actually changes.
+    void SetEnemyState(Enemy& enemy, EnemyState newState);
 
     // Helper: Calculate distance between two points
     f32 getDistance(f32 x1, f32 y1, f32 x2, f32 y2);

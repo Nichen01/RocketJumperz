@@ -15,16 +15,18 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 enum GS_STATES
 {
-	GS_TEST = 0,
+	GS_SPLASH = 0,
+	GS_TEST,
 	GS_PROJECTILE_TEST,
 	GS_MAINMENU,
 	GS_TUTORIAL,
 	GS_LEVEL1,
 	GS_LEVEL2,
+	GS_LEVEL3,
 	GS_LEVELEDITOR,
 	GS_VICTORY,
 	GS_DEATH,
 	GS_QUIT,
 	GS_GAMEOVER,
-	GS_RESTART
+	GS_RESTART,
 };

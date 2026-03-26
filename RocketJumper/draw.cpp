@@ -1,10 +1,12 @@
 #include "Draw.h"
-#include "AEGraphics.h"
-#include "BinaryMap.h"
+#include "traps.h"
+#include "AssetManager.h"
 
 // Global texture pointers -- declared extern in draw.h, defined here
 AEGfxTexture* characterPictest = NULL;
 AEGfxTexture* plasma = NULL;
+
+Enemy enemies[MAX_ENEMIES];
 
 f32 doorX, doorY;
 s32  doorFrameCount = 7;
@@ -16,6 +18,8 @@ SpriteAnimation  doorAnim;
 AEGfxVertexList* doorMesh;
 bool doorIsOpen = false; // tracks fully-open state
 AEGfxTexture* doorTex;
+
+static f32 pi = static_cast<f32>(3.14159);
 
 namespace renderlogic {
 
@@ -53,24 +57,7 @@ namespace renderlogic {
 
 				switch (MapData[row][col]) {
 				case 0: // air tile
-				{
-					int glassType = glassMap[row][col];
-					if (glassType >= 0) {
-						AEGfxSetTransparency(0.4f);
-						switch (glassType) {
-						case 0: AEGfxTextureSet(glass0, 0, 0); break;
-						case 1: AEGfxTextureSet(glass1, 0, 0); break;
-						case 2: AEGfxTextureSet(glass2, 0, 0); break;
-						case 3: AEGfxTextureSet(glass3, 0, 0); break;
-						case 4: AEGfxTextureSet(glass4, 0, 0); break;
-						}
-						renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f,
-							450.0f - ((float)yo + mapS / 2),
-							(float)mapS, (float)mapS);
-						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
-						AEGfxSetTransparency(1.f);
-					}
-				}
+					drawGlass(row, col, mapS, platformMesh);
 				break;
 				case 11: // platform1
 					AEGfxTextureSet(platform1, 0, 0);
@@ -126,7 +113,7 @@ namespace renderlogic {
 					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
 					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					break;
-				case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29:
+				case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29: // door
 				{
 					if (!doorMesh || !doorTex) break;  // safety guard
 					// Find the matching door for this tile position
@@ -135,9 +122,7 @@ namespace renderlogic {
 
 					f32 uOffset = 0.f; // default to frame 0
 					for (auto& door : doors) {
-						// Match this tile to the correct door by position,
-						// using currentGameLevel so it works on every level.
-						if ((door.firstLevel == currentGameLevel || door.secondLevel == currentGameLevel) &&
+						if ((door.entranceLevel == currentGameLevel || door.exitLevel == currentGameLevel) &&
 							fabsf(door.worldX - tileWorldX) < 1.f &&
 							fabsf(door.worldY - tileWorldY) < 1.f)
 						{
@@ -151,6 +136,59 @@ namespace renderlogic {
 					AEGfxMeshDraw(doorMesh, AE_GFX_MDM_TRIANGLES);
 					break;
 				}
+				case 50: // suction trap
+					drawGlass(row, col, mapS, platformMesh);
+					AEGfxTextureSet(eyeTrap, 0, 0);
+					//AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f);
+					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					break;
+				case 51: // animated saw blade
+				{
+					drawGlass(row, col, mapS, platformMesh);
+
+					// Get the saw spritesheet texture and mesh from AssetManager
+					AEGfxTexture*    sawTex  = AssetManager::GetTexture(TEX_SAW);
+					AEGfxVertexList* sawMesh = AssetManager::GetMesh(MESH_SAW);
+
+					// Fall back to static trap2 texture if saw assets aren't loaded yet
+					if (sawTex && sawMesh) {
+						AEGfxTextureSet(sawTex, traps::GetSawUOffset(), 0.0f);
+						renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+						AEGfxMeshDraw(sawMesh, AE_GFX_MDM_TRIANGLES);
+					}
+					else {
+						AEGfxTextureSet(sawTrap, 0, 0);
+						renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					}
+					break;
+				}
+				case 67: // key
+					drawGlass(row, col, mapS, platformMesh);
+
+					if (key.active) { // floating key
+						static f32 timer = 0.f;
+						f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+						timer += dt;
+
+						// Moves up and down
+						f32 pixel = 5.f;   // pixels
+						f32 frequency = 1.f;   // cycles per second
+						f32 yOffset = sinf(timer * frequency * 2.f * pi) * pixel;
+
+						f32 xPos = ((float)xo + mapS / 2) - AEGfxGetWindowWidth() / 2;
+						f32 yPos = AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2) + yOffset;
+
+						AEGfxTextureSet(keyTexture, 0, 0);
+						renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					}
+					break;
+				case 81: case 82: // enemy
+					drawGlass(row, col, mapS, platformMesh);
+					break;
 				default: //defaults to playable area
 					break;
 				}
@@ -178,9 +216,10 @@ namespace renderlogic {
 
 	}
 
-	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale) {
+	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX, f32 scaleY) {
+		if (!textureAsset) return;
 		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
-		AEMtx33Scale(&uiScl, scale, scale);
+		AEMtx33Scale(&uiScl, scaleX, scaleY);
 		AEMtx33Rot(&uiRot, 0);
 		
 		AEMtx33Trans(&uiTransl, x, y);
@@ -189,7 +228,7 @@ namespace renderlogic {
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxTextureSet(textureAsset, 0, 0);
 		AEGfxSetTransform(uiTransf.m);
-		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 	}
 
 	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale = 40.f) {
@@ -209,6 +248,85 @@ namespace renderlogic {
 		drawSquare(x, y, scale, scale);
 		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 		AEGfxSetTransparency(1.f);  // reset transparency after drawing
+	}
+
+	// Draw glass only if the current cell has a valid glass type
+	void drawGlass(int row, int col, int mapS, AEGfxVertexList* mesh) {
+		int glassType = glassMap[row][col];
+		if (glassType < 0) return; // skip if no glass assigned
+
+		// Semi-transparent overlay
+		AEGfxSetTransparency(0.4f);
+
+		// Select texture based on type
+		switch (glassType) {
+		case 0: AEGfxTextureSet(glass0, 0, 0); break;
+		case 1: AEGfxTextureSet(glass1, 0, 0); break;
+		case 2: AEGfxTextureSet(glass2, 0, 0); break;
+		case 3: AEGfxTextureSet(glass3, 0, 0); break;
+		case 4: AEGfxTextureSet(glass4, 0, 0); break;
+		}
+
+		// Position square in world space
+		float xPos = (col * mapS + mapS / 2.0f) - 800.0f;
+		float yPos = 450.0f - (row * mapS + mapS / 2.0f);
+
+		renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+		// Reset transparency so later draws aren�t affected
+		AEGfxSetTransparency(1.0f);
+	}
+
+	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale) {
+		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
+		AEMtx33Scale(&uiScl, scale, scale);
+		AEMtx33Rot(&uiRot, 0);
+
+		AEMtx33Trans(&uiTransl, x, y);
+		AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
+		AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxTextureSet(textureAsset, 0, 0);
+		AEGfxSetTransform(uiTransf.m);
+		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
+	void drawWireInventory(int wire) {
+		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
+		AEMtx33Scale(&uiScl, 100.f, 100.f);
+		AEMtx33Rot(&uiRot, 0);
+
+		AEMtx33Trans(&uiTransl, -650.f, -400.f);
+		AEMtx33Concat(&uiTransf, &uiRot, &uiScl);
+		AEMtx33Concat(&uiTransf, &uiTransl, &uiTransf);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+		if (wire == 0) {
+			AEGfxTextureSet(inventory, 0, 0);
+		}
+		else if (wire == 1) {
+			AEGfxTextureSet(wireInventory0, 0, 0);
+		}
+		else if (wire == 2) {
+			AEGfxTextureSet(wireInventory1, 0, 0);
+		}
+		else if (wire == 3) {
+			AEGfxTextureSet(wireInventory2, 0, 0);
+		}
+		
+		AEGfxSetTransform(uiTransf.m);
+		AEGfxMeshDraw(uiMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
+	void drawCooldownHUD(f32 x, f32 y) {
+		int totalFrames = 40;
+		int numImages = 6;
+
+		int frameIndex = (movement::jetPackCooldown * numImages) / totalFrames;
+		if (frameIndex >= numImages) frameIndex = numImages - 1;
+
+		renderlogic::drawTexture(x, y, cooldownFrame[frameIndex], uiMesh, 100.f, 100.f);
 	}
 }
 

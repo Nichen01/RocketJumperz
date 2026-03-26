@@ -1,5 +1,6 @@
 #include "DeathScreen.h"
 #include "Draw.h"
+#include "movement.h"
 static s8 deathfont = -1;
 static f32 width, height;
 
@@ -9,11 +10,11 @@ static MenuButton restartButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
 
-static AEGfxVertexList* buttonMesh = nullptr;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
 static AEGfxTexture* menutex;
 static AEGfxTexture* buttontex;
+
 void DeathScreen_Load() {
     AEGfxMeshStart();
 
@@ -46,16 +47,13 @@ void DeathScreen_Load() {
     menutex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
     backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
-    if (!backgroundTexture) {
-        printf("Warning: MenuBackground.png not found. Using solid color background.\n");
-    }
 
     deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void DeathScreen_Init() {
     float buttonwidth = 390.0f;
     float buttonlength = 80.0f;
-    restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESUME", false };
+    restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESTART", false };
     tomenuButton = { 0.0f, -120.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
     exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
@@ -66,6 +64,7 @@ void DeathScreen_Update() {
 
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
+            movement::bulletCount = 10;
             next = GS_TUTORIAL;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");
         }

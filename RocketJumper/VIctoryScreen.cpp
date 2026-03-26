@@ -10,7 +10,6 @@ static MenuButton restartButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
 
-static AEGfxVertexList* buttonMesh = nullptr;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
 static AEGfxTexture* menutex;
@@ -48,6 +47,7 @@ void VictoryScreen_Load() {
     menutex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
     backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
+
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
     }
@@ -57,7 +57,7 @@ void VictoryScreen_Load() {
 void VictoryScreen_Init() {
     float buttonwidth = 390.0f;
     float buttonlength = 80.0f;
-    restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESUME", false };
+    restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESTART", false };
     tomenuButton = { 0.0f, -120.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
     exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
@@ -95,6 +95,7 @@ void VictoryScreen_Draw() {
     AEGfxGetPrintSize(victoryfont, "VICTORY", 1.f, &width, &height);
     AEGfxPrint(victoryfont, "VICTORY", -width / 2, 0.60f - height / 2, 1, 1, 1, 1, 1);
 
+   
 
     MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttontex);
     MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttontex);

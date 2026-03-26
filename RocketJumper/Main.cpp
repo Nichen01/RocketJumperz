@@ -13,6 +13,7 @@
 
 bool pause = false;
 bool canpause = true;
+
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -28,7 +29,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		return 0;
 	}
-
+	//AESysSetFullScreen(1);
 	// Using custom window procedure
 	//int gGameRunning = 1;
 
@@ -40,11 +41,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// reset the system modules
 	AESysReset();
 	printf("Team project test\n");
-
-	GSM_Initialize(GS_TUTORIAL);
+	
+	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
 	{
+		if (current == GS_SPLASH) {
+			canpause = false;
+		}
 		if (current == GS_MAINMENU) {
 			canpause = false;
 		}
@@ -54,12 +58,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (current == GS_DEATH) {
 			canpause = false;
 		}
+		if (current == GS_LEVELEDITOR) {
+			canpause = false;	
+		}
 
 		if (current != GS_RESTART) {
 			GSM_Update();
 			fpLoad();
 			if (canpause) {
-				Pause_Load();			
+				Pause_Load();	
 			}
 		}
 		else {

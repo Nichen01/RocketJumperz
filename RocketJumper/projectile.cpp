@@ -1,4 +1,6 @@
 #include "Projectile.h"
+#include <cmath>    // sinf, cosf, sqrtf
+#include <cstdlib>  // rand, RAND_MAX
 
 namespace projectileSystem {
 
@@ -19,8 +21,8 @@ namespace projectileSystem {
         {
             projectiles[i].shape.xPos = 0.0f;
             projectiles[i].shape.yPos = 0.0f;
-            projectiles[i].shape.xScale = 10.0f;
-            projectiles[i].shape.yScale = 10.0f;
+            projectiles[i].shape.xScale = 20.0f;
+            projectiles[i].shape.yScale = 20.0f;
             projectiles[i].shape.velocityX = 0.0f;
             projectiles[i].shape.velocityY = 0.0f;
             projectiles[i].isActive = 0;
@@ -30,7 +32,7 @@ namespace projectileSystem {
     /*!*************************************************************************
      * FIRE PROJECTILES
      * @brief Finds an inactive projectile slot and fires it from the player's
-     * position. Calculates direction vector away from the mouse cursor
+     * position. Calculates direction vector toward the mouse cursor
      * and sets the projectile's velocity.
      * Usage: projectileSystem::fireProjectiles(mouseX, mouseY, playerObj, Projectiles, MAX_PROJECTILES);
      *
@@ -68,11 +70,11 @@ namespace projectileSystem {
             {
                 // Set projectile starting pos to player pos
                 projectiles[foundSlot].shape.xPos = player.xPos;
-                projectiles[foundSlot].shape.yPos = player.yPos;
+                projectiles[foundSlot].shape.yPos = player.yPos + 5.0f;
 
-                // Calculate direction vector AWAY from mouse (rocket-jumper: fire opposite to aim)
-                f32 dx = player.xPos - static_cast<f32>(worldMouseX);
-                f32 dy = player.yPos - static_cast<f32>(worldMouseY);
+                // Calculate direction vector TOWARD the mouse cursor
+                f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
+                f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
 
                 // Normalize direction vector
                 f32 length = sqrtf(dx * dx + dy * dy);
@@ -81,6 +83,57 @@ namespace projectileSystem {
                     dx /= length;
                     dy /= length;
                 }
+
+                // Set velocity
+                f32 speed = 15.0f;
+                projectiles[foundSlot].shape.velocityX = dx * speed;
+                projectiles[foundSlot].shape.velocityY = dy * speed;
+
+                // Activate projectile
+                projectiles[foundSlot].isActive = 1;
+                AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
+                printf("Projectile slot %d fired!\n", foundSlot);
+            }
+            else
+            {
+                printf("No available projectile slots! Max: %d\n", maxCount);
+            }
+        }
+        if (AEInputCheckTriggered(AEVK_RBUTTON))
+        {
+            s32 foundSlot = -1;
+
+            // Find first inactive projectile slot in projectiles array
+            for (int i = 0; i < maxCount; i++)
+            {
+                if (projectiles[i].isActive == 0)
+                {
+                    foundSlot = i; // set potential slot to proj index
+                    break;  // Exit loop early when we find a slot
+                }
+            }
+
+            // if slot available, fire the projectile
+            if (foundSlot != -1)
+            {
+                // Set projectile starting pos to player pos
+                projectiles[foundSlot].shape.xPos = player.xPos;
+                projectiles[foundSlot].shape.yPos = player.yPos + 5.0f;
+
+                // Calculate direction vector TOWARD the mouse cursor
+                f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
+                f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
+
+                // Normalize direction vector
+                f32 length = sqrtf(dx * dx + dy * dy);
+                if (length > 0.0f)
+                {
+                    dx /= length;
+                    dy /= length;
+                }
+
+                dx = -dx;
+                dy = -dy;
 
                 // Set velocity
                 f32 speed = 15.0f;
@@ -106,7 +159,7 @@ namespace projectileSystem {
         {
             if (projectiles[i].isActive == 1)
             {
-                // Move projectile along its velocity vector (away from mouse)
+                // Move projectile along its velocity vector (toward mouse)
                 projectiles[i].shape.xPos += projectiles[i].shape.velocityX;
                 projectiles[i].shape.yPos += projectiles[i].shape.velocityY;
 
@@ -133,7 +186,6 @@ namespace projectileSystem {
         if (!texture)
         {
             printf("TEXTURE IS NULL!\n");
-            
         }
 
         for (int i = 0; i < maxCount; i++)
@@ -181,6 +233,121 @@ namespace projectileSystem {
                     projectiles[i].isActive = 0;  // Destroy projectile on hit
                     printf("Projectile %d hit obstacle!\n", i);
                 }
+            }
+        }
+    }
+
+    /*!*************************************************************************
+     * FIRE SHOTGUN
+     * @brief Fires 5 pellets in a cone spread toward the mouse cursor.
+     *        Uses 2D vector rotation to fan the pellets out from the base
+     *        direction, and adds +/- 10% random speed variance per pellet.
+     *
+     * @param worldMouseX    Mouse X coordinate in world space
+     * @param worldMouseY    Mouse Y coordinate in world space
+     * @param player         Reference to the player object
+     * @param projectiles[]  Array containing the projectile structs
+     * @param maxCount       Maximum number of projectiles in the array
+     * @param attackSound    Sound effect to play on fire
+     * @param sfxGroup       Audio group for the sound effect
+     ***************************************************************************/
+    void FireShotgun(s32 worldMouseX,
+        s32 worldMouseY,
+        objectsquares& player,
+        Projectile projectiles[],
+        s32 maxCount,
+        AEAudio attackSound,
+        AEAudioGroup sfxGroup)
+    {
+        if (!(AEInputCheckTriggered(AEVK_LBUTTON)||AEInputCheckTriggered(AEVK_RBUTTON)))
+            return;
+
+        // ---- Constants for the shotgun spread ----
+        const int   kPelletCount    = 5;       // Number of pellets per shot
+        const f32   kBaseSpeed      = 15.0f;   // Same base speed as plasma
+        const f32   kSpeedVariance  = 0.10f;   // +/- 10% random variance
+        const f32   kSpreadAngle    = 0.35f;   // Total cone half-angle in radians (~20 degrees)
+
+        // Calculate base direction vector from player to mouse
+        f32 dx = static_cast<f32>(worldMouseX) - player.xPos;
+        f32 dy = static_cast<f32>(worldMouseY) - player.yPos;
+
+        // Normalize direction
+        f32 length = sqrtf(dx * dx + dy * dy);
+        if (length > 0.0f)
+        {
+            dx /= length;
+            dy /= length;
+        }
+        else
+        {
+            // If mouse is exactly on the player, default to shooting right
+            dx = 1.0f;
+            dy = 0.0f;
+        }
+        if (AEInputCheckTriggered(AEVK_RBUTTON)) {
+            dx=-dx;
+            dy=-dy;
+        }
+        bool playedSound = false;
+
+        // Spawn each pellet with a slightly different angle
+        for (int pellet = 0; pellet < kPelletCount; ++pellet)
+        {
+            // Find an inactive projectile slot
+            s32 foundSlot = -1;
+            for (int i = 0; i < maxCount; ++i)
+            {
+                if (projectiles[i].isActive == 0)
+                {
+                    foundSlot = i;
+                    break;
+                }
+            }
+
+            // If no slot available, stop spawning (don't waste iteration)
+            if (foundSlot == -1)
+            {
+                printf("Shotgun: ran out of projectile slots at pellet %d\n", pellet);
+                break;
+            }
+
+            // ---- Calculate this pellet's rotation angle ----
+            // Spread the pellets evenly across the cone, from -kSpreadAngle to +kSpreadAngle.
+            // For 5 pellets: angles are -0.35, -0.175, 0, +0.175, +0.35
+            // Map pellet index [0..4] to angle [-kSpreadAngle..+kSpreadAngle]
+            f32 theta = -kSpreadAngle + (2.0f * kSpreadAngle)
+                * (static_cast<f32>(pellet) / static_cast<f32>(kPelletCount - 1));
+
+            // ---- 2D vector rotation ----
+            // Rotated direction = (x*cos(theta) - y*sin(theta),
+            //                      x*sin(theta) + y*cos(theta))
+            f32 cosTheta = cosf(theta);
+            f32 sinTheta = sinf(theta);
+            f32 rotatedDx = dx * cosTheta - dy * sinTheta;
+            f32 rotatedDy = dx * sinTheta + dy * cosTheta;
+
+            // ---- Random speed variance (+/- 10%) ----
+            // rand() / RAND_MAX gives [0, 1], scale to [-variance, +variance]
+            f32 randomFactor = 1.0f + kSpeedVariance
+                * (2.0f * (static_cast<f32>(rand()) / static_cast<f32>(RAND_MAX)) - 1.0f);
+            f32 pelletSpeed = kBaseSpeed * randomFactor;
+
+            // ---- Set up the projectile ----
+            projectiles[foundSlot].shape.xPos = player.xPos;
+            projectiles[foundSlot].shape.yPos = player.yPos + 5.0f;
+            projectiles[foundSlot].shape.velocityX = rotatedDx * pelletSpeed;
+            projectiles[foundSlot].shape.velocityY = rotatedDy * pelletSpeed;
+            projectiles[foundSlot].isActive = 1;
+
+            printf("Shotgun pellet %d fired in slot %d (angle=%.2f, speed=%.2f)\n",
+                pellet, foundSlot, theta, pelletSpeed);
+
+            // Play the sound only once per shot, not per pellet
+            if (!playedSound)
+            {
+                AEAudioPlay(attackSound, sfxGroup, 1.0f, 1.0f, 0);
+                playedSound = true;
             }
         }
     }

@@ -35,6 +35,10 @@ enum TextureID {
     TEX_GLASS3,
     TEX_GLASS4,
 
+    //trap tile textures
+    TEX_EYETRAP,
+    TEX_TRAPBEAM,
+
     // UI textures
     TEX_CTRL1,
     TEX_CTRL2,
@@ -77,11 +81,80 @@ enum TextureID {
     TEX_MUSHROOM_IDLE5,
     TEX_MUSHROOM_IDLE6,
 
+    // Main Menu textures
+    TEX_MAIN_MENU_BG,
+    TEX_TITLE,
+    TEX_DIGIPEN_LOGO,   // DigiPenWhite.png used on the credits screen
+
     // Level editor: static door thumbnail
     TEX_STATIC_DOOR,
 
     // Mushroom idle sheet (spritesheet used by animation system)
     TEX_MUSHROOM_IDLE_SHEET,
+
+    // Key texture
+    TEX_KEYCARD,
+
+    // Error prompt
+    TEX_ERRORPROMPT,
+    TEX_PROMPT1,
+    TEX_PROMPT2,
+    TEX_PROMPT3,
+    TEX_PROMPT4,
+    TEX_PROMPT5,
+    TEX_PROMPT6,
+    TEX_PROMPT7,
+    TEX_PROMPT8,
+    TEX_PROMPT9,
+    TEX_REDBUTTON,
+    TEX_GREENBUTTON,
+
+    // Inventory texture
+    TEX_INVENTORY,
+    TEX_KEYCARDINVENTORY,
+
+    // Broken door(s)
+    TEX_BROKENDOOR0,
+    TEX_BROKENDOOR1,
+    TEX_BROKENDOOR2,
+
+    // Wire (world drop item)
+    TEX_WIRE,
+
+    // Wire Inventory
+    TEX_WIREINVENTORY0,
+    TEX_WIREINVENTORY1,
+    TEX_WIREINVENTORY2,
+    //ammo drop
+    TEX_DROP,
+    // Ranged enemy state spritesheets
+    TEX_RANGED_IDLE,    // RangedMove.png frame 0 (reused as idle)
+    TEX_RANGED_MOVE,    // RangedMove.png   (1 row, 4 cols)
+    TEX_RANGED_ATTACK,  // RangedAttack.png (1 row, 6 cols)
+    TEX_RANGED_DEATH,   // RangedDeath.png  (1 row, 4 cols)
+    TEX_RANGED_HURT,    // RangedHurt.png   (1 row, 2 cols)
+
+    // Weapon textures
+    TEX_PLASMA_GUN,     // Assets/Weapons/plasmaGun.png
+    TEX_SHOTGUN,        // Assets/Weapons/shotGun.png
+
+    TEX_COOLDOWNBAR0,
+    TEX_COOLDOWNBAR1,
+    TEX_COOLDOWNBAR2,
+    TEX_COOLDOWNBAR3,
+    TEX_COOLDOWNBAR4,
+    TEX_COOLDOWNBAR5,
+
+    TEX_MENU,
+    TEX_BUTTON,
+
+    TEX_BACKGROUND,
+
+    // Saw trap spritesheet (1 row, 7 columns)
+    TEX_SAW,
+
+    // Instructions menu full-screen image
+    TEX_INSTRUCTIONS_MENU,
 
     // Add new textures above this line
     TEX_MAX
@@ -89,14 +162,16 @@ enum TextureID {
 
 // Define all meshes here
 enum MeshID {
-    MESH_PLAYER,
-    MESH_PLATFORM,
-    MESH_PROJECTILE,
-    MESH_ENEMY,
-    MESH_DOOR,
-    MESH_UI,
-    MESH_MELEE_ENEMY, // animated melee enemy mesh (built by animSystem::buildMesh)
-    MESH_TEST,        // pTestMesh used in Level1
+    MESH_QUAD,        // single reusable 1x1 quad for all standard static objects
+    MESH_MELEE_ENEMY, // animated melee enemy mesh (spritesheet-sliced)
+    MESH_DOOR,        // animated door mesh (spritesheet-sliced)
+    MESH_MENU_BUTTON, // unit quad with black vertex color for color-mode button rendering
+    MESH_RANGED_MOVE,   // spritesheet mesh (1 row, 4 cols)
+    MESH_RANGED_ATTACK, // spritesheet mesh (1 row, 6 cols)
+    MESH_RANGED_DEATH,  // spritesheet mesh (1 row, 4 cols)
+    MESH_RANGED_HURT,   // spritesheet mesh (1 row, 2 cols)
+    MESH_BUTTON,
+    MESH_SAW,       // spritesheet mesh (1 row, 7 cols) for saw trap animation
     // Add new meshes above this line
     MESH_MAX
 };
@@ -125,8 +200,10 @@ public:
     // Meshes  (built procedurally, not loaded from a file)
     // -------------------------------------------------------------------------
 
-    // Creates a 1x1 mesh and automatically stores it in the cache.
-    static void BuildSqrMesh(MeshID id);
+    // Creates a square mesh and automatically stores it in the cache.
+    // When rows/cols are 1 (default), builds a standard 1x1 quad.
+    // When rows/cols > 1, slices UVs for spritesheet animation frames.
+    static void BuildSqrMesh(MeshID id, int rows = 1, int cols = 1, u32 vertexColor = 0xFFFFFFFF);
 
     // Registers a mesh pointer under name. 
     static void StoreMesh(MeshID id, AEGfxVertexList* pMesh);

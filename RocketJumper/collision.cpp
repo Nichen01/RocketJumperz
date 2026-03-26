@@ -150,9 +150,25 @@ namespace gamelogic {
 		return -((pos - 450) / (float)MS);
 	}
 
+	float index_to_posX(float pos, float MS) {
+		return (pos * MS - 800);
+	}
+
+	float index_to_posY(float pos, float MS) {
+		return -(pos*MS-450);
+	}
+
+	// Helper: safely read 1D map array, returns 0 if out of bounds
+	static inline int safeMapRead(int map[], int ix, int iy, int mapX, int mapY)
+	{
+		if (ix < 0 || ix >= mapX || iy < 0 || iy >= mapY)
+			return 0;
+		return map[iy * mapX + ix];
+	}
 
 	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX)
 	{
+		int mapY = BINARY_MAP_HEIGHT;
 		float x1, y1, x2, y2;
 		int flag = 0;
 		// right
@@ -162,10 +178,9 @@ namespace gamelogic {
 
 		x2 = PosX + scaleX / 2.0f;
 		y2 = PosY - scaleY / 4.0f;
-	
-		int index1 = (int)y1 * mapX + (int)x1;
-		int index2 = (int)y2 * mapX + (int)x2;
-		if (map[index1] == index || map[index2] == index) {
+
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_RIGHT;
 		}
 
@@ -176,10 +191,8 @@ namespace gamelogic {
 		x2 = PosX - scaleX / 2.0f;
 		y2 = PosY + scaleY / 4.0f;
 
-		index1 = (int)y1 * mapX + (int)x1;
-		index2 = (int)y2 * mapX + (int)x2;
-
-		if (map[index1] == index || map[index2] == index) {
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_LEFT;
 		}
 
@@ -190,11 +203,8 @@ namespace gamelogic {
 		x2 = PosX + scaleX / 4.0f;
 		y2 = PosY + scaleY / 2.0f;
 
-
-		index1 = (int)y1 * mapX + (int)x1;
-		index2 = (int)y2 * mapX + (int)x2;
-
-		if (map[index1] == index || map[index2] == index) {
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_TOP;
 		}
 
@@ -205,13 +215,11 @@ namespace gamelogic {
 		x2 = PosX + scaleX / 4.0f;
 		y2 = PosY - scaleY / 2.0f;
 
-		index1 = (int)y1 * mapX + (int)x1;
-		index2 = (int)y2 * mapX + (int)x2;
-
-		if (map[index1] == index || map[index2] == index) {
+		if (safeMapRead(map, (int)x1, (int)y1, mapX, mapY) >= index ||
+			safeMapRead(map, (int)x2, (int)y2, mapX, mapY) >= index) {
 			flag = flag | COLLISION_BOTTOM;
 		}
-		
+
 		return flag;
 	}
 

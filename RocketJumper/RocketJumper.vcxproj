@@ -18,12 +18,13 @@
     <ClCompile Include="DeathScreen.cpp" />
     <ClCompile Include="DoorSystem.cpp" />
     <ClCompile Include="Draw.cpp" />
-    <ClCompile Include="drops.cpp" />
+    <ClCompile Include="Drops.cpp" />
     <ClCompile Include="Enemies.cpp" />
     <ClCompile Include="Gameover.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="Level1.cpp" />
     <ClCompile Include="Level2.cpp" />
+    <ClCompile Include="Level3.cpp" />
     <ClCompile Include="LevelEditor.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
@@ -31,13 +32,15 @@
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="ProjectileTest.cpp" />
     <ClCompile Include="Load.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="SplashScreen.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="traps.cpp" />
     <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="VictoryScreen.cpp" />
+    <ClCompile Include="WeaponSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AimingInterface.h" />
@@ -48,26 +51,29 @@
     <ClInclude Include="DeathScreen.h" />
     <ClInclude Include="DoorSystem.h" />
     <ClInclude Include="Draw.h" />
-    <ClInclude Include="drops.h" />
+    <ClInclude Include="Drops.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="Gameover.h" />
     <ClInclude Include="GameStateList.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Level1.h" />
     <ClInclude Include="Level2.h" />
+    <ClInclude Include="Level3.h" />
     <ClInclude Include="LevelEditor.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Movement.h" />
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
-    <ClInclude Include="ProjectileTest.h" />
     <ClInclude Include="Load.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Sound.h" />
+    <ClInclude Include="SplashScreen.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="traps.h" />
     <ClInclude Include="Tutorial.h" />
     <ClInclude Include="VictoryScreen.h" />
+    <ClInclude Include="WeaponSprite.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

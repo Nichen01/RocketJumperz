@@ -1,23 +1,10 @@
-/* Start Header ************************************************************************/
-/*!
-\file		  Level1.cpp
-\author       Ivan Chong, i.chong, 2503476
-\par          i.chong@digipen.edu
-\date         January, 16, 2026
-\brief        Contain functions called by GameStateManager.cpp
-
-Copyright (C) 2026 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
-*/
-/* End Header **************************************************************************/
 
 #include "pch.h"
 #include "AssetManager.h"
 #include "Level1.h"
 #include "aimingInterface.h"
-#include "drops.h"
+#include "WeaponSprite.h"
+#include "Drops.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -62,26 +49,33 @@ void Tutorial_Load()
 	audio::loadsound();
 
 	// Load textures via AssetManager (enum-based IDs)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/astronautRight.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
 	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
-	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
+	//AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
+	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
+	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
+	AssetManager::LoadTexture(TEX_RANGED_HURT,    "Assets/Enemy/RangedHurt.png");
 
 	// Sync the extern pointers so other files can use them directly
 	characterPictest  = AssetManager::GetTexture(TEX_PLAYER);
 	plasma            = AssetManager::GetTexture(TEX_PLASMA);
 	doorTex           = AssetManager::GetTexture(TEX_DOOR);
-	meleeEnemyTexture = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	
 	rangedEnemyTexture = AssetManager::GetTexture(TEX_RANGED_ENEMY);
 
 	// Load platform assets
 	load::platform();
 	load::ui();
+	load::cooldownBar();
+	load::background();
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
+	weaponSprite::Load();
 }
 
 void Tutorial_Initialize()
@@ -96,16 +90,12 @@ void Tutorial_Initialize()
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
-	AssetManager::BuildSqrMesh(MESH_ENEMY);
-	AssetManager::BuildSqrMesh(MESH_PLATFORM);
-	AssetManager::BuildSqrMesh(MESH_PLAYER);
-	AssetManager::BuildSqrMesh(MESH_PROJECTILE);
-	AssetManager::BuildSqrMesh(MESH_UI);
-	enemyMesh      = AssetManager::GetMesh(MESH_ENEMY);
-	platformMesh   = AssetManager::GetMesh(MESH_PLATFORM);
-	pMesh          = AssetManager::GetMesh(MESH_PLAYER);
-	projectileMesh = AssetManager::GetMesh(MESH_PROJECTILE);
-	uiMesh         = AssetManager::GetMesh(MESH_UI);
+	AssetManager::BuildSqrMesh(MESH_QUAD);
+	enemyMesh      = AssetManager::GetMesh(MESH_QUAD);
+	platformMesh   = AssetManager::GetMesh(MESH_QUAD);
+	pMesh          = AssetManager::GetMesh(MESH_QUAD);
+	projectileMesh = AssetManager::GetMesh(MESH_QUAD);
+	uiMesh         = AssetManager::GetMesh(MESH_QUAD);
 
 	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
 		printf("Could not import file");
@@ -144,34 +134,31 @@ void Tutorial_Initialize()
 	// Initialize player health to 100 HP with no invincibility active
 	InitPlayerHealth(objectinfoTut[player]);
 
+	// Start with the plasma gun equipped (default weapon)
+	objectinfoTut[player].currentWeapon = WEAPON_PLASMA;
+
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
+	// SPAWN test enemies
+	
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -400.0f, 300.0f);
+	
 	
 
-	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, 300.0f, -100.0f);
-
-	// Build animated mesh for melee enemy (3 cols x 2 rows spritesheet)
-	{
-		AEGfxVertexList* meleeEnemyMesh = nullptr;
-		animSystem::buildMesh(&meleeEnemyMesh, 2, 3);
-		AssetManager::StoreMesh(MESH_MELEE_ENEMY, meleeEnemyMesh);
-	}
-	// Initialize melee enemy animation (3 cols, 2 rows, 6 frames at 10 fps, looping)
-	animSystem::init(meleeAnim, 3, 2, 6, 0.1f, ANIM_LOOP, 0);
+	// Build spritesheet meshes for ranged enemy states (rows, cols)
+	AssetManager::BuildSqrMesh(MESH_RANGED_MOVE,   1, 4);
+	AssetManager::BuildSqrMesh(MESH_RANGED_ATTACK,  1, 6);
+	AssetManager::BuildSqrMesh(MESH_RANGED_DEATH,   1, 4);
+	AssetManager::BuildSqrMesh(MESH_RANGED_HURT,    1, 2);
 
 	// DOOR
 
 	// Build door animation mesh: 1 row, 7 columns (7 frames in a horizontal strip).
-	// Free any existing doorMesh first to avoid leaking if re-initialized.
-	AEGfxVertexList* tempDoorMesh = nullptr;
-	animSystem::buildMesh(&tempDoorMesh, 1, 7);
-	AssetManager::StoreMesh(MESH_DOOR, tempDoorMesh);
-	doorMesh = tempDoorMesh;
+	AssetManager::BuildSqrMesh(MESH_DOOR, 1, 7);
+	doorMesh = AssetManager::GetMesh(MESH_DOOR);
 
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");
@@ -180,9 +167,9 @@ void Tutorial_Initialize()
 
 void Tutorial_Update()
 {
+	if (AEInputCheckCurr(AEVK_1)) next = GS_LEVEL1;
 
-	if (AEInputCheckTriggered(AEVK_L)) next = GS_LEVELEDITOR;
-	//====== AUDIO CONTROLS ======
+	//====== AUDIO CONTROLS ======//
 	if (AEInputCheckTriggered(AEVK_1)) {
 		bgVolume -= 0.1f;
 		if (bgVolume <= 0.f)
@@ -207,28 +194,56 @@ void Tutorial_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfoTut[player]);
 
+	// ---- Weapon Toggle (Q key) ----
+	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
 	if (AEInputCheckTriggered(AEVK_Q)) {
-		next = GS_QUIT;
+		if (objectinfoTut[player].currentWeapon == WEAPON_PLASMA) {
+			objectinfoTut[player].currentWeapon = WEAPON_SHOTGUN;
+			printf("Weapon switched to: SHOTGUN\n");
+		}
+		else {
+			objectinfoTut[player].currentWeapon = WEAPON_PLASMA;
+			printf("Weapon switched to: PLASMA\n");
+		}
 	}
+
 	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next= GS_MAINMENU;
+		next = GS_MAINMENU;
 	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfoTut[player]);
+	movement::UpdatePlayerFacing(objectinfoTut[player]);
 	pickup::updateDrops(TutDrop, MAX_ENEMIES, objectinfoTut[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
-	if (movement::bulletCount) {projectileSystem::fireProjectiles(
-		static_cast<s32>(worldMouseX),
-		static_cast<s32>(worldMouseY),
-		objectinfoTut[player],
-		Projectiles,
-		MAX_PROJECTILES,
-		LaserBlast,
-		soundEffects);}
+	// Fire using the currently equipped weapon (toggled with Q)
+	if (movement::bulletCount) {
+		if (objectinfoTut[player].currentWeapon == WEAPON_SHOTGUN) {
+			// Shotgun: 5-pellet cone spread
+			projectileSystem::FireShotgun(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfoTut[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+		else {
+			// Plasma (default): single shot toward mouse
+			projectileSystem::fireProjectiles(
+				static_cast<s32>(worldMouseX),
+				static_cast<s32>(worldMouseY),
+				objectinfoTut[player],
+				Projectiles,
+				MAX_PROJECTILES,
+				LaserBlast,
+				soundEffects);
+		}
+	}
 
 	// Update all active projectiles
 	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
@@ -253,9 +268,7 @@ void Tutorial_Update()
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
 		Projectiles, MAX_PROJECTILES);
 
-	// Check melee enemies damaging player (uses PlayerTakeDamage internally)
-	enemySystem::checkPlayerEnemyCollision(enemies, MAX_ENEMIES,
-		objectinfoTut[player], Punch, soundEffects);
+
 
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
@@ -276,7 +289,7 @@ void Tutorial_Update()
 
 	for (auto& door : doors) {
 
-		if (door.firstLevel != 0 && door.secondLevel != 0) continue;
+		if (door.entranceLevel != 0 && door.exitLevel != 0) continue;
 		f32 dx = objectinfoTut[player].xPos - door.worldX;
 		f32 dy = objectinfoTut[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
@@ -295,7 +308,7 @@ void Tutorial_Update()
 
 		// E key transition -- inside the loop so door and playerNear are in scope
 		if (playerNear && door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-			int toLevel = (currentGameLevel == door.firstLevel) ? door.secondLevel : door.firstLevel;
+			int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
 			playerEnteredDoorId = door.id;  // remember which door was used
 			switch (toLevel) {
 			case 0: next = GS_TUTORIAL; break;
@@ -305,14 +318,15 @@ void Tutorial_Update()
 		}
 	}
 
-	// MUSHROOM ANIMATION
-	animSystem::update(meleeAnim, dt);
+	
 	aiming::updateAiming(objectinfoTut[player]);
+	weaponSprite::Update(objectinfoTut[player]);
 }
 
 void Tutorial_Draw()
 {
-	AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
+	//AEGfxSetBackgroundColor(0.2f, 0.2f, 0.3f);  // Dark blue-gray background
+	renderlogic::drawTexture(0.f, 0.f, backgroundTex, uiMesh, static_cast<f32>(AEGfxGetWindowWidth()), static_cast<f32>(AEGfxGetWindowHeight()));
 
 	// Setup for textured rendering
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -346,6 +360,9 @@ void Tutorial_Draw()
 	sprintf_s(strBuffer, "Spacebar to Jump");
 	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
+	sprintf_s(strBuffer, "Q to Switch Weapon");
+	AEGfxPrint(font, strBuffer, 0.0f, -0.78f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+
 	sprintf_s(strBuffer, "E to Enter");
 	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
@@ -371,8 +388,12 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
+	// Flip sprite horizontally when the player is aiming left.
+	f32 playerDrawScaleX = movement::playerFacingLeft
+		? -objectinfoTut[player].xScale
+		:  objectinfoTut[player].xScale;
 	renderlogic::drawSquare(objectinfoTut[player].xPos, objectinfoTut[player].yPos,
-		objectinfoTut[player].xScale, objectinfoTut[player].yScale);
+		playerDrawScaleX, objectinfoTut[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	// Render player projectiles with plasma texture
@@ -380,6 +401,9 @@ void Tutorial_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
+
+	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
+	renderlogic::drawCooldownHUD(objectinfoTut[player].xPos, objectinfoTut[player].yPos - 40.f);
 
 	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.
@@ -397,6 +421,12 @@ void Tutorial_Draw()
 
 		// Print at top-left corner of the screen (white text)
 		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+
+		// Show the currently equipped weapon below the health display
+		const char* weaponName = (objectinfoTut[player].currentWeapon == WEAPON_SHOTGUN)
+			? "Weapon: Shotgun"
+			: "Weapon: Plasma";
+		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
 	// ===== RENDERING OF THE FLASHING 'E' ===== //
@@ -404,6 +434,7 @@ void Tutorial_Draw()
 		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
 	}
 	aiming::drawAiming();
+	weaponSprite::Draw();
 	pickup::drawDrops(TutDrop, MAX_ENEMIES);
 }
 
@@ -422,13 +453,14 @@ void Tutorial_Free()
 void Tutorial_Unload()
 {
 	AssetManager::UnloadAllTextures();
-	
+
 	if (glassMap) {
 		for (int i = 0; i < BINARY_MAP_HEIGHT; ++i) delete[] glassMap[i];
 		delete[] glassMap;
 		glassMap = nullptr;
 	}
 	aiming::unloadAiming();
+	weaponSprite::Unload();
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 

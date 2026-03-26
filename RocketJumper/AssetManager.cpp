@@ -84,33 +84,46 @@ void AssetManager::UnloadAllTextures() {
 // --- MESHES ---
 /*!*************************************************************************
  * BUILD SQUARE MESH
- * @brief Procedurally builds a standard 1x1 square mesh and caches it in
- * the centralized array at the specified ID.
- * Usage: AssetManager::BuildSqrMesh(MESH_PLAYER);
+ * @brief Procedurally builds a square mesh and caches it in the centralized
+ * array at the specified ID. When rows/cols are 1, builds a standard
+ * full-UV quad. When rows/cols > 1, slices UVs to span exactly one
+ * frame of a spritesheet (replaces animSystem::buildMesh).
+ * Usage: AssetManager::BuildSqrMesh(MESH_QUAD);
+ *        AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
  *
  * @param id          The MeshID enum value to store the new mesh at
+ * @param rows        Number of rows in the spritesheet (default 1)
+ * @param cols        Number of columns in the spritesheet (default 1)
  * @return VOID
  ***************************************************************************/
-void AssetManager::BuildSqrMesh(MeshID id) {
+void AssetManager::BuildSqrMesh(MeshID id, int rows, int cols, u32 vertexColor) {
     // check if the mesh id is valid
     if (id < 0 || id >= MESH_MAX) return;
 
-    // if the mesh is live, then free it 
+    // guard against division by zero
+    if (rows <= 0 || cols <= 0) return;
+
+    // if the mesh is live, then free it
     if (sMeshes[id] != nullptr) {
         AEGfxMeshFree(sMeshes[id]);
     }
 
+    // Calculate UV boundaries for one frame of the spritesheet.
+    // Default (1,1) yields uMax=1.0 and vMax=1.0 (full texture).
+    f32 uMax = 1.0f / static_cast<f32>(cols);
+    f32 vMax = 1.0f / static_cast<f32>(rows);
+
     //build square mesh with 2 triangles
     AEGfxMeshStart();
     AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-        0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f
+        -0.5f, -0.5f, vertexColor, 0.0f, vMax,
+        0.5f, -0.5f, vertexColor, uMax, vMax,
+        -0.5f, 0.5f, vertexColor, 0.0f, 0.0f
     );
     AEGfxTriAdd(
-        0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-        0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f
+        0.5f, -0.5f, vertexColor, uMax, vMax,
+        0.5f, 0.5f, vertexColor, uMax, 0.0f,
+        -0.5f, 0.5f, vertexColor, 0.0f, 0.0f
     );
 
     // assign mesh to the array id
@@ -143,7 +156,7 @@ void AssetManager::StoreMesh(MeshID id, AEGfxVertexList* pMesh) {
  * GET MESH
  * @brief Retrieves a cached mesh pointer from the centralized array in
  * O(1) time using its ID.
- * Usage: AEGfxMeshDraw(AssetManager::GetMesh(MESH_PLAYER), AE_GFX_MDM_TRIANGLES);
+ * Usage: AEGfxMeshDraw(AssetManager::GetMesh(MESH_QUAD), AE_GFX_MDM_TRIANGLES);
  *
  * @param id          The MeshID enum value of the desired mesh
  * @return AEGfxVertexList* Pointer to the mesh, or nullptr if invalid/unloaded

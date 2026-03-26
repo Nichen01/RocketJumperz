@@ -29,13 +29,21 @@ void GSM_Update()
 		fpFree = Level1_Free;
 		fpUnload = Level1_Unload;
 		break;
-	case GS_PROJECTILE_TEST:
-		fpLoad = ProjectileTest_Load;
-		fpInitialize = ProjectileTest_Initialize;
-		fpUpdate = ProjectileTest_Update;
-		fpDraw = ProjectileTest_Draw;
-		fpFree = ProjectileTest_Free;
-		fpUnload = ProjectileTest_Unload;
+	case GS_LEVEL2:
+		fpLoad = Level2_Load;
+		fpInitialize = Level2_Initialize;
+		fpUpdate = Level2_Update;
+		fpDraw = Level2_Draw;
+		fpFree = Level2_Free;
+		fpUnload = Level2_Unload;
+		break;
+	case GS_LEVEL3:
+		fpLoad = Level3_Load;
+		fpInitialize = Level3_Initialize;
+		fpUpdate = Level3_Update;
+		fpDraw = Level3_Draw;
+		fpFree = Level3_Free;
+		fpUnload = Level3_Unload;
 		break;
 	case GS_MAINMENU:
 		fpLoad = MainMenu_Load;
@@ -44,14 +52,6 @@ void GSM_Update()
 		fpDraw = MainMenu_Draw;
 		fpFree = MainMenu_Free;
 		fpUnload = MainMenu_Unload;
-		break;
-	case GS_LEVEL2:
-		fpLoad = Level2_Load;
-		fpInitialize = Level2_Initialize;
-		fpUpdate = Level2_Update;
-		fpDraw = Level2_Draw;
-		fpFree = Level2_Free;
-		fpUnload = Level2_Unload;
 		break;
 	case GS_LEVELEDITOR:
 		fpLoad = LevelEditor_Load;
@@ -84,6 +84,14 @@ void GSM_Update()
 		fpDraw = Tutorial_Draw;
 		fpFree = Tutorial_Free;
 		fpUnload = Tutorial_Unload;
+		break;
+	case GS_SPLASH:
+		fpLoad = SplashScreen_Load;
+		fpInitialize = SplashScreen_Init;
+		fpUpdate = SplashScreen_Update;
+		fpDraw = SplashScreen_Draw;
+		fpFree = SplashScreen_Free;
+		fpUnload = SplashScreen_Unload;
 		break;
 	case GS_RESTART:
 		break;

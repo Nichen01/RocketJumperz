@@ -2,39 +2,27 @@
 #include "Draw.h"
 #include "Main.h"
 
+
 static s8 pausefont = -1;
 static f32 width, height;
 
 static MenuButton resumeButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
-static AEGfxVertexList* buttonMesh = nullptr;
 
-static AEGfxTexture* menutex;
-static AEGfxTexture* buttontex;
 
 void Pause_Load() {
-	AEGfxMeshStart();
 
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
-
-	buttonMesh = AEGfxMeshEnd();
-
-	menutex = AEGfxTextureLoad("Assets/UI/Menus/Menu.png");
-	buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
+	load::pauseMenu();
 	
 	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 
 void Pause_Initialize() {
+
+	AssetManager::BuildSqrMesh(MESH_BUTTON);
+	buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
+
 	float buttonwidth = 390.0f;
 	float buttonlength = 80.0f;
 	resumeButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESUME", false };
@@ -64,28 +52,26 @@ void Pause_Update() {
 
 void Pause_Draw() {
 
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxTextureSet(menutex, 0, 0);
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); 
-	renderlogic::drawSquare(0.0f, 0.0f, 500.0f, 640.0f);
-	AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
+	//AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	//AEGfxTextureSet(menutex, 0, 0);
+	//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); 
+	//renderlogic::drawSquare(0.0f, 0.0f, 500.0f, 640.0f);
+	//AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
+
+	renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, 500.f, 640.f);
 
 	AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);
-	AEGfxPrint(pausefont, "PAUSE", -0.06-width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
+	AEGfxPrint(pausefont, "PAUSE", -0.06f-width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
 
-	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttontex);
-	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttontex);
-	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttontex);
+	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttonTex);
+	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttonTex);
+	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttonTex);
 }
 
 void Pause_Free() {
-	if (buttonMesh) {
-		AEGfxMeshFree(buttonMesh);
-		buttonMesh = nullptr;
-	}
+
+	AssetManager::FreeAllMeshes();
 }
 void Pause_Unload() {
-	if (pausefont != -1) { AEGfxDestroyFont(pausefont); pausefont = -1; }
-	if (menutex != nullptr) { AEGfxTextureUnload(menutex); };
-	if (buttontex != nullptr) { AEGfxTextureUnload(buttontex); };
+	AssetManager::UnloadAllTextures();
 }
