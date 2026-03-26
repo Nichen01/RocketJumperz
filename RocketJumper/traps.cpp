@@ -49,7 +49,7 @@ namespace traps {
 				if (checkY < 0) checkY = 0;
 				if (checkX >= x) checkX = x-1;
 				if (checkY >= y) checkY = y-1;
-				if (MapData[checkY][checkX] == 51) {
+				if (MapData[checkY][checkX] == 50) {
 					nearTrap = 1;
 					AEVec2Set(&temp, static_cast<f32>(checkX), static_cast<f32>(checkY));
 					return temp;
