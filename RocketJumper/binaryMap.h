@@ -55,6 +55,13 @@ struct Key {
 	bool active{ true };
 };
 
+struct HealthPack {
+	f32 worldX;
+	f32 worldY;
+	f32 size{ tileSize };
+	bool active{ true };
+};
+
 extern f32 tileSize; // Global tile size
 extern brokenDoor finalDoor;
 extern Key key;

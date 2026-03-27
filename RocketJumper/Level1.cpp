@@ -52,6 +52,7 @@ static s8 fontLevel1 = -1;
 static bool playerNear;
 
 // bool for keycard in inventory
+static bool healthCollected;
 static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 

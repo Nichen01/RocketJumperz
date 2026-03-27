@@ -38,6 +38,7 @@ static char strBuffer[100];
 
 static bool playerNear;
 
+static bool healthCollected;
 static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 
@@ -325,6 +326,10 @@ void Tutorial_Update()
 	
 	aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
+
+	//============= UPDATE HEALTH COLLISION =================//
+	
+	
 }
 
 void Tutorial_Draw()
