@@ -3,6 +3,7 @@
 #include "Level1.h"
 #include "traps.h"
 #include "WeaponSprite.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x;
@@ -143,6 +144,9 @@ void Level1_Load()
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	//aiming::loadAiming();
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool
+	ParticleSystem::Load();
 }
 
 void Level1_Initialize()
@@ -353,6 +357,9 @@ void Level1_Update()
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 
+	// Step all active particles forward
+	ParticleSystem::Update(dt);
+
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo1[player], L1Drop,
@@ -548,6 +555,17 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	// ====== PARTICLE SYSTEM RENDER ====== //
+	// Draw particles behind UI elements but in front of projectiles
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo1[player].xPos, objectinfo1[player].yPos - 40.f);
 
@@ -677,6 +695,9 @@ void Level1_Unload()
 
 	// Destroy the font created in Load
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 

@@ -4,6 +4,9 @@
     <ClCompile Include="AimingInterface.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="BinaryMap.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -88,7 +91,7 @@
     <ClCompile Include="traps.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="BinaryMap.cpp">
+    <ClCompile Include="ParticleSystem.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -184,6 +187,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Level1.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
