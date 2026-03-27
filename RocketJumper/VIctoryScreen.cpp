@@ -69,11 +69,18 @@ void VictoryScreen_Update() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
-            next = GS_TUTORIAL;  // Change to test file if needed
+            movement::bulletCount = 10;
+            wireCount = 0;             // Reset Wires
+            keycardCollected = false;  // Reset Keycard
+            doorState = 0;             // Reset Final Door
+            next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {
-            next = GS_MAINMENU;  // Change to test file if needed
+            wireCount = 0;             // Reset Wires
+            keycardCollected = false;  // Reset Keycard
+            doorState = 0;             // Reset Final Door
+            next = GS_MAINMENU;
             printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {

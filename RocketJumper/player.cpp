@@ -3,6 +3,8 @@
 #include <cstdio>
 
 int wireCount = 0;
+bool keycardCollected = false;
+int doorState = 0;
 
 // ---------------------------------------------------------------------------
 // InitPlayerHealth

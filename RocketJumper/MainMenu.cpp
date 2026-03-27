@@ -313,7 +313,10 @@ void UpdateMainMenu() {
         if (playButton.isHovered) {
             movement::bulletCount = 10;
             playerEnteredDoorId = -1;
-            next = GS_TUTORIAL;  // Change to test file if needed
+            wireCount = 0;             // Reset Wires
+            keycardCollected = false;  // Reset Keycard
+            doorState = 0;             // Reset Final Door
+            next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
         }
         else if (instructionsButton.isHovered) {
