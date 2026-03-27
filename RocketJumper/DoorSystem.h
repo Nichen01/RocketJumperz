@@ -14,6 +14,7 @@ struct DoorLink {
     bool isOpen = false;
     bool isLocked;
     SpriteAnimation anim;
+    float sparkTimer = 0.0f;  // Counts up to 4 seconds between spark bursts
 };
 
 struct brokenDoor {

@@ -25,6 +25,7 @@ struct Particle {
     float lifetime;     // remaining seconds before this particle dies
     float maxLifetime;  // original lifetime (used to compute fade alpha)
     float scale;        // render size in world units
+    float r, g, b, a;  // per-particle colour (set at spawn time)
     bool  isActive;     // true = alive and updating, false = free slot
 };
 
@@ -43,6 +44,7 @@ struct EmitterProps {
     float lifetimeSpread;   // random spread added to base lifetime
     float scaleBase;        // render scale for each particle
     int   emitCount;        // how many particles to spawn per Emit call
+    bool  useSparkColors = false;  // true = random white/yellow/orange per particle
 };
 
 // Maximum number of particles alive at any time (object pool size)

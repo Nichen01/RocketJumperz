@@ -406,6 +406,37 @@ void Level1_Update()
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
 
+		// --- Spark Emission Logic for Locked Doors ---
+		// Locked doors emit a small burst of falling white sparks every 4 seconds.
+		// Once the player collects the keycard (isLocked becomes false), sparks stop.
+		if (door.isLocked) {
+			door.sparkTimer += dt;
+			if (door.sparkTimer >= 2.0f) {
+				door.sparkTimer = 0.0f; // Reset the 4-second timer
+
+				EmitterProps sparkProps;
+				// Spawn slightly near the center/top of the door
+				sparkProps.spawnX = door.worldX;
+				sparkProps.spawnY = door.worldY;
+
+				// Shoot upwards -- gravity in Update() pulls them back down
+				sparkProps.velocityXBase = 0.0f;
+				sparkProps.velocityYBase = 100.0f;
+
+				// Wide X spread + narrow Y spread = upward cone shape
+				sparkProps.velocitySpreadX = 100.0f;
+				sparkProps.velocitySpreadY = 20.0f;
+
+				sparkProps.lifetimeBase = 1.0f;   // Short-lived sparks
+				sparkProps.lifetimeSpread = 0.7f;
+				sparkProps.scaleBase = 5.0f;       // Small specks
+				sparkProps.emitCount = 18;          // Small burst quantity
+				sparkProps.useSparkColors = true;   // Random white/yellow/orange sparks
+
+				ParticleSystem::Emit(sparkProps);
+			}
+		}
+
 		// get distance of player to door
 		f32 dx = objectinfo1[player].xPos - door.worldX;
 		f32 dy = objectinfo1[player].yPos - door.worldY;

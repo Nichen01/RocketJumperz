@@ -107,6 +107,24 @@ void ParticleSystem::Emit(const EmitterProps& props) {
         // Scale: direct copy from emitter properties
         p.scale = props.scaleBase;
 
+        // Colour: if spark mode is on, randomly pick white/yellow/orange.
+        // Otherwise default to white so the Draw() colour multiply works as before.
+        if (props.useSparkColors) {
+            int colorPick = rand() % 3;
+            if (colorPick == 0) {        // White
+                p.r = 1.0f; p.g = 1.0f; p.b = 1.0f;
+            } else if (colorPick == 1) { // Yellow
+                p.r = 1.0f; p.g = 1.0f; p.b = 0.0f;
+            } else {                     // Orange
+                p.r = 1.0f; p.g = 0.5f; p.b = 0.0f;
+            }
+        } else {
+            // Default to the original warm orange so existing effects (e.g. rocket
+            // exhaust) look exactly the same as before this change.
+            p.r = 1.0f; p.g = 0.7f; p.b = 0.2f;
+        }
+        p.a = 1.0f; // Fully opaque at spawn
+
         ++spawned;
     }
 }
@@ -117,6 +135,10 @@ void ParticleSystem::Emit(const EmitterProps& props) {
 // Particles whose lifetime expires are deactivated (returned to the pool).
 // -----------------------------------------------------------------------
 void ParticleSystem::Update(float dt) {
+    // Gravity acceleration applied to every particle each frame.
+    // Negative Y is downward in AEEngine, so this pulls particles down.
+    const float kGravity = -250.0f;
+
     for (int i = 0; i < MAX_PARTICLES; ++i) {
         if (!sParticles[i].isActive) {
             continue;
@@ -133,7 +155,10 @@ void ParticleSystem::Update(float dt) {
             continue;
         }
 
-        // Move the particle based on its velocity
+        // Apply gravity (accelerated motion) -- velocity changes each frame
+        p.velY += kGravity * dt;
+
+        // Update position (linear motion using the new velocity)
         p.x += p.velX * dt;
         p.y += p.velY * dt;
     }
@@ -171,9 +196,9 @@ void ParticleSystem::Draw() {
         // Fade alpha from fully opaque (1.0) to invisible (0.0)
         float alpha = lifeRatio;
 
-        // Use a warm orange/yellow colour that fades with lifetime.
+        // Use the per-particle colour (set at spawn time) and fade with lifetime.
         // The vertex colour is white, so ColorToMultiply sets the final RGB+A.
-        AEGfxSetColorToMultiply(1.0f, 0.7f, 0.2f, alpha);
+        AEGfxSetColorToMultiply(p.r, p.g, p.b, alpha);
         AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
         AEGfxSetTransparency(alpha);
 

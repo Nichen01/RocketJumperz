@@ -1,6 +1,7 @@
 
 // External libraries are included in header file
 #include "Level3.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x;
@@ -138,6 +139,9 @@ void Level3_Load()
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel3 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	aiming::loadAiming();
+
+	// Build the particle system mesh and reset the pool
+	ParticleSystem::Load();
 }
 
 void Level3_Initialize()
@@ -339,6 +343,9 @@ void Level3_Update()
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 
+	// Step all active particles forward
+	ParticleSystem::Update(dt);
+
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo3[player], L3Drop,
@@ -385,6 +392,29 @@ void Level3_Update()
 		// Only process doors connected to this level
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
+
+		// --- Spark Emission Logic for Locked Doors ---
+		if (door.isLocked) {
+			door.sparkTimer += dt;
+			if (door.sparkTimer >= 4.0f) {
+				door.sparkTimer = 0.0f;
+
+				EmitterProps sparkProps;
+				sparkProps.spawnX = door.worldX;
+				sparkProps.spawnY = door.worldY + 10.0f;
+				sparkProps.velocityXBase = 0.0f;
+				sparkProps.velocityYBase = 200.0f;    // Shoot upwards; gravity pulls them down
+				sparkProps.velocitySpreadX = 100.0f;  // Wide X spread for cone shape
+				sparkProps.velocitySpreadY = 40.0f;
+				sparkProps.lifetimeBase = 1.0f;        // Longer life to show the arc
+				sparkProps.lifetimeSpread = 0.7f;
+				sparkProps.scaleBase = 5.0f;
+				sparkProps.emitCount = 18;
+				sparkProps.useSparkColors = true;   // Random white/yellow/orange sparks
+
+				ParticleSystem::Emit(sparkProps);
+			}
+		}
 
 		f32 dx = objectinfo3[player].xPos - door.worldX;
 		f32 dy = objectinfo3[player].yPos - door.worldY;
@@ -562,6 +592,15 @@ void Level3_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	// ====== PARTICLE SYSTEM RENDER ====== //
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo3[player].xPos, objectinfo3[player].yPos - 40.f);
 
@@ -699,6 +738,9 @@ void Level3_Unload()
 
 	// Destroy the font created in Load
 	if (fontLevel3 != -1) { AEGfxDestroyFont(fontLevel3); fontLevel3 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 
