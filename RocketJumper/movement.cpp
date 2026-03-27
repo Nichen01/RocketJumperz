@@ -14,7 +14,7 @@ namespace movement {
     s32 mouseX,mouseY;
     f32 mouseDistance;
     AEVec2 directionVector;
-    int bulletCount = 10;
+    int bulletCount = 25;
     bool playerFacingLeft = false; // starts facing right
 
     void initPlayerMovement(objectsquares& player)
