@@ -63,17 +63,14 @@ void Level1_Load()
 {
 	audio::loadsound();
 
-	// Load platform tile textures
 	load::platform();
-
-	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
 	load::cooldownBar();
+	load::wireInventory();
+	load::background();
 
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
-	load::wireInventory();
-	load::background();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
