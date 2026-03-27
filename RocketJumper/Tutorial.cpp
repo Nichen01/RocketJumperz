@@ -149,8 +149,6 @@ void Tutorial_Initialize()
 	// SPAWN test enemies
 	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -600.0f, 100.0f);
 	
-	
-
 	// Build spritesheet meshes for ranged enemy states (rows, cols)
 	AssetManager::BuildSqrMesh(MESH_RANGED_MOVE,   1, 4);
 	AssetManager::BuildSqrMesh(MESH_RANGED_ATTACK,  1, 6);
