@@ -255,6 +255,7 @@ void Level2_Initialize()
 
 void Level2_Update()
 {
+	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL3;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		level = 2;
