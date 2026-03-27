@@ -169,7 +169,7 @@ namespace renderlogic {
 					drawGlass(row, col, mapS, platformMesh);
 					{
 						static f32 timer = 0.f;
-						timer += g_dt;
+						timer += static_cast<f32>(g_dt);
 
 						// Moves up and down
 						f32 pixel = 5.f;   // pixels
@@ -189,7 +189,7 @@ namespace renderlogic {
 
 					if (key.active) { // floating key
 						static f32 timer = 0.f;
-						timer += g_dt;
+						timer += static_cast<f32>(g_dt);
 
 						// Moves up and down
 						f32 pixel = 5.f;   // pixels
