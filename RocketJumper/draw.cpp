@@ -168,28 +168,26 @@ namespace renderlogic {
 				case 60: // health pack
 					drawGlass(row, col, mapS, platformMesh);
 					{
-						for (auto& hp : healthPacks) {
-							if (hp.active) {
-								static f32 timer = 0.f;
-								timer += static_cast<f32>(g_dt);
+						if (hp.active) {
+							static f32 timer = 0.f;
+							timer += static_cast<f32>(g_dt);
 
-								// Moves up and down
-								f32 pixel = 5.f;   // pixels
-								f32 frequency = 1.f;   // cycles per second
-								f32 yOffset = sinf(timer * frequency * 2.f * pi) * pixel;
+							// Moves up and down
+							f32 pixel = 5.f;   // pixels
+							f32 frequency = 1.f;   // cycles per second
+							f32 yOffset = sinf(timer * frequency * 2.f * pi) * pixel;
 
-								f32 xPos = ((float)xo + mapS / 2) - AEGfxGetWindowWidth() / 2;
-								f32 yPos = AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2) + yOffset;
+							f32 xPos = ((float)xo + mapS / 2) - AEGfxGetWindowWidth() / 2;
+							f32 yPos = AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2) + yOffset;
 
-								AEGfxTextureSet(healthDrop, 0, 0);
-								renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
-								AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
-							}
+							AEGfxTextureSet(healthDrop, 0, 0);
+							renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+							AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 						}
 						break;
 					}
 				case 67: // key
-					drawGlass(row, col, mapS, platformMesh);
+					renderlogic::drawGlass(row, col, mapS, platformMesh);
 
 					if (key.active) { // floating key
 						static f32 timer = 0.f;
@@ -234,7 +232,7 @@ namespace renderlogic {
 			case 71: case 72: case 73: case 74: case 75: case 76: case 77: case 78:
 			{
 				// Draw the glass base layer first
-				drawGlass(row, col, mapS, platformMesh);
+				renderlogic::drawGlass(row, col, mapS, platformMesh);
 
 				// Pick the correct border texture based on tile ID
 				AEGfxTexture* borderTex = nullptr;
@@ -259,7 +257,7 @@ namespace renderlogic {
 				break;
 			}
 			case 81: case 82: // enemy
-					drawGlass(row, col, mapS, platformMesh);
+					renderlogic::drawGlass(row, col, mapS, platformMesh);
 					break;
 				default: //defaults to playable area
 					break;

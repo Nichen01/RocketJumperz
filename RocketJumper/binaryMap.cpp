@@ -37,7 +37,7 @@ int** glassMap;
 
 // extern key obj
 Key key{};
-std::vector<HealthPack> healthPacks;
+HealthPack hp;
 
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
@@ -139,13 +139,11 @@ int ImportMapDataFromFile(const char* FileName)
 
 			// SAVING COORDINATES OF HEALTH PACK
 			if (value == 60) {
-				HealthPack hp;
 				hp.worldX = ((float)col * tileSize + tileSize / 2) - 800.f;
 				hp.worldY = 450.f - ((float)row * tileSize + tileSize / 2);
 				hp.size = (float)tileSize;
 				hp.active = true;
 				hp.collected = false;
-				healthPacks.push_back(hp);
 			}
 
 			// SAVING COORDINATES OF KEY

@@ -263,6 +263,8 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
+
+	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL2;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		next = GS_LEVELEDITOR;
@@ -481,18 +483,16 @@ void Level1_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
-	for (auto& hp : healthPacks) {
-		objectsquares healthObj;
-		healthObj.xPos = hp.worldX;
-		healthObj.yPos = hp.worldY;
-		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
 
-		if (hp.active && gamelogic::static_collision(&objectinfo1[player], &healthObj)) {
-			hp.active = false;
-			hp.collected = true;
-			objectinfo1[player].health += rand() % 31;
-			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
-		}
+	if (hp.active && gamelogic::static_collision(&objectinfo1[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfo1[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
 	// After loop, set global flag for rendering

@@ -139,7 +139,7 @@ void Level3_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel3 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
 
 	// Build the particle system mesh and reset the pool
 	ParticleSystem::Load();
@@ -304,7 +304,7 @@ void Level3_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo3[player]);
 	movement::UpdatePlayerFacing(objectinfo3[player]);
-	aiming::updateAiming(objectinfo3[player]);
+	//aiming::updateAiming(objectinfo3[player]);
 	weaponSprite::Update(objectinfo3[player]);
 	pickup::updateDrops(L3Drop, MAX_ENEMIES, objectinfo3[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo3[player]);
@@ -460,18 +460,16 @@ void Level3_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
-	for (auto& hp : healthPacks) {
-		objectsquares healthObj;
-		healthObj.xPos = hp.worldX;
-		healthObj.yPos = hp.worldY;
-		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
-
-		if (hp.active && gamelogic::static_collision(&objectinfo3[player], &healthObj)) {
-			hp.active = false;
-			hp.collected = true;
-			objectinfo3[player].health += rand() % 31;
-			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
-		}
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+	
+	if (hp.active && gamelogic::static_collision(&objectinfo3[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfo3[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
 	// Check if player is near the broken door
@@ -741,7 +739,7 @@ void Level3_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
+//	aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 

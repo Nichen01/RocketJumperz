@@ -320,18 +320,16 @@ void Tutorial_Update()
 	aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
 
-	for (auto& hp : healthPacks) {
-		objectsquares healthObj;
-		healthObj.xPos = hp.worldX;
-		healthObj.yPos = hp.worldY;
-		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
 
-		if (hp.active && gamelogic::static_collision(&objectinfoTut[player], &healthObj)) {
-			hp.active = false;
-			hp.collected = true;
-			objectinfoTut[player].health += rand() % 31;
-			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
-		}
+	if (hp.active && gamelogic::static_collision(&objectinfoTut[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfoTut[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 	
 }
