@@ -37,6 +37,8 @@ int** glassMap;
 
 // extern key obj
 Key key{};
+std::vector<HealthPack> healthPacks;
+
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int finalDoorCount = 0;
@@ -135,8 +137,19 @@ int ImportMapDataFromFile(const char* FileName)
 				BinaryCollisionArray[row][col] = 0;
 			}
 
-			// to save coordinates of the key
-			if (value == 67) {
+			// SAVING COORDINATES OF HEALTH PACK
+			if (value == 60) {
+				HealthPack hp;
+				hp.worldX = ((float)col * tileSize + tileSize / 2) - 800.f;
+				hp.worldY = 450.f - ((float)row * tileSize + tileSize / 2);
+				hp.size = (float)tileSize;
+				hp.active = true;
+				hp.collected = false;
+				healthPacks.push_back(hp);
+			}
+
+			// SAVING COORDINATES OF KEY
+			else if (value == 67) {
 				key.row = row;
 				key.col = col;
 				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
@@ -145,7 +158,7 @@ int ImportMapDataFromFile(const char* FileName)
 				else if (currentGameLevel == 2) keyCountLevel2 = 1;
 			}
 
-			// to save coordinates of brokenDoor
+			// SAVING COORDINATES OF BROKEN DOOR
 			if (value == 69) {
 				finalDoor.worldX = (col * tileSize + tileSize / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				finalDoor.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.f);

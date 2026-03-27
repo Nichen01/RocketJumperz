@@ -53,6 +53,7 @@ static s8 fontLevel2 = -1;
 static bool playerNear;
 
 // bool for keycard in inventory
+static bool healthCollected;
 static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 
@@ -461,6 +462,20 @@ void Level2_Update()
 
 		if (door.anim.justFinished)
 			door.isOpen = (door.anim.currentFrame != 0);
+	}
+
+	for (auto& hp : healthPacks) {
+		objectsquares healthObj;
+		healthObj.xPos = hp.worldX;
+		healthObj.yPos = hp.worldY;
+		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+
+		if (hp.active && gamelogic::static_collision(&objectinfo2[player], &healthObj)) {
+			hp.active = false;
+			hp.collected = true;
+			objectinfo2[player].health += rand() % 31;
+			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
+		}
 	}
 
 	// After loop, set global flag for rendering

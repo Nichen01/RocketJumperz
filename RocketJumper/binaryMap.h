@@ -55,6 +55,16 @@ struct Key {
 	bool active{ true };
 };
 
+struct HealthPack {
+	f32 worldX;
+	f32 worldY;
+	f32 size{ 80.f };
+	bool active{ true };
+	bool collected = false;
+};
+
+extern std::vector<HealthPack> healthPacks;
+
 extern f32 tileSize; // Global tile size
 extern brokenDoor finalDoor;
 extern Key key;
