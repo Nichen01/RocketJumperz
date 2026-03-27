@@ -38,7 +38,6 @@ static char strBuffer[100];
 
 static bool playerNear;
 
-static bool healthCollected;
 static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 
@@ -327,18 +326,17 @@ void Tutorial_Update()
 	aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
 
-	//============= UPDATE HEALTH COLLISION =================//
 	for (auto& hp : healthPacks) {
-		if (!hp.active) continue;
+		objectsquares healthObj;
+		healthObj.xPos = hp.worldX;
+		healthObj.yPos = hp.worldY;
+		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
 
-		float dx = objectinfoTut[player].xPos - hp.worldX;
-		float dy = objectinfoTut[player].yPos - hp.worldY;
-		float dist = sqrtf(dx * dx + dy * dy);
-
-		if (dist < (hp.size / 2 + objectinfoTut[player].xScale / 2)) {
+		if (hp.active && gamelogic::static_collision(&objectinfoTut[player], &healthObj)) {
 			hp.active = false;
-			healthCollected = true;
-			AEAudioPlay(Pickup, soundEffects, 1.f, 1.f, 0);
+			hp.collected = true;
+			objectinfoTut[player].health += rand() % 31;
+			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 		}
 	}
 	
@@ -480,9 +478,8 @@ void Tutorial_Draw()
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
 
-	for (auto& hp : healthPacks) {
+	// ====== DRAW HEALTH PACK COLLISION ====== //
 
-	}
 
 }
 

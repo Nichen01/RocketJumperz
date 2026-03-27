@@ -144,6 +144,7 @@ int ImportMapDataFromFile(const char* FileName)
 				hp.worldY = 450.f - ((float)row * tileSize + tileSize / 2);
 				hp.size = (float)tileSize;
 				hp.active = true;
+				hp.collected = false;
 				healthPacks.push_back(hp);
 			}
 

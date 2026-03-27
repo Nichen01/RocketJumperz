@@ -60,6 +60,7 @@ struct HealthPack {
 	f32 worldY;
 	f32 size{ 80.f };
 	bool active{ true };
+	bool collected = false;
 };
 
 extern std::vector<HealthPack> healthPacks;
