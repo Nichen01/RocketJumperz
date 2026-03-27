@@ -344,31 +344,39 @@ void Tutorial_Draw()
 
 	// ==== RENDER UI FOR TUTORIAL ==== //
 	renderlogic::drawTileArray();
-	renderlogic::drawUITexture(350.f, -280.f, leftClick, 50.f);
-	renderlogic::drawUITexture(-50.f, -280.f, gButton, 50.f);
-	renderlogic::drawUITexture(-600.f, 10.f, spacebar, 50.f);
-	renderlogic::drawUITexture(280.f, 250.f, eButton, 50.f);
+	renderlogic::drawUITexture(350.f, -280.f, leftClick, 55.f);
+	renderlogic::drawUITexture(-50.f, -280.f, rightClick, 55.f);
+	renderlogic::drawUITexture(200.f, 50.f, gButton, 55.f);
+	renderlogic::drawUITexture(-600.f, -280.f, qButton, 55.f);
+	renderlogic::drawUITexture(-600.f, 10.f, spacebar, 55.f);
+	renderlogic::drawUITexture(280.f, 250.f, eButton, 55.f);
 
 	memset(strBuffer, 0, 100 * sizeof(char));
 	f32 textWidth, textHeight;
-	AEGfxGetPrintSize(font, strBuffer, 0.15f, &textWidth, &textHeight);
-	sprintf_s(strBuffer, "Left Click to Propel");
-	AEGfxPrint(font, strBuffer, 0.5f, -0.6f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxGetPrintSize(font, strBuffer, 0.6f, &textWidth, &textHeight);
+	sprintf_s(strBuffer, "Left Click to Shoot");
+	AEGfxPrint(font, strBuffer, 0.52f, -0.6f, 0.5f, 0.f, 0.f, 0.f, 1.f);
 
 	sprintf_s(strBuffer, "towards Mouse Cursor");
-	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.5f, 0.f, 0.f, 0.f, 1.f);
 
-	sprintf_s(strBuffer, "G To Toggle Gravity");
-	AEGfxPrint(font, strBuffer, 0.0f, -0.63f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	sprintf_s(strBuffer, "Right Click to Advance");
+	AEGfxPrint(font, strBuffer, 0.f, -0.6f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+
+	sprintf_s(strBuffer, "towards Mouse Cursor");
+	AEGfxPrint(font, strBuffer, 0.f, -0.67f, 0.5f, 0.f, 0.f, 0.f, 1.f);
 
 	sprintf_s(strBuffer, "Spacebar to Jump");
-	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.4f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+
+	sprintf_s(strBuffer, "G To Toggle Gravity");
+	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 0.f, 0.f, 0.f, 1.f);
 
 	sprintf_s(strBuffer, "Q to Switch Weapon");
-	AEGfxPrint(font, strBuffer, 0.0f, -0.78f, 0.3f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.65f, 0.6f, 0.f, 0.f, 0.f, 1.f);
 
 	sprintf_s(strBuffer, "E to Enter");
-	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.4f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 0.f, 0.f, 0.f, 1.f);
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies, MAX_ENEMIES,
@@ -407,7 +415,7 @@ void Tutorial_Draw()
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
-	renderlogic::drawCooldownHUD(objectinfoTut[player].xPos, objectinfoTut[player].yPos - 40.f);
+	renderlogic::drawCooldownHUD(objectinfoTut[player].xPos, objectinfoTut[player].yPos - 50.f);
 
 	// ====== HUD: Player Health Display ======
 	// Drawn last so it appears on top of all world geometry.
