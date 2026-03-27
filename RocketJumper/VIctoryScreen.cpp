@@ -69,7 +69,7 @@ void VictoryScreen_Update() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
-            movement::bulletCount = 10;
+            movement::bulletCount = 50;
             wireCount = 0;             // Reset Wires
             keycardCollected = false;  // Reset Keycard
             doorState = 0;             // Reset Final Door

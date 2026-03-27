@@ -28,7 +28,7 @@ namespace pickup {
 				if (instance[i].type == DROP_HEALTH) {
 					player.health += 50;
 				} else {
-					movement::bulletCount += 25;
+					movement::bulletCount += 50;
 				}
 				AEAudioPlay(Pickup, soundEffects, 1.0f, 1.0f, 0);
 			}

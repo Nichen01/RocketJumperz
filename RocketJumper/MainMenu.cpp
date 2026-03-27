@@ -323,7 +323,7 @@ void UpdateMainMenu() {
             currentMenuState = MENU_INSTRUCTIONS;
             printf("Instructions button clicked!\n");
         }
-        else if (creditsButton.isHovered) {
+        else if (creditsButton.isHovered) { 
             currentMenuState = MENU_CREDITS;
             creditsScrollY = -scrH * 0.667f; // Reset scroll position
             printf("Credits button clicked!\n");
