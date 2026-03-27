@@ -91,6 +91,9 @@ void Tutorial_Initialize()
 	movement::initPlayerMovement(objectinfoTut[player]);
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
+	// Set starting ammo for the Tutorial level
+	movement::bulletCount = 35;
+
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
 
@@ -464,7 +467,7 @@ void Tutorial_Draw()
 		AEGfxPrint(fontLevel1, healthText, -0.88f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Ammo icon + count (right beside health) ----
-		f32 ammoIconX = healthIconX + 130.f;  // offset to the right of health
+		f32 ammoIconX = healthIconX + 200.f;  // offset to the right of health (increased for readability)
 		f32 ammoIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -477,7 +480,7 @@ void Tutorial_Draw()
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel1, ammoText, -0.72f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel1, ammoText, -0.58f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Current weapon sprite (below health row) ----
 		// Show the sprite of the currently equipped weapon

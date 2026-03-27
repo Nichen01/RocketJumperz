@@ -614,7 +614,7 @@ void Level2_Draw()
 		AEGfxPrint(fontLevel2, healthText, -0.88f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Ammo icon + count (right beside health) ----
-		f32 ammoIconX = healthIconX + 130.f;
+		f32 ammoIconX = healthIconX + 200.f;  // increased for readability
 		f32 ammoIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -626,7 +626,7 @@ void Level2_Draw()
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel2, ammoText, -0.72f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel2, ammoText, -0.58f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Current weapon sprite (below health row) ----
 		AEGfxTexture* weaponIcon = (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN)
