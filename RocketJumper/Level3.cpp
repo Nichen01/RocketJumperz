@@ -2,6 +2,7 @@
 // External libraries are included in header file
 #include "Level3.h"
 #include "ParticleSystem.h"
+#include "traps.h"
 
 static s32* map = nullptr;
 static int x;
@@ -263,6 +264,11 @@ void Level3_Initialize()
 		}
 	}
 
+	// Initialize saw trap animation and build the MESH_SAW spritesheet mesh.
+	// Without this call, MESH_SAW is null and the draw code falls back to
+	// rendering the entire spritesheet squished into one tile.
+	traps::initTraps();
+
 }
 
 void Level3_Update()
@@ -362,6 +368,10 @@ void Level3_Update()
 
 	// Step all active particles forward
 	ParticleSystem::Update(dt);
+
+	// Advance saw blade spin animation and update trap suction/damage logic
+	traps::updateTraps(enemies, objectinfo3, map, x, y, tileSize);
+	traps::UpdateSawAnim(dt);
 
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
