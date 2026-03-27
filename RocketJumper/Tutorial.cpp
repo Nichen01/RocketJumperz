@@ -73,7 +73,7 @@ void Tutorial_Load()
 	load::platform();
 	load::ui();
 	load::cooldownBar();
-	load::background();
+	load::background2();
 	load::wireInventory();
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
@@ -85,7 +85,7 @@ void Tutorial_Load()
 void Tutorial_Initialize()
 {
 	currentGameLevel = 0;
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, 0.1f, 1.f, -1);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);
@@ -147,8 +147,7 @@ void Tutorial_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -400.0f, 300.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -600.0f, 100.0f);
 	
 	
 
