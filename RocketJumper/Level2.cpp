@@ -54,7 +54,7 @@ static bool playerNear;
 
 // bool for keycard in inventory
 static bool healthCollected;
-static bool keycardCollected;
+static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
@@ -255,6 +255,22 @@ void Level2_Initialize()
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
 	traps::initTraps();
+
+	// RESET KEYCARD
+	for (int row = 0; row < y; ++row) {
+		for (int col = 0; col < x; ++col) {
+			int tile = BinaryCollisionArray[row][col];
+			map[row * x + col] = tile;
+			if (tile == 67) {
+				key.active = true;
+				key.worldX = col * tileSize;
+				key.worldY = row * tileSize;
+				key.size = PlayerScale;
+				keycardCollected = false;
+			}
+		}
+	}
+
 }
 
 void Level2_Update()
@@ -311,7 +327,7 @@ void Level2_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo2[player]);
 	movement::UpdatePlayerFacing(objectinfo2[player]);
-	aiming::updateAiming(objectinfo2[player]);
+	//aiming::updateAiming(objectinfo2[player]);
 	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo2[player]);
@@ -680,7 +696,7 @@ void Level2_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
+	//::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 

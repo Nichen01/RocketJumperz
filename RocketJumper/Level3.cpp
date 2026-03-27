@@ -53,8 +53,10 @@ static bool playerNearBrokenDoor;
 
 // bool for keycard in inventory
 static bool healthCollected;
-static bool keycardCollected;
+static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
+
+static int doorState = 0;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -247,6 +249,20 @@ void Level3_Initialize()
 	// Wire drops: reset per-level tracker and initialize wire drop array
 	pickup::ResetWireDropTracker();
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
+
+	for (int row = 0; row < y; ++row) {
+		for (int col = 0; col < x; ++col) {
+			int tile = BinaryCollisionArray[row][col];
+			map[row * x + col] = tile;
+			if (tile == 67) {
+				key.active = true;
+				key.worldX = col * tileSize;
+				key.worldY = row * tileSize;
+				key.size = PlayerScale; // or whatever scale you use
+			}
+		}
+	}
+
 }
 
 void Level3_Update()
@@ -381,7 +397,7 @@ void Level3_Update()
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo3[player], map, x, static_cast<int>(tileSize), 1);
 
-	if (AEInputCheckCurr(AEVK_3)) wireCount = 3;
+	if (AEInputCheckCurr(AEVK_4)) wireCount = 2;
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -505,34 +521,23 @@ void Level3_Update()
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
-	//========== DOOR RENDERING BASED ON WIRE COUNT ==========//
-	// Show progressively repaired door as the player collects wires
-	if (wireCount <= 0) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
-	}
-	else if (wireCount == 1) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
-	}
-	else {
-		// 2 or 3 wires: show most-repaired door texture
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
-	}
-
-	// Player tries to use the final broken door.
-	// The door requires exactly 3 wires to be accessible.
-	// If the player has fewer than 3, play an error sound.
 	if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor) {
-		if (wireCount >= 3) {
-			// Door is accessible -- transition to victory
+		if (doorState < 3 && wireCount > 0) {
+			// Consume a wire and advance the door one stage
+			doorState++;
+			wireCount--;
+			AEAudioPlay(Pickup, soundEffects, 1.f, 1.f, 0);
+		}
+		else if (doorState == 3) {
+			// Door is fully repaired, now trigger victory
 			next = GS_VICTORY;
 		}
 		else {
-			// Not enough wires -- play error sound to inform the player
+			// Tried to repair without wires
 			AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
-			printf("Need 3 wires to open the final door! Current: %d\n", wireCount);
+			printf("Need wires to repair the door! Current: %d\n", wireCount);
 		}
 	}
-
 
 }
 
@@ -551,17 +556,26 @@ void Level3_Draw()
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
 
-	// ====== DRAW FINAL DOOR BASED ON WIRE COUNT ====== //
-	// Visual repair progress tied to global wireCount
-	if (wireCount <= 0) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
+	// ====== DRAW FINAL DOOR ====== //
+	// Draw final door based on doorState
+	switch (doorState) {
+	case 0:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			brokenDoor0, uiMesh, tileSize, tileSize);
+		break;
+	case 1:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			brokenDoor1, uiMesh, tileSize, tileSize);
+		break;
+	case 2:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			brokenDoor2, uiMesh, tileSize, tileSize);
+		break;
+	case 3:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			staticDoor, uiMesh, tileSize, tileSize);
 	}
-	else if (wireCount == 1) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
-	}
-	else {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
-	}
+
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
@@ -690,27 +704,8 @@ void Level3_Draw()
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
 
-	// Draw wire count text at the bottom-right of the wire inventory box
-	if (fontLevel3 >= 0) {
-		char wireText[16];
-		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel3, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
-	}
-
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected) {
-		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
-		for (auto& door : doors) {
-			door.isLocked = false;
-		}	
-	}
-	else {
-		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
-	}
+	renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 
 	if (playerNearBrokenDoor) {
 		renderlogic::flashingTexture(finalDoor.worldX, finalDoor.worldY + 60.f, eButton, 50.f);

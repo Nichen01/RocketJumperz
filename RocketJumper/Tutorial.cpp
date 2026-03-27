@@ -78,7 +78,7 @@ void Tutorial_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
 	weaponSprite::Load();
 }
 
@@ -317,7 +317,7 @@ void Tutorial_Update()
 		}
 	}
 
-	aiming::updateAiming(objectinfoTut[player]);
+	//aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
 
 	objectsquares healthObj;
@@ -493,7 +493,7 @@ void Tutorial_Unload()
 		delete[] glassMap;
 		glassMap = nullptr;
 	}
-	aiming::unloadAiming();
+	//aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }

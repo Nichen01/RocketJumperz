@@ -28,6 +28,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* borderTL = NULL, * borderT = NULL, * borderTR = NULL;
 	AEGfxTexture* borderCL = NULL, * borderCR = NULL;
 	AEGfxTexture* borderBL = NULL, * borderB = NULL, * borderBR = NULL;
+	AEGfxTexture* staticDoor = NULL;
 
 	int keyX{}, keyY{};
 
@@ -129,6 +130,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_SPACEBAR, "Assets/UI/spacebar.png");
 		AssetManager::LoadTexture(TEX_INVENTORY, "Assets/UI/inventory.png");
 		AssetManager::LoadTexture(TEX_KEYCARDINVENTORY, "Assets/UI/keycardInventory.png");
+		AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
 
 		// Sync the extern pointers so other files can use them directly
 		ctrl1 = AssetManager::GetTexture(TEX_CTRL1);
@@ -148,6 +150,7 @@ namespace load {
 		spacebar = AssetManager::GetTexture(TEX_SPACEBAR);
 		inventory = AssetManager::GetTexture(TEX_INVENTORY);
 		keycardInventory = AssetManager::GetTexture(TEX_KEYCARDINVENTORY);
+		staticDoor = AssetManager::GetTexture(TEX_STATIC_DOOR);
 	}
 
 	void key() {

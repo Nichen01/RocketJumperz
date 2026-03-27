@@ -152,6 +152,7 @@ int ImportMapDataFromFile(const char* FileName)
 				key.col = col;
 				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
+				key.active = true;
 				if (currentGameLevel == 1) keyCountLevel1 = 1;
 				else if (currentGameLevel == 2) keyCountLevel2 = 1;
 			}
