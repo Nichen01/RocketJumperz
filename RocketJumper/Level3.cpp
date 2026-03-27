@@ -430,6 +430,20 @@ void Level3_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
+	for (auto& hp : healthPacks) {
+		objectsquares healthObj;
+		healthObj.xPos = hp.worldX;
+		healthObj.yPos = hp.worldY;
+		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+
+		if (hp.active && gamelogic::static_collision(&objectinfo3[player], &healthObj)) {
+			hp.active = false;
+			hp.collected = true;
+			objectinfo3[player].health += rand() % 31;
+			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
+		}
+	}
+
 	// Check if player is near the broken door
 		f32 dx = objectinfo3[player].xPos - finalDoor.worldX;
 		f32 dy = objectinfo3[player].yPos - finalDoor.worldY;

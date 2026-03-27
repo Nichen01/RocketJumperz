@@ -272,8 +272,6 @@ void Tutorial_Update()
 	enemySystem::checkProjectileEnemyCollision(enemies, MAX_ENEMIES,
 		Projectiles, MAX_PROJECTILES);
 
-
-
 	// Check ranged enemy projectiles hitting player (uses PlayerTakeDamage internally)
 	enemySystem::checkEnemyPlayerProjectileCollision(
 		enemyProjectiles, MAX_PROJECTILES, objectinfoTut[player]);
@@ -322,7 +320,6 @@ void Tutorial_Update()
 		}
 	}
 
-	
 	aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
 
@@ -477,9 +474,6 @@ void Tutorial_Draw()
 
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
-
-	// ====== DRAW HEALTH PACK COLLISION ====== //
-
 
 }
 
