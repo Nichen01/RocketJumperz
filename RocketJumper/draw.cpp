@@ -165,13 +165,31 @@ namespace renderlogic {
 					}
 					break;
 				}
+				case 60: // health pack
+					drawGlass(row, col, mapS, platformMesh);
+					{
+						static f32 timer = 0.f;
+						timer += g_dt;
+
+						// Moves up and down
+						f32 pixel = 5.f;   // pixels
+						f32 frequency = 1.f;   // cycles per second
+						f32 yOffset = sinf(timer * frequency * 2.f * pi) * pixel;
+
+						f32 xPos = ((float)xo + mapS / 2) - AEGfxGetWindowWidth() / 2;
+						f32 yPos = AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2) + yOffset;
+
+						AEGfxTextureSet(healthDrop, 0, 0);
+						renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+						break;
+					}
 				case 67: // key
 					drawGlass(row, col, mapS, platformMesh);
 
 					if (key.active) { // floating key
 						static f32 timer = 0.f;
-						f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
-						timer += dt;
+						timer += g_dt;
 
 						// Moves up and down
 						f32 pixel = 5.f;   // pixels

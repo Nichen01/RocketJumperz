@@ -617,14 +617,14 @@ void Level3_Draw()
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		if (movement::enableGravity) {
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel3, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
-		}
-		else {
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel3, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
-		}
+		//if (movement::enableGravity) {
+		//	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		//	AEGfxPrint(fontLevel3, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+		//}
+		//else {
+		//	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		//	AEGfxPrint(fontLevel3, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		//}
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //

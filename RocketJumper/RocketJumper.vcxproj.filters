@@ -4,9 +4,6 @@
     <ClCompile Include="AimingInterface.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="BinaryMap.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -90,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="traps.cpp">
       <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="BinaryMap.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
