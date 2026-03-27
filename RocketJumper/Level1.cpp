@@ -141,7 +141,7 @@ void Level1_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
 	weaponSprite::Load();
 }
 
@@ -539,7 +539,7 @@ void Level1_Draw()
 	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
 		playerDrawScaleX, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture

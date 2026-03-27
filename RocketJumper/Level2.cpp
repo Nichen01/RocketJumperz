@@ -140,7 +140,7 @@ void Level2_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
 	weaponSprite::Load();
 }
 
@@ -507,7 +507,7 @@ void Level2_Draw()
 	renderlogic::drawSquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
 		playerDrawScaleX, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -548,16 +548,6 @@ void Level2_Draw()
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
 
-	// Draw wire count text at the bottom-right of the wire inventory box
-	if (fontLevel2 >= 0) {
-		char wireText[16];
-		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel2, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
-	}
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);

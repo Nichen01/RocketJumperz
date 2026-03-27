@@ -38,6 +38,9 @@ static char strBuffer[100];
 
 static bool playerNear;
 
+static bool keycardCollected;
+static bool keycardCollectedAudio = false;
+
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
@@ -71,6 +74,7 @@ void Tutorial_Load()
 	load::ui();
 	load::cooldownBar();
 	load::background();
+	load::wireInventory();
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -433,9 +437,23 @@ void Tutorial_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
 	}
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 	pickup::drawDrops(TutDrop, MAX_ENEMIES);
+
+	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
+	if (keycardCollected) {
+		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
+	}
+	else {
+		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+	}
+
+	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
+	renderlogic::drawWireInventory(wireCount);
 }
 
 void Tutorial_Free()
