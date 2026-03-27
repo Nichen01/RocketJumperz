@@ -553,7 +553,7 @@ void Level3_Draw()
 	renderlogic::drawSquare(objectinfo3[player].xPos, objectinfo3[player].yPos,
 		playerDrawScaleX, objectinfo3[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture

@@ -17,10 +17,9 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* eyeTrap = NULL, * sawTrap = NULL, * trapBeam = NULL;
 	AEGfxTexture* keyTexture = NULL;
 	AEGfxTexture* errorPromptMenu = NULL, * redButton = NULL, * greenButton = NULL;
-	AEGfxTexture* prompt1 = NULL, * prompt2 = NULL, * prompt3 = NULL, * prompt4 = NULL, * prompt5 = NULL, * prompt6 = NULL, * prompt7 = NULL, * prompt8 = NULL, * prompt9 = NULL;
 	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
 	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
-	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
+	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL, * wireInventory3 = NULL;
 	AEGfxTexture* menuTex = NULL, * buttonTex = NULL;
 	AEGfxTexture* backgroundTex = NULL;
 	AEGfxTexture* ammoDrop = NULL;
@@ -156,25 +155,7 @@ namespace load {
 
 	void errorPrompt() {
 		AssetManager::LoadTexture(TEX_ERRORPROMPT, "Assets/UI/menu.png");
-		AssetManager::LoadTexture(TEX_PROMPT1, "Assets/UI/prompt1.png");
-		AssetManager::LoadTexture(TEX_PROMPT2, "Assets/UI/prompt2.png");
-		AssetManager::LoadTexture(TEX_PROMPT3, "Assets/UI/prompt3.png");
-		AssetManager::LoadTexture(TEX_PROMPT4, "Assets/UI/prompt4.png");
-		AssetManager::LoadTexture(TEX_PROMPT5, "Assets/UI/prompt5.png");
-		AssetManager::LoadTexture(TEX_PROMPT6, "Assets/UI/prompt6.png");
-		AssetManager::LoadTexture(TEX_PROMPT7, "Assets/UI/prompt7.png");
-		AssetManager::LoadTexture(TEX_PROMPT8, "Assets/UI/prompt8.png");
-		AssetManager::LoadTexture(TEX_PROMPT9, "Assets/UI/prompt9.png");
 		errorPromptMenu = AssetManager::GetTexture(TEX_ERRORPROMPT);
-		prompt1 = AssetManager::GetTexture(TEX_PROMPT1);
-		prompt2 = AssetManager::GetTexture(TEX_PROMPT2);
-		prompt3 = AssetManager::GetTexture(TEX_PROMPT3);
-		prompt4 = AssetManager::GetTexture(TEX_PROMPT4);
-		prompt5 = AssetManager::GetTexture(TEX_PROMPT5);
-		prompt6 = AssetManager::GetTexture(TEX_PROMPT6);
-		prompt7 = AssetManager::GetTexture(TEX_PROMPT7);
-		prompt8 = AssetManager::GetTexture(TEX_PROMPT8);
-		prompt9 = AssetManager::GetTexture(TEX_PROMPT9);
 	}
 
 	void redButtonOption() {
@@ -200,9 +181,11 @@ namespace load {
 		AssetManager::LoadTexture(TEX_WIREINVENTORY0, "Assets/UI/wireInventory0.png");
 		AssetManager::LoadTexture(TEX_WIREINVENTORY1, "Assets/UI/wireInventory1.png");
 		AssetManager::LoadTexture(TEX_WIREINVENTORY2, "Assets/UI/wireInventory2.png");
+		AssetManager::LoadTexture(TEX_WIREINVENTORY3, "Assets/UI/wireInventory3.png");
 		wireInventory0 = AssetManager::GetTexture(TEX_WIREINVENTORY0);
 		wireInventory1 = AssetManager::GetTexture(TEX_WIREINVENTORY1);
 		wireInventory2 = AssetManager::GetTexture(TEX_WIREINVENTORY2);
+		wireInventory3 = AssetManager::GetTexture(TEX_WIREINVENTORY3);
 	}
 
 	void cooldownBar() {
