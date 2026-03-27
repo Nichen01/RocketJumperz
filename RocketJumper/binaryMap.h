@@ -63,10 +63,9 @@ struct HealthPack {
 	bool collected = false;
 };
 
-extern std::vector<HealthPack> healthPacks;
-
 extern f32 tileSize; // Global tile size
 extern brokenDoor finalDoor;
+extern HealthPack hp;
 extern Key key;
 extern int keyCountLevel1; // one level can only have one key
 extern int keyCountLevel2;

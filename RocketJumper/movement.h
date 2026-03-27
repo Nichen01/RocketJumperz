@@ -8,7 +8,7 @@ extern s32 screenWidth, screenLength;
 namespace movement {
     extern u8 jetPackCooldown;
     // Movement physics constants
-    constexpr f32 THRUST_POWER = 10.0f;      // Jetpack acceleration force
+    constexpr f32 THRUST_POWER = 17.0f;      // Jetpack acceleration force
     constexpr f32 ABSOLUTE_RECOIL = 10.f;      // Bullet Recoil force (plasma gun baseline)
     constexpr f32 SHOTGUN_RECOIL_MULTIPLIER = 4.f; // Shotgun recoil is 1.6x the plasma gun
     constexpr f32 DRAG_COEFFICIENT = 0.97f;  // Air drag (0.92 = 8% speed loss per frame)

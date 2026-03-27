@@ -37,7 +37,7 @@ int** glassMap;
 
 // extern key obj
 Key key{};
-std::vector<HealthPack> healthPacks;
+HealthPack hp;
 
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
@@ -139,13 +139,11 @@ int ImportMapDataFromFile(const char* FileName)
 
 			// SAVING COORDINATES OF HEALTH PACK
 			if (value == 60) {
-				HealthPack hp;
 				hp.worldX = ((float)col * tileSize + tileSize / 2) - 800.f;
 				hp.worldY = 450.f - ((float)row * tileSize + tileSize / 2);
 				hp.size = (float)tileSize;
 				hp.active = true;
 				hp.collected = false;
-				healthPacks.push_back(hp);
 			}
 
 			// SAVING COORDINATES OF KEY
@@ -154,6 +152,7 @@ int ImportMapDataFromFile(const char* FileName)
 				key.col = col;
 				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
+				key.active = true;
 				if (currentGameLevel == 1) keyCountLevel1 = 1;
 				else if (currentGameLevel == 2) keyCountLevel2 = 1;
 			}

@@ -3,6 +3,7 @@
 #include "Level1.h"
 #include "traps.h"
 #include "WeaponSprite.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x;
@@ -62,17 +63,14 @@ void Level1_Load()
 {
 	audio::loadsound();
 
-	// Load platform tile textures
 	load::platform();
-
-	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
 	load::cooldownBar();
+	load::wireInventory();
+	load::background();
 
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
-	load::wireInventory();
-	load::background();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
@@ -144,6 +142,9 @@ void Level1_Load()
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	//aiming::loadAiming();
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool
+	ParticleSystem::Load();
 }
 
 void Level1_Initialize()
@@ -355,6 +356,9 @@ void Level1_Update()
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 
+	// Step all active particles forward
+	ParticleSystem::Update(dt);
+
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo1[player], L1Drop,
@@ -400,6 +404,37 @@ void Level1_Update()
 		// Only process doors connected to this level
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
+
+		// --- Spark Emission Logic for Locked Doors ---
+		// Locked doors emit a small burst of falling white sparks every 4 seconds.
+		// Once the player collects the keycard (isLocked becomes false), sparks stop.
+		if (door.isLocked) {
+			door.sparkTimer += dt;
+			if (door.sparkTimer >= 2.0f) {
+				door.sparkTimer = 0.0f; // Reset the 4-second timer
+
+				EmitterProps sparkProps;
+				// Spawn slightly near the center/top of the door
+				sparkProps.spawnX = door.worldX;
+				sparkProps.spawnY = door.worldY;
+
+				// Shoot upwards -- gravity in Update() pulls them back down
+				sparkProps.velocityXBase = 0.0f;
+				sparkProps.velocityYBase = 100.0f;
+
+				// Wide X spread + narrow Y spread = upward cone shape
+				sparkProps.velocitySpreadX = 100.0f;
+				sparkProps.velocitySpreadY = 20.0f;
+
+				sparkProps.lifetimeBase = 1.0f;   // Short-lived sparks
+				sparkProps.lifetimeSpread = 0.7f;
+				sparkProps.scaleBase = 5.0f;       // Small specks
+				sparkProps.emitCount = 18;          // Small burst quantity
+				sparkProps.useSparkColors = true;   // Random white/yellow/orange sparks
+
+				ParticleSystem::Emit(sparkProps);
+			}
+		}
 
 		// get distance of player to door
 		f32 dx = objectinfo1[player].xPos - door.worldX;
@@ -447,18 +482,16 @@ void Level1_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
-	for (auto& hp : healthPacks) {
-		objectsquares healthObj;
-		healthObj.xPos = hp.worldX;
-		healthObj.yPos = hp.worldY;
-		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
 
-		if (hp.active && gamelogic::static_collision(&objectinfo1[player], &healthObj)) {
-			hp.active = false;
-			hp.collected = true;
-			objectinfo1[player].health += rand() % 31;
-			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
-		}
+	if (hp.active && gamelogic::static_collision(&objectinfo1[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfo1[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
 	// After loop, set global flag for rendering
@@ -564,6 +597,17 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	// ====== PARTICLE SYSTEM RENDER ====== //
+	// Draw particles behind UI elements but in front of projectiles
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo1[player].xPos, objectinfo1[player].yPos - 40.f);
 
@@ -594,7 +638,7 @@ void Level1_Draw()
 		AEGfxPrint(fontLevel1, healthText, -0.88f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Ammo icon + count (right beside health) ----
-		f32 ammoIconX = healthIconX + 130.f;  // offset to the right of health
+		f32 ammoIconX = healthIconX + 200.f;  // offset to the right of health (increased for readability)
 		f32 ammoIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -607,7 +651,7 @@ void Level1_Draw()
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel1, ammoText, -0.72f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel1, ammoText, -0.38f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Current weapon sprite (below health row) ----
 		// Show the sprite of the currently equipped weapon
@@ -693,6 +737,9 @@ void Level1_Unload()
 
 	// Destroy the font created in Load
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 

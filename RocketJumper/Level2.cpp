@@ -3,6 +3,7 @@
 #include "Level2.h"
 #include "traps.h"
 #include "WeaponSprite.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x;
@@ -53,7 +54,7 @@ static bool playerNear;
 
 // bool for keycard in inventory
 static bool healthCollected;
-static bool keycardCollected;
+static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
@@ -143,6 +144,9 @@ void Level2_Load()
 	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	//aiming::loadAiming();
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool
+	ParticleSystem::Load();
 }
 
 void Level2_Initialize()
@@ -251,6 +255,22 @@ void Level2_Initialize()
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
 	traps::initTraps();
+
+	// RESET KEYCARD
+	for (int row = 0; row < y; ++row) {
+		for (int col = 0; col < x; ++col) {
+			int tile = BinaryCollisionArray[row][col];
+			map[row * x + col] = tile;
+			if (tile == 67) {
+				key.active = true;
+				key.worldX = col * tileSize;
+				key.worldY = row * tileSize;
+				key.size = PlayerScale;
+				keycardCollected = false;
+			}
+		}
+	}
+
 }
 
 void Level2_Update()
@@ -307,7 +327,7 @@ void Level2_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo2[player]);
 	movement::UpdatePlayerFacing(objectinfo2[player]);
-	aiming::updateAiming(objectinfo2[player]);
+	//aiming::updateAiming(objectinfo2[player]);
 	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo2[player]);
@@ -344,6 +364,9 @@ void Level2_Update()
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Step all active particles forward
+	ParticleSystem::Update(dt);
 
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
@@ -392,6 +415,29 @@ void Level2_Update()
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
 
+		// --- Spark Emission Logic for Locked Doors ---
+		if (door.isLocked) {
+			door.sparkTimer += dt;
+			if (door.sparkTimer >= 4.0f) {
+				door.sparkTimer = 0.0f;
+
+				EmitterProps sparkProps;
+				sparkProps.spawnX = door.worldX;
+				sparkProps.spawnY = door.worldY + 10.0f;
+				sparkProps.velocityXBase = 0.0f;
+				sparkProps.velocityYBase = 200.0f;    // Shoot upwards; gravity pulls them down
+				sparkProps.velocitySpreadX = 100.0f;  // Wide X spread for cone shape
+				sparkProps.velocitySpreadY = 40.0f;
+				sparkProps.lifetimeBase = 1.0f;        // Longer life to show the arc
+				sparkProps.lifetimeSpread = 0.7f;
+				sparkProps.scaleBase = 5.0f;
+				sparkProps.emitCount = 18;
+				sparkProps.useSparkColors = true;   // Random white/yellow/orange sparks
+
+				ParticleSystem::Emit(sparkProps);
+			}
+		}
+
 		f32 dx = objectinfo2[player].xPos - door.worldX;
 		f32 dy = objectinfo2[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
@@ -435,18 +481,16 @@ void Level2_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
-	for (auto& hp : healthPacks) {
-		objectsquares healthObj;
-		healthObj.xPos = hp.worldX;
-		healthObj.yPos = hp.worldY;
-		healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
 
-		if (hp.active && gamelogic::static_collision(&objectinfo2[player], &healthObj)) {
-			hp.active = false;
-			hp.collected = true;
-			objectinfo2[player].health += rand() % 31;
-			AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
-		}
+	if (hp.active && gamelogic::static_collision(&objectinfo2[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfo2[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
 	// After loop, set global flag for rendering
@@ -532,6 +576,17 @@ void Level2_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	// ====== PARTICLE SYSTEM RENDER ====== //
+	// Draw particles behind UI elements but in front of projectiles
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo2[player].xPos, objectinfo2[player].yPos - 40.f);
 
@@ -559,7 +614,7 @@ void Level2_Draw()
 		AEGfxPrint(fontLevel2, healthText, -0.88f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Ammo icon + count (right beside health) ----
-		f32 ammoIconX = healthIconX + 130.f;
+		f32 ammoIconX = healthIconX + 200.f;  // increased for readability
 		f32 ammoIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -571,7 +626,7 @@ void Level2_Draw()
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel2, ammoText, -0.72f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel2, ammoText, -0.58f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// ---- Current weapon sprite (below health row) ----
 		AEGfxTexture* weaponIcon = (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN)
@@ -641,7 +696,7 @@ void Level2_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
+	//::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
@@ -653,6 +708,9 @@ void Level2_Unload()
 
 	// Destroy the font created in Load
 	if (fontLevel2 != -1) { AEGfxDestroyFont(fontLevel2); fontLevel2 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 
