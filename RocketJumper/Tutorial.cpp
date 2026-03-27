@@ -328,7 +328,19 @@ void Tutorial_Update()
 	weaponSprite::Update(objectinfoTut[player]);
 
 	//============= UPDATE HEALTH COLLISION =================//
-	
+	for (auto& hp : healthPacks) {
+		if (!hp.active) continue;
+
+		float dx = objectinfoTut[player].xPos - hp.worldX;
+		float dy = objectinfoTut[player].yPos - hp.worldY;
+		float dist = sqrtf(dx * dx + dy * dy);
+
+		if (dist < (hp.size / 2 + objectinfoTut[player].xScale / 2)) {
+			hp.active = false;
+			healthCollected = true;
+			AEAudioPlay(Pickup, soundEffects, 1.f, 1.f, 0);
+		}
+	}
 	
 }
 
@@ -467,6 +479,11 @@ void Tutorial_Draw()
 
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
+
+	for (auto& hp : healthPacks) {
+
+	}
+
 }
 
 void Tutorial_Free()

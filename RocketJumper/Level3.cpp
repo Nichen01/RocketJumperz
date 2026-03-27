@@ -51,6 +51,7 @@ static bool playerNear;
 static bool playerNearBrokenDoor;
 
 // bool for keycard in inventory
+static bool healthCollected;
 static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 
