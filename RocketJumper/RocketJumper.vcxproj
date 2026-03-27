@@ -15,6 +15,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="BinaryMap.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="Confirmation.cpp" />
     <ClCompile Include="DeathScreen.cpp" />
     <ClCompile Include="DoorSystem.cpp" />
     <ClCompile Include="Draw.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="BinaryMap.h" />
     <ClInclude Include="Collision.h" />
+    <ClInclude Include="Confirmation.h" />
     <ClInclude Include="DeathScreen.h" />
     <ClInclude Include="DoorSystem.h" />
     <ClInclude Include="Draw.h" />

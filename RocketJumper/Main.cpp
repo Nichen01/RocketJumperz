@@ -7,12 +7,14 @@
 #include "Load.h"
 #include "Sound.h"
 #include "PauseMenu.h"
+#include "Confirmation.h"
 
 // ---------------------------------------------------------------------------
 // main
 
 bool pause = false;
 bool canpause = true;
+bool destructive = false;
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -42,7 +44,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 	
-	GSM_Initialize(GS_LEVEL1);
+	GSM_Initialize(GS_VICTORY);
 
 	while (current != GS_QUIT)
 	{
@@ -65,6 +67,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (current != GS_RESTART) {
 			GSM_Update();
 			fpLoad();
+			Confirmation_Load();
 			if (canpause) {
 				Pause_Load();	
 			}
@@ -76,22 +79,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (canpause) {
 			Pause_Initialize();
 		}
-		
+		Confirmation_Init();
 		fpInitialize();
 
 		while (next == current)
 		{
 			AESysFrameStart();
-
-			if (canpause) {
-				if (AEInputCheckTriggered(AEVK_TAB)) {
-					if (pause) {
-						pause = false;
-					}
-					else {
-						pause = true;
-					}
+			if (AEInputCheckTriggered(AEVK_J)) {
+				if (destructive) {
+					destructive = false;
 				}
+				else {
+					destructive = true;
+				}
+			}
+			if (canpause) {
+				
 
 				if (!pause) {
 					audio::audiolevel(1.0f);
@@ -101,17 +104,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				fpDraw();
 
 				if (pause) {
-					Pause_Update();
+					if (!destructive) {
+						Pause_Update();
+					}
 					Pause_Draw();
+					if (destructive) {
+						Confirmation_Draw();
+					}
 					audio::audiolevel(0.2f);
 				}
 			}
 			else {
-				fpUpdate();
+				if (!destructive) {
+					fpUpdate();
+				}
 				fpDraw();
+				if (destructive) {
+					Confirmation_Draw();
+				}
 			}
-			
-			
+
 			AESysFrameEnd();
 			if (AESysDoesWindowExist() == false){
 				next = GS_QUIT;
@@ -127,12 +139,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			Pause_Free();
 		}
 		fpFree();
+		Confirmation_Free();
 
 		if (next != GS_RESTART) {
 			if (canpause) {
 				Pause_Unload();
 			}
 			fpUnload();
+			Confirmation_Unload();
 			pause = false;
 			previous = current;
 		}

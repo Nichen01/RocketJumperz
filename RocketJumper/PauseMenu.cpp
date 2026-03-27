@@ -52,12 +52,6 @@ void Pause_Update() {
 
 void Pause_Draw() {
 
-	//AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	//AEGfxTextureSet(menutex, 0, 0);
-	//AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); 
-	//renderlogic::drawSquare(0.0f, 0.0f, 500.0f, 640.0f);
-	//AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
-
 	renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, 500.f, 640.f);
 
 	AEGfxGetPrintSize(pausefont, "PAUSE", 1.f, &width, &height);

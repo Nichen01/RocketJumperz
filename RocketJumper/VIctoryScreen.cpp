@@ -1,4 +1,5 @@
 #include "VictoryScreen.h"
+#include "Confirmation.h"
 #include "Draw.h"
 
 static s8 victoryfont = -1;
@@ -77,7 +78,9 @@ void VictoryScreen_Update() {
             printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {
-            next = GS_QUIT;
+       
+                next = GS_QUIT;
+            
             printf("Exiting game!\n");
         }
     }
@@ -100,6 +103,8 @@ void VictoryScreen_Draw() {
     MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttontex);
     MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttontex);
     MenuHelpers::TexdrawButton(exitButton, buttonMesh, victoryfont, buttontex);
+
+   
 
 }
 void VictoryScreen_Free() {
