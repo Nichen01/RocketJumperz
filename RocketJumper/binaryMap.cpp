@@ -43,6 +43,13 @@ int healthCountLevel1 = 0;
 int healthCountLevel2 = 0;
 int healthCountLevel3 = 0;
 
+int rEnemyLevel1;
+int mEnemyLevel1;
+int rEnemyLevel2;
+int mEnemyLevel2;
+int rEnemyLevel3;
+int mEnemyLevel3;
+
 int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
 brokenDoor finalDoor{};
@@ -141,10 +148,16 @@ int ImportMapDataFromFile(const char* FileName)
 			else if (value == 81) {
 				enemy1X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				enemy1Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+				if (currentGameLevel == 1) rEnemyLevel1 = 1;
+				else if (currentGameLevel == 2) rEnemyLevel2 = 1;
+				else if (currentGameLevel == 3) rEnemyLevel3 = 1;
 			}
 			else if (value == 82) {
 				enemy2X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				enemy2Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+				if (currentGameLevel == 1) mEnemyLevel1 = 1;
+				else if (currentGameLevel == 2) mEnemyLevel2 = 1;
+				else if (currentGameLevel == 3) mEnemyLevel3 = 1;
 			}
 
 

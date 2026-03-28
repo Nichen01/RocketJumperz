@@ -96,8 +96,6 @@ enum TextureID {
     // Key texture
     TEX_KEYCARD,
 
-    // Error prompt
-    TEX_ERRORPROMPT,
     TEX_REDBUTTON,
     TEX_GREENBUTTON,
 

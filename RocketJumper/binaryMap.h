@@ -79,6 +79,13 @@ extern int healthCountLevel1;
 extern int healthCountLevel2;
 extern int healthCountLevel3;
 
+extern int rEnemyLevel1;
+extern int mEnemyLevel1;
+extern int rEnemyLevel2;
+extern int mEnemyLevel2;
+extern int rEnemyLevel3;
+extern int mEnemyLevel3;
+
 extern int finalDoorCount; // Final Door Count
 
 extern f32 enemy1X, enemy1Y, enemy2X, enemy2Y;
