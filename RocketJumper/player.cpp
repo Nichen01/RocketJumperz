@@ -3,6 +3,7 @@
 #include <cstdio>
 
 int wireCount = 0;
+bool keycardCollected0 = false;
 bool keycardCollected1 = false;
 bool keycardCollected2 = false;
 bool keycardCollected3 = false;

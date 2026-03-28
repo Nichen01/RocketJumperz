@@ -398,6 +398,17 @@ namespace renderlogic {
 
 		renderlogic::drawTexture(x, y, cooldownFrame[frameIndex], uiMesh, 100.f, 100.f);
 	}
+
+	void drawPadlock(f32 x, f32 y) {
+		AEMtx33 scale, rot, trans, transf;
+		AEMtx33Scale(&scale, 40.f, 40.f);
+		AEMtx33Rot(&rot, 0);
+
+		AEMtx33Trans(&trans, x, y);
+		AEMtx33Concat(&transf, &rot, &scale);
+		AEMtx33Concat(&transf, &trans, &transf);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	}
 }
 
 

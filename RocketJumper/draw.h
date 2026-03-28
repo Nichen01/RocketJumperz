@@ -18,6 +18,7 @@ namespace renderlogic {
 	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
 	void drawWireInventory(int);
 	void drawCooldownHUD(f32, f32);
+	void drawPadlock(f32, f32);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp

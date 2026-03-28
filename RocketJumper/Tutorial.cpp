@@ -37,8 +37,8 @@ static f32 bgVolume = 1.f;
 static char strBuffer[100];
 
 static bool playerNear;
+bool playerEnteredDoor0 = false;
 
-static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 
 // Font resource (must be destroyed in Unload to avoid leak)
@@ -77,6 +77,7 @@ void Tutorial_Load()
 	load::cooldownBar();
 	load::background2();
 	load::wireInventory();
+	load::key();
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
@@ -125,9 +126,10 @@ void Tutorial_Initialize()
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	for (auto& door : doors) {
+		door.isLocked = true;
 		if (door.id == playerEnteredDoorId) {
 			objectinfoTut[player].xPos = door.worldX;
-			objectinfoTut[player].yPos = door.worldY; // slight offset so player isn't inside door
+			objectinfoTut[player].yPos = door.worldY;
 			spawnSet = true;
 			break;
 		}
@@ -169,6 +171,7 @@ void Tutorial_Initialize()
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");
 	pickup::initDrops(TutDrop, MAX_ENEMIES, PlayerScale);
+
 }
 
 void Tutorial_Update()
@@ -289,28 +292,30 @@ void Tutorial_Update()
 	// -----------------------------------------------------------------------
 
 	for (auto& door : doors) {
-
-		if (door.entranceLevel != 0 && door.exitLevel != 0) continue;
 		f32 dx = objectinfoTut[player].xPos - door.worldX;
 		f32 dy = objectinfoTut[player].yPos - door.worldY;
 		f32 dist = sqrtf(dx * dx + dy * dy);
 		playerNear = (dist <= doorTriggerRadius);
 
-		if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
-			animSystem::play(door.anim, ANIM_PLAY_ONCE);
+		// Only animate if door is not locked
+		if (!door.isLocked) {
+			if (playerNear && !door.isOpen && door.anim.playMode == ANIM_IDLE)
+				animSystem::play(door.anim, ANIM_PLAY_ONCE);
 
-		if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE)
-			animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+			if (!playerNear && door.isOpen && door.anim.playMode == ANIM_IDLE)
+				animSystem::play(door.anim, ANIM_PLAY_REVERSE);
+		}
 
 		animSystem::update(door.anim, dt);
 
 		if (door.anim.justFinished)
 			door.isOpen = (door.anim.currentFrame != 0);
 
-		// E key transition -- inside the loop so door and playerNear are in scope
-		if (playerNear && door.isOpen && AEInputCheckTriggered(AEVK_E)) {
+		// Transition only if unlocked
+		if (playerNear && door.isOpen && !door.isLocked && AEInputCheckTriggered(AEVK_E)) {
 			int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
-			playerEnteredDoorId = door.id;  // remember which door was used
+			playerEnteredDoor0 = true;
+			playerEnteredDoorId = door.id;
 			switch (toLevel) {
 			case 0: next = GS_TUTORIAL; break;
 			case 1: next = GS_LEVEL1; break;
@@ -318,6 +323,23 @@ void Tutorial_Update()
 			}
 		}
 	}
+
+	objectsquares keyObj;
+	keyObj.xPos = key.worldX;
+	keyObj.yPos = key.worldY;
+	keyObj.xScale = key.size;
+	keyObj.yScale = key.size;
+
+	if (key.active && gamelogic::static_collision(&objectinfoTut[player], &keyObj)) {
+		key.active = false;
+		keycardCollected0 = true;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
+
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
+	}
+
 
 	//aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
@@ -333,6 +355,14 @@ void Tutorial_Update()
 		objectinfoTut[player].health += rand() % 31;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
+
+	// Ensure doors stay unlocked once the keycard is collected
+	if (keycardCollected0) {
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
+	}
+
 	
 }
 
@@ -347,18 +377,6 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
-
-	// ===== RENDER WALLS ======= //
-	renderlogic::drawMapWallFloor(map, x, y, s);
-
-	// ==== RENDER UI FOR TUTORIAL ==== //
-	renderlogic::drawTileArray();
-	renderlogic::drawUITexture(350.f, -280.f, leftClick, 55.f);
-	renderlogic::drawUITexture(-50.f, -280.f, rightClick, 55.f);
-	renderlogic::drawUITexture(200.f, 50.f, gButton, 55.f);
-	renderlogic::drawUITexture(-600.f, -280.f, qButton, 55.f);
-	renderlogic::drawUITexture(-600.f, 10.f, spacebar, 55.f);
-	renderlogic::drawUITexture(280.f, 250.f, eButton, 55.f);
 
 	memset(strBuffer, 0, 100 * sizeof(char));
 	f32 textWidth, textHeight;
@@ -387,6 +405,26 @@ void Tutorial_Draw()
 	sprintf_s(strBuffer, "E to Enter");
 	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 0.f, 0.f, 0.f, 1.f);
 
+	// ===== RENDER WALLS ======= //
+	renderlogic::drawMapWallFloor(map, x, y, s);
+
+	// ==== RENDER UI FOR TUTORIAL ==== //
+	renderlogic::drawTileArray();
+	renderlogic::drawUITexture(350.f, -280.f, leftClick, 55.f);
+	renderlogic::drawUITexture(-50.f, -280.f, rightClick, 55.f);
+	renderlogic::drawUITexture(200.f, 50.f, gButton, 55.f);
+	renderlogic::drawUITexture(-600.f, -280.f, qButton, 55.f);
+	renderlogic::drawUITexture(-600.f, 10.f, spacebar, 55.f);
+	renderlogic::drawUITexture(280.f, 250.f, eButton, 55.f);
+
+	// ====== RENDERING PADLOCK ====== //
+	for (auto& door : doors) {
+		if (door.isLocked) {
+			// Draw padlock texture at the door’s position
+			renderlogic::drawTexture(door.worldX, door.worldY, padlock, uiMesh, 50.f, 50.f);
+		}
+	}
+
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies, MAX_ENEMIES,
 		AssetManager::GetMesh(MESH_MELEE_ENEMY),
@@ -400,7 +438,6 @@ void Tutorial_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(enemyProjectiles, MAX_PROJECTILES, plasma, projectileMesh);
-
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
@@ -518,14 +555,20 @@ void Tutorial_Draw()
 	pickup::drawDrops(TutDrop, MAX_ENEMIES);
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected) {
-		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
-		for (auto& door : doors) {
-			door.isLocked = false;
-		}
+	if (playerEnteredDoor0) {
+		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
 	else {
-		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+		// Otherwise, show keycard if collected, empty if not
+		if (keycardCollected0) {
+			renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
+			for (auto& door : doors) {
+				door.isLocked = false;
+			}
+		}
+		else {
+			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+		}
 	}
 
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //

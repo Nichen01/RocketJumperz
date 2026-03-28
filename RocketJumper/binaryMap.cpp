@@ -39,6 +39,17 @@ int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int finalDoorCount = 0;
 
+int healthCountLevel1 = 0;
+int healthCountLevel2 = 0;
+int healthCountLevel3 = 0;
+
+int rEnemyLevel1;
+int mEnemyLevel1;
+int rEnemyLevel2;
+int mEnemyLevel2;
+int rEnemyLevel3;
+int mEnemyLevel3;
+
 int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
 brokenDoor finalDoor{};
@@ -95,18 +106,31 @@ int ImportMapDataFromFile(const char* FileName)
 				hp.size = (float)tileSize;
 				hp.active = true;
 				hp.collected = false;
+				if (currentGameLevel == 1) healthCountLevel1 = 1;
+				else if (currentGameLevel == 2) healthCountLevel2 = 1;
+				else healthCountLevel3 = 1;
 			}
 
 			// SAVING COORDINATES OF KEY
 			else if (value == 67) {
-				key.row = row;
-				key.col = col;
-				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
-				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
-				key.active = true;
-				if (currentGameLevel == 1) keyCountLevel1 = 1;
-				else if (currentGameLevel == 2) keyCountLevel2 = 1;
+				// If the player has already entered Door0 or collected the key,
+				// treat this tile as empty so the key won't respawn.
+				if (playerEnteredDoor0 || keycardCollected0) {
+					MapData[row][col] = 0;              // overwrite tile to empty
+					BinaryCollisionArray[row][col] = 0; // no collision
+					key.active = false;
+				}
+				else {
+					key.row = row;
+					key.col = col;
+					key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+					key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
+					key.active = true;
+					if (currentGameLevel == 1) keyCountLevel1 = 1;
+					else if (currentGameLevel == 2) keyCountLevel2 = 1;
+				}
 			}
+
 
 			// SAVING COORDINATES OF BROKEN DOOR
 			if (value == 69) {
@@ -134,10 +158,16 @@ int ImportMapDataFromFile(const char* FileName)
 			else if (value == 81) {
 				enemy1X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				enemy1Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+				if (currentGameLevel == 1) rEnemyLevel1 = 1;
+				else if (currentGameLevel == 2) rEnemyLevel2 = 1;
+				else if (currentGameLevel == 3) rEnemyLevel3 = 1;
 			}
 			else if (value == 82) {
 				enemy2X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				enemy2Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+				if (currentGameLevel == 1) mEnemyLevel1 = 1;
+				else if (currentGameLevel == 2) mEnemyLevel2 = 1;
+				else if (currentGameLevel == 3) mEnemyLevel3 = 1;
 			}
 
 

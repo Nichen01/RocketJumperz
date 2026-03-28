@@ -193,7 +193,6 @@ void Level1_Initialize()
 			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
-	PrintRetrievedInformation();
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	if (playerEnteredDoorId != -1) {
@@ -231,11 +230,9 @@ void Level1_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	// SPAWN test enemies if not previously cleared
-	if (!prevCleared1) {
-		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy1X, enemy1Y);
-		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy2X, enemy2Y);
-	}
+	// SPAWN test enemies
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);

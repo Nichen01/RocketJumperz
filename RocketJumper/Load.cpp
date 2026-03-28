@@ -16,7 +16,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, *qButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
 	AEGfxTexture* eyeTrap = NULL, * sawTrap = NULL, * trapBeam = NULL;
 	AEGfxTexture* keyTexture = NULL;
-	AEGfxTexture* errorPromptMenu = NULL, * redButton = NULL, * greenButton = NULL;
+	AEGfxTexture* redButton = NULL, * greenButton = NULL;
 	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
 	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
 	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL, * wireInventory3 = NULL;
@@ -29,6 +29,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	AEGfxTexture* borderCL = NULL, * borderCR = NULL;
 	AEGfxTexture* borderBL = NULL, * borderB = NULL, * borderBR = NULL;
 	AEGfxTexture* staticDoor = NULL;
+	AEGfxTexture* padlock = NULL;
 
 	int keyX{}, keyY{};
 
@@ -131,6 +132,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_INVENTORY, "Assets/UI/inventory.png");
 		AssetManager::LoadTexture(TEX_KEYCARDINVENTORY, "Assets/UI/keycardInventory.png");
 		AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
+		AssetManager::LoadTexture(TEX_PADLOCK, "Assets/Items/padlock.png");
 
 		// Sync the extern pointers so other files can use them directly
 		ctrl1 = AssetManager::GetTexture(TEX_CTRL1);
@@ -151,16 +153,12 @@ namespace load {
 		inventory = AssetManager::GetTexture(TEX_INVENTORY);
 		keycardInventory = AssetManager::GetTexture(TEX_KEYCARDINVENTORY);
 		staticDoor = AssetManager::GetTexture(TEX_STATIC_DOOR);
+		padlock = AssetManager::GetTexture(TEX_PADLOCK);
 	}
 
 	void key() {
 		AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 		keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
-	}
-
-	void errorPrompt() {
-		AssetManager::LoadTexture(TEX_ERRORPROMPT, "Assets/UI/menu.png");
-		errorPromptMenu = AssetManager::GetTexture(TEX_ERRORPROMPT);
 	}
 
 	void redButtonOption() {
