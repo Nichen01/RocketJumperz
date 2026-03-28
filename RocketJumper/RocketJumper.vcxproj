@@ -38,7 +38,7 @@
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SplashScreen.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="traps.cpp" />
+    <ClCompile Include="Traps.cpp" />
     <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="VictoryScreen.cpp" />
     <ClCompile Include="WeaponSprite.cpp" />
@@ -72,7 +72,7 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SplashScreen.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="traps.h" />
+    <ClInclude Include="Traps.h" />
     <ClInclude Include="Tutorial.h" />
     <ClInclude Include="VictoryScreen.h" />
     <ClInclude Include="WeaponSprite.h" />

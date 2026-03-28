@@ -256,7 +256,7 @@ namespace renderlogic {
 				}
 				break;
 			}
-			case 81: case 82: // enemy
+			case 81: case 82: // enemy, 81 is drone, 82 is mushroom
 					renderlogic::drawGlass(row, col, mapS, platformMesh);
 					break;
 				default: //defaults to playable area

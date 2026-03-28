@@ -88,7 +88,7 @@
     <ClCompile Include="Player.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="traps.cpp">
+    <ClCompile Include="Traps.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="ParticleSystem.cpp">
@@ -165,7 +165,7 @@
     <ClInclude Include="SplashScreen.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="traps.h">
+    <ClInclude Include="Traps.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Tutorial.h">
