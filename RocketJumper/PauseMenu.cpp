@@ -53,6 +53,8 @@ void Pause_Update() {
 		if (tomenuButton.isHovered) {
 			destructive = true;
 			if (leave == 1) {
+				destructive = false;
+				leave = 0;
 				next = GS_MAINMENU;  // Change to test file if needed
 			}
 			else if (leave == 2) {
@@ -64,6 +66,8 @@ void Pause_Update() {
 		else if (exitButton.isHovered) {
 			destructive = true;
 			if (leave==1) {
+				destructive = false;
+				leave = 0;
 				next = GS_QUIT;
 			}
 			else if (leave == 2) {

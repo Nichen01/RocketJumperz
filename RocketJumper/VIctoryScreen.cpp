@@ -75,7 +75,15 @@ void VictoryScreen_Update() {
             keycardCollected3 = false;  // Reset Keycard
             wireDropsSpawned = 0;
             doorState = 0;             // Reset Final Door
-            next = GS_TUTORIAL;
+            destructive = true;
+            if (leave == 1) {
+                next = GS_TUTORIAL;
+            }
+            else if (leave == 2) {
+                destructive = false;
+                leave = 0;
+            }
+            
             printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {
@@ -85,12 +93,24 @@ void VictoryScreen_Update() {
             keycardCollected3 = false;  // Reset Keycard
             wireDropsSpawned = 0;
             doorState = 0;             // Reset Final Door
-            next = GS_MAINMENU;
+            destructive = true;
+            if (leave == 1) {
+                destructive = false;
+                leave = 0;
+                next = GS_MAINMENU;
+            }
+            else if (leave == 2) {
+                destructive = false;
+                leave = 0;
+            }
+
             printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {
             destructive = true;
             if (leave == 1) {
+                destructive = false;
+                leave = 0;
                 next = GS_QUIT;
             }
             else if (leave == 2) {
@@ -113,8 +133,6 @@ void VictoryScreen_Draw() {
 
     AEGfxGetPrintSize(victoryfont, "VICTORY", 1.f, &width, &height);
     AEGfxPrint(victoryfont, "VICTORY", -width / 2, 0.60f - height / 2, 1, 1, 1, 1, 1);
-
-   
 
     MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttonTex);
     MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttonTex);
