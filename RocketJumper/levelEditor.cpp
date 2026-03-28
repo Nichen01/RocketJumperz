@@ -17,7 +17,6 @@ static f32 doorPromptAlpha = 1.0f;
 static bool showDoorPrompt = false;
 static f32 errorPromptAlpha = 1.0f;
 
-static bool showErrorPrompt = false;
 static u32 doorID{};
 
 static int promptRow = -1;
@@ -27,7 +26,13 @@ static char strBuffer[100];
 static char errorMessage[256];
 
 errorPromptButton errorPromptBtn;
+static bool enemyExistError = false;
+static bool finaldoorLevelError = false;
+static bool finaldoorExistError = false;
+static bool healthExistError = false;
+static bool doorlinkExistError = false;
 static bool keycardExistError = false;
+static bool wrongKeyLevelError = false;
 
 // ==================== FORWARD DECLARATIONS ====================//
 static bool isMouseOverDoorButton(const doorButton& button);
@@ -355,10 +360,8 @@ void LevelEditor_Update() {
 		for (doorButton& currentButton : buttonArr) {
 			updateDoorButtonHover(currentButton);
 			if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
-				if (currentButton.id == -1) {
-					showDoorPrompt = false;
-					doorPromptAlpha = 0.f;
-					break;
+				if (currentButton.id == -1) { // Close button
+					errorPromptAlpha = 1.0f;
 				}
 
 				// check individual door counter
@@ -386,11 +389,10 @@ void LevelEditor_Update() {
 					doorPromptAlpha = 0.f;
 				}
 				else {
-					std::cout << "This door link already exists!" << std::endl;
+					doorlinkExistError = true;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 					showDoorPrompt = false;
 					doorPromptAlpha = 0.f;
-					showErrorPrompt = true;
 					errorPromptAlpha = 1.0f;
 				}
 				break;
@@ -436,15 +438,11 @@ void LevelEditor_Update() {
 	if (currentTileIndex == 10 && AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (level == 1 && keyCountLevel1 >= 1) {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
-			sprintf_s(errorMessage, "Keycard already exists in this level!");
 			keycardExistError = true;
-			std::cout << "Keycard already exists" << std::endl;
 		}
 		else if (level == 2 && keyCountLevel2 >= 1) {
-			std::cout << "Keycard already exists" << std::endl;
-			sprintf_s(errorMessage, "Keycard already exists in this level!");
-			keycardExistError = true;
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
+			keycardExistError = true;
 		}
 	}
 }
@@ -517,7 +515,7 @@ void LevelEditor_Draw() {
 						bool placeKey = false;
 						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
 						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
-						else if (level == 3) std::cout << "You can't place a key in this level!" << std::endl;
+						else if (level == 3) wrongKeyLevelError = true;
 
 						if (placeKey) {
 							TileAction action;
@@ -555,13 +553,13 @@ void LevelEditor_Draw() {
 							else if (level == 3) healthCountLevel3++;
 						}
 						else {
-							std::cout << "Health pack already exists in this level" << std::endl;
+							healthExistError = true;
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
 					}
 					else if (currentTileIndex == 12) {
 						if (level != 3) {
-							std::cout << "Final Door can only be placed in Level 3!" << std::endl;
+							finaldoorLevelError = true;
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
 						else {
@@ -578,7 +576,7 @@ void LevelEditor_Draw() {
 								finalDoorCount = 1;
 							}
 							else {
-								std::cout << "Final Door already exists in this level!" << std::endl;
+								finaldoorExistError = true;
 								AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 							}
 						}
@@ -625,16 +623,16 @@ void LevelEditor_Draw() {
 							else if (level == 3) rEnemyLevel3 = 1;
 						}
 						else {
-							std::cout << "Enemy already exists in this level!" << std::endl;
+							enemyExistError = true;
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
 					}
 					else if (currentTileIndex == 16) {
 						bool placeEnemy = false;
 
-						if (level == 1 && rEnemyLevel1 == 0) placeEnemy = true;
-						else if (level == 2 && rEnemyLevel2 == 0) placeEnemy = true;
-						else if (level == 3 && rEnemyLevel3 == 0) placeEnemy = true;
+						if (level == 1 && mEnemyLevel1 == 0) placeEnemy = true;
+						else if (level == 2 && mEnemyLevel2 == 0) placeEnemy = true;
+						else if (level == 3 && mEnemyLevel3 == 0) placeEnemy = true;
 
 						if (placeEnemy) {
 							TileAction action;
@@ -651,9 +649,19 @@ void LevelEditor_Draw() {
 							else if (level == 3) mEnemyLevel3 = 1;
 						}
 						else {
-							std::cout << "Enemy already exists in this level!" << std::endl;
+							enemyExistError = true;
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
+					}
+					else if (currentTileIndex >= 17 && currentTileIndex <= 24) {
+						TileAction action;
+						action.row = row;
+						action.col = col;
+						action.prevValue = MapData[row][col];
+						action.newValue = 54 + currentTileIndex;
+
+						MapData[row][col] = action.newValue;
+						actionHistory.push_back(action);
 					}
 				}
 				if (AEInputCheckTriggered(AEVK_RBUTTON)) {
@@ -835,6 +843,24 @@ void LevelEditor_Draw() {
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "9", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
+			else if (!isGridHovered && currentTileIndex == 13) {
+				if (MapData[row][col] == 50) {
+					float W, H;
+					AEGfxGetPrintSize(font, "This", 0.5f, &W, &H);
+					float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - W / 2.0f;
+					float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - H / 2.0f;
+					AEGfxPrint(font, "This", normX, normY, 0.5f, 1, 1, 1, 1);
+				}
+			}
+			else if (!isGridHovered && currentTileIndex == 14) {
+				if (MapData[row][col] == 51) {
+					float W, H;
+					AEGfxGetPrintSize(font, "This", 0.5f, &W, &H);
+					float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - W / 2.0f;
+					float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - H / 2.0f;
+					AEGfxPrint(font, "This", normX, normY, 0.5f, 1, 1, 1, 1);
+				}
+			}
 		}
 	}
 
@@ -1010,12 +1036,16 @@ void LevelEditor_Draw() {
 	sprintf_s(strBuffer, "for Level");
 	AEGfxPrint(font, strBuffer, 0.67f, -0.35f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetBlendMode(AE_GFX_BM_NONE);   // no blending, just solid fill
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
 	// door prompt background box
 	if (showDoorPrompt && doorPromptAlpha > 0.0f) {
 		// Main prompt panel
 		float boxWidth = 850.0f;
 		float boxHeight = 400.0f;
-		AEGfxSetColorToMultiply(0.1f, 0.1f, 0.3f, doorPromptAlpha); // dark blue background
+		AEGfxSetColorToMultiply(0.f, 0.f, 0.f, doorPromptAlpha); // dark blue background
 		renderlogic::drawSquare(0, 0, boxWidth, boxHeight);
 		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
@@ -1033,17 +1063,18 @@ void LevelEditor_Draw() {
 		}
 	}
 
-	if (showErrorPrompt && errorPromptAlpha > 0.0f) {
+	if (errorPromptAlpha > 0.0f) {
 		if (showDoorPrompt) {
 			for (doorButton& currentButton : buttonArr) {
 				updateDoorButtonHover(currentButton);
 				if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
-					if (currentButton.id == -1) {
+					if (currentButton.id == -1) { // Cancel button
 						showDoorPrompt = false;
 						doorPromptAlpha = 0.f;
+						doorlinkExistError = false;
+						errorPromptAlpha = 0.f;
 						break;
 					}
-
 					// check individual door counter
 					bool canPlace = false;
 					if (currentButton.id == 0 && tutDoorCount == 0) canPlace = true;
@@ -1079,21 +1110,96 @@ void LevelEditor_Draw() {
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_LBUTTON)) {
-		if (errorPromptBtn.isHovered) {
-			keycardExistError = false;
-		}
-	}
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// ERROR PROMPT
 	if (keycardExistError) {
 		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
-		f32 errorWidth, errorHeight;
-		AEGfxGetPrintSize(font, errorMessage, 1.f, &errorWidth, &errorHeight);
 		sprintf_s(errorMessage, "Keycard already exists!");
 		AEGfxPrint(font, errorMessage, -0.37f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
 		drawErrorButton(errorPromptBtn, uiMesh, font);
 		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			keycardExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (wrongKeyLevelError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Keycard can't be placed in this level!");
+		AEGfxPrint(font, errorMessage, -0.4f, -0.05f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			wrongKeyLevelError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (doorlinkExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Door already exists!");
+		AEGfxPrint(font, errorMessage, -0.31f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			doorlinkExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (healthExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Health Pack already exists!");
+		AEGfxPrint(font, errorMessage, -0.43f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			healthExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (finaldoorLevelError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Door can't be placed in this level!");
+		AEGfxPrint(font, errorMessage, -0.42f, -0.05f, 0.8f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			finaldoorLevelError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (finaldoorExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Final Door already exists!");
+		AEGfxPrint(font, errorMessage, -0.41f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			finaldoorExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (enemyExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Enemy already exists!");
+		AEGfxPrint(font, errorMessage, -0.35f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			enemyExistError = false;
+			errorPromptAlpha = 0.f;
+		}
 	}
 }
 
