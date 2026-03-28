@@ -3,7 +3,7 @@
 
 // ==================== GLOBAL RESOURCES ==================== //
 static AEGfxTexture* door;
-static AEGfxTexture* tileTextures[16];
+static AEGfxTexture* tileTextures[25];
 static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
 static const char* pText3{ "Level 3" };
@@ -170,10 +170,19 @@ void LevelEditor_Load() {
 	AssetManager::LoadTexture(TEX_PLATFORM9, "Assets/Platform/platform9.png");
 	AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
+	AssetManager::LoadTexture(TEX_HEALTH, "Assets/Items/health.png");
 	AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
-	AssetManager::LoadTexture(TEX_SAW, "Assets/Items/saw.png");
+	AssetManager::LoadTexture(TEX_STATICSAW, "Assets/Traps/staticSaw.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
+	AssetManager::LoadTexture(TEX_BORDER_TL, "Assets/Platform/borderTL.png");
+	AssetManager::LoadTexture(TEX_BORDER_T, "Assets/Platform/borderT.png");
+	AssetManager::LoadTexture(TEX_BORDER_TR, "Assets/Platform/borderTR.png");
+	AssetManager::LoadTexture(TEX_BORDER_CL, "Assets/Platform/borderCL.png");
+	AssetManager::LoadTexture(TEX_BORDER_CR, "Assets/Platform/borderCR.png");
+	AssetManager::LoadTexture(TEX_BORDER_BL, "Assets/Platform/borderBL.png");
+	AssetManager::LoadTexture(TEX_BORDER_B, "Assets/Platform/borderB.png");
+	AssetManager::LoadTexture(TEX_BORDER_BR, "Assets/Platform/borderBR.png");
 
 	tileTextures[0] = AssetManager::GetTexture(TEX_PLATFORM1);
 	tileTextures[1] = AssetManager::GetTexture(TEX_PLATFORM2);
@@ -186,11 +195,20 @@ void LevelEditor_Load() {
 	tileTextures[8] = AssetManager::GetTexture(TEX_PLATFORM9);
 	tileTextures[9] = AssetManager::GetTexture(TEX_STATIC_DOOR);
 	tileTextures[10] = AssetManager::GetTexture(TEX_KEYCARD);
-	tileTextures[11] = AssetManager::GetTexture(TEX_BROKENDOOR0);
-	tileTextures[12] = AssetManager::GetTexture(TEX_EYETRAP);
-	tileTextures[13] = AssetManager::GetTexture(TEX_SAW);
-	tileTextures[14] = AssetManager::GetTexture(TEX_RANGED_ENEMY);
-	tileTextures[15] = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	tileTextures[11] = AssetManager::GetTexture(TEX_HEALTH);
+	tileTextures[12] = AssetManager::GetTexture(TEX_BROKENDOOR0);
+	tileTextures[13] = AssetManager::GetTexture(TEX_EYETRAP);
+	tileTextures[14] = AssetManager::GetTexture(TEX_STATICSAW);
+	tileTextures[15] = AssetManager::GetTexture(TEX_RANGED_ENEMY);
+	tileTextures[16] = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	tileTextures[17] = AssetManager::GetTexture(TEX_BORDER_TL);
+	tileTextures[18] = AssetManager::GetTexture(TEX_BORDER_T);
+	tileTextures[19] = AssetManager::GetTexture(TEX_BORDER_TR);
+	tileTextures[20] = AssetManager::GetTexture(TEX_BORDER_CL);
+	tileTextures[21] = AssetManager::GetTexture(TEX_BORDER_CR);
+	tileTextures[22] = AssetManager::GetTexture(TEX_BORDER_BL);
+	tileTextures[23] = AssetManager::GetTexture(TEX_BORDER_B);
+	tileTextures[24] = AssetManager::GetTexture(TEX_BORDER_BR);
 }
 
 void LevelEditor_Initialize() {
@@ -230,8 +248,6 @@ void LevelEditor_Initialize() {
 }
 
 void LevelEditor_Update() {
-	// blocking the tab button
-	if (AEInputCheckTriggered(AEVK_TAB)) {}
 
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
 		level = 1;
@@ -494,6 +510,9 @@ void LevelEditor_Draw() {
 				AEGfxSetColorToMultiply(0.49f, 0.49f, 0.49f, 1.0f); // dark gray
 			}
 			else if (MapData[row][col] <= 29 && MapData[row][col] >= 21) {
+				AEGfxSetColorToMultiply(0.8f, 0.8f, 0.56f, 1.f);
+			}
+			else if (MapData[row][col] == 60) { // healthpack
 				AEGfxSetColorToMultiply(0.5f, 0.8f, 0.5f, 1.f);
 			}
 			else if (MapData[row][col] == 67) { // key
@@ -505,7 +524,7 @@ void LevelEditor_Draw() {
 			else if (MapData[row][col] == 50 || MapData[row][col] == 51) { // traps
 				AEGfxSetColorToMultiply(0.42f, 0.59f, 0.72f, 1.f);
 			}
-			else if (MapData[row][col] == 80 || MapData[row][col] == 81) { // enemy
+			else if (MapData[row][col] == 81 || MapData[row][col] == 82) { // enemy
 				AEGfxSetColorToMultiply(0.59f, 0.4f, 0.4f, 1.f);
 			}
 			else {
@@ -540,6 +559,13 @@ void LevelEditor_Draw() {
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Door", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
+			else if (isGridHovered && MapData[row][col] == 60) {
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Health", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Health", normX, normY, 0.4f, 1, 1, 1, 1);
+			}
 			else if (isGridHovered && MapData[row][col] == 67) { // key
 				// normalize tile center
 				AEGfxGetPrintSize(font, "Key", 0.4f, &textW, &textH);
@@ -563,7 +589,7 @@ void LevelEditor_Draw() {
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Trap", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
-			else if (isGridHovered && (MapData[row][col] == 80 || MapData[row][col] == 81)) { // enemy
+			else if (isGridHovered && (MapData[row][col] == 81 || MapData[row][col] == 82)) { // enemy
 				// normalize tile center
 				AEGfxGetPrintSize(font, "Enemy", 0.4f, &textW, &textH);
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
@@ -693,11 +719,11 @@ void LevelEditor_Draw() {
 		break;
 	case 12:
 		sprintf_s(strBuffer, "Trap: Pulls Player towards it");
-		AEGfxPrint(font, strBuffer, -0.23f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.43f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 13:
 		sprintf_s(strBuffer, "Trap: Damages Player");
-		AEGfxPrint(font, strBuffer, -0.23f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.35f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	}
 
@@ -706,21 +732,21 @@ void LevelEditor_Draw() {
 	renderlogic::drawTexture(-170.f, -330.f, leftArrow, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(-20.f, -330.f, rightArrow, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, 400.f, ctrl1, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(610.f, 400.f, ctrl2, uiMesh);
-	renderlogic::drawTexture(670.f, 400.f, leftClick, uiMesh);
-	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh);
-	renderlogic::drawTexture(570.f, 170.f, ctrl1, uiMesh);
-	renderlogic::drawTexture(610.f, 170.f, ctrl2, uiMesh);
-	renderlogic::drawTexture(670.f, 170.f, sButton, uiMesh);
-	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh);
-	renderlogic::drawTexture(570.f, 60.f, ctrl1, uiMesh);
-	renderlogic::drawTexture(610.f, 60.f, ctrl2, uiMesh);
-	renderlogic::drawTexture(670.f, 60.f, zButton, uiMesh);
-	renderlogic::drawTexture(570.f, -60.f, ctrl1, uiMesh);
-	renderlogic::drawTexture(610.f, -60.f, ctrl2, uiMesh);
-	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh);
-	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh);
-	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh);
+	renderlogic::drawTexture(610.f, 400.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(670.f, 400.f, leftClick, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(570.f, 170.f, ctrl1, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(610.f, 170.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(670.f, 170.f, sButton, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(570.f, 60.f, ctrl1, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(610.f, 60.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(670.f, 60.f, zButton, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(570.f, -60.f, ctrl1, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(610.f, -60.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh, 50.f, 50.f);
 
 	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;
@@ -805,35 +831,6 @@ void LevelEditor_Draw() {
 						AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						showDoorPrompt = false;
 						doorPromptAlpha = 0.f;
-
-						//AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-						//AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-						////========== ERROR PROMPT ==========//
-						//renderlogic::drawTexture(-250.f, 200.f, prompt1, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(-150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(-50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(50.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(150.f, 200.f, prompt2, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(250.f, 200.f, prompt3, uiMesh, 100.f, 100.f);
-
-						//renderlogic::drawTexture(-250.f, 100.f, prompt4, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(-150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(-50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(50.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(150.f, 100.f, prompt5, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(250.f, 100.f, prompt6, uiMesh, 100.f, 100.f);
-
-						//renderlogic::drawTexture(-250.f, 0.f, prompt7, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(-150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(-50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(50.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(150.f, 0.f, prompt8, uiMesh, 100.f, 100.f);
-						//renderlogic::drawTexture(250.f, 0.f, prompt9, uiMesh, 100.f, 100.f);
-
-						//AEGfxPrint(font, "ERROR", -0.1f, 0.3f, 0.9f, 1, 1, 1, 1);
-						//AEGfxPrint(font, "Door already exists!", -0.25f, 0.1f, 0.8f, 1, 1, 1, 1);
-						//renderlogic::drawTexture(0.f, -50.f, redButton, uiMesh, 200.f, 73.f);
-						//AEGfxPrint(font, "Close", -0.07f, -0.14f, 0.8f, 1, 1, 1, 1);
 					}
 					break;
 				}

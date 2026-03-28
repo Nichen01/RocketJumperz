@@ -145,6 +145,7 @@ enum TextureID {
     TEX_BACKGROUND2,
 
     // Saw trap spritesheet (1 row, 7 columns)
+    TEX_STATICSAW,
     TEX_SAW,
 
     // Instructions menu full-screen image
