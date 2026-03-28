@@ -119,6 +119,7 @@ namespace movement {
         // Fire bullet with left mouse button
         if (AEInputCheckTriggered(AEVK_LBUTTON) && bulletCount > 0)
         {
+            if (player.currentWeapon == WEAPON_SHOTGUN && bulletCount < 3) return;
             // Calculate direction vector from player to mouse
             getMouse(player);
 
@@ -134,6 +135,7 @@ namespace movement {
         }
         if (AEInputCheckTriggered(AEVK_RBUTTON) && bulletCount>0)
         {
+            if (player.currentWeapon == WEAPON_SHOTGUN && bulletCount < 3) return;
             // Calculate direction vector from player to mouse
             getMouse(player);
 

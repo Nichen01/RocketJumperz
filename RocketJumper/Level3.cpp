@@ -334,8 +334,8 @@ void Level3_Update()
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	// Fire using the currently equipped weapon (toggled with Q)
-	if (movement::bulletCount) {
-		if (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN) {
+	if (movement::bulletCount>0) {
+		if (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN && movement::bulletCount > 2) {
 			// Shotgun: 5-pellet cone spread
 			projectileSystem::FireShotgun(
 				static_cast<s32>(worldMouseX),
@@ -346,7 +346,7 @@ void Level3_Update()
 				LaserBlast,
 				soundEffects);
 		}
-		else {
+		else if(objectinfo3[player].currentWeapon != WEAPON_SHOTGUN) {
 			// Plasma (default): single shot toward mouse
 			projectileSystem::fireProjectiles(
 				static_cast<s32>(worldMouseX),
