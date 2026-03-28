@@ -328,8 +328,8 @@ void Level2_Update()
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	// Fire using the currently equipped weapon (toggled with Q)
-	if (movement::bulletCount) {
-		if (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN) {
+	if (movement::bulletCount>0) {
+		if (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN && movement::bulletCount > 2) {
 			projectileSystem::FireShotgun(
 				static_cast<s32>(worldMouseX),
 				static_cast<s32>(worldMouseY),
@@ -339,7 +339,7 @@ void Level2_Update()
 				LaserBlast,
 				soundEffects);
 		}
-		else {
+		else if (objectinfo2[player].currentWeapon != WEAPON_SHOTGUN) {
 			projectileSystem::fireProjectiles(
 				static_cast<s32>(worldMouseX),
 				static_cast<s32>(worldMouseY),
