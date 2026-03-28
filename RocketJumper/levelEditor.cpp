@@ -703,9 +703,9 @@ void LevelEditor_Draw() {
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	
-	renderlogic::drawTexture(-170.f, -330.f, leftArrow, uiMesh);
-	renderlogic::drawTexture(-20.f, -330.f, rightArrow, uiMesh);
-	renderlogic::drawTexture(570.f, 400.f, ctrl1, uiMesh);
+	renderlogic::drawTexture(-170.f, -330.f, leftArrow, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(-20.f, -330.f, rightArrow, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(570.f, 400.f, ctrl1, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(610.f, 400.f, ctrl2, uiMesh);
 	renderlogic::drawTexture(670.f, 400.f, leftClick, uiMesh);
 	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh);

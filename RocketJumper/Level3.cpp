@@ -54,7 +54,6 @@ static bool playerNearBrokenDoor;
 
 // bool for keycard in inventory
 static bool healthCollected;
-//static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
 
 //static int doorState = 0;
@@ -195,7 +194,7 @@ void Level3_Initialize()
 	for (auto& door : doors) {
 		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
-		if (door.id == 21) {
+		if (door.id == 23) {
 			door.isLocked = false;
 		}
 
@@ -458,7 +457,7 @@ void Level3_Update()
 
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				if (door.isLocked && !keycardCollected) {
+				if (door.isLocked && !keycardCollected3) {
 					std::cout << "Door is locked!" << std::endl;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
@@ -527,7 +526,7 @@ void Level3_Update()
 
 	if (key.active && gamelogic::static_collision(&objectinfo3[player], &keyObj)) {
 		key.active = false;
-		keycardCollected = true;
+		keycardCollected3 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 

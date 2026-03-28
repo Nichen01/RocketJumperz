@@ -71,7 +71,9 @@ enum objecttype {
 
 // Counter for the WIRE to fix FINAL DOOR
 extern int wireCount;
-extern bool keycardCollected;
+extern bool keycardCollected1;
+extern bool keycardCollected2;
+extern bool keycardCollected3;
 extern int doorState;
 
 extern objectsquares objectinfo2[2];

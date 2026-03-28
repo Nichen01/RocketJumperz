@@ -1,12 +1,14 @@
-#include "drops.h"
-#include "collision.h"
-#include "draw.h"
-#include "movement.h"
+#include "Drops.h"
+#include "Collision.h"
+#include "Draw.h"
+#include "Movement.h"
 #include "AssetManager.h"
 #include "Load.h"
 #include "Sound.h"
 #include <cstdlib>   // rand()
 #include <cmath>     // sinf()
+
+int wireDropsSpawned{};
 
 namespace pickup {
 	AEMtx33 dropTransform = { 0 };
@@ -112,8 +114,12 @@ namespace pickup {
 	//
 	// Returns true if a wire was actually placed on the ground.
 	bool TrySpawnWireDrop(WireDrop wireDrops[], int maxCount,
-	                      f32 xPos, f32 yPos)
+		f32 xPos, f32 yPos)
 	{
+		// If we already spawned 3 wires total, stop
+		if (wireDropsSpawned >= 3)
+			return false;
+
 		// If we already dropped a wire on this level, skip
 		if (wireDroppedThisLevel)
 			return false;
@@ -124,36 +130,37 @@ namespace pickup {
 
 		if (enemiesKilledThisLevel == 1)
 		{
-			// First kill: 50% chance
 			int roll = rand() % 100;
 			shouldDrop = (roll < kWireDropChancePercent);
 		}
 		else if (enemiesKilledThisLevel == 2)
 		{
-			// Second kill: guaranteed if first didn't drop
 			shouldDrop = true;
 		}
-		// After the 2nd kill, no more wire drops on this level
 
 		if (!shouldDrop)
 			return false;
 
-		// Find an inactive slot in the wire drop array
 		for (int i = 0; i < maxCount; ++i)
 		{
 			if (wireDrops[i].info.flag == 0)
 			{
 				wireDrops[i].info.xPos = xPos;
 				wireDrops[i].info.yPos = yPos;
-				wireDrops[i].info.flag = 1;  // 1 = active on ground
+				wireDrops[i].info.flag = 1;
 				wireDroppedThisLevel = true;
-				printf("Wire dropped at (%.1f, %.1f)!\n", xPos, yPos);
+
+				wireDropsSpawned++;  // increment global counter
+				printf("Wire dropped at (%.1f, %.1f)! Total spawned: %d\n",
+					xPos, yPos, wireDropsSpawned);
+
 				return true;
 			}
 		}
 
-		return false;  // no free slot (should not happen normally)
+		return false;
 	}
+
 
 	// ---- UpdateWireDrops ----
 	// Checks every active wire drop for overlap with the player.

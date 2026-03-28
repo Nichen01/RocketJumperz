@@ -4,6 +4,7 @@
 #include "traps.h"
 #include "WeaponSprite.h"
 #include "ParticleSystem.h"
+#include "Player.h"
 
 static s32* map = nullptr;
 static int x;
@@ -453,7 +454,7 @@ void Level1_Update()
 				
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				if (door.isLocked && !keycardCollected) {
+				if (door.isLocked && !keycardCollected1) {
 					std::cout << "Door is locked!" << std::endl;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
@@ -515,7 +516,7 @@ void Level1_Update()
 
 	if (key.active && gamelogic::static_collision(&objectinfo1[player], &keyObj)) {
 		key.active = false;
-		keycardCollected = true;
+		keycardCollected1 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 }
@@ -692,7 +693,7 @@ void Level1_Draw()
 	renderlogic::drawWireInventory(wireCount);
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected) {
+	if (keycardCollected1) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
 		for (auto& door : doors) {
 			door.isLocked = false;

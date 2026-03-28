@@ -54,7 +54,7 @@ static bool playerNear;
 
 // bool for keycard in inventory
 static bool healthCollected;
-//static bool keycardCollected = false;
+static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
@@ -198,7 +198,7 @@ void Level2_Initialize()
 	for (auto& door : doors) {
 		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
-		if (door.id == 21||door.id==23) {
+		if (door.id == 22) {
 			door.isLocked = false;
 		}
 

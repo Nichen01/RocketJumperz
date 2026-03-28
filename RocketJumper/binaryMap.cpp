@@ -210,6 +210,7 @@ int ImportMapDataFromFile(const char* FileName)
 				door.col = col;
 				door.worldX = (col * 80) + 40 - 800.0f;
 				door.worldY = 450.0f - (row * 80 + 40);
+				door.isLocked = (tile == 21) ? false : true;
 
 				switch (tile) {
 				case 21: door.entranceLevel = 0; door.exitLevel = 1; break;

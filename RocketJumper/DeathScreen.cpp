@@ -66,14 +66,20 @@ void DeathScreen_Update() {
         if (restartButton.isHovered) {
             movement::bulletCount = 50;
             wireCount = 0;             // Reset Wires
-            keycardCollected = false;  // Reset Keycard
+            keycardCollected1 = false;  // Reset Keycard
+            keycardCollected2 = false;  // Reset Keycard
+            keycardCollected3 = false;  // Reset Keycard
+            wireDropsSpawned = 0;
             doorState = 0;
             next = GS_TUTORIAL;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {
             wireCount = 0;             // Reset Wires
-            keycardCollected = false;  // Reset Keycard
+            keycardCollected1 = false;  // Reset Keycard
+            keycardCollected2 = false;  // Reset Keycard
+            keycardCollected3 = false;  // Reset Keycard
+            wireDropsSpawned = 0;
             doorState = 0;
             next = GS_MAINMENU;  // Change to test file if needed
             printf("Play button clicked - Starting game!\n");

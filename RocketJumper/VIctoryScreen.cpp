@@ -71,14 +71,20 @@ void VictoryScreen_Update() {
         if (restartButton.isHovered) {
             movement::bulletCount = 50;
             wireCount = 0;             // Reset Wires
-            keycardCollected = false;  // Reset Keycard
+            keycardCollected1 = false;  // Reset Keycard
+            keycardCollected2 = false;  // Reset Keycard
+            keycardCollected3 = false;  // Reset Keycard
+            wireDropsSpawned = 0;
             doorState = 0;             // Reset Final Door
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {
             wireCount = 0;             // Reset Wires
-            keycardCollected = false;  // Reset Keycard
+            keycardCollected1 = false;  // Reset Keycard
+            keycardCollected2 = false;  // Reset Keycard
+            keycardCollected3 = false;  // Reset Keycard
+            wireDropsSpawned = 0;
             doorState = 0;             // Reset Final Door
             next = GS_MAINMENU;
             printf("Play button clicked - Starting game!\n");

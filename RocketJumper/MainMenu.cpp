@@ -314,7 +314,9 @@ void UpdateMainMenu() {
             movement::bulletCount = 10;
             playerEnteredDoorId = -1;
             wireCount = 0;             // Reset Wires
-            keycardCollected = false;  // Reset Keycard
+            keycardCollected1 = false;  // Reset Keycard
+            keycardCollected2 = false;  // Reset Keycard
+            keycardCollected3 = false;  // Reset Keycard
             doorState = 0;             // Reset Final Door
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");

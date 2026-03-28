@@ -1,6 +1,8 @@
 #pragma once
 #include "player.h"
 
+extern int wireDropsSpawned;
+
 enum DropType {
 	DROP_AMMO,
 	DROP_HEALTH
