@@ -29,6 +29,7 @@ extern AEGfxTexture* borderTL, * borderT, * borderTR;
 extern AEGfxTexture* borderCL, * borderCR;
 extern AEGfxTexture* borderBL, * borderB, * borderBR;
 extern AEGfxTexture* staticDoor;
+extern AEGfxTexture* padlock;
 
 extern int keyX, keyY;
 extern int brokenDoorX, brokenDoorY;

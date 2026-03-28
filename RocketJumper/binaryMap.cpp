@@ -113,14 +113,24 @@ int ImportMapDataFromFile(const char* FileName)
 
 			// SAVING COORDINATES OF KEY
 			else if (value == 67) {
-				key.row = row;
-				key.col = col;
-				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
-				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
-				key.active = true;
-				if (currentGameLevel == 1) keyCountLevel1 = 1;
-				else if (currentGameLevel == 2) keyCountLevel2 = 1;
+				// If the player has already entered Door0 or collected the key,
+				// treat this tile as empty so the key won't respawn.
+				if (playerEnteredDoor0 || keycardCollected0) {
+					MapData[row][col] = 0;              // overwrite tile to empty
+					BinaryCollisionArray[row][col] = 0; // no collision
+					key.active = false;
+				}
+				else {
+					key.row = row;
+					key.col = col;
+					key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+					key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
+					key.active = true;
+					if (currentGameLevel == 1) keyCountLevel1 = 1;
+					else if (currentGameLevel == 2) keyCountLevel2 = 1;
+				}
 			}
+
 
 			// SAVING COORDINATES OF BROKEN DOOR
 			if (value == 69) {

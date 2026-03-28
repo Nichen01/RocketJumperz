@@ -28,12 +28,13 @@ struct doorButton {
 };
 
 struct errorPromptButton {
-	f32 x, y; // position
-	f32 width, height; // size
-	f32 scale; // current scale
+	f32 x = 0.f, y = -100.f; // position
+	f32 width = 220.f, height = 80.f; // size
+	f32 scale = 1.0f; // current scale
 	f32 targetScale;
-	const char* text; // button label
-	bool isHovered; // hover state
+	const char* text = "CLOSE"; // button label
+	bool isHovered = false; // hover state
+	int id;
 };
 
 void LevelEditor_Load();

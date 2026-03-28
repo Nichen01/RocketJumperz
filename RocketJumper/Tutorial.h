@@ -9,6 +9,8 @@
 #include "Movement.h"
 #include "Enemies.h"
 
+extern bool playerEnteredDoor0;
+
 void Tutorial_Load();
 
 void Tutorial_Initialize();

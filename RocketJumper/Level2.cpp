@@ -196,7 +196,6 @@ void Level2_Initialize()
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	for (auto& door : doors) {
-		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
 		if (door.id == 22) {
 			door.isLocked = false;

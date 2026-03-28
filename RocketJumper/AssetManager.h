@@ -136,6 +136,7 @@ enum TextureID {
     TEX_COOLDOWNBAR4,
     TEX_COOLDOWNBAR5,
 
+    TEX_PADLOCK,
     TEX_MENU,
     TEX_BUTTON,
 
