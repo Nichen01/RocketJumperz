@@ -174,7 +174,7 @@ void LevelEditor_Load() {
 	AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
 	AssetManager::LoadTexture(TEX_STATICSAW, "Assets/Traps/staticSaw.png");
 	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
-	AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
+	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE0, "Assets/Enemy/MushroomIdle/mushroomIdle0.png");
 	AssetManager::LoadTexture(TEX_BORDER_TL, "Assets/Platform/borderTL.png");
 	AssetManager::LoadTexture(TEX_BORDER_T, "Assets/Platform/borderT.png");
 	AssetManager::LoadTexture(TEX_BORDER_TR, "Assets/Platform/borderTR.png");
@@ -200,7 +200,7 @@ void LevelEditor_Load() {
 	tileTextures[13] = AssetManager::GetTexture(TEX_EYETRAP);
 	tileTextures[14] = AssetManager::GetTexture(TEX_STATICSAW);
 	tileTextures[15] = AssetManager::GetTexture(TEX_RANGED_ENEMY);
-	tileTextures[16] = AssetManager::GetTexture(TEX_MELEE_ENEMY);
+	tileTextures[16] = AssetManager::GetTexture(TEX_MUSHROOM_IDLE0);
 	tileTextures[17] = AssetManager::GetTexture(TEX_BORDER_TL);
 	tileTextures[18] = AssetManager::GetTexture(TEX_BORDER_T);
 	tileTextures[19] = AssetManager::GetTexture(TEX_BORDER_TR);
@@ -314,12 +314,12 @@ void LevelEditor_Update() {
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex++;
-		if (currentTileIndex >= 26) currentTileIndex = 0;
+		if (currentTileIndex >= 25) currentTileIndex = 0;
 	}
 	else if (AEInputCheckTriggered(AEVK_LEFT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex--;
-		if (currentTileIndex < 0) currentTileIndex = 25;
+		if (currentTileIndex < 0) currentTileIndex = 24;
 	}
 
 	// undo
@@ -667,7 +667,7 @@ void LevelEditor_Draw() {
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	if (currentTileIndex >= 0 && currentTileIndex < 14 && tileTextures[currentTileIndex]) {
+	if (currentTileIndex >= 0 && currentTileIndex < 25 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);
 	}
 
@@ -724,14 +724,18 @@ void LevelEditor_Draw() {
 		AEGfxPrint(font, strBuffer, -0.17f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 11:
+		sprintf_s(strBuffer, "Health Pack");
+		AEGfxPrint(font, strBuffer, -0.2f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 12:
 		sprintf_s(strBuffer, "Final Door");
 		AEGfxPrint(font, strBuffer, -0.23f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
-	case 12:
+	case 13:
 		sprintf_s(strBuffer, "Trap: Pulls Player towards it");
 		AEGfxPrint(font, strBuffer, -0.43f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
-	case 13:
+	case 14:
 		sprintf_s(strBuffer, "Trap: Damages Player");
 		AEGfxPrint(font, strBuffer, -0.35f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;

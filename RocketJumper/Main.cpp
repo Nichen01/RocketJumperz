@@ -82,7 +82,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			AESysFrameStart();
 
 			if (canpause) {
-				if (AEInputCheckTriggered(AEVK_TAB)) {
+				if (AEInputCheckTriggered(AEVK_ESCAPE)) {
 					if (pause) {
 						pause = false;
 					}

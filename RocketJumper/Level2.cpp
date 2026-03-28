@@ -307,10 +307,6 @@ void Level2_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo2[player]);
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next = GS_QUIT;
-	}
-
 	// ---- Weapon Toggle (Q key) ----
 	if (AEInputCheckTriggered(AEVK_Q)) {
 		if (objectinfo2[player].currentWeapon == WEAPON_PLASMA) {

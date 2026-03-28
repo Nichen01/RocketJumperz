@@ -304,10 +304,6 @@ void Level3_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo3[player]);
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next = GS_QUIT;
-	}
-
 	// ---- Weapon Toggle (Q key) ----
 	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
 	if (AEInputCheckTriggered(AEVK_Q)) {
