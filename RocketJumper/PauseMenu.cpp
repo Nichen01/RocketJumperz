@@ -1,6 +1,7 @@
 #include "PauseMenu.h"
 #include "Draw.h"
 #include "Main.h"
+#include "Confirmation.h"
 
 
 static s8 pausefont = -1;
@@ -9,7 +10,8 @@ static f32 width, height;
 static MenuButton resumeButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
-
+static MenuButton yesButton;
+static MenuButton noButton;
 
 void Pause_Load() {
 
@@ -22,6 +24,8 @@ void Pause_Initialize() {
 
 	AssetManager::BuildSqrMesh(MESH_BUTTON);
 	buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
+
+	Confirmation_Init(yesButton,noButton);
 
 	float buttonwidth = 390.0f;
 	float buttonlength = 80.0f;

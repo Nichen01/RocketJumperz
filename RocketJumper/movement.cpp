@@ -1,4 +1,6 @@
 #include "Movement.h"
+#include "Sound.h"
+#include "ParticleSystem.h"
 //#include "physicsEngine.h"
 #include <cmath>
 
@@ -12,7 +14,7 @@ namespace movement {
     s32 mouseX,mouseY;
     f32 mouseDistance;
     AEVec2 directionVector;
-    int bulletCount = 10;
+    int bulletCount = 25;
     bool playerFacingLeft = false; // starts facing right
 
     void initPlayerMovement(objectsquares& player)
@@ -54,9 +56,10 @@ namespace movement {
             jetPackCooldown--;
         }
 
-        // Toggle gravity with G
+        // Toggle gravity with G -- play sound effect on each toggle
         if (AEInputCheckTriggered(AEVK_G)) {
             enableGravity = !enableGravity;
+            AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
             printf("Gravity: %d\n", enableGravity);
         }
 
@@ -84,6 +87,33 @@ namespace movement {
 
             // Set cooldown in frames (e.g. 30 = ~0.5s at 60 FPS)
             jetPackCooldown = 30;
+
+            // --- Jetpack exhaust particles ---
+            // Spawn particles opposite to thrust direction so they look
+            // like hot gas shooting out behind the player.
+            const float kExhaustOffset   = 25.0f;   // how far below/behind player to spawn
+            const float kExhaustSpeed    = 350.0f;   // base speed of exhaust particles
+            const float kExhaustSpreadX  = 120.0f;   // horizontal randomness
+            const float kExhaustSpreadY  =  80.0f;   // vertical randomness
+            const float kExhaustLifetime =   0.3f;   // seconds before particles fade out
+            const float kExhaustScale    =   6.0f;   // particle render size
+            const int   kExhaustCount    =  12;       // particles per burst
+
+            EmitterProps exhaust;
+            // Offset the spawn point opposite to the thrust direction
+            exhaust.spawnX          = player.xPos - directionVector.x * kExhaustOffset;
+            exhaust.spawnY          = player.yPos - directionVector.y * kExhaustOffset;
+            // Base velocity is opposite to thrust (exhaust blows backward)
+            exhaust.velocityXBase   = -directionVector.x * kExhaustSpeed;
+            exhaust.velocityYBase   = -directionVector.y * kExhaustSpeed;
+            exhaust.velocitySpreadX = kExhaustSpreadX;
+            exhaust.velocitySpreadY = kExhaustSpreadY;
+            exhaust.lifetimeBase    = kExhaustLifetime;
+            exhaust.lifetimeSpread  = 0.1f;   // slight variation so particles don't all die at once
+            exhaust.scaleBase       = kExhaustScale;
+            exhaust.emitCount       = kExhaustCount;
+
+            ParticleSystem::Emit(exhaust);
         }
 
         // Fire bullet with left mouse button

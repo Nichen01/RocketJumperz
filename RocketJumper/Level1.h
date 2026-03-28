@@ -18,7 +18,6 @@ Technology is prohibited.
 #include "AimingInterface.h"
 #include "Draw.h"
 #include "Collision.h"
-#include "Player.h"
 #include "GameStateManager.h"
 #include "Projectile.h"
 #include "Movement.h"

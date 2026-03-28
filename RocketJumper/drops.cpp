@@ -1,20 +1,25 @@
-#include "drops.h"
-#include "collision.h"
-#include "draw.h"
-#include "movement.h"
+#include "Drops.h"
+#include "Collision.h"
+#include "Draw.h"
+#include "Movement.h"
 #include "AssetManager.h"
 #include "Load.h"
+#include "Sound.h"
 #include <cstdlib>   // rand()
 #include <cmath>     // sinf()
 
+int wireDropsSpawned{};
+
 namespace pickup {
 	AEMtx33 dropTransform = { 0 };
+	static const f32 kPi = 3.14159f;
+
 	void initDrops(drop instance[], int max,f32 scale) {
 		for (int i{};i < max;i++) {
 			instance[i].info.xScale = scale;
 			instance[i].info.yScale = scale;
 			instance[i].info.flag = 0;
-
+			instance[i].type = DROP_AMMO;
 		}
 	}
 	void updateDrops(drop instance[],int max,objectsquares& player) {
@@ -22,23 +27,49 @@ namespace pickup {
 			if (instance[i].info.flag == 0) continue;
 			else if (gamelogic::static_collision(&player, &instance[i].info)) {
 				instance[i].info.flag = 0;
-				movement::bulletCount += 25;
-				player.health += 50;
-
+				if (instance[i].type == DROP_HEALTH) {
+					player.health += 50;
+				} else {
+					movement::bulletCount += 50;
+				}
+				AEAudioPlay(Pickup, soundEffects, 1.0f, 1.0f, 0);
 			}
 		}
 	}
 	void drawDrops(drop instance[], int max) {
-		AEGfxTextureSet(ammoDrop, 0, 0);
-		for (int i{};i < max;i++) {
+		static f32 bobTimer = 0.0f;
+		f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+		bobTimer += dt;
+
+		const f32 bobPixels    = 5.0f;
+		const f32 bobFrequency = 1.0f;
+
+		AEGfxTexture* ammoTex   = AssetManager::GetTexture(TEX_DROP);
+		AEGfxTexture* healthTex = AssetManager::GetTexture(TEX_HEALTH);
+
+		for (int i{}; i < max; i++) {
 			if (instance[i].info.flag == 0) continue;
-			else {
-				renderlogic::drawSquare(instance[i].info.xPos, instance[i].info.yPos, instance[i].info.xScale, instance[i].info.xScale);
-				AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-				//printf("\n\ndrawn drop:%d\n\n", i);
-			}
+
+			AEGfxTexture* tex = (instance[i].type == DROP_HEALTH) ? healthTex : ammoTex;
+			if (!tex) continue;
+
+			f32 yOffset = sinf(bobTimer * bobFrequency * 2.0f * kPi) * bobPixels;
+
+			AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+			AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+			AEGfxTextureSet(tex, 0.0f, 0.0f);
+
+			renderlogic::drawSquare(
+				instance[i].info.xPos,
+				instance[i].info.yPos + yOffset,
+				instance[i].info.xScale,
+				instance[i].info.yScale);
+			AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 		}
-		// Reset color state so subsequent draw calls are not tinted green
+
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
 	// ====================================================================
@@ -53,9 +84,6 @@ namespace pickup {
 	// Probability that the FIRST kill drops a wire (50%).
 	// If the first kill misses, the second kill is guaranteed.
 	static const int kWireDropChancePercent = 50;
-
-	// Pi constant for the floating animation
-	static const f32 kPi = 3.14159f;
 
 	// ---- ResetWireDropTracker ----
 	// Call at the start of every level Initialize so the chance logic
@@ -86,8 +114,12 @@ namespace pickup {
 	//
 	// Returns true if a wire was actually placed on the ground.
 	bool TrySpawnWireDrop(WireDrop wireDrops[], int maxCount,
-	                      f32 xPos, f32 yPos)
+		f32 xPos, f32 yPos)
 	{
+		// If we already spawned 3 wires total, stop
+		if (wireDropsSpawned >= 3)
+			return false;
+
 		// If we already dropped a wire on this level, skip
 		if (wireDroppedThisLevel)
 			return false;
@@ -98,36 +130,37 @@ namespace pickup {
 
 		if (enemiesKilledThisLevel == 1)
 		{
-			// First kill: 50% chance
 			int roll = rand() % 100;
 			shouldDrop = (roll < kWireDropChancePercent);
 		}
 		else if (enemiesKilledThisLevel == 2)
 		{
-			// Second kill: guaranteed if first didn't drop
 			shouldDrop = true;
 		}
-		// After the 2nd kill, no more wire drops on this level
 
 		if (!shouldDrop)
 			return false;
 
-		// Find an inactive slot in the wire drop array
 		for (int i = 0; i < maxCount; ++i)
 		{
 			if (wireDrops[i].info.flag == 0)
 			{
 				wireDrops[i].info.xPos = xPos;
 				wireDrops[i].info.yPos = yPos;
-				wireDrops[i].info.flag = 1;  // 1 = active on ground
+				wireDrops[i].info.flag = 1;
 				wireDroppedThisLevel = true;
-				printf("Wire dropped at (%.1f, %.1f)!\n", xPos, yPos);
+
+				wireDropsSpawned++;  // increment global counter
+				printf("Wire dropped at (%.1f, %.1f)! Total spawned: %d\n",
+					xPos, yPos, wireDropsSpawned);
+
 				return true;
 			}
 		}
 
-		return false;  // no free slot (should not happen normally)
+		return false;
 	}
+
 
 	// ---- UpdateWireDrops ----
 	// Checks every active wire drop for overlap with the player.
@@ -149,6 +182,7 @@ namespace pickup {
 					wireCount++;
 					printf("Wire collected! Total wires: %d / 3\n", wireCount);
 				}
+				AEAudioPlay(Pickup, soundEffects, 1.0f, 1.0f, 0);
 			}
 		}
 	}

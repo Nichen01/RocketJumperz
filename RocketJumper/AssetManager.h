@@ -49,6 +49,7 @@ enum TextureID {
     TEX_E_BUTTON,
     TEX_G_BUTTON,
     TEX_S_BUTTON,
+    TEX_Q_BUTTON,
     TEX_Z_BUTTON,
     TEX_BUTTON1,
     TEX_BUTTON2,
@@ -97,15 +98,6 @@ enum TextureID {
 
     // Error prompt
     TEX_ERRORPROMPT,
-    TEX_PROMPT1,
-    TEX_PROMPT2,
-    TEX_PROMPT3,
-    TEX_PROMPT4,
-    TEX_PROMPT5,
-    TEX_PROMPT6,
-    TEX_PROMPT7,
-    TEX_PROMPT8,
-    TEX_PROMPT9,
     TEX_REDBUTTON,
     TEX_GREENBUTTON,
 
@@ -125,6 +117,7 @@ enum TextureID {
     TEX_WIREINVENTORY0,
     TEX_WIREINVENTORY1,
     TEX_WIREINVENTORY2,
+    TEX_WIREINVENTORY3,
     //ammo drop
     TEX_DROP,
     // Ranged enemy state spritesheets
@@ -149,12 +142,30 @@ enum TextureID {
     TEX_BUTTON,
 
     TEX_BACKGROUND,
+    TEX_BACKGROUND2,
 
     // Saw trap spritesheet (1 row, 7 columns)
+    TEX_STATICSAW,
     TEX_SAW,
 
     // Instructions menu full-screen image
     TEX_INSTRUCTIONS_MENU,
+
+    // Health pack drop
+    TEX_HEALTH,
+
+    // Background wall tile (non-collidable, drawn over glass)
+    TEX_WALL_BG_1,
+
+    // Border tile textures (8 directional variants, used for wall borders)
+    TEX_BORDER_TL,  // top-left corner
+    TEX_BORDER_T,   // top edge
+    TEX_BORDER_TR,  // top-right corner
+    TEX_BORDER_CL,  // center-left edge
+    TEX_BORDER_CR,  // center-right edge
+    TEX_BORDER_BL,  // bottom-left corner
+    TEX_BORDER_B,   // bottom edge
+    TEX_BORDER_BR,  // bottom-right corner
 
     // Add new textures above this line
     TEX_MAX

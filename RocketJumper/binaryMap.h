@@ -55,8 +55,17 @@ struct Key {
 	bool active{ true };
 };
 
+struct HealthPack {
+	f32 worldX;
+	f32 worldY;
+	f32 size{ 80.f };
+	bool active{ true };
+	bool collected = false;
+};
+
 extern f32 tileSize; // Global tile size
 extern brokenDoor finalDoor;
+extern HealthPack hp;
 extern Key key;
 extern int keyCountLevel1; // one level can only have one key
 extern int keyCountLevel2;

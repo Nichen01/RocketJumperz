@@ -1,6 +1,8 @@
 
 // External libraries are included in header file
 #include "Level3.h"
+#include "ParticleSystem.h"
+#include "traps.h"
 
 static s32* map = nullptr;
 static int x;
@@ -51,8 +53,10 @@ static bool playerNear;
 static bool playerNearBrokenDoor;
 
 // bool for keycard in inventory
-static bool keycardCollected;
+static bool healthCollected;
 static bool keycardCollectedAudio = false;
+
+//static int doorState = 0;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
@@ -137,7 +141,10 @@ void Level3_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel3 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
+
+	// Build the particle system mesh and reset the pool
+	ParticleSystem::Load();
 }
 
 void Level3_Initialize()
@@ -187,7 +194,7 @@ void Level3_Initialize()
 	for (auto& door : doors) {
 		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
-		if (door.id == 21) {
+		if (door.id == 23) {
 			door.isLocked = false;
 		}
 
@@ -218,8 +225,8 @@ void Level3_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy1X, enemy1Y);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy2X, enemy2Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -242,6 +249,25 @@ void Level3_Initialize()
 	// Wire drops: reset per-level tracker and initialize wire drop array
 	pickup::ResetWireDropTracker();
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
+
+	for (int row = 0; row < y; ++row) {
+		for (int col = 0; col < x; ++col) {
+			int tile = BinaryCollisionArray[row][col];
+			map[row * x + col] = tile;
+			if (tile == 67) {
+				key.active = true;
+				key.worldX = col * tileSize;
+				key.worldY = row * tileSize;
+				key.size = PlayerScale; // or whatever scale you use
+			}
+		}
+	}
+
+	// Initialize saw trap animation and build the MESH_SAW spritesheet mesh.
+	// Without this call, MESH_SAW is null and the draw code falls back to
+	// rendering the entire spritesheet squished into one tile.
+	traps::initTraps();
+
 }
 
 void Level3_Update()
@@ -278,10 +304,6 @@ void Level3_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo3[player]);
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next = GS_QUIT;
-	}
-
 	// ---- Weapon Toggle (Q key) ----
 	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
 	if (AEInputCheckTriggered(AEVK_Q)) {
@@ -299,7 +321,7 @@ void Level3_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo3[player]);
 	movement::UpdatePlayerFacing(objectinfo3[player]);
-	aiming::updateAiming(objectinfo3[player]);
+	//aiming::updateAiming(objectinfo3[player]);
 	weaponSprite::Update(objectinfo3[player]);
 	pickup::updateDrops(L3Drop, MAX_ENEMIES, objectinfo3[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo3[player]);
@@ -333,11 +355,18 @@ void Level3_Update()
 	}
 
 	// Update all active projectiles
-	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Step all active particles forward
+	ParticleSystem::Update(dt);
+
+	// Advance saw blade spin animation and update trap suction/damage logic
+	traps::updateTraps(enemies, objectinfo3, map, x, y, tileSize);
+	traps::UpdateSawAnim(dt);
 
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
@@ -347,7 +376,7 @@ void Level3_Update()
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
-	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	// Tick down the player's invincibility timer each frame
 	UpdatePlayerInvincibility(objectinfo3[player], dt);
@@ -373,7 +402,7 @@ void Level3_Update()
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo3[player], map, x, static_cast<int>(tileSize), 1);
 
-	if (AEInputCheckCurr(AEVK_3)) wireCount = 3;
+	if (AEInputCheckCurr(AEVK_4)) wireCount = 2;
 
 	// -----------------------------------------------------------------------
 	// Door animation
@@ -385,6 +414,29 @@ void Level3_Update()
 		// Only process doors connected to this level
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
+
+		// --- Spark Emission Logic for Locked Doors ---
+		if (door.isLocked) {
+			door.sparkTimer += dt;
+			if (door.sparkTimer >= 4.0f) {
+				door.sparkTimer = 0.0f;
+
+				EmitterProps sparkProps;
+				sparkProps.spawnX = door.worldX;
+				sparkProps.spawnY = door.worldY + 10.0f;
+				sparkProps.velocityXBase = 0.0f;
+				sparkProps.velocityYBase = 200.0f;    // Shoot upwards; gravity pulls them down
+				sparkProps.velocitySpreadX = 100.0f;  // Wide X spread for cone shape
+				sparkProps.velocitySpreadY = 40.0f;
+				sparkProps.lifetimeBase = 1.0f;        // Longer life to show the arc
+				sparkProps.lifetimeSpread = 0.7f;
+				sparkProps.scaleBase = 5.0f;
+				sparkProps.emitCount = 18;
+				sparkProps.useSparkColors = true;   // Random white/yellow/orange sparks
+
+				ParticleSystem::Emit(sparkProps);
+			}
+		}
 
 		f32 dx = objectinfo3[player].xPos - door.worldX;
 		f32 dy = objectinfo3[player].yPos - door.worldY;
@@ -401,7 +453,7 @@ void Level3_Update()
 
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				if (door.isLocked && !keycardCollected) {
+				if (door.isLocked && !keycardCollected3) {
 					std::cout << "Door is locked!" << std::endl;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
@@ -427,6 +479,18 @@ void Level3_Update()
 
 		if (door.anim.justFinished)
 			door.isOpen = (door.anim.currentFrame != 0);
+	}
+
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+	
+	if (hp.active && gamelogic::static_collision(&objectinfo3[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfo3[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
 	// Check if player is near the broken door
@@ -458,38 +522,27 @@ void Level3_Update()
 
 	if (key.active && gamelogic::static_collision(&objectinfo3[player], &keyObj)) {
 		key.active = false;
-		keycardCollected = true;
+		keycardCollected3 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
-	//========== DOOR RENDERING BASED ON WIRE COUNT ==========//
-	// Show progressively repaired door as the player collects wires
-	if (wireCount <= 0) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
-	}
-	else if (wireCount == 1) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
-	}
-	else {
-		// 2 or 3 wires: show most-repaired door texture
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
-	}
-
-	// Player tries to use the final broken door.
-	// The door requires exactly 3 wires to be accessible.
-	// If the player has fewer than 3, play an error sound.
 	if (AEInputCheckTriggered(AEVK_E) && playerNearBrokenDoor) {
-		if (wireCount >= 3) {
-			// Door is accessible -- transition to victory
+		if (doorState < 3 && wireCount > 0) {
+			// Consume a wire and advance the door one stage
+			doorState++;
+			wireCount--;
+			AEAudioPlay(Pickup, soundEffects, 1.f, 1.f, 0);
+		}
+		else if (doorState == 3) {
+			// Door is fully repaired, now trigger victory
 			next = GS_VICTORY;
 		}
 		else {
-			// Not enough wires -- play error sound to inform the player
+			// Tried to repair without wires
 			AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
-			printf("Need 3 wires to open the final door! Current: %d\n", wireCount);
+			printf("Need wires to repair the door! Current: %d\n", wireCount);
 		}
 	}
-
 
 }
 
@@ -508,17 +561,26 @@ void Level3_Draw()
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
 
-	// ====== DRAW FINAL DOOR BASED ON WIRE COUNT ====== //
-	// Visual repair progress tied to global wireCount
-	if (wireCount <= 0) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor0, uiMesh, tileSize, tileSize);
+	// ====== DRAW FINAL DOOR ====== //
+	// Draw final door based on doorState
+	switch (doorState) {
+	case 0:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			brokenDoor0, uiMesh, tileSize, tileSize);
+		break;
+	case 1:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			brokenDoor1, uiMesh, tileSize, tileSize);
+		break;
+	case 2:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			brokenDoor2, uiMesh, tileSize, tileSize);
+		break;
+	case 3:
+		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY,
+			staticDoor, uiMesh, tileSize, tileSize);
 	}
-	else if (wireCount == 1) {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor1, uiMesh, tileSize, tileSize);
-	}
-	else {
-		renderlogic::drawTexture(finalDoor.worldX, finalDoor.worldY, brokenDoor2, uiMesh, tileSize, tileSize);
-	}
+
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
@@ -546,10 +608,14 @@ void Level3_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxTextureSet(characterPictest, 0, 0);
+	// Flip sprite horizontally when the player is aiming left.
+	f32 playerDrawScaleX = movement::playerFacingLeft
+		? -objectinfo3[player].xScale
+		: objectinfo3[player].xScale;
 	renderlogic::drawSquare(objectinfo3[player].xPos, objectinfo3[player].yPos,
-		objectinfo3[player].xScale, objectinfo3[player].yScale);
+		playerDrawScaleX, objectinfo3[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -558,31 +624,82 @@ void Level3_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	// ====== PARTICLE SYSTEM RENDER ====== //
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo3[player].xPos, objectinfo3[player].yPos - 40.f);
 
-	// ====== HUD: Player Health Display ======//
+	// ====== HUD: Health, Ammo, Weapon, Gravity ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
 	if (fontLevel3 >= 0)
 	{
-		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo3[player].health);
+		// ---- Health icon + number (top-left) ----
+		f32 halfW = static_cast<f32>(AEGfxGetWindowWidth())  * 0.5f;
+		f32 halfH = static_cast<f32>(AEGfxGetWindowHeight()) * 0.5f;
 
-		// Prepare render state for font (font uses a glyph texture atlas)
+		// Health icon at top-left (world coords from normalized -0.93, 0.88)
+		f32 healthIconX = -halfW + 40.f;   // 40px from left edge
+		f32 healthIconY = halfH - 40.f;   // 40px from top edge
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(healthIconX, healthIconY, healthDrop, uiMesh, 70.f, 70.f);
+
+		// Health number text right of the icon
+		char healthText[32];
+		snprintf(healthText, sizeof(healthText), "%d", objectinfo3[player].health);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel3, healthText, -0.88f, 0.88f, 0.8f, 0.0f, 1.0f, 0.0f, 1.0f);
 
-		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel3, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// ---- Ammo icon + count (right beside health) ----
+		f32 ammoIconX = healthIconX + 200.f;  // offset to the right of health (increased for readability)
+		f32 ammoIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(ammoIconX, ammoIconY, ammoDrop, uiMesh, 60.f, 60.f);
 
-		// Show the currently equipped weapon below the health display
-		const char* weaponName = (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN)
-			? "Weapon: Shotgun"
-			: "Weapon: Plasma";
-		AEGfxPrint(fontLevel3, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// Ammo count text right of the ammo icon
+		char ammoText[32];
+		snprintf(ammoText, sizeof(ammoText), "%d", movement::bulletCount);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel3, ammoText, -0.63f, 0.88f, 0.8f, 1.0f, 1.0f, 0.0f, 1.0f);
+
+		// ---- Current weapon sprite (below health row) ----
+		// Show the sprite of the currently equipped weapon
+		AEGfxTexture* weaponIcon = (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN)
+			? AssetManager::GetTexture(TEX_SHOTGUN)
+			: AssetManager::GetTexture(TEX_PLASMA_GUN);
+		f32 weaponIconX = healthIconX + 400.f;
+		f32 weaponIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 100.f, 50.f);
+
+		// ---- Gravity indicator (top center) ----
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		if (movement::enableGravity) {
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel3, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+		}
+		else {
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel3, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		}
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //
@@ -596,27 +713,8 @@ void Level3_Draw()
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
 
-	// Draw wire count text at the bottom-right of the wire inventory box
-	if (fontLevel3 >= 0) {
-		char wireText[16];
-		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel3, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
-	}
-
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected) {
-		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
-		for (auto& door : doors) {
-			door.isLocked = false;
-		}	
-	}
-	else {
-		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
-	}
+	renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 
 	if (playerNearBrokenDoor) {
 		renderlogic::flashingTexture(finalDoor.worldX, finalDoor.worldY + 60.f, eButton, 50.f);
@@ -645,7 +743,7 @@ void Level3_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
+//	aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
@@ -657,6 +755,9 @@ void Level3_Unload()
 
 	// Destroy the font created in Load
 	if (fontLevel3 != -1) { AEGfxDestroyFont(fontLevel3); fontLevel3 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 

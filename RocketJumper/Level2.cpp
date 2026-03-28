@@ -3,6 +3,7 @@
 #include "Level2.h"
 #include "traps.h"
 #include "WeaponSprite.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x;
@@ -52,7 +53,8 @@ static s8 fontLevel2 = -1;
 static bool playerNear;
 
 // bool for keycard in inventory
-static bool keycardCollected;
+static bool healthCollected;
+static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
@@ -71,7 +73,7 @@ void Level2_Load()
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
 	load::wireInventory();
-	load::background();
+	load::background2();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
@@ -140,8 +142,11 @@ void Level2_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool
+	ParticleSystem::Load();
 }
 
 void Level2_Initialize()
@@ -193,7 +198,7 @@ void Level2_Initialize()
 	for (auto& door : doors) {
 		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
-		if (door.id == 21||door.id==23) {
+		if (door.id == 22) {
 			door.isLocked = false;
 		}
 
@@ -224,8 +229,8 @@ void Level2_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy1X, enemy1Y);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy2X, enemy2Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -250,10 +255,27 @@ void Level2_Initialize()
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
 	traps::initTraps();
+
+	// RESET KEYCARD
+	for (int row = 0; row < y; ++row) {
+		for (int col = 0; col < x; ++col) {
+			int tile = BinaryCollisionArray[row][col];
+			map[row * x + col] = tile;
+			if (tile == 67) {
+				key.active = true;
+				key.worldX = col * tileSize;
+				key.worldY = row * tileSize;
+				key.size = PlayerScale;
+				keycardCollected = false;
+			}
+		}
+	}
+
 }
 
 void Level2_Update()
 {
+	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL3;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		level = 2;
@@ -285,10 +307,6 @@ void Level2_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo2[player]);
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next = GS_QUIT;
-	}
-
 	// ---- Weapon Toggle (Q key) ----
 	if (AEInputCheckTriggered(AEVK_Q)) {
 		if (objectinfo2[player].currentWeapon == WEAPON_PLASMA) {
@@ -305,7 +323,7 @@ void Level2_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo2[player]);
 	movement::UpdatePlayerFacing(objectinfo2[player]);
-	aiming::updateAiming(objectinfo2[player]);
+	//aiming::updateAiming(objectinfo2[player]);
 	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo2[player]);
@@ -337,11 +355,14 @@ void Level2_Update()
 	}
 
 	// Update all active projectiles
-	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Step all active particles forward
+	ParticleSystem::Update(dt);
 
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
@@ -351,7 +372,7 @@ void Level2_Update()
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
-	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	// Tick down the player's invincibility timer each frame
 	UpdatePlayerInvincibility(objectinfo2[player], dt);
@@ -389,6 +410,29 @@ void Level2_Update()
 		// Only process doors connected to this level
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
+
+		// --- Spark Emission Logic for Locked Doors ---
+		if (door.isLocked) {
+			door.sparkTimer += dt;
+			if (door.sparkTimer >= 4.0f) {
+				door.sparkTimer = 0.0f;
+
+				EmitterProps sparkProps;
+				sparkProps.spawnX = door.worldX;
+				sparkProps.spawnY = door.worldY + 10.0f;
+				sparkProps.velocityXBase = 0.0f;
+				sparkProps.velocityYBase = 200.0f;    // Shoot upwards; gravity pulls them down
+				sparkProps.velocitySpreadX = 100.0f;  // Wide X spread for cone shape
+				sparkProps.velocitySpreadY = 40.0f;
+				sparkProps.lifetimeBase = 1.0f;        // Longer life to show the arc
+				sparkProps.lifetimeSpread = 0.7f;
+				sparkProps.scaleBase = 5.0f;
+				sparkProps.emitCount = 18;
+				sparkProps.useSparkColors = true;   // Random white/yellow/orange sparks
+
+				ParticleSystem::Emit(sparkProps);
+			}
+		}
 
 		f32 dx = objectinfo2[player].xPos - door.worldX;
 		f32 dy = objectinfo2[player].yPos - door.worldY;
@@ -431,6 +475,18 @@ void Level2_Update()
 
 		if (door.anim.justFinished)
 			door.isOpen = (door.anim.currentFrame != 0);
+	}
+
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+
+	if (hp.active && gamelogic::static_collision(&objectinfo2[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfo2[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 
 	// After loop, set global flag for rendering
@@ -507,7 +563,7 @@ void Level2_Draw()
 	renderlogic::drawSquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
 		playerDrawScaleX, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -516,26 +572,84 @@ void Level2_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	// ====== PARTICLE SYSTEM RENDER ====== //
+	// Draw particles behind UI elements but in front of projectiles
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo2[player].xPos, objectinfo2[player].yPos - 40.f);
 
-	// ====== HUD: Player Health Display ======//
+	// ====== HUD: Health, Ammo, Weapon, Gravity ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
 	if (fontLevel2 >= 0)
 	{
-		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo2[player].health);
+		// ---- Health icon + number (top-left) ----
+		f32 halfW = static_cast<f32>(AEGfxGetWindowWidth())  * 0.5f;
+		f32 halfH = static_cast<f32>(AEGfxGetWindowHeight()) * 0.5f;
 
-		// Prepare render state for font (font uses a glyph texture atlas)
+		// Health icon at top-left (world coords from normalized -0.93, 0.88)
+		f32 healthIconX = -halfW + 40.f;   // 40px from left edge
+		f32 healthIconY = halfH - 40.f;   // 40px from top edge
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(healthIconX, healthIconY, healthDrop, uiMesh, 70.f, 70.f);
+
+		// Health number text right of the icon
+		char healthText[32];
+		snprintf(healthText, sizeof(healthText), "%d", objectinfo2[player].health);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel2, healthText, -0.88f, 0.88f, 0.8f, 0.0f, 1.0f, 0.0f, 1.0f);
 
-		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel2, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// ---- Ammo icon + count (right beside health) ----
+		f32 ammoIconX = healthIconX + 200.f;  // offset to the right of health (increased for readability)
+		f32 ammoIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(ammoIconX, ammoIconY, ammoDrop, uiMesh, 60.f, 60.f);
 
+		// Ammo count text right of the ammo icon
+		char ammoText[32];
+		snprintf(ammoText, sizeof(ammoText), "%d", movement::bulletCount);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel2, ammoText, -0.63f, 0.88f, 0.8f, 1.0f, 1.0f, 0.0f, 1.0f);
+
+		// ---- Current weapon sprite (below health row) ----
+		// Show the sprite of the currently equipped weapon
+		AEGfxTexture* weaponIcon = (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN)
+			? AssetManager::GetTexture(TEX_SHOTGUN)
+			: AssetManager::GetTexture(TEX_PLASMA_GUN);
+		f32 weaponIconX = healthIconX + 400.f;
+		f32 weaponIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 100.f, 50.f);
+
+		// ---- Gravity indicator (top center) ----
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		if (movement::enableGravity) {
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel2, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+		}
+		else {
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel2, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		}
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //
@@ -548,16 +662,6 @@ void Level2_Draw()
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
 
-	// Draw wire count text at the bottom-right of the wire inventory box
-	if (fontLevel2 >= 0) {
-		char wireText[16];
-		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel2, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
-	}
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
 	if (keycardCollected) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
@@ -592,7 +696,7 @@ void Level2_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
+	//::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
@@ -604,6 +708,9 @@ void Level2_Unload()
 
 	// Destroy the font created in Load
 	if (fontLevel2 != -1) { AEGfxDestroyFont(fontLevel2); fontLevel2 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 

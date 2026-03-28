@@ -3,10 +3,8 @@
 #include "MainMenu.h"
 #include "load.h"
 
-void Confirmation_Load();
-void Confirmation_Init();
-void Confirmation_Update();
+void Confirmation_Init(MenuButton& yesButton, MenuButton& noButton);
+bool Confirmation_Update(f32 buttontex, f32 backtex, f32 font);
 void Confirmation_Draw();
-void Confirmation_Free();
-void Confirmation_Unload();
+
 

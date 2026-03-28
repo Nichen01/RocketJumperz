@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "Player.h"
 #include "AssetManager.h"
 #include <cmath>
+#include <cstdlib>   // rand()
 
 namespace enemySystem {
     // Note: Audio resources are loaded and managed by Level files, not here.
@@ -405,6 +406,7 @@ namespace enemySystem {
                             loot[i].info.xPos = enemies[i].shape.xPos;
                             loot[i].info.yPos = enemies[i].shape.yPos;
                             loot[i].info.flag = 1;
+                            loot[i].type = (rand() % 2 == 0) ? DROP_AMMO : DROP_HEALTH;
                         }
 
                         printf("Enemy %d defeated!\n", i);
@@ -446,6 +448,7 @@ namespace enemySystem {
                     loot[i].info.xPos = enemies[i].shape.xPos;
                     loot[i].info.yPos = enemies[i].shape.yPos;
                     loot[i].info.flag = 1;
+                    loot[i].type = (rand() % 2 == 0) ? DROP_AMMO : DROP_HEALTH;
                 }
 
                 printf("Enemy %d defeated!\n", i);

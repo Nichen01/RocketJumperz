@@ -1,5 +1,4 @@
 #include "VictoryScreen.h"
-#include "Confirmation.h"
 #include "Draw.h"
 
 static s8 victoryfont = -1;
@@ -70,17 +69,28 @@ void VictoryScreen_Update() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
-            next = GS_TUTORIAL;  // Change to test file if needed
+            movement::bulletCount = 50;
+            wireCount = 0;             // Reset Wires
+            keycardCollected1 = false;  // Reset Keycard
+            keycardCollected2 = false;  // Reset Keycard
+            keycardCollected3 = false;  // Reset Keycard
+            wireDropsSpawned = 0;
+            doorState = 0;             // Reset Final Door
+            next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {
-            next = GS_MAINMENU;  // Change to test file if needed
+            wireCount = 0;             // Reset Wires
+            keycardCollected1 = false;  // Reset Keycard
+            keycardCollected2 = false;  // Reset Keycard
+            keycardCollected3 = false;  // Reset Keycard
+            wireDropsSpawned = 0;
+            doorState = 0;             // Reset Final Door
+            next = GS_MAINMENU;
             printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {
-       
-                next = GS_QUIT;
-            
+            next = GS_QUIT;
             printf("Exiting game!\n");
         }
     }
@@ -103,8 +113,6 @@ void VictoryScreen_Draw() {
     MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttontex);
     MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttontex);
     MenuHelpers::TexdrawButton(exitButton, buttonMesh, victoryfont, buttontex);
-
-   
 
 }
 void VictoryScreen_Free() {

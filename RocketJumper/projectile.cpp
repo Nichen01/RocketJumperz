@@ -1,4 +1,5 @@
 #include "Projectile.h"
+#include "BinaryMap.h"  // BINARY_MAP_HEIGHT for tile-collision bounds check
 #include <cmath>    // sinf, cosf, sqrtf
 #include <cstdlib>  // rand, RAND_MAX
 
@@ -152,8 +153,9 @@ namespace projectileSystem {
         }
     }
 
-    // UPDATE ALL ACTIVE PROJECTILES (MOVEMENT AND BOUNDING)
-    void UpdateProjectiles(Projectile projectiles[], s32 maxCount)
+    // UPDATE ALL ACTIVE PROJECTILES (MOVEMENT, BOUNDING, AND WALL COLLISION)
+    void UpdateProjectiles(Projectile projectiles[], s32 maxCount,
+        int map[], int mapX, int mapS)
     {
         for (int i = 0; i < maxCount; i++)
         {
@@ -169,6 +171,33 @@ namespace projectileSystem {
                 {
                     projectiles[i].isActive = 0;  // Deactivate projectile
                     printf("Projectile %d went off-screen\n", i);
+                    continue; // Already deactivated, skip wall check
+                }
+
+                // --- Tile collision check ---
+                // Convert world position to map-grid indices using the same
+                // helper functions that Collision_movement uses.
+                float tileS = static_cast<float>(mapS);
+                float gridX = gamelogic::posX_to_index(projectiles[i].shape.xPos, tileS);
+                float gridY = gamelogic::posY_to_index(projectiles[i].shape.yPos, tileS);
+
+                // Convert to integer tile coordinates
+                int tileCol = static_cast<int>(gridX);
+                int tileRow = static_cast<int>(gridY);
+
+                // Bounds check before accessing the map array
+                if (tileCol >= 0 && tileCol < mapX &&
+                    tileRow >= 0 && tileRow < BINARY_MAP_HEIGHT)
+                {
+                    int tileValue = map[tileRow * mapX + tileCol];
+
+                    // Any non-zero tile is solid (matches BinaryCollisionArray logic)
+                    if (tileValue >= 1)
+                    {
+                        projectiles[i].isActive = 0;
+                        printf("Projectile %d hit wall at tile (%d, %d)\n",
+                            i, tileCol, tileRow);
+                    }
                 }
             }
         }

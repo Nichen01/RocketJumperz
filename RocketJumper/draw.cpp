@@ -165,13 +165,33 @@ namespace renderlogic {
 					}
 					break;
 				}
-				case 67: // key
+				case 60: // health pack
 					drawGlass(row, col, mapS, platformMesh);
+					{
+						if (hp.active) {
+							static f32 timer = 0.f;
+							timer += static_cast<f32>(g_dt);
+
+							// Moves up and down
+							f32 pixel = 5.f;   // pixels
+							f32 frequency = 1.f;   // cycles per second
+							f32 yOffset = sinf(timer * frequency * 2.f * pi) * pixel;
+
+							f32 xPos = ((float)xo + mapS / 2) - AEGfxGetWindowWidth() / 2;
+							f32 yPos = AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2) + yOffset;
+
+							AEGfxTextureSet(healthDrop, 0, 0);
+							renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+							AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+						}
+						break;
+					}
+				case 67: // key
+					renderlogic::drawGlass(row, col, mapS, platformMesh);
 
 					if (key.active) { // floating key
 						static f32 timer = 0.f;
-						f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
-						timer += dt;
+						timer += static_cast<f32>(g_dt);
 
 						// Moves up and down
 						f32 pixel = 5.f;   // pixels
@@ -186,8 +206,58 @@ namespace renderlogic {
 						AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 					}
 					break;
-				case 81: case 82: // enemy
+				case 70: // background wall tile (non-collidable, drawn on top of glass)
+				{
+					// Step A: Draw the glass base layer first
 					drawGlass(row, col, mapS, platformMesh);
+
+					// Step B: Overlay the wall background texture on top
+					AEGfxTextureSet(wallBg1, 0, 0);
+					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+					break;
+				}
+				// ---------------------------------------------------------------
+			// Border tile variants (non-collidable, drawn on top of glass)
+			//   71 = borderTL   (top-left corner)
+			//   72 = borderT    (top edge)
+			//   73 = borderTR   (top-right corner)
+			//   74 = borderCL   (center-left edge)
+			//   75 = borderCR   (center-right edge)
+			//   76 = borderBL   (bottom-left corner)
+			//   77 = borderB    (bottom edge)
+			//   78 = borderBR   (bottom-right corner)
+			// ---------------------------------------------------------------
+			case 71: case 72: case 73: case 74: case 75: case 76: case 77: case 78:
+			{
+				// Draw the glass base layer first
+				renderlogic::drawGlass(row, col, mapS, platformMesh);
+
+				// Pick the correct border texture based on tile ID
+				AEGfxTexture* borderTex = nullptr;
+				switch (MapData[row][col]) {
+				case 71: borderTex = borderTL; break;
+				case 72: borderTex = borderT;  break;
+				case 73: borderTex = borderTR; break;
+				case 74: borderTex = borderCL; break;
+				case 75: borderTex = borderCR; break;
+				case 76: borderTex = borderBL; break;
+				case 77: borderTex = borderB;  break;
+				case 78: borderTex = borderBR; break;
+				}
+
+				// Overlay the border texture on top of glass
+				if (borderTex) {
+					AEGfxTextureSet(borderTex, 0, 0);
+					AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+					renderlogic::drawSquare(((float)xo + mapS / 2) - 800.0f, 450.0f - ((float)yo + mapS / 2), (float)mapS, (float)mapS);
+					AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+				}
+				break;
+			}
+			case 81: case 82: // enemy, 81 is drone, 82 is mushroom
+					renderlogic::drawGlass(row, col, mapS, platformMesh);
 					break;
 				default: //defaults to playable area
 					break;
@@ -303,16 +373,16 @@ namespace renderlogic {
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
 		if (wire == 0) {
-			AEGfxTextureSet(inventory, 0, 0);
-		}
-		else if (wire == 1) {
 			AEGfxTextureSet(wireInventory0, 0, 0);
 		}
-		else if (wire == 2) {
+		else if (wire == 1) {
 			AEGfxTextureSet(wireInventory1, 0, 0);
 		}
-		else if (wire == 3) {
+		else if (wire == 2) {
 			AEGfxTextureSet(wireInventory2, 0, 0);
+		}
+		else if (wire == 3) {
+			AEGfxTextureSet(wireInventory3, 0, 0);
 		}
 		
 		AEGfxSetTransform(uiTransf.m);

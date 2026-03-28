@@ -7,6 +7,7 @@ extern AEAudio Punch;
 extern AEAudio Error;
 extern AEAudio Pickup;
 extern AEAudio ArrowSound;
+extern AEAudio GravityToggle;
 extern AEAudio MainMenu;
 extern AEAudioGroup bgm;
 extern AEAudioGroup soundEffects;

@@ -28,15 +28,13 @@ int BINARY_MAP_HEIGHT;
 //when the "ImportMapDataFromFile" function is called
 int** MapData;
 
-//This will contain the collision data of the binary map. It will be filled in the 
-//"ImportMapDataFromFile" after filling "MapData". Basically, if an array element 
-//in MapData is 1, it represents a collision cell, any other value is a non-collision
-//cell
 int** BinaryCollisionArray;
 int** glassMap;
 
 // extern key obj
 Key key{};
+HealthPack hp;
+
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int finalDoorCount = 0;
@@ -48,51 +46,6 @@ brokenDoor finalDoor{};
 f32 enemy1X, enemy1Y, enemy2X, enemy2Y;
 
 f32 tileSize = 80.f;
-
-// ----------------------------------------------------------------------------
-//
-//	This function opens the file name "FileName" and retrieves all the map data.
-//	It allocates memory for the 2 arrays: MapData & BinaryCollisionArray
-//	The first line in this file is the width of the map.
-//	The second line in this file is the height of the map.
-//	The remaining part of the file is a series of numbers
-//	Each number represents the ID (or value) of a different element in the 
-//	double dimensionaly array.
-//
-//	Example:
-//
-//	5 (Width)
-//	5 (Height)
-//	1 1 1 1 1
-//	1 1 1 3 1
-//	1 4 2 0 1
-//	1 0 0 0 1
-//	1 1 1 1 1
-//
-//
-//	After importing the above data, "MapData" and " BinaryCollisionArray" 
-//	should be
-//
-//	1 1 1 1 1
-//	1 1 1 3 1
-//	1 4 2 0 1
-//	1 0 0 0 1
-//	1 1 1 1 1
-//
-//	and
-//
-//	1 1 1 1 1
-//	1 1 1 0 1
-//	1 0 0 0 1
-//	1 0 0 0 1
-//	1 1 1 1 1
-//
-//	respectively.
-//	
-//	Finally, the function returns 1 if the file named "FileName" exists, 
-//	otherwise it returns 0
-//
-// ----------------------------------------------------------------------------
 
 int ImportMapDataFromFile(const char* FileName)
 {
@@ -135,17 +88,27 @@ int ImportMapDataFromFile(const char* FileName)
 				BinaryCollisionArray[row][col] = 0;
 			}
 
-			// to save coordinates of the key
-			if (value == 67) {
+			// SAVING COORDINATES OF HEALTH PACK
+			if (value == 60) {
+				hp.worldX = ((float)col * tileSize + tileSize / 2) - 800.f;
+				hp.worldY = 450.f - ((float)row * tileSize + tileSize / 2);
+				hp.size = (float)tileSize;
+				hp.active = true;
+				hp.collected = false;
+			}
+
+			// SAVING COORDINATES OF KEY
+			else if (value == 67) {
 				key.row = row;
 				key.col = col;
 				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
+				key.active = true;
 				if (currentGameLevel == 1) keyCountLevel1 = 1;
 				else if (currentGameLevel == 2) keyCountLevel2 = 1;
 			}
 
-			// to save coordinates of brokenDoor
+			// SAVING COORDINATES OF BROKEN DOOR
 			if (value == 69) {
 				finalDoor.worldX = (col * tileSize + tileSize / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				finalDoor.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.f);
@@ -178,8 +141,8 @@ int ImportMapDataFromFile(const char* FileName)
 			}
 
 
-			// assign random glass type if tile is "air"
-			if (value == 0 || (value >= 31 && value <= 39) || value == 67 || value == 81 || value == 82 || value == 50 || value == 51) {
+			// assign random glass type if tile is "air", decoration tiles, enemy, traps/items
+			if (value == 0 || (value >= 70 && value <= 78) || (value >= 80 && value <= 89) || (value >= 50 && value <= 69)) {
 				glassMap[row][col] = rand() % 5;
 			}
 			else {
@@ -198,6 +161,7 @@ int ImportMapDataFromFile(const char* FileName)
 				door.col = col;
 				door.worldX = (col * 80) + 40 - 800.0f;
 				door.worldY = 450.0f - (row * 80 + 40);
+				door.isLocked = (tile == 21) ? false : true;
 
 				switch (tile) {
 				case 21: door.entranceLevel = 0; door.exitLevel = 1; break;
@@ -216,14 +180,6 @@ int ImportMapDataFromFile(const char* FileName)
 	return 1;
 }
 
-
-// ----------------------------------------------------------------------------
-//
-//	This function frees the memory that was allocated for the 2 arrays MapData 
-//	& BinaryCollisionArray which was allocated in the "ImportMapDataFromFile" 
-//	function
-//
-// ----------------------------------------------------------------------------
 void FreeMapData(void){
 	for (int i = 0; i < BINARY_MAP_HEIGHT; i++) {
 		delete[] MapData[i];
@@ -239,14 +195,6 @@ void FreeMapData(void){
 
 }
 
-// ----------------------------------------------------------------------------
-//
-//	This function prints out the content of the 2D array �MapData�
-//	You must print to the console, the same information you are reading from "Exported.txt" file
-//	Follow exactly the same format of the file, including the print of the width and the height
-//	Add spaces and end lines at convenient places
-//
-// ----------------------------------------------------------------------------
 void PrintRetrievedInformation()
 {
 	std::cout << "Width " << BINARY_MAP_WIDTH << std::endl;
@@ -260,29 +208,12 @@ void PrintRetrievedInformation()
 	}
 }
 
-// ----------------------------------------------------------------------------
-//
-//	This function retrieves the value of the element (X;Y) in BinaryCollisionArray.
-//	Before retrieving the value, it should check that the supplied X and Y values
-//	are not out of bounds (in that case return 0)
-//
-// ----------------------------------------------------------------------------
 int GetCellValue(int X, int Y)
 {
 	if (X < 0 || X >= BINARY_MAP_WIDTH || Y < 0 || Y >= BINARY_MAP_HEIGHT) return 0;
 	else return BinaryCollisionArray[Y][X];
 }
 
-// ----------------------------------------------------------------------------
-//
-//	This function snaps the value sent as parameter to the center of the cell.
-//	It is used when a sprite is colliding with a collision area from one 
-//	or more side.
-//	To snap the value sent by "Coordinate", find its integral part by type 
-//	casting it to an integer, then add 0.5 (which is half the cell's width 
-//	or height)
-//
-// ----------------------------------------------------------------------------
 void SnapToCell(float* Coordinate)
 {
 	int index = static_cast<int>(*Coordinate);

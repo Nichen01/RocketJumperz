@@ -13,17 +13,22 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	// different types of platforms
 	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
 	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
-	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
+	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, *qButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
 	AEGfxTexture* eyeTrap = NULL, * sawTrap = NULL, * trapBeam = NULL;
 	AEGfxTexture* keyTexture = NULL;
 	AEGfxTexture* errorPromptMenu = NULL, * redButton = NULL, * greenButton = NULL;
-	AEGfxTexture* prompt1 = NULL, * prompt2 = NULL, * prompt3 = NULL, * prompt4 = NULL, * prompt5 = NULL, * prompt6 = NULL, * prompt7 = NULL, * prompt8 = NULL, * prompt9 = NULL;
 	AEGfxTexture* inventory = NULL, * keycardInventory = NULL;
 	AEGfxTexture* brokenDoor0 = NULL, * brokenDoor1 = NULL, * brokenDoor2 = NULL;
-	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL;
+	AEGfxTexture* wireInventory0 = NULL, * wireInventory1 = NULL, * wireInventory2 = NULL, * wireInventory3 = NULL;
 	AEGfxTexture* menuTex = NULL, * buttonTex = NULL;
 	AEGfxTexture* backgroundTex = NULL;
 	AEGfxTexture* ammoDrop = NULL;
+	AEGfxTexture* healthDrop = NULL;
+	AEGfxTexture* wallBg1 = NULL;
+	AEGfxTexture* borderTL = NULL, * borderT = NULL, * borderTR = NULL;
+	AEGfxTexture* borderCL = NULL, * borderCR = NULL;
+	AEGfxTexture* borderBL = NULL, * borderB = NULL, * borderBR = NULL;
+	AEGfxTexture* staticDoor = NULL;
 
 	int keyX{}, keyY{};
 
@@ -56,6 +61,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
 		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
 		AssetManager::LoadTexture(TEX_DROP, "Assets/bullets.png");
+		AssetManager::LoadTexture(TEX_HEALTH, "Assets/Items/health.png");
 
 		// Saw trap spritesheet (1 row, 7 cols spinning saw blade)
 		AssetManager::LoadTexture(TEX_SAW, "Assets/Traps/saw.png");
@@ -78,7 +84,32 @@ namespace load {
 		eyeTrap = AssetManager::GetTexture(TEX_EYETRAP);
 		sawTrap = AssetManager::GetTexture(TEX_SAW);
 		trapBeam = AssetManager::GetTexture(TEX_TRAPBEAM);
-		ammoDrop= AssetManager::GetTexture(TEX_DROP);
+		ammoDrop   = AssetManager::GetTexture(TEX_DROP);
+		healthDrop = AssetManager::GetTexture(TEX_HEALTH);
+
+		// Background wall tile (decorative, non-collidable)
+		AssetManager::LoadTexture(TEX_WALL_BG_1, "Assets/WallBackground.png");
+		wallBg1 = AssetManager::GetTexture(TEX_WALL_BG_1);
+
+		// Border tile textures (8 directional variants for wall borders)
+		AssetManager::LoadTexture(TEX_BORDER_TL, "Assets/Platform/borderTL.png");
+		AssetManager::LoadTexture(TEX_BORDER_T,  "Assets/Platform/borderT.png");
+		AssetManager::LoadTexture(TEX_BORDER_TR, "Assets/Platform/borderTR.png");
+		AssetManager::LoadTexture(TEX_BORDER_CL, "Assets/Platform/borderCL.png");
+		AssetManager::LoadTexture(TEX_BORDER_CR, "Assets/Platform/borderCR.png");
+		AssetManager::LoadTexture(TEX_BORDER_BL, "Assets/Platform/borderBL.png");
+		AssetManager::LoadTexture(TEX_BORDER_B,  "Assets/Platform/borderB.png");
+		AssetManager::LoadTexture(TEX_BORDER_BR, "Assets/Platform/borderBR.png");
+
+		// Sync extern pointers for border textures
+		borderTL = AssetManager::GetTexture(TEX_BORDER_TL);
+		borderT  = AssetManager::GetTexture(TEX_BORDER_T);
+		borderTR = AssetManager::GetTexture(TEX_BORDER_TR);
+		borderCL = AssetManager::GetTexture(TEX_BORDER_CL);
+		borderCR = AssetManager::GetTexture(TEX_BORDER_CR);
+		borderBL = AssetManager::GetTexture(TEX_BORDER_BL);
+		borderB  = AssetManager::GetTexture(TEX_BORDER_B);
+		borderBR = AssetManager::GetTexture(TEX_BORDER_BR);
 	}
 
 	void ui() {
@@ -91,6 +122,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_E_BUTTON, "Assets/UI/eButton.png");
 		AssetManager::LoadTexture(TEX_G_BUTTON, "Assets/UI/gButton.png");
 		AssetManager::LoadTexture(TEX_S_BUTTON, "Assets/UI/sButton.png");
+		AssetManager::LoadTexture(TEX_Q_BUTTON, "Assets/UI/qButton.png");
 		AssetManager::LoadTexture(TEX_Z_BUTTON, "Assets/UI/zButton.png");
 		AssetManager::LoadTexture(TEX_BUTTON1, "Assets/UI/1Button.png");
 		AssetManager::LoadTexture(TEX_BUTTON2, "Assets/UI/2Button.png");
@@ -98,6 +130,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_SPACEBAR, "Assets/UI/spacebar.png");
 		AssetManager::LoadTexture(TEX_INVENTORY, "Assets/UI/inventory.png");
 		AssetManager::LoadTexture(TEX_KEYCARDINVENTORY, "Assets/UI/keycardInventory.png");
+		AssetManager::LoadTexture(TEX_STATIC_DOOR, "Assets/Platform/staticDoor.jpg");
 
 		// Sync the extern pointers so other files can use them directly
 		ctrl1 = AssetManager::GetTexture(TEX_CTRL1);
@@ -109,6 +142,7 @@ namespace load {
 		eButton = AssetManager::GetTexture(TEX_E_BUTTON);
 		gButton = AssetManager::GetTexture(TEX_G_BUTTON);
 		sButton = AssetManager::GetTexture(TEX_S_BUTTON);
+		qButton = AssetManager::GetTexture(TEX_Q_BUTTON);
 		zButton = AssetManager::GetTexture(TEX_Z_BUTTON);
 		button1 = AssetManager::GetTexture(TEX_BUTTON1);
 		button2 = AssetManager::GetTexture(TEX_BUTTON2);
@@ -116,6 +150,7 @@ namespace load {
 		spacebar = AssetManager::GetTexture(TEX_SPACEBAR);
 		inventory = AssetManager::GetTexture(TEX_INVENTORY);
 		keycardInventory = AssetManager::GetTexture(TEX_KEYCARDINVENTORY);
+		staticDoor = AssetManager::GetTexture(TEX_STATIC_DOOR);
 	}
 
 	void key() {
@@ -125,25 +160,7 @@ namespace load {
 
 	void errorPrompt() {
 		AssetManager::LoadTexture(TEX_ERRORPROMPT, "Assets/UI/menu.png");
-		AssetManager::LoadTexture(TEX_PROMPT1, "Assets/UI/prompt1.png");
-		AssetManager::LoadTexture(TEX_PROMPT2, "Assets/UI/prompt2.png");
-		AssetManager::LoadTexture(TEX_PROMPT3, "Assets/UI/prompt3.png");
-		AssetManager::LoadTexture(TEX_PROMPT4, "Assets/UI/prompt4.png");
-		AssetManager::LoadTexture(TEX_PROMPT5, "Assets/UI/prompt5.png");
-		AssetManager::LoadTexture(TEX_PROMPT6, "Assets/UI/prompt6.png");
-		AssetManager::LoadTexture(TEX_PROMPT7, "Assets/UI/prompt7.png");
-		AssetManager::LoadTexture(TEX_PROMPT8, "Assets/UI/prompt8.png");
-		AssetManager::LoadTexture(TEX_PROMPT9, "Assets/UI/prompt9.png");
 		errorPromptMenu = AssetManager::GetTexture(TEX_ERRORPROMPT);
-		prompt1 = AssetManager::GetTexture(TEX_PROMPT1);
-		prompt2 = AssetManager::GetTexture(TEX_PROMPT2);
-		prompt3 = AssetManager::GetTexture(TEX_PROMPT3);
-		prompt4 = AssetManager::GetTexture(TEX_PROMPT4);
-		prompt5 = AssetManager::GetTexture(TEX_PROMPT5);
-		prompt6 = AssetManager::GetTexture(TEX_PROMPT6);
-		prompt7 = AssetManager::GetTexture(TEX_PROMPT7);
-		prompt8 = AssetManager::GetTexture(TEX_PROMPT8);
-		prompt9 = AssetManager::GetTexture(TEX_PROMPT9);
 	}
 
 	void redButtonOption() {
@@ -169,9 +186,11 @@ namespace load {
 		AssetManager::LoadTexture(TEX_WIREINVENTORY0, "Assets/UI/wireInventory0.png");
 		AssetManager::LoadTexture(TEX_WIREINVENTORY1, "Assets/UI/wireInventory1.png");
 		AssetManager::LoadTexture(TEX_WIREINVENTORY2, "Assets/UI/wireInventory2.png");
+		AssetManager::LoadTexture(TEX_WIREINVENTORY3, "Assets/UI/wireInventory3.png");
 		wireInventory0 = AssetManager::GetTexture(TEX_WIREINVENTORY0);
 		wireInventory1 = AssetManager::GetTexture(TEX_WIREINVENTORY1);
 		wireInventory2 = AssetManager::GetTexture(TEX_WIREINVENTORY2);
+		wireInventory3 = AssetManager::GetTexture(TEX_WIREINVENTORY3);
 	}
 
 	void cooldownBar() {
@@ -198,6 +217,11 @@ namespace load {
 	
 	void background() {
 		AssetManager::LoadTexture(TEX_BACKGROUND, "Assets/Map/background.jpg");
+		backgroundTex = AssetManager::GetTexture(TEX_BACKGROUND);
+	}
+
+	void background2() {
+		AssetManager::LoadTexture(TEX_BACKGROUND, "Assets/Map/background2.png");
 		backgroundTex = AssetManager::GetTexture(TEX_BACKGROUND);
 	}
 

@@ -44,7 +44,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 	
-	GSM_Initialize(GS_VICTORY);
+	GSM_Initialize(GS_TUTORIAL);
 
 	while (current != GS_QUIT)
 	{
@@ -67,7 +67,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (current != GS_RESTART) {
 			GSM_Update();
 			fpLoad();
-			Confirmation_Load();
 			if (canpause) {
 				Pause_Load();	
 			}
@@ -79,7 +78,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (canpause) {
 			Pause_Initialize();
 		}
-		Confirmation_Init();
 		fpInitialize();
 
 		while (next == current)
@@ -108,9 +106,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						Pause_Update();
 					}
 					Pause_Draw();
-					if (destructive) {
-						Confirmation_Draw();
-					}
 					audio::audiolevel(0.2f);
 				}
 			}
@@ -120,7 +115,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				}
 				fpDraw();
 				if (destructive) {
-					Confirmation_Draw();
 				}
 			}
 
@@ -139,14 +133,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			Pause_Free();
 		}
 		fpFree();
-		Confirmation_Free();
 
 		if (next != GS_RESTART) {
 			if (canpause) {
 				Pause_Unload();
 			}
 			fpUnload();
-			Confirmation_Unload();
 			pause = false;
 			previous = current;
 		}

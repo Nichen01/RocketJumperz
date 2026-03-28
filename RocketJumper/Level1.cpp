@@ -3,6 +3,8 @@
 #include "Level1.h"
 #include "traps.h"
 #include "WeaponSprite.h"
+#include "ParticleSystem.h"
+#include "Player.h"
 
 static s32* map = nullptr;
 static int x;
@@ -52,7 +54,8 @@ static s8 fontLevel1 = -1;
 static bool playerNear;
 
 // bool for keycard in inventory
-static bool keycardCollected;
+static bool healthCollected;
+//static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
@@ -61,17 +64,14 @@ void Level1_Load()
 {
 	audio::loadsound();
 
-	// Load platform tile textures
 	load::platform();
-
-	// Load UI textures (eButton used by flashing door prompt in Draw)
 	load::ui();
 	load::cooldownBar();
+	load::wireInventory();
+	load::background();
 
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
-	load::wireInventory();
-	load::background();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
@@ -141,8 +141,11 @@ void Level1_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	aiming::loadAiming();
+	//aiming::loadAiming();
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool
+	ParticleSystem::Load();
 }
 
 void Level1_Initialize()
@@ -187,6 +190,7 @@ void Level1_Initialize()
 			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
+	PrintRetrievedInformation();
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	if (playerEnteredDoorId != -1) {
@@ -225,8 +229,8 @@ void Level1_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, -200.0f, 100.0f);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, -100.0f, -200.0f);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy1X, enemy1Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy2X, enemy2Y);
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -260,6 +264,7 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
+	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL2;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		next = GS_LEVELEDITOR;
@@ -291,10 +296,6 @@ void Level1_Update()
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo1[player]);
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next = GS_QUIT;
-	}
-
 	// ---- Weapon Toggle (Q key) ----
 	// Press Q to switch between Plasma (single shot) and Shotgun (spread).
 	if (AEInputCheckTriggered(AEVK_Q)) {
@@ -312,7 +313,7 @@ void Level1_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo1[player]);
 	movement::UpdatePlayerFacing(objectinfo1[player]);
-	aiming::updateAiming(objectinfo1[player]);
+	//aiming::updateAiming(objectinfo1[player]);
 	weaponSprite::Update(objectinfo1[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo1[player]);
@@ -346,11 +347,14 @@ void Level1_Update()
 	}
 
 	// Update all active projectiles
-	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(Projectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Step all active particles forward
+	ParticleSystem::Update(dt);
 
 	// Update enemies (pass wireDrops so dead enemies can spawn wire items)
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
@@ -360,7 +364,7 @@ void Level1_Update()
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
-	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES);
+	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));
 
 	// Tick down the player's invincibility timer each frame
 	UpdatePlayerInvincibility(objectinfo1[player], dt);
@@ -398,6 +402,37 @@ void Level1_Update()
 		if (door.entranceLevel != currentGameLevel && door.exitLevel != currentGameLevel)
 			continue;
 
+		// --- Spark Emission Logic for Locked Doors ---
+		// Locked doors emit a small burst of falling white sparks every 4 seconds.
+		// Once the player collects the keycard (isLocked becomes false), sparks stop.
+		if (door.isLocked) {
+			door.sparkTimer += dt;
+			if (door.sparkTimer >= 2.0f) {
+				door.sparkTimer = 0.0f; // Reset the 4-second timer
+
+				EmitterProps sparkProps;
+				// Spawn slightly near the center/top of the door
+				sparkProps.spawnX = door.worldX;
+				sparkProps.spawnY = door.worldY;
+
+				// Shoot upwards -- gravity in Update() pulls them back down
+				sparkProps.velocityXBase = 0.0f;
+				sparkProps.velocityYBase = 100.0f;
+
+				// Wide X spread + narrow Y spread = upward cone shape
+				sparkProps.velocitySpreadX = 100.0f;
+				sparkProps.velocitySpreadY = 20.0f;
+
+				sparkProps.lifetimeBase = 1.0f;   // Short-lived sparks
+				sparkProps.lifetimeSpread = 0.7f;
+				sparkProps.scaleBase = 5.0f;       // Small specks
+				sparkProps.emitCount = 18;          // Small burst quantity
+				sparkProps.useSparkColors = true;   // Random white/yellow/orange sparks
+
+				ParticleSystem::Emit(sparkProps);
+			}
+		}
+
 		// get distance of player to door
 		f32 dx = objectinfo1[player].xPos - door.worldX;
 		f32 dy = objectinfo1[player].yPos - door.worldY;
@@ -415,7 +450,7 @@ void Level1_Update()
 				
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				if (door.isLocked && !keycardCollected) {
+				if (door.isLocked && !keycardCollected1) {
 					std::cout << "Door is locked!" << std::endl;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
@@ -444,6 +479,18 @@ void Level1_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
+	objectsquares healthObj;
+	healthObj.xPos = hp.worldX;
+	healthObj.yPos = hp.worldY;
+	healthObj.xScale = hp.size; healthObj.yScale = hp.size;
+
+	if (hp.active && gamelogic::static_collision(&objectinfo1[player], &healthObj)) {
+		hp.active = false;
+		hp.collected = true;
+		objectinfo1[player].health += rand() % 31;
+		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
+	}
+
 	// After loop, set global flag for rendering
 	playerNear = nearAnyDoor;
 
@@ -465,7 +512,7 @@ void Level1_Update()
 
 	if (key.active && gamelogic::static_collision(&objectinfo1[player], &keyObj)) {
 		key.active = false;
-		keycardCollected = true;
+		keycardCollected1 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
 }
@@ -507,10 +554,29 @@ void Level1_Draw()
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	if (objectinfo1[player].invincibilityTimer > 0.0f) {
+		// Tint the player red. (Red=1.0, Green=0.2, Blue=0.2 for a nice hit flash)
+		//AEGfxSetColorToMultiply(1.0f, 0.2f, 0.2f, 1.0f);
+
+		// Optional: If you want it to rapidly blink red and normal, you can use sin() math instead!
+		 if (sinf(objectinfo1[player].invincibilityTimer * 40.0f) > 0.0f) {
+		     AEGfxSetColorToMultiply(1.0f, 0.2f, 0.2f, 1.0f);
+		 } else {
+		     AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		 }
+	}
+	else {
+		// Normal color
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	AEGfxTextureSet(characterPictest, 0, 0);
+
+
 	// Flip sprite horizontally when the player is aiming left.
 	// Negating xScale mirrors the quad along the Y axis.
 	f32 playerDrawScaleX = movement::playerFacingLeft
@@ -519,7 +585,7 @@ void Level1_Draw()
 	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
 		playerDrawScaleX, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	aiming::drawAiming();
+	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -528,31 +594,88 @@ void Level1_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, AssetManager::GetMesh(MESH_QUAD));
 
+	// ====== PARTICLE SYSTEM RENDER ====== //
+	// Draw particles behind UI elements but in front of projectiles
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfo1[player].xPos, objectinfo1[player].yPos - 40.f);
 
-	// ====== HUD: Player Health Display ======//
+	// ====== HUD: Health, Ammo, Weapon, Gravity ======//
 	// Drawn last so it appears on top of all world geometry.
 	// AEGfxPrint uses normalized coords: (-1,-1) = bottom-left, (1,1) = top-right.
 	if (fontLevel1 >= 0)
 	{
-		char healthText[32];
-		snprintf(healthText, sizeof(healthText), "Health: %d", objectinfo1[player].health);
+		// ---- Health icon + number (top-left) ----
+		// Render a small health sprite to the left of the health number
+		f32 halfW = static_cast<f32>(AEGfxGetWindowWidth())  * 0.5f;
+		f32 halfH = static_cast<f32>(AEGfxGetWindowHeight()) * 0.5f;
 
-		// Prepare render state for font (font uses a glyph texture atlas)
+		// Health icon at top-left (world coords from normalized -0.93, 0.88)
+		f32 healthIconX = -halfW + 40.f;   // 40px from left edge
+		f32 healthIconY = halfH - 40.f;   // 40px from top edge
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(healthIconX, healthIconY, healthDrop, uiMesh, 70.f, 70.f);
+
+		// Health number text right of the icon
+		char healthText[32];
+		snprintf(healthText, sizeof(healthText), "%d", objectinfo1[player].health);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel1, healthText, -0.88f, 0.88f, 0.8f, 0.0f, 1.0f, 0.0f, 1.0f);
 
-		// Print at top-left corner of the screen (white text)
-		AEGfxPrint(fontLevel1, healthText, -0.95f, 0.85f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// ---- Ammo icon + count (right beside health) ----
+		f32 ammoIconX = healthIconX + 200.f;  // offset to the right of health (increased for readability)
+		f32 ammoIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(ammoIconX, ammoIconY, ammoDrop, uiMesh, 60.f, 60.f);
 
-		// Show the currently equipped weapon below the health display
-		const char* weaponName = (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN)
-			? "Weapon: Shotgun"
-			: "Weapon: Plasma";
-		AEGfxPrint(fontLevel1, weaponName, -0.95f, 0.75f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f);
+		// Ammo count text right of the ammo icon
+		char ammoText[32];
+		snprintf(ammoText, sizeof(ammoText), "%d", movement::bulletCount);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxPrint(fontLevel1, ammoText, -0.63f, 0.88f, 0.8f, 1.0f, 1.0f, 0.0f, 1.0f);
+
+		// ---- Current weapon sprite (below health row) ----
+		// Show the sprite of the currently equipped weapon
+		AEGfxTexture* weaponIcon = (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN)
+			? AssetManager::GetTexture(TEX_SHOTGUN)
+			: AssetManager::GetTexture(TEX_PLASMA_GUN);
+		f32 weaponIconX = healthIconX + 400.f;
+		f32 weaponIconY = healthIconY;
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 100.f, 50.f);
+
+		// ---- Gravity indicator (top center) ----
+		// Text changes colour: Green when gravity is ON, Red when OFF
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		if (movement::enableGravity) {
+			// Green text -- gravity is active
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+		}
+		else {
+			// Red text -- gravity is disabled
+			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		}
 	}
 
 	// ====== HARDCODED TILES AT THE BOTTOM ====== //
@@ -565,18 +688,8 @@ void Level1_Draw()
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
 
-	// Draw wire count text at the bottom-right of the wire inventory box
-	if (fontLevel1 >= 0) {
-		char wireText[16];
-		snprintf(wireText, sizeof(wireText), "%d/3", wireCount);
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel1, wireText, -0.84f, -0.97f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f);
-	}
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected) {
+	if (keycardCollected1) {
 		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
 		for (auto& door : doors) {
 			door.isLocked = false;
@@ -609,7 +722,7 @@ void Level1_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	aiming::unloadAiming();
+	//aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
@@ -621,6 +734,9 @@ void Level1_Unload()
 
 	// Destroy the font created in Load
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 
