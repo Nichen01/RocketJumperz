@@ -14,7 +14,7 @@
 
 bool pause = false;
 bool canpause = true;
-bool destructive = false;
+
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -91,14 +91,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					pause = true;
 				}
 			}
-			if (AEInputCheckTriggered(AEVK_J)) {
-				if (destructive) {
-					destructive = false;
-				}
-				else {
-					destructive = true;
-				}
-			}
+			
 			if (canpause) {
 				
 
@@ -110,20 +103,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				fpDraw();
 
 				if (pause) {
-					if (!destructive) {
-						Pause_Update();
-					}
+					Pause_Update();
 					Pause_Draw();
 					audio::audiolevel(0.2f);
 				}
 			}
 			else {
-				if (!destructive) {
-					fpUpdate();
-				}
+				fpUpdate();
 				fpDraw();
-				if (destructive) {
-				}
 			}
 
 			AESysFrameEnd();

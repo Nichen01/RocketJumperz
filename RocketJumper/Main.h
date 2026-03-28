@@ -8,6 +8,5 @@
 #include "GameStateList.h"
 
 extern bool pause;
-extern bool destructive;
 
 #endif

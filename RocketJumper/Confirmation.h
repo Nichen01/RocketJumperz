@@ -4,7 +4,7 @@
 #include "load.h"
 
 void Confirmation_Init(MenuButton& yesButton, MenuButton& noButton);
-bool Confirmation_Update(f32 buttontex, f32 backtex, f32 font);
-void Confirmation_Draw();
+void Confirmation_Update(MenuButton& yesButton, MenuButton& noButton, bool& leave);
+void Confirmation_Draw(s8 font, MenuButton& yesButton, MenuButton& noButton);
 
 

@@ -13,6 +13,8 @@ static MenuButton tomenuButton;
 static MenuButton yesButton;
 static MenuButton noButton;
 
+static bool leave = false;
+static bool destructive = false;
 void Pause_Load() {
 
 	load::pauseMenu();
@@ -34,10 +36,14 @@ void Pause_Initialize() {
 	exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
 void Pause_Update() {
-	MenuHelpers::updateButtonHover(resumeButton);
-	MenuHelpers::updateButtonHover(tomenuButton);
-	MenuHelpers::updateButtonHover(exitButton);
-
+	if (!destructive) {
+		MenuHelpers::updateButtonHover(resumeButton);
+		MenuHelpers::updateButtonHover(tomenuButton);
+		MenuHelpers::updateButtonHover(exitButton);
+	}
+	else {
+		Confirmation_Update(yesButton, noButton, leave);
+	}
 	if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (resumeButton.isHovered) {
 			pause = false;  // Change to test file if needed
@@ -48,8 +54,10 @@ void Pause_Update() {
 			printf("Play button clicked - Starting game!\n");
 		}
 		else if (exitButton.isHovered) {
-			next = GS_QUIT;
-			printf("Exiting game!\n");
+			destructive = true;
+			if (leave) {
+				next = GS_QUIT;
+			}
 		}
 	}
 }
@@ -64,6 +72,10 @@ void Pause_Draw() {
 	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttonTex);
+
+	if (destructive) {
+		Confirmation_Draw(pausefont, yesButton,noButton);
+	}
 }
 
 void Pause_Free() {
