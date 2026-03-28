@@ -362,8 +362,6 @@ void Tutorial_Update()
 			door.isLocked = false;
 		}
 	}
-
-	
 }
 
 void Tutorial_Draw()

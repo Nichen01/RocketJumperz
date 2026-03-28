@@ -51,6 +51,7 @@ static s8 fontLevel2 = -1;
 
 // bool for checking player proximity with door
 static bool playerNear;
+bool playerEnteredDoor2 = false;
 
 // bool for keycard in inventory
 static bool healthCollected;

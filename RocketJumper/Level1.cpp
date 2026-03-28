@@ -52,6 +52,7 @@ static s8 fontLevel1 = -1;
 
 // bool for checking player proximity with door
 static bool playerNear;
+bool playerEnteredDoor1 = false;
 
 //bool for checking if player previously cleared level
 extern bool prevCleared1 = 0;
@@ -517,6 +518,14 @@ void Level1_Update()
 		keycardCollected1 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
 	}
+
+	// Ensure doors stay unlocked once the keycard is collected
+	if (keycardCollected1) {
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
+	}
+
 }
 
 void Level1_Draw()
@@ -533,6 +542,14 @@ void Level1_Draw()
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
+
+	// ====== RENDERING PADLOCK ====== //
+	for (auto& door : doors) {
+		if (door.isLocked) {
+			// Draw padlock texture at the door’s position
+			renderlogic::drawTexture(door.worldX, door.worldY, padlock, uiMesh, 50.f, 50.f);
+		}
+	}
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
@@ -691,15 +708,22 @@ void Level1_Draw()
 	renderlogic::drawWireInventory(wireCount);
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected1) {
-		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
-		for (auto& door : doors) {
-			door.isLocked = false;
-		}
-	}
-	else {
+	std::cout << keycardCollected1;
+	if (playerEnteredDoor1) {
 		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
+	else {
+		if (keycardCollected1) {
+			renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
+			for (auto& door : doors) {
+				door.isLocked = false;
+			}
+		}
+		else {
+			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+		}
+	}
+
 }
 
 void Level1_Free()
