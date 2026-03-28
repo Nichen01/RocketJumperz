@@ -53,6 +53,9 @@ static s8 fontLevel1 = -1;
 // bool for checking player proximity with door
 static bool playerNear;
 
+//bool for checking if player previously cleared level
+extern bool prevCleared1 = 0;
+
 // bool for keycard in inventory
 static bool healthCollected;
 //static bool keycardCollected;
@@ -228,9 +231,11 @@ void Level1_Initialize()
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
-	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy1X, enemy1Y);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy2X, enemy2Y);
+	// SPAWN test enemies if not previously cleared
+	if (!prevCleared1) {
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy1X, enemy1Y);
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy2X, enemy2Y);
+	}
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -360,7 +365,7 @@ void Level1_Update()
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo1[player], L1Drop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects,
+		dt, LaserBlast, soundEffects, prevCleared1,
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles

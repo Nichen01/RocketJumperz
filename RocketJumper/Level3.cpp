@@ -58,6 +58,9 @@ static bool keycardCollectedAudio = false;
 
 //static int doorState = 0;
 
+//bool for checking if player previously cleared level
+extern bool prevCleared3 = 0;
+
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level3_Load()
@@ -225,8 +228,10 @@ void Level3_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
+	if (prevCleared3) {
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
+	}
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -372,7 +377,7 @@ void Level3_Update()
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo3[player], L3Drop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects,
+		dt, LaserBlast, soundEffects, prevCleared3,
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles

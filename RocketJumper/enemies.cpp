@@ -258,7 +258,7 @@ namespace enemySystem {
     void updateEnemies(Enemy enemies[], s32 maxCount,
         objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
-        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup,
+        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup, bool& prevCleared,
         WireDrop wireDrops[], s32 wireDropMax)
     {
         // iterate through enemy slots 
@@ -438,9 +438,11 @@ namespace enemySystem {
 
                 // Attempt wire drop first -- wire takes priority over standard loot.
                 bool wireDropped = false;
-                if (wireDrops && wireDropMax > 0)
+                if (wireDrops && wireDropMax > 0) {
                     wireDropped = pickup::TrySpawnWireDrop(wireDrops, wireDropMax,
                         enemies[i].shape.xPos, enemies[i].shape.yPos);
+                    prevCleared = 1;
+                }
 
                 // Only spawn standard loot (health/ammo) if no wire was dropped.
                 if (!wireDropped)

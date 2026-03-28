@@ -16,6 +16,7 @@ static MenuButton noButton;
 
 static bool destructive = false;
 static s8 leave = 0;
+extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void Pause_Load() {
 
@@ -62,6 +63,10 @@ void Pause_Update() {
 				destructive = false;
 				leave = 0;
 			}
+			next = GS_MAINMENU;  // Change to test file if needed
+			prevCleared1 = 0;
+			prevCleared2 = 0;
+			prevCleared3 = 0;
 			printf("Play button clicked - Starting game!\n");
 		}
 		else if (exitButton.isHovered) {

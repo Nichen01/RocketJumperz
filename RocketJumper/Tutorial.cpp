@@ -44,6 +44,8 @@ static bool keycardCollectedAudio = false;
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
+bool prevClearedTut = 0;
+
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Tutorial_Load()
@@ -257,7 +259,7 @@ void Tutorial_Update()
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfoTut[player],TutDrop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects);
+		dt, LaserBlast, soundEffects,prevClearedTut);
 
 	// Update enemy projectiles
 	projectileSystem::UpdateProjectiles(enemyProjectiles, MAX_PROJECTILES, map, x, static_cast<int>(tileSize));

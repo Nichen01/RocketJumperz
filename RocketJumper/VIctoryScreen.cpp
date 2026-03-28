@@ -2,6 +2,7 @@
 #include "Draw.h"
 #include "Confirmation.h"
 
+
 static s8 victoryfont = -1;
 static f32 width, height;
 
@@ -18,7 +19,9 @@ static bool destructive = false;
 static s8 leave = 0;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
-
+static AEGfxTexture* menutex;
+static AEGfxTexture* buttontex;
+extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void VictoryScreen_Load() {
 
@@ -92,6 +95,9 @@ void VictoryScreen_Update() {
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
             wireDropsSpawned = 0;
+            prevCleared1 = 0;
+            prevCleared2 = 0;
+            prevCleared3 = 0;
             doorState = 0;             // Reset Final Door
             destructive = true;
             if (leave == 1) {
