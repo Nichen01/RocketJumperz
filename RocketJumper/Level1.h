@@ -32,6 +32,8 @@ Technology is prohibited.
 #include "Traps.h"
 #include "WeaponSprite.h"
 
+extern bool playerEnteredDoor1;
+
 void Level1_Load();
 
 void Level1_Initialize();

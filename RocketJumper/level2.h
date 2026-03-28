@@ -31,6 +31,7 @@ Technology is prohibited.
 #include "drops.h"
 
 extern int screenWidth; extern int screenLength;
+extern bool playerEnteredDoor2;
 
 void Level2_Load();
 
