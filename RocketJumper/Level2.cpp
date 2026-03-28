@@ -267,6 +267,8 @@ void Level2_Initialize()
 				key.worldY = row * tileSize;
 				key.size = PlayerScale;
 				keycardCollected = false;
+
+				keyCountLevel2 = 1;
 			}
 		}
 	}

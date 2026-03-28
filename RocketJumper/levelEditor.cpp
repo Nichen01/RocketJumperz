@@ -251,14 +251,17 @@ void LevelEditor_Update() {
 
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
 		level = 1;
+		currentGameLevel = 1;
 		next = GS_RESTART;
 	}
 	else if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_2)) {
 		level = 2;
+		currentGameLevel = 2;
 		next = GS_RESTART;
 	}
 	else if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_3)) {
 		level = 3;
+		currentGameLevel = 3;
 		next = GS_RESTART;
 	}
 	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : (level == 2) ? GS_LEVEL2 : GS_LEVEL3;
@@ -425,6 +428,7 @@ void LevelEditor_Draw() {
 						bool placeKey = false;
 						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
 						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
+						else if (level == 3) std::cout << "You can't place a key in this level!" << std::endl;
 
 						if (placeKey) {
 							TileAction action;
@@ -437,11 +441,36 @@ void LevelEditor_Draw() {
 							actionHistory.push_back(action);
 
 							// increment the counter right here
-							if (level == 1) keyCountLevel1++;
-							else if (level == 2) keyCountLevel2++;
+							if (level == 1) keyCountLevel1 = 1;
+							else if (level == 2) keyCountLevel2 = 1;
 						}
 					}
 					else if (currentTileIndex == 11) {
+						bool placeHealth = false;
+						if (level == 1 && healthCountLevel1 == 0) placeHealth = true;
+						else if (level == 2 && healthCountLevel2 == 0) placeHealth = true;
+						else if (level == 3 && healthCountLevel3 == 0) placeHealth = true;
+
+						if (placeHealth) {
+							TileAction action;
+							action.row = row;
+							action.col = col;
+							action.prevValue = MapData[row][col];
+							action.newValue = 60;
+
+							MapData[row][col] = action.newValue;
+							actionHistory.push_back(action);
+
+							if (level == 1) healthCountLevel1++;
+							else if (level == 2) healthCountLevel2++;
+							else if (level == 3) healthCountLevel3++;
+						}
+						else {
+							std::cout << "Health pack already exists in this level" << std::endl;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						}
+					}
+					else if (currentTileIndex == 12) {
 						if (level != 3) {
 							std::cout << "Final Door can only be placed in Level 3!" << std::endl;
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
@@ -500,6 +529,11 @@ void LevelEditor_Draw() {
 					}
 					else if (MapData[row][col] == 69) {
 						finalDoorCount = 0;
+					}
+					else if (MapData[row][col] == 60) {
+						if (level == 1) healthCountLevel1 = 0;
+						else if (level == 2) healthCountLevel2 = 0;
+						else if (level == 3) healthCountLevel3 = 0;
 					}
 
 					MapData[row][col] = action.newValue;
@@ -664,9 +698,12 @@ void LevelEditor_Draw() {
 	AEMtx33Concat(&tileTransf, &tileTransl, &tileTransf);
 
 	// Reset color modifiers before rendering textured tile preview
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
 	if (currentTileIndex >= 0 && currentTileIndex < 25 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);
 	}
@@ -725,7 +762,7 @@ void LevelEditor_Draw() {
 		break;
 	case 11:
 		sprintf_s(strBuffer, "Health Pack");
-		AEGfxPrint(font, strBuffer, -0.2f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.25f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 12:
 		sprintf_s(strBuffer, "Final Door");
@@ -738,6 +775,46 @@ void LevelEditor_Draw() {
 	case 14:
 		sprintf_s(strBuffer, "Trap: Damages Player");
 		AEGfxPrint(font, strBuffer, -0.35f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 15:
+		sprintf_s(strBuffer, "Ranged Enemy");
+		AEGfxPrint(font, strBuffer, -0.28f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 16:
+		sprintf_s(strBuffer, "Melee Enemy");
+		AEGfxPrint(font, strBuffer, -0.26f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 17:
+		sprintf_s(strBuffer, "Decoration: Top Left");
+		AEGfxPrint(font, strBuffer, -0.35f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 18:
+		sprintf_s(strBuffer, "Decoration: Top Middle");
+		AEGfxPrint(font, strBuffer, -0.37f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 19:
+		sprintf_s(strBuffer, "Decoration: Top Right");
+		AEGfxPrint(font, strBuffer, -0.36f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 20:
+		sprintf_s(strBuffer, "Decoration: Middle Left");
+		AEGfxPrint(font, strBuffer, -0.38f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 21:
+		sprintf_s(strBuffer, "Decoration: Middle Right");
+		AEGfxPrint(font, strBuffer, -0.38f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 22:
+		sprintf_s(strBuffer, "Decoration: Bottom Left");
+		AEGfxPrint(font, strBuffer, -0.4f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 23:
+		sprintf_s(strBuffer, "Decoration: Bottom Middle");
+		AEGfxPrint(font, strBuffer, -0.4f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 24:
+		sprintf_s(strBuffer, "Decoration: Bottom Right");
+		AEGfxPrint(font, strBuffer, -0.4f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	}
 
@@ -758,9 +835,9 @@ void LevelEditor_Draw() {
 	renderlogic::drawTexture(670.f, 60.f, zButton, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, -60.f, ctrl1, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(610.f, -60.f, ctrl2, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh, 45.f, 50.f);
+	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh, 45.f, 45.f);
+	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh, 45.f, 45.f);
 
 	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;

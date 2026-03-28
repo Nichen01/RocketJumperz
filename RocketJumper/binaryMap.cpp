@@ -39,6 +39,10 @@ int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int finalDoorCount = 0;
 
+int healthCountLevel1 = 0;
+int healthCountLevel2 = 0;
+int healthCountLevel3 = 0;
+
 int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
 brokenDoor finalDoor{};
@@ -95,6 +99,9 @@ int ImportMapDataFromFile(const char* FileName)
 				hp.size = (float)tileSize;
 				hp.active = true;
 				hp.collected = false;
+				if (currentGameLevel == 1) healthCountLevel1 = 1;
+				else if (currentGameLevel == 2) healthCountLevel2 = 1;
+				else healthCountLevel3 = 1;
 			}
 
 			// SAVING COORDINATES OF KEY
