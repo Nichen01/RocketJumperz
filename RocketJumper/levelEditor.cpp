@@ -152,7 +152,6 @@ void LevelEditor_Load() {
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	load::ui();
-	load::errorPrompt();
 	load::redButtonOption();
 	load::brokenDoor();
 	// Load sound

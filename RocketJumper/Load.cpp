@@ -158,11 +158,6 @@ namespace load {
 		keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	}
 
-	void errorPrompt() {
-		AssetManager::LoadTexture(TEX_ERRORPROMPT, "Assets/UI/menu.png");
-		errorPromptMenu = AssetManager::GetTexture(TEX_ERRORPROMPT);
-	}
-
 	void redButtonOption() {
 		AssetManager::LoadTexture(TEX_REDBUTTON, "Assets/UI/redButton.png");
 		redButton = AssetManager::GetTexture(TEX_REDBUTTON);
