@@ -314,12 +314,12 @@ void LevelEditor_Update() {
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex++;
-		if (currentTileIndex >= 14) currentTileIndex = 0;
+		if (currentTileIndex >= 26) currentTileIndex = 0;
 	}
 	else if (AEInputCheckTriggered(AEVK_LEFT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex--;
-		if (currentTileIndex < 0) currentTileIndex = 13;
+		if (currentTileIndex < 0) currentTileIndex = 25;
 	}
 
 	// undo
@@ -510,7 +510,7 @@ void LevelEditor_Draw() {
 				AEGfxSetColorToMultiply(0.49f, 0.49f, 0.49f, 1.0f); // dark gray
 			}
 			else if (MapData[row][col] <= 29 && MapData[row][col] >= 21) {
-				AEGfxSetColorToMultiply(0.8f, 0.8f, 0.56f, 1.f);
+				AEGfxSetColorToMultiply(0.57f, 0.76f, 0.72f, 1.f);
 			}
 			else if (MapData[row][col] == 60) { // healthpack
 				AEGfxSetColorToMultiply(0.5f, 0.8f, 0.5f, 1.f);
@@ -523,6 +523,9 @@ void LevelEditor_Draw() {
 			}
 			else if (MapData[row][col] == 50 || MapData[row][col] == 51) { // traps
 				AEGfxSetColorToMultiply(0.42f, 0.59f, 0.72f, 1.f);
+			}
+			else if (MapData[row][col] <= 79 && MapData[row][col] >= 71) { // aesthetic walls
+				AEGfxSetColorToMultiply(0.83f, 0.79f, 0.69f, 1.f);
 			}
 			else if (MapData[row][col] == 81 || MapData[row][col] == 82) { // enemy
 				AEGfxSetColorToMultiply(0.59f, 0.4f, 0.4f, 1.f);
@@ -588,6 +591,13 @@ void LevelEditor_Draw() {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
 				AEGfxPrint(font, "Trap", normX, normY, 0.4f, 1, 1, 1, 1);
+			}
+			else if (isGridHovered && (MapData[row][col] <= 79 && MapData[row][col] >= 71)) { // aesthetic walls
+				// normalize tile center
+				AEGfxGetPrintSize(font, "Deco", 0.4f, &textW, &textH);
+				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - textW / 2.0f;
+				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - textH / 2.0f;
+				AEGfxPrint(font, "Deco", normX, normY, 0.4f, 1, 1, 1, 1);
 			}
 			else if (isGridHovered && (MapData[row][col] == 81 || MapData[row][col] == 82)) { // enemy
 				// normalize tile center
