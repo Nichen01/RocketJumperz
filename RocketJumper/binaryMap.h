@@ -31,7 +31,6 @@ extern int** MapData;
 extern int** BinaryCollisionArray;
 extern int** glassMap;
 
-
 // ----------------------------------------------------------------------------
 //
 // different types of objects
@@ -97,5 +96,6 @@ int		ImportMapDataFromFile(const char *FileName);
 void	FreeMapData(void);
 void	PrintRetrievedInformation(void);
 int		ExportMapDataToFile(const char* FileName);
+void	ResetMapData();
 
 #endif // BINARY_MAP_H_

@@ -37,6 +37,15 @@ struct errorPromptButton {
 	int id;
 };
 
+struct resetButton {
+	f32 x = 620.f, y = -380.f;
+	f32 width = 313.5f, height = 88.f;
+	f32 scale = 1.0f;
+	f32 targetScale;
+	const char* text = "RESET LEVEL";
+	bool isHovered = false;
+};
+
 void LevelEditor_Load();
 
 void LevelEditor_Initialize();

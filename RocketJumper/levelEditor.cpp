@@ -25,6 +25,8 @@ static int promptCol = -1;
 static char strBuffer[100];
 static char errorMessage[256];
 
+resetButton resetBtn;
+
 errorPromptButton errorPromptBtn;
 static bool enemyExistError = false;
 static bool finaldoorLevelError = false;
@@ -37,11 +39,14 @@ static bool wrongKeyLevelError = false;
 // ==================== FORWARD DECLARATIONS ====================//
 static bool isMouseOverDoorButton(const doorButton& button);
 static bool isMouseOverCloseButton(const errorPromptButton& button);
+static bool isMouseOverResetButton(const resetButton& button);
 static void updateDoorButtonHover(doorButton& button);
 static void updateCloseButtonHover(errorPromptButton& button);
+static void updateResetButtonHover(resetButton& button);
 static void drawDoorButton(const doorButton& button, AEGfxVertexList* mesh, s8 fontID);
 static void drawErrorButton(const errorPromptButton& button, AEGfxVertexList* mesh, s8 fontID);
 static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
+static void drawResetTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
 
 // ==================== BUTTON ARRAY ==================== //
 static const f32 BUTTON_SCALE_NORMAL = 1.0f;
@@ -86,6 +91,22 @@ static bool isMouseOverCloseButton(const errorPromptButton& button) {
 		worldMouseY <= button.y + halfHeight);
 }
 
+static bool isMouseOverResetButton(const resetButton& button) {
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	f32 halfWidth = (button.width * button.scale) / 2.0f;
+	f32 halfHeight = (button.height * button.scale) / 2.0f;
+
+	return (worldMouseX >= button.x - halfWidth &&
+		worldMouseX <= button.x + halfWidth &&
+		worldMouseY >= button.y - halfHeight &&
+		worldMouseY <= button.y + halfHeight);
+}
+
 static void updateDoorButtonHover(doorButton& button) {
 	button.isHovered = isMouseOverDoorButton(button);
 
@@ -109,6 +130,27 @@ static void updateDoorButtonHover(doorButton& button) {
 
 static void updateCloseButtonHover(errorPromptButton& button) {
 	button.isHovered = isMouseOverCloseButton(button);
+
+	// Set target scale based on hover state
+	button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
+
+	// Smooth interpolation towards target scale
+	if (button.scale < button.targetScale) {
+		button.scale += BUTTON_SCALE_SPEED;
+		if (button.scale > button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+	else if (button.scale > button.targetScale) {
+		button.scale -= BUTTON_SCALE_SPEED;
+		if (button.scale < button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+}
+
+static void updateResetButtonHover(resetButton& button) {
+	button.isHovered = isMouseOverResetButton(button);
 
 	// Set target scale based on hover state
 	button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
@@ -198,8 +240,73 @@ static void drawErrorButton(const errorPromptButton& button, AEGfxVertexList* me
 	drawDoorTextCentered(button.text, button.x, button.y, button.scale, fontID);
 }
 
+static void drawResetButton(const resetButton& button, AEGfxVertexList* mesh, s8 fontID) {
+	// Build transform for button quad
+	AEMtx33 scale, translate, transform;
+	AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+	AEMtx33Trans(&translate, button.x, button.y);
+	AEMtx33Concat(&transform, &translate, &scale);
+
+	// Render textured button (redButton)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxTextureSet(errorOverlayTex, 0, 0);
+	AEGfxSetTransform(transform.m);
+
+	// Apply hover tint
+	if (button.isHovered) {
+		// Slight brightening tint when hovered
+		AEGfxSetColorToAdd(0.2f, 0.2f, 0.2f, 0.3f);
+	}
+	else {
+		// No tint normally
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	// Reset color state
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Draw button text (e.g. "Close")
+	drawResetTextCentered(button.text, button.x, button.y, button.scale - 0.3f, fontID);
+}
 
 static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID) {
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	if (fontID < 0) {
+		printf("FONT IS NOT LOADED."); return;
+	}
+
+	// Get text dimensions in normalized units (0 to 2 range per AE docs)
+	f32 textWidth, textHeight;
+	AEGfxGetPrintSize(fontID, text, scale, &textWidth, &textHeight);
+
+	// Convert world coordinates to normalized coordinates for AEGfxPrint.
+	// AEGfxPrint uses [-1, 1] range where (-1,-1) = bottom-left, (1,1) = top-right.
+	// Our world coords have (0,0) = center, so dividing by half-screen gives normalized.
+	f32 halfW = screenWidth / 2.0f;
+	f32 halfH = screenLength / 2.0f;
+	f32 normalizedX = x / halfW;
+	f32 normalizedY = y / halfH;
+
+	// Center the text by offsetting half the text dimensions
+	f32 printX = normalizedX - textWidth / 2.0f;
+	f32 printY = normalizedY - textHeight / 2.0f;
+
+	// Switch to TEXTURE mode so the font glyph atlas can be sampled
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	// Reset color modifiers so the font renders with its own colors
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxPrint(fontID, text, printX, printY,
+		scale, 1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+static void drawResetTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID) {
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	if (fontID < 0) {
 		printf("FONT IS NOT LOADED."); return;
@@ -444,6 +551,10 @@ void LevelEditor_Update() {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 			keycardExistError = true;
 		}
+	}
+
+	if (resetBtn.isHovered && AEInputCheckCurr(AEVK_LBUTTON)) {
+		ResetMapData();
 	}
 }
 
@@ -1201,6 +1312,10 @@ void LevelEditor_Draw() {
 			errorPromptAlpha = 0.f;
 		}
 	}
+
+	//========== DRAW RESET BUTTON ==========//
+	drawResetButton(resetBtn, uiMesh, font);
+	updateResetButtonHover(resetBtn);
 }
 
 void LevelEditor_Free() {
