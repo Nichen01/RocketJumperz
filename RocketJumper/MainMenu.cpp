@@ -200,7 +200,6 @@ void MainMenu_Load() {
     // load audio for the menu
     audio::loadsound();
 
-
     // Build meshes via AssetManager instead of manually creating them here.
     // MESH_QUAD = white-vertex unit quad (used for textured background & title).
     // MESH_MENU_BUTTON = black-vertex unit quad (used for color-mode button rects).
@@ -359,8 +358,15 @@ void UpdateCreditsMenu() {
     // Update back button
     MenuHelpers::updateButtonHover(backButton);
 
+    f32 scrollSpeed = CREDITS_SCROLL_SPEED;
+    if (AEInputCheckCurr(AEVK_DOWN)) {
+        scrollSpeed *= 3.f;
+    }
+
+    renderlogic::flashingTexture(-100.f, -400.f, eButton, 50.f);
+
     // Scroll credits upward each frame
-    creditsScrollY += CREDITS_SCROLL_SPEED;
+    creditsScrollY += scrollSpeed;
 
     // The credits content is tall (~28 lines). Once it scrolls far enough past the
     // top of the screen, wrap back to the starting position below the viewport.
