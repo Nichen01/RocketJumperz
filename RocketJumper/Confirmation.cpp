@@ -9,14 +9,14 @@ void Confirmation_Init(MenuButton &yesButton, MenuButton &noButton) {
     yesButton = {-300.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "YES", false };
     noButton = {300.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "NO", false };
 }
-void Confirmation_Update(MenuButton& yesButton, MenuButton& noButton, bool& leave) {
+void Confirmation_Update(MenuButton& yesButton, MenuButton& noButton) {
     MenuHelpers::updateButtonHover(yesButton);
     MenuHelpers::updateButtonHover(noButton);
 
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (yesButton.isHovered) {
-            leave = true;
+            
         }
         if (noButton.isHovered) {
             
