@@ -67,6 +67,7 @@ extern f32 tileSize; // Global tile size
 extern brokenDoor finalDoor;
 extern HealthPack hp;
 extern Key key;
+extern int keyCountLevel0;
 extern int keyCountLevel1; // one level can only have one key
 extern int keyCountLevel2;
 

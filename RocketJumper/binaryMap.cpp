@@ -35,6 +35,7 @@ int** glassMap;
 Key key{};
 HealthPack hp;
 
+int keyCountLevel0 = 0;
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int finalDoorCount = 0;
@@ -113,9 +114,9 @@ int ImportMapDataFromFile(const char* FileName)
 
 			// SAVING COORDINATES OF KEY
 			else if (value == 67) {
-				if ((currentGameLevel == 1 && playerEnteredDoor1) ||
-					(currentGameLevel == 0 && playerEnteredDoor0) ||
-					(currentGameLevel == 2 && playerEnteredDoor2)) {
+				if ((currentGameLevel == 0 && keycardCollected0) ||
+					(currentGameLevel == 1 && keycardCollected1) ||
+					(currentGameLevel == 2 && keycardCollected2)) {
 
 					MapData[row][col] = 0;
 					BinaryCollisionArray[row][col] = 0;
@@ -128,13 +129,12 @@ int ImportMapDataFromFile(const char* FileName)
 					key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 					key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
 					key.active = true;
-					if (currentGameLevel == 1) keyCountLevel1 = 1;
+
+					if (currentGameLevel == 0) keyCountLevel0 = 1;
+					else if (currentGameLevel == 1) keyCountLevel1 = 1;
 					else if (currentGameLevel == 2) keyCountLevel2 = 1;
 				}
 			}
-
-
-
 
 			// SAVING COORDINATES OF BROKEN DOOR
 			if (value == 69) {
