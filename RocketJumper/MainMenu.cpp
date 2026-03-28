@@ -348,10 +348,6 @@ void UpdateInstructionsMenu() {
         }
     }
 
-    // Also allow ESC to go back
-    if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-        currentMenuState = MENU_MAIN;
-    }
 }
 
 void UpdateCreditsMenu() {
@@ -382,10 +378,7 @@ void UpdateCreditsMenu() {
         }
     }
 
-    // Also allow ESC to go back
-    if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-        currentMenuState = MENU_MAIN;
-    }
+
 }
 
 // ==================== DRAW FUNCTIONS =================================================================

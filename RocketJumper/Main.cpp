@@ -7,6 +7,7 @@
 #include "Load.h"
 #include "Sound.h"
 #include "PauseMenu.h"
+#include "Confirmation.h"
 
 // ---------------------------------------------------------------------------
 // main 
@@ -74,7 +75,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (canpause) {
 			Pause_Initialize();
 		}
-		
 		fpInitialize();
 
 		while (next == current)
@@ -90,6 +90,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						pause = true;
 					}
 				}
+				else {
+					pause = true;
+				}
+			}
+			
+			if (canpause) {
+				
 
 				if (!pause) {
 					audio::audiolevel(1.0f);
@@ -108,8 +115,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				fpUpdate();
 				fpDraw();
 			}
-			
-			
+
 			AESysFrameEnd();
 			if (AESysDoesWindowExist() == false){
 				next = GS_QUIT;

@@ -211,9 +211,6 @@ void Tutorial_Update()
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-		next = GS_MAINMENU;
-	}
 
 	//===========  APPLY PHYSICS(DRAG)===================//
 	// Update player physics (drag + position)
