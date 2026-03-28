@@ -94,6 +94,9 @@
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Confirmation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AimingInterface.h">
@@ -190,6 +193,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Confirmation.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

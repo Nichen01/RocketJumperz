@@ -130,8 +130,9 @@ namespace movement {
             player.velocityX -= directionVector.x * recoil * static_cast<f32>(screenLength) / screenWidth;
             player.velocityY -= directionVector.y * recoil * static_cast<f32>(screenWidth) / screenLength;
             bulletCount -= 1;
+            if (player.currentWeapon == WEAPON_SHOTGUN) bulletCount -= 2;
         }
-        if (AEInputCheckTriggered(AEVK_RBUTTON) && bulletCount)
+        if (AEInputCheckTriggered(AEVK_RBUTTON) && bulletCount>0)
         {
             // Calculate direction vector from player to mouse
             getMouse(player);
@@ -145,6 +146,7 @@ namespace movement {
             player.velocityY += directionVector.y * recoil * static_cast<f32>(screenWidth) / screenLength;
 
             bulletCount -= 1;
+            if (player.currentWeapon == WEAPON_SHOTGUN) bulletCount -= 2;
         }
     }
 
