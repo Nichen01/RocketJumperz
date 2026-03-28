@@ -599,44 +599,48 @@ void Level2_Draw()
 		f32 halfW = static_cast<f32>(AEGfxGetWindowWidth())  * 0.5f;
 		f32 halfH = static_cast<f32>(AEGfxGetWindowHeight()) * 0.5f;
 
-		f32 healthIconX = -halfW + 40.f;
-		f32 healthIconY =  halfH - 40.f;
+		// Health icon at top-left (world coords from normalized -0.93, 0.88)
+		f32 healthIconX = -halfW + 40.f;   // 40px from left edge
+		f32 healthIconY = halfH - 40.f;   // 40px from top edge
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		renderlogic::drawTexture(healthIconX, healthIconY, healthDrop, uiMesh, 30.f, 30.f);
+		renderlogic::drawTexture(healthIconX, healthIconY, healthDrop, uiMesh, 70.f, 70.f);
 
+		// Health number text right of the icon
 		char healthText[32];
 		snprintf(healthText, sizeof(healthText), "%d", objectinfo2[player].health);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel2, healthText, -0.88f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel2, healthText, -0.88f, 0.88f, 0.8f, 0.0f, 1.0f, 0.0f, 1.0f);
 
 		// ---- Ammo icon + count (right beside health) ----
-		f32 ammoIconX = healthIconX + 200.f;  // increased for readability
+		f32 ammoIconX = healthIconX + 200.f;  // offset to the right of health (increased for readability)
 		f32 ammoIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		renderlogic::drawTexture(ammoIconX, ammoIconY, ammoDrop, uiMesh, 30.f, 30.f);
+		renderlogic::drawTexture(ammoIconX, ammoIconY, ammoDrop, uiMesh, 60.f, 60.f);
 
+		// Ammo count text right of the ammo icon
 		char ammoText[32];
 		snprintf(ammoText, sizeof(ammoText), "%d", movement::bulletCount);
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel2, ammoText, -0.58f, 0.88f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(fontLevel2, ammoText, -0.63f, 0.88f, 0.8f, 1.0f, 1.0f, 0.0f, 1.0f);
 
 		// ---- Current weapon sprite (below health row) ----
+		// Show the sprite of the currently equipped weapon
 		AEGfxTexture* weaponIcon = (objectinfo2[player].currentWeapon == WEAPON_SHOTGUN)
 			? AssetManager::GetTexture(TEX_SHOTGUN)
 			: AssetManager::GetTexture(TEX_PLASMA_GUN);
-		f32 weaponIconX = healthIconX;
-		f32 weaponIconY = healthIconY - 40.f;
+		f32 weaponIconX = healthIconX + 400.f;
+		f32 weaponIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 50.f, 30.f);
+		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 100.f, 50.f);
 
 		// ---- Gravity indicator (top center) ----
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
