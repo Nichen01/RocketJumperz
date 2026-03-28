@@ -1,36 +1,40 @@
 #include "VictoryScreen.h"
 #include "Draw.h"
+#include "Confirmation.h"
 
 static s8 victoryfont = -1;
 static f32 width, height;
 
 static AEGfxTexture* backgroundTexture = nullptr;
+static AEGfxTexture* TitleTex;
 
 static MenuButton restartButton;
 static MenuButton exitButton;
 static MenuButton tomenuButton;
+static MenuButton yesButton;
+static MenuButton noButton;
 
+static bool destructive = false;
+static s8 leave = 0;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
-static AEGfxTexture* menutex;
-static AEGfxTexture* buttontex;
+
 
 void VictoryScreen_Load() {
-    AEGfxMeshStart();
 
-    AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFF000000, 0.0f, 1.0f,
-        0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+    load::pauseMenu();
+    TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
+    backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
 
-    AEGfxTriAdd(
-        0.5f, -0.5f, 0xFF000000, 1.0f, 1.0f,
-        0.5f, 0.5f, 0xFF000000, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0xFF000000, 0.0f, 0.0f);
+    if (!backgroundTexture) {
+        printf("Warning: MenuBackground.png not found. Using solid color background.\n");
+    }
 
-    buttonMesh = AEGfxMeshEnd();
-
-    AEGfxMeshStart();
+    victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+}
+void VictoryScreen_Init() {
+    AssetManager::BuildSqrMesh(MESH_BUTTON);
+    buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
     AEGfxTriAdd(
         -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
@@ -44,17 +48,8 @@ void VictoryScreen_Load() {
 
     backgroundMesh = AEGfxMeshEnd();
 
-    menutex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
-    buttontex = AEGfxTextureLoad("Assets/UI/Menus/button.png");
-    backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
+    Confirmation_Init(yesButton, noButton);
 
-    if (!backgroundTexture) {
-        printf("Warning: MenuBackground.png not found. Using solid color background.\n");
-    }
-
-    victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-}
-void VictoryScreen_Init() {
     float buttonwidth = 390.0f;
     float buttonlength = 80.0f;
     restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESTART", false };
@@ -62,10 +57,14 @@ void VictoryScreen_Init() {
     exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
 void VictoryScreen_Update() {
-    MenuHelpers::updateButtonHover(restartButton);
-    MenuHelpers::updateButtonHover(tomenuButton);
-    MenuHelpers::updateButtonHover(exitButton);
-
+    if (!destructive) {
+        MenuHelpers::updateButtonHover(restartButton);
+        MenuHelpers::updateButtonHover(tomenuButton);
+        MenuHelpers::updateButtonHover(exitButton);
+    }
+    else {
+        Confirmation_Update(yesButton, noButton, leave);
+    }
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
@@ -90,7 +89,14 @@ void VictoryScreen_Update() {
             printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {
-            next = GS_QUIT;
+            destructive = true;
+            if (leave == 1) {
+                next = GS_QUIT;
+            }
+            else if (leave == 2) {
+                destructive = false;
+                leave = 0;
+            }
             printf("Exiting game!\n");
         }
     }
@@ -100,7 +106,7 @@ void VictoryScreen_Draw() {
 
     float multi = 1.3f;
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-    AEGfxTextureSet(menutex, 0, 0);
+    AEGfxTextureSet(TitleTex, 0, 0);
     AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
     renderlogic::drawSquare(0.0f, 247.0f, 285.0f*multi, 115.0f * multi);
     AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
@@ -110,30 +116,34 @@ void VictoryScreen_Draw() {
 
    
 
-    MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttontex);
-    MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttontex);
-    MenuHelpers::TexdrawButton(exitButton, buttonMesh, victoryfont, buttontex);
+    MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttonTex);
+    MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttonTex);
+    MenuHelpers::TexdrawButton(exitButton, buttonMesh, victoryfont, buttonTex);
+
+    if (destructive) {
+        Confirmation_Draw(victoryfont, yesButton, noButton);
+    }
 
 }
 void VictoryScreen_Free() {
-    if (buttonMesh) {
-        AEGfxMeshFree(buttonMesh);
-        buttonMesh = nullptr;
-    }
     if (backgroundMesh) {
         AEGfxMeshFree(backgroundMesh);
         backgroundMesh = nullptr;
     }
+    AssetManager::FreeAllMeshes();
 }
 void VictoryScreen_Unload() {
+    if (TitleTex) {
+        AEGfxTextureUnload(TitleTex);
+        TitleTex = nullptr;
+    }
     if (backgroundTexture) {
         AEGfxTextureUnload(backgroundTexture);
         backgroundTexture = nullptr;
     }
-
+    
     if (victoryfont != -1) { AEGfxDestroyFont(victoryfont); victoryfont = -1; }
-    if (menutex != nullptr) { AEGfxTextureUnload(menutex); };
-    if (buttontex != nullptr) { AEGfxTextureUnload(buttontex); };
+    AssetManager::UnloadAllTextures();
 }
 
 void VDrawBackground() {

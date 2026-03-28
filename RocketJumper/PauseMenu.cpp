@@ -14,6 +14,8 @@ static MenuButton yesButton;
 static MenuButton noButton;
 
 static bool destructive = false;
+static s8 leave = 0;
+
 void Pause_Load() {
 
 	load::pauseMenu();
@@ -41,7 +43,7 @@ void Pause_Update() {
 		MenuHelpers::updateButtonHover(exitButton);
 	}
 	else {
-		Confirmation_Update(yesButton, noButton);
+		Confirmation_Update(yesButton, noButton,leave);
 	}
 	if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (resumeButton.isHovered) {
@@ -49,11 +51,25 @@ void Pause_Update() {
 			printf("Play button clicked - Starting game!\n");
 		}
 		if (tomenuButton.isHovered) {
-			next = GS_MAINMENU;  // Change to test file if needed
+			destructive = true;
+			if (leave == 1) {
+				next = GS_MAINMENU;  // Change to test file if needed
+			}
+			else if (leave == 2) {
+				destructive = false;
+				leave = 0;
+			}
 			printf("Play button clicked - Starting game!\n");
 		}
 		else if (exitButton.isHovered) {
-			next = GS_QUIT;
+			destructive = true;
+			if (leave==1) {
+				next = GS_QUIT;
+			}
+			else if (leave == 2) {
+				destructive = false;
+				leave = 0;
+			}
 		}
 	}
 }
