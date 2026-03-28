@@ -90,9 +90,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						pause = true;
 					}
 				}
-				else {
-					pause = true;
-				}
 			}
 			
 			if (canpause) {
