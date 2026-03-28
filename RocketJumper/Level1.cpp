@@ -54,7 +54,7 @@ static bool playerNear;
 
 // bool for keycard in inventory
 static bool healthCollected;
-static bool keycardCollected;
+//static bool keycardCollected;
 static bool keycardCollectedAudio = false;
 
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
