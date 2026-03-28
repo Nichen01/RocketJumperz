@@ -363,8 +363,6 @@ void UpdateCreditsMenu() {
         scrollSpeed *= 3.f;
     }
 
-    renderlogic::flashingTexture(-100.f, -400.f, eButton, 50.f);
-
     // Scroll credits upward each frame
     creditsScrollY += scrollSpeed;
 
