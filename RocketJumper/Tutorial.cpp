@@ -134,6 +134,7 @@ void Tutorial_Initialize()
 			break;
 		}
 	}
+
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
 		objectinfoTut[player].xPos = 600.f;

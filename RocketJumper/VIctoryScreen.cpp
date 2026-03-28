@@ -77,6 +77,9 @@ void VictoryScreen_Update() {
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            playerEnteredDoor0 = false;
+            playerEnteredDoor1 = false;
+            playerEnteredDoor2 = false;
             wireDropsSpawned = 0;
             doorState = 0;             // Reset Final Door
             destructive = true;
@@ -96,6 +99,9 @@ void VictoryScreen_Update() {
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            playerEnteredDoor0 = false;
+            playerEnteredDoor1 = false;
+            playerEnteredDoor2 = false;
             wireDropsSpawned = 0;
             prevCleared1 = 0;
             prevCleared2 = 0;

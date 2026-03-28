@@ -228,7 +228,7 @@ void Level3_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	if (prevCleared3) {
+	if (!prevCleared3) {
 		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
 		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
 	}

@@ -74,6 +74,9 @@ void DeathScreen_Update() {
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            playerEnteredDoor0 = false;
+            playerEnteredDoor1 = false;
+            playerEnteredDoor2 = false;
             prevCleared1 = 0;
             prevCleared2 = 0;
             prevCleared3 = 0;
@@ -97,6 +100,9 @@ void DeathScreen_Update() {
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            playerEnteredDoor0 = false;
+            playerEnteredDoor1 = false;
+            playerEnteredDoor2 = false;
             prevCleared1 = 0;
             prevCleared2 = 0;
             prevCleared3 = 0;

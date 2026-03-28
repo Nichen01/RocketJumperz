@@ -55,7 +55,6 @@ bool playerEnteredDoor2 = false;
 
 // bool for keycard in inventory
 static bool healthCollected;
-static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
 
 //bool for checking if player previously cleared level
@@ -155,6 +154,14 @@ void Level2_Load()
 
 void Level2_Initialize()
 {
+	// Spawn card only if not yet collected and not already progressed
+	if (!keycardCollected2 && !playerEnteredDoor2) {
+		key.active = true;
+	}
+	else {
+		key.active = false;
+	}
+
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
 	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
@@ -199,19 +206,19 @@ void Level2_Initialize()
 	}
 	// Spawn player at the door they came from
 	bool spawnSet = false;
-	for (auto& door : doors) {
-		door.isLocked = true;
-		if (door.id == 22) {
-			door.isLocked = false;
-		}
-
-		if (door.id == playerEnteredDoorId) {
-			objectinfo2[player].xPos = door.worldX;
-			objectinfo2[player].yPos = door.worldY;
-			spawnSet = true;
-			break;
+	if (playerEnteredDoorId != -1) {
+		for (auto& door : doors) {
+			door.isLocked = true;
+			if (door.id == 22) door.isLocked = false;
+			if (keycardCollected2) door.isLocked = false; // keep unlocked if card collected
+			if (door.id == playerEnteredDoorId) {
+				objectinfo2[player].xPos = door.worldX;
+				objectinfo2[player].yPos = door.worldY;
+				spawnSet = true;
+			}
 		}
 	}
+
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
 		objectinfo2[player].xPos = 0.f;
@@ -260,23 +267,6 @@ void Level2_Initialize()
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
 	traps::initTraps();
-
-	// RESET KEYCARD
-	for (int row = 0; row < y; ++row) {
-		for (int col = 0; col < x; ++col) {
-			int tile = BinaryCollisionArray[row][col];
-			map[row * x + col] = tile;
-			if (tile == 67) {
-				key.active = true;
-				key.worldX = col * tileSize;
-				key.worldY = row * tileSize;
-				key.size = PlayerScale;
-				keycardCollected = false;
-
-				keyCountLevel2 = 1;
-			}
-		}
-	}
 
 }
 
@@ -456,12 +446,13 @@ void Level2_Update()
 
 			// Handle E key transition
 			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
-				if (door.isLocked && !keycardCollected) {
+				if (door.isLocked && !keycardCollected2) {
 					std::cout << "Door is locked!" << std::endl;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
 				else {
 					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+					playerEnteredDoor2 = true;
 					playerEnteredDoorId = door.id; // remember which door was used
 					switch (toLevel) {
 					case 0: next = GS_TUTORIAL; break;
@@ -517,8 +508,19 @@ void Level2_Update()
 
 	if (key.active && gamelogic::static_collision(&objectinfo2[player], &keyObj)) {
 		key.active = false;
-		keycardCollected = true;
+		keycardCollected2 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
+
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
+	}
+
+	// Ensure doors stay unlocked once the keycard is collected
+	if (keycardCollected2) {
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
 	}
 }
 
@@ -536,6 +538,14 @@ void Level2_Draw()
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
+
+	// ====== RENDERING PADLOCK ====== //
+	for (auto& door : doors) {
+		if (door.isLocked) {
+			// Draw padlock texture at the door’s position
+			renderlogic::drawTexture(door.worldX, door.worldY, padlock, uiMesh, 50.f, 50.f);
+		}
+	}
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
@@ -670,14 +680,19 @@ void Level2_Draw()
 	renderlogic::drawWireInventory(wireCount);
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected) {
-		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
-		for (auto& door : doors) {
-			door.isLocked = false;
-		}
+	if (playerEnteredDoor2) {
+		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
 	else {
-		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+		if (keycardCollected2) {
+			renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
+			for (auto& door : doors) {
+				door.isLocked = false;
+			}
+		}
+		else {
+			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+		}
 	}
 }
 

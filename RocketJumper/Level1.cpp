@@ -154,6 +154,14 @@ void Level1_Load()
 
 void Level1_Initialize()
 {
+	// Only reset if this is the very first time entering Level1
+	if (!playerEnteredDoor1 && !keycardCollected1) {
+		key.active = true;   // spawn card
+	}
+	else {
+		key.active = false;  // prevent respawn
+	}
+
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
 	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
@@ -198,20 +206,17 @@ void Level1_Initialize()
 	bool spawnSet = false;
 	if (playerEnteredDoorId != -1) {
 		for (auto& door : doors) {
-			// Lock all doors
 			door.isLocked = true;
-			if (door.id == 21) {
-				door.isLocked = false;
-			}
-
+			if (door.id == 21) door.isLocked = false; // tutorial entry always unlocked
+			if (keycardCollected1) door.isLocked = false; // keep unlocked if card collected
 			if (door.id == playerEnteredDoorId) {
 				objectinfo1[player].xPos = door.worldX;
 				objectinfo1[player].yPos = door.worldY;
 				spawnSet = true;
-				break;
 			}
 		}
 	}
+
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
 		objectinfo1[player].xPos = 0.f;
@@ -459,6 +464,7 @@ void Level1_Update()
 				}
 				else {
 					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+					playerEnteredDoor1 = true;
 					playerEnteredDoorId = door.id; // remember which door was used
 					switch (toLevel) {
 					case 0: next = GS_TUTORIAL; break;
@@ -517,6 +523,10 @@ void Level1_Update()
 		key.active = false;
 		keycardCollected1 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
+
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
 	}
 
 	// Ensure doors stay unlocked once the keycard is collected
@@ -594,7 +604,6 @@ void Level1_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
 	AEGfxTextureSet(characterPictest, 0, 0);
-
 
 	// Flip sprite horizontally when the player is aiming left.
 	// Negating xScale mirrors the quad along the Y axis.
@@ -708,7 +717,6 @@ void Level1_Draw()
 	renderlogic::drawWireInventory(wireCount);
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	std::cout << keycardCollected1;
 	if (playerEnteredDoor1) {
 		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
@@ -723,7 +731,6 @@ void Level1_Draw()
 			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 		}
 	}
-
 }
 
 void Level1_Free()
