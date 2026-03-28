@@ -14,6 +14,7 @@ static AEGfxVertexList* backgroundMesh = nullptr;
 
 static AEGfxTexture* menutex;
 static AEGfxTexture* buttontex;
+extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void DeathScreen_Load() {
     AEGfxMeshStart();
@@ -69,6 +70,9 @@ void DeathScreen_Update() {
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            prevCleared1 = 0;
+            prevCleared2 = 0;
+            prevCleared3 = 0;
             wireDropsSpawned = 0;
             doorState = 0;
             next = GS_TUTORIAL;  // Change to test file if needed
@@ -79,6 +83,9 @@ void DeathScreen_Update() {
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            prevCleared1 = 0;
+            prevCleared2 = 0;
+            prevCleared3 = 0;
             wireDropsSpawned = 0;
             doorState = 0;
             next = GS_MAINMENU;  // Change to test file if needed

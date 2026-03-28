@@ -1,6 +1,7 @@
 #include "VictoryScreen.h"
 #include "Draw.h"
 
+
 static s8 victoryfont = -1;
 static f32 width, height;
 
@@ -14,6 +15,7 @@ static AEGfxVertexList* backgroundMesh = nullptr;
 
 static AEGfxTexture* menutex;
 static AEGfxTexture* buttontex;
+extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void VictoryScreen_Load() {
     AEGfxMeshStart();
@@ -85,6 +87,9 @@ void VictoryScreen_Update() {
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
             wireDropsSpawned = 0;
+            prevCleared1 = 0;
+            prevCleared2 = 0;
+            prevCleared3 = 0;
             doorState = 0;             // Reset Final Door
             next = GS_MAINMENU;
             printf("Play button clicked - Starting game!\n");

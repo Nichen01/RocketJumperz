@@ -88,7 +88,7 @@ namespace enemySystem {
     void updateEnemies(Enemy enemies[], s32 maxCount,
         objectsquares& player, drop loot[],
         Projectile enemyProjectiles[], s32 maxProjectiles,
-        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup,
+        f32 deltaTime, AEAudio attackSound, AEAudioGroup sfxGroup, bool& prevCleared,
         WireDrop wireDrops[] = nullptr, s32 wireDropMax = 0);
 
     // Render all active enemies

@@ -57,6 +57,9 @@ static bool healthCollected;
 static bool keycardCollected = false;
 static bool keycardCollectedAudio = false;
 
+//bool for checking if player previously cleared level
+extern bool prevCleared2 = 0;
+
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level2_Load()
@@ -229,8 +232,10 @@ void Level2_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
+	if (!prevCleared2) {
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
+	}
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -368,7 +373,7 @@ void Level2_Update()
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo2[player], L2Drop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects,
+		dt, LaserBlast, soundEffects, prevCleared2,
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
