@@ -83,6 +83,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		while (next == current)
 		{
 			AESysFrameStart();
+			if (AEInputCheckTriggered(AEVK_ESCAPE)) {
+				if (pause) {
+					pause = false;
+				}
+				else {
+					pause = true;
+				}
+			}
 			if (AEInputCheckTriggered(AEVK_J)) {
 				if (destructive) {
 					destructive = false;
