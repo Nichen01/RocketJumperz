@@ -452,14 +452,13 @@ void Level1_Update()
 			nearAnyDoor = true; 
 
 			// open door if closed and not animating
-			if (!door.isOpen && door.anim.playMode == ANIM_IDLE) {
+			if (!door.isLocked && !door.isOpen && door.anim.playMode == ANIM_IDLE) {
 				animSystem::play(door.anim, ANIM_PLAY_ONCE);
 			}
 				
 			// Handle E key transition
-			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
+			if (nearThisDoor && AEInputCheckTriggered(AEVK_E)) {
 				if (door.isLocked && !keycardCollected1) {
-					std::cout << "Door is locked!" << std::endl;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
 				else {
