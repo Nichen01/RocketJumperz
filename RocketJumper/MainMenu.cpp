@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "GameStateList.h"
 #include "Load.h"
 #include "Confirmation.h"
+#include "player.h"
 #include <cmath>
 
 // ==================== FORWARD DECLARATIONS ====================
@@ -338,13 +339,20 @@ void UpdateMainMenu() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (playButton.isHovered) {
-            movement::bulletCount = 10;
+            movement::bulletCount = 50;
             playerEnteredDoorId = -1;
             wireCount = 0;             // Reset Wires
+            keycardCollected0 = false;  // Reset Keycard
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
             doorState = 0;             // Reset Final Door
+
+            // Reset checkpoint variables so a new game starts fresh
+            savedAmmo      = 50;
+            savedWireCount = 0;
+            savedHealth    = 100;
+
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
         }

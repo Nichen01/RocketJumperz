@@ -94,8 +94,10 @@ void Tutorial_Initialize()
 	movement::initPlayerMovement(objectinfoTut[player]);
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
 
-	// Set starting ammo for the Tutorial level
-	movement::bulletCount = 50;
+	// Load saved checkpoint stats so progress from previous levels is preserved.
+	// On a fresh game these are the defaults (ammo=50, wires=0, health=100).
+	movement::bulletCount = savedAmmo;
+	wireCount             = savedWireCount;
 
 	//=============CREATE TEXTURED MESH FOR WALLS==================//
 	// This mesh is used by draw.cpp for rendering walls
@@ -143,8 +145,9 @@ void Tutorial_Initialize()
 	objectinfoTut[player].xScale = PlayerScale;
 	objectinfoTut[player].yScale = PlayerScale;
 
-	// Initialize player health to 100 HP with no invincibility active
+	// Initialize player health from saved checkpoint (max on fresh game)
 	InitPlayerHealth(objectinfoTut[player]);
+	objectinfoTut[player].health = savedHealth;
 
 	// Start with the plasma gun equipped (default weapon)
 	objectinfoTut[player].currentWeapon = WEAPON_PLASMA;
@@ -315,6 +318,13 @@ void Tutorial_Update()
 		// Transition only if unlocked
 		if (playerNear && door.isOpen && !door.isLocked && AEInputCheckTriggered(AEVK_E)) {
 			int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+
+			// Save current stats as a checkpoint before leaving the level.
+			// If the player dies in the next level, these values are restored.
+			savedAmmo      = movement::bulletCount;
+			savedWireCount = wireCount;
+			savedHealth    = objectinfoTut[player].health;
+
 			playerEnteredDoor0 = true;
 			playerEnteredDoorId = door.id;
 			switch (toLevel) {
@@ -415,7 +425,7 @@ void Tutorial_Draw()
 	// ====== RENDERING PADLOCK ====== //
 	for (auto& door : doors) {
 		if (door.isLocked) {
-			// Draw padlock texture at the door’s position
+			// Draw padlock texture at the doorï¿½s position
 			renderlogic::drawTexture(door.worldX, door.worldY, padlock, uiMesh, 50.f, 50.f);
 		}
 	}

@@ -216,8 +216,13 @@ void Level3_Initialize()
 	objectinfo3[player].xScale = PlayerScale;
 	objectinfo3[player].yScale = PlayerScale;
 
-	// Initialize player health to 100 HP with no invincibility active
+	// Initialize player health from saved checkpoint (max on fresh game)
 	InitPlayerHealth(objectinfo3[player]);
+	objectinfo3[player].health = savedHealth;
+
+	// Load saved checkpoint stats so progress from previous levels is preserved
+	movement::bulletCount = savedAmmo;
+	wireCount             = savedWireCount;
 
 	// Start with the plasma gun equipped (default weapon)
 	objectinfo3[player].currentWeapon = WEAPON_PLASMA;
@@ -464,6 +469,12 @@ void Level3_Update()
 				}
 				else {
 					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+
+					// Save current stats as a checkpoint before leaving the level
+					savedAmmo      = movement::bulletCount;
+					savedWireCount = wireCount;
+					savedHealth    = objectinfo3[player].health;
+
 					playerEnteredDoorId = door.id; // remember which door was used
 					switch (toLevel) {
 					case 0: next = GS_TUTORIAL; break;

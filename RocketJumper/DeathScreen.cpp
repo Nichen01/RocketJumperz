@@ -2,6 +2,8 @@
 #include "Draw.h"
 #include "movement.h"
 #include "Confirmation.h"
+#include "DoorSystem.h"
+#include "player.h"
 
 static s8 deathfont = -1;
 static f32 width, height;
@@ -68,31 +70,38 @@ void DeathScreen_Update() {
     }
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
-            movement::bulletCount = 50;
-            wireCount = 0;             // Reset Wires
-            keycardCollected0 = false;  // Reset Keycard
-            keycardCollected1 = false;  // Reset Keycard
-            keycardCollected2 = false;  // Reset Keycard
-            keycardCollected3 = false;  // Reset Keycard
-            playerEnteredDoor0 = false;
-            playerEnteredDoor1 = false;
-            playerEnteredDoor2 = false;
-            prevCleared1 = 0;
-            prevCleared2 = 0;
-            prevCleared3 = 0;
-            wireDropsSpawned = 0;
-            doorState = 0;
+            // Restore checkpoint stats so the player keeps progress from prior levels
+            // but loses anything collected during the level they died on.
+            movement::bulletCount = savedAmmo;
+            wireCount             = savedWireCount;
+
+            // Only reset the keycard for the level the player died on
+            switch (currentGameLevel) {
+            case 0: keycardCollected0 = false; playerEnteredDoor0 = false; break;
+            case 1: keycardCollected1 = false; playerEnteredDoor1 = false; break;
+            case 2: keycardCollected2 = false; playerEnteredDoor2 = false; break;
+            case 3: keycardCollected3 = false; break;
+            }
+
             destructive = true;
             if (leave == 1) {
                 destructive = false;
                 leave = 0;
-                next = GS_TUTORIAL;
+
+                // Send the player back to the level they died on, not the tutorial
+                switch (currentGameLevel) {
+                case 0: next = GS_TUTORIAL; break;
+                case 1: next = GS_LEVEL1;   break;
+                case 2: next = GS_LEVEL2;   break;
+                case 3: next = GS_LEVEL3;   break;
+                default: next = GS_TUTORIAL; break;
+                }
             }
             else if (leave == 2) {
                 destructive = false;
                 leave = 0;
             }
-            printf("Play button clicked - Starting game!\n");
+            printf("Restart button clicked - Restarting level %d!\n", currentGameLevel);
         }
         if (tomenuButton.isHovered) {
             wireCount = 0;             // Reset Wires

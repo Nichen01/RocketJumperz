@@ -69,6 +69,14 @@ enum objecttype {
 	enemy
 };
 
+// ---- Checkpoint Variables ----
+// These store the player's stats at the moment they transition between levels.
+// On death, the player restarts the current level with these saved values,
+// preserving progress from previous levels while losing current-level pickups.
+extern int savedWireCount;
+extern int savedAmmo;
+extern int savedHealth;
+
 // Counter for the WIRE to fix FINAL DOOR
 extern int wireCount;
 extern bool keycardCollected0;
