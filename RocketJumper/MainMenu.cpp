@@ -57,6 +57,7 @@ static MenuButton creditsButton;
 static MenuButton quitButton;
 static MenuButton yesButton;
 static MenuButton noButton;
+static SettingButton settingBtn;
 
 // Back button for sub-menus
 static MenuButton backButton;
@@ -198,6 +199,99 @@ namespace MenuHelpers {
         AEGfxPrint(fontID, text, printX, printY,
             scale, 1.0f, 1.0f, 1.0f, 1.0f);
     }
+
+    static bool isMouseOverButton(const SettingButton& button) {
+        s32 mouseX, mouseY;
+        AEInputGetCursorPosition(&mouseX, &mouseY);
+        // Convert pixel cursor position to world coordinates.
+        // Read from the global screen-size externs so this works from ANY
+        // game state (MainMenu, DeathScreen, VictoryScreen, etc.), not just
+        // when MainMenu_Init has run and populated the static locals.
+        f32 currentHalfW = static_cast<f32>(screenWidth) / 2.0f;
+        f32 currentHalfH = static_cast<f32>(screenLength) / 2.0f;
+        f32 worldMouseX = static_cast<f32>(mouseX) - currentHalfW;
+        f32 worldMouseY = currentHalfH - static_cast<f32>(mouseY);
+
+        f32 bHalfWidth = (button.width * button.scale) / 2.0f;
+        f32 bHalfHeight = (button.height * button.scale) / 2.0f;
+
+        return (worldMouseX >= button.x - bHalfWidth &&
+            worldMouseX <= button.x + bHalfWidth &&
+            worldMouseY >= button.y - bHalfHeight &&
+            worldMouseY <= button.y + bHalfHeight);
+    }
+
+    void updateButtonHover(SettingButton& button) {
+        button.isHovered = isMouseOverButton(button);
+
+        // Set target scale based on hover state
+        button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
+
+        // Smooth interpolation towards target scale
+        if (button.scale < button.targetScale) {
+            button.scale += BUTTON_SCALE_SPEED;
+            if (button.scale > button.targetScale) {
+                button.scale = button.targetScale;
+            }
+        }
+        else if (button.scale > button.targetScale) {
+            button.scale -= BUTTON_SCALE_SPEED;
+            if (button.scale < button.targetScale) {
+                button.scale = button.targetScale;
+            }
+        }
+    }
+    void TexdrawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture) {
+        // Draw button background
+        AEMtx33 scale, translate, transform;
+        AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+        AEMtx33Trans(&translate, button.x, button.y);
+        AEMtx33Concat(&transform, &translate, &scale);
+
+        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+        // Color based on hover state
+        if (button.isHovered) {
+            AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
+        }
+        else {
+            AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+        }
+
+        AEGfxTextureSet(texture, 0, 0);
+        AEGfxSetTransform(transform.m);
+        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+        // Draw button text
+        drawTextCentered(button.text, button.x, button.y, button.scale * 0.7f, fontID);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+    }
+
+    void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID) {
+        // Draw button background
+        AEMtx33 scale, translate, transform;
+        AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+        AEMtx33Trans(&translate, button.x, button.y);
+        AEMtx33Concat(&transform, &translate, &scale);
+
+        AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+        // Color based on hover state
+        if (button.isHovered) {
+            AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
+        }
+        else {
+            AEGfxSetColorToAdd(0.15f, 0.15f, 0.3f, 0.7f); // Dark blue-gray normally
+        }
+
+        AEGfxSetTransform(transform.m);
+        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+        // Draw button text
+        drawTextCentered(button.text, button.x, button.y, button.scale, fontID);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+    }
 }
 
 // ==================== INITIALIZATION FUNCTIONS ========================================================================
@@ -228,6 +322,10 @@ void MainMenu_Load() {
         printf("Warning: DigiPenWhite.png not found. Credits logo will not render.\n");
     }
 
+    AssetManager::LoadTexture(TEX_SETTINGS, "Assets/UI/Menus/DigiPenWhite.png");
+    if (!AssetManager::GetTexture(TEX_SETTINGS)) {
+        printf("Warning: settings.png not found. Credits logo will not render.\n");
+    }
     // Load font
     menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 48);
     if (menuFont < 0) {
@@ -255,6 +353,7 @@ void MainMenu_Init() {
 
     menuTex = AssetManager::GetTexture(TEX_MENU);
     buttonTex = AssetManager::GetTexture(TEX_BUTTON);
+    setting = AssetManager::GetTexture(TEX_SETTINGS);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
     // Cache screen dimensions as floats so every layout calc can use them directly.

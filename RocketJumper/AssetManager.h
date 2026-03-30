@@ -153,6 +153,8 @@ enum TextureID {
     // Health pack drop
     TEX_HEALTH,
 
+    TEX_SETTINGS,
+
     // Background wall tile (non-collidable, drawn over glass)
     TEX_WALL_BG_1,
 

@@ -30,6 +30,7 @@ extern AEGfxTexture* borderCL, * borderCR;
 extern AEGfxTexture* borderBL, * borderB, * borderBR;
 extern AEGfxTexture* staticDoor;
 extern AEGfxTexture* padlock;
+extern AEGfxTexture* setting;
 
 extern int keyX, keyY;
 extern int brokenDoorX, brokenDoorY;
@@ -38,7 +39,6 @@ namespace load {
 	void platform();
 	void ui();
 	void key();
-	void errorPrompt();
 	void redButtonOption();
 	void greenButtonOption();
 	void brokenDoor();
@@ -47,5 +47,4 @@ namespace load {
 	void pauseMenu();
 	void background();
 	void background2();
-
 }

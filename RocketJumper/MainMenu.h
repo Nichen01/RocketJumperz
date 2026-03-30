@@ -39,6 +39,13 @@ struct MenuButton {
     bool isHovered;
 };
 
+struct SettingButton {
+    f32 x, y;
+    f32 width, height;
+    f32 scale, targetScale;
+    bool isHovered;
+};
+
 // Function declarations
 void MainMenu_Load();
 void MainMenu_Init();
@@ -54,4 +61,8 @@ namespace MenuHelpers {
     void TexdrawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture);
     void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID);
     void drawTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
+    bool isMouseOverButton(const SettingButton& button);
+    void updateButtonHover(SettingButton& button);
+    void TexdrawButton(const SettingButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture);
+    void drawButton(const SettingButton& button, AEGfxVertexList* mesh, s8 fontID);
 }
