@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "GameStateManager.h"
 #include "GameStateList.h"
 #include "Load.h"
+#include "Confirmation.h"
 #include <cmath>
 
 // ==================== FORWARD DECLARATIONS ====================
@@ -54,10 +55,14 @@ static MenuButton playButton;
 static MenuButton instructionsButton;
 static MenuButton creditsButton;
 static MenuButton quitButton;
+static MenuButton yesButton;
+static MenuButton noButton;
 
 // Back button for sub-menus
 static MenuButton backButton;
 
+static bool destructive = false;
+static s8 leave = 0;
 
 // Animation constants
 static const f32 BUTTON_SCALE_NORMAL = 1.0f;
@@ -234,6 +239,8 @@ void MainMenu_Load() {
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");
 
+    AssetManager::LoadTexture(TEX_MENU, "Assets/UI/Menus/Menu.png");
+
     // Instructions screen image (full panel showing controls / objectives)
     AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/instructionsMenu.png");
     if (!AssetManager::GetTexture(TEX_INSTRUCTIONS_MENU)) {
@@ -246,6 +253,9 @@ void MainMenu_Load() {
 void MainMenu_Init() {
     AEAudioPlay(MainMenu, bgm, 0.5f, 1.f, -1);
 
+    menuTex = AssetManager::GetTexture(TEX_MENU);
+    buttonTex = AssetManager::GetTexture(TEX_BUTTON);
+    buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
     // Cache screen dimensions as floats so every layout calc can use them directly.
     // These come from the global extern ints defined in Main.cpp.
@@ -269,6 +279,7 @@ void MainMenu_Init() {
     instructionsButton = { 0.0f, startY - btnGap,       btnW, btnH, 1.0f, 1.0f, "INSTRUCTIONS", false };
     creditsButton      = { 0.0f, startY - btnGap * 2.0f, btnW, btnH, 1.0f, 1.0f, "CREDITS",     false };
     quitButton         = { 0.0f, startY - btnGap * 3.0f, btnW, btnH, 1.0f, 1.0f, "QUIT",        false };
+    Confirmation_Init(yesButton, noButton);
 
     // Back button (sub-menus): slightly smaller, near bottom of screen
     f32 backBtnW = scrW * 0.156f;   // ~250 / 1600
@@ -302,11 +313,15 @@ void MainMenu_Update() {
 
 void UpdateMainMenu() {
     // Update button hover states
-    MenuHelpers::updateButtonHover(playButton);
-    MenuHelpers::updateButtonHover(instructionsButton);
-    MenuHelpers::updateButtonHover(creditsButton);
-    MenuHelpers::updateButtonHover(quitButton);
-
+    if (!destructive) {
+        MenuHelpers::updateButtonHover(playButton);
+        MenuHelpers::updateButtonHover(instructionsButton);
+        MenuHelpers::updateButtonHover(creditsButton);
+        MenuHelpers::updateButtonHover(quitButton);
+    }
+    else {
+        Confirmation_Update(yesButton, noButton, leave);
+    }
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (playButton.isHovered) {
@@ -330,7 +345,16 @@ void UpdateMainMenu() {
             printf("Credits button clicked!\n");
         }
         else if (quitButton.isHovered) {
-            next = GS_QUIT;
+            destructive = true;
+            if (leave == 1) {
+                destructive = false;
+                leave = 0;
+                next = GS_QUIT;  // Change to test file if needed
+            }
+            else if (leave == 2) {
+                destructive = false;
+                leave = 0;
+            }
             printf("Exiting game!\n");
         }
     }
@@ -403,6 +427,7 @@ void DrawBackground() {
     AEGfxTexture* bgTex = AssetManager::GetTexture(TEX_MAIN_MENU_BG);
     AEGfxVertexList* quadMesh = AssetManager::GetMesh(MESH_QUAD);
 
+
     if (bgTex && quadMesh) {
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
         AEGfxTextureSet(bgTex, 0, 0);
@@ -457,6 +482,7 @@ void DrawMainMenu() {
 
         AEGfxSetTransform(bannerTransform.m);
         AEGfxMeshDraw(quadMesh, AE_GFX_MDM_TRIANGLES);
+        
     }
     else {
         // Fallback: render the title as text if the texture failed to load
@@ -475,6 +501,10 @@ void DrawMainMenu() {
     MenuHelpers::TexdrawButton(instructionsButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(creditsButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(quitButton, btnMesh, menuFont, btnTex);
+
+    if (destructive) {
+        Confirmation_Draw(menuFont, yesButton, noButton);
+    }
 }
 
 void DrawInstructionsMenu() {
