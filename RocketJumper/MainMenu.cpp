@@ -57,7 +57,7 @@ static MenuButton creditsButton;
 static MenuButton quitButton;
 static MenuButton yesButton;
 static MenuButton noButton;
-static SettingButton settingBtn;
+static MenuButton settingBtn;
 
 // Back button for sub-menus
 static MenuButton backButton;
@@ -69,6 +69,9 @@ static s8 leave = 0;
 static const f32 BUTTON_SCALE_NORMAL = 1.0f;
 static const f32 BUTTON_SCALE_HOVER  = 1.15f;
 static const f32 BUTTON_SCALE_SPEED  = 0.15f;
+
+static char strBuffer[100];
+static AEGfxTexture* errorOverlayTex;
 
 // ==================== HELPER FUNCTIONS ======================================================================================
 namespace MenuHelpers {
@@ -199,90 +202,6 @@ namespace MenuHelpers {
         AEGfxPrint(fontID, text, printX, printY,
             scale, 1.0f, 1.0f, 1.0f, 1.0f);
     }
-
-    static bool isMouseOverButton(const SettingButton& button) {
-        s32 mouseX, mouseY;
-        AEInputGetCursorPosition(&mouseX, &mouseY);
-        // Convert pixel cursor position to world coordinates.
-        // Read from the global screen-size externs so this works from ANY
-        // game state (MainMenu, DeathScreen, VictoryScreen, etc.), not just
-        // when MainMenu_Init has run and populated the static locals.
-        f32 currentHalfW = static_cast<f32>(screenWidth) / 2.0f;
-        f32 currentHalfH = static_cast<f32>(screenLength) / 2.0f;
-        f32 worldMouseX = static_cast<f32>(mouseX) - currentHalfW;
-        f32 worldMouseY = currentHalfH - static_cast<f32>(mouseY);
-
-        f32 bHalfWidth = (button.width * button.scale) / 2.0f;
-        f32 bHalfHeight = (button.height * button.scale) / 2.0f;
-
-        return (worldMouseX >= button.x - bHalfWidth &&
-            worldMouseX <= button.x + bHalfWidth &&
-            worldMouseY >= button.y - bHalfHeight &&
-            worldMouseY <= button.y + bHalfHeight);
-    }
-
-    void updateButtonHover(SettingButton& button) {
-        button.isHovered = isMouseOverButton(button);
-
-        // Set target scale based on hover state
-        button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
-
-        // Smooth interpolation towards target scale
-        if (button.scale < button.targetScale) {
-            button.scale += BUTTON_SCALE_SPEED;
-            if (button.scale > button.targetScale) {
-                button.scale = button.targetScale;
-            }
-        }
-        else if (button.scale > button.targetScale) {
-            button.scale -= BUTTON_SCALE_SPEED;
-            if (button.scale < button.targetScale) {
-                button.scale = button.targetScale;
-            }
-        }
-    }
-    void TexdrawButton(const SettingButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture) {
-        // Draw button background
-        AEMtx33 scale, translate, transform;
-        AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
-        AEMtx33Trans(&translate, button.x, button.y);
-        AEMtx33Concat(&transform, &translate, &scale);
-
-        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-
-        // Color based on hover state
-        if (button.isHovered) {
-            AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
-        }
-        else {
-            AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-        }
-
-        AEGfxTextureSet(texture, 0, 0);
-        AEGfxSetTransform(transform.m);
-        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-    }
-   
-    void drawButton(const SettingButton& button, AEGfxVertexList* mesh, s8 fontID) {
-        // Draw button background
-        AEMtx33 scale, translate, transform;
-        AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
-        AEMtx33Trans(&translate, button.x, button.y);
-        AEMtx33Concat(&transform, &translate, &scale);
-
-        AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-
-        // Color based on hover state
-        if (button.isHovered) {
-            AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
-        }
-        else {
-            AEGfxSetColorToAdd(0.15f, 0.15f, 0.3f, 0.7f); // Dark blue-gray normally
-        }
-
-        AEGfxSetTransform(transform.m);
-        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-    }
 }
 
 // ==================== INITIALIZATION FUNCTIONS ========================================================================
@@ -313,7 +232,7 @@ void MainMenu_Load() {
         printf("Warning: DigiPenWhite.png not found. Credits logo will not render.\n");
     }
 
-    AssetManager::LoadTexture(TEX_SETTINGS, "Assets/UI/Menus/DigiPenWhite.png");
+    AssetManager::LoadTexture(TEX_SETTINGS, "Assets/UI/Menus/settings.png");
     if (!AssetManager::GetTexture(TEX_SETTINGS)) {
         printf("Warning: settings.png not found. Credits logo will not render.\n");
     }
@@ -342,9 +261,10 @@ void MainMenu_Load() {
 void MainMenu_Init() {
     AEAudioPlay(MainMenu, bgm, 0.5f, 1.f, -1);
 
+    errorOverlayTex = AssetManager::GetTexture(TEX_BUTTON);
+    setting = AssetManager::GetTexture(TEX_SETTINGS);
     menuTex = AssetManager::GetTexture(TEX_MENU);
     buttonTex = AssetManager::GetTexture(TEX_BUTTON);
-    setting = AssetManager::GetTexture(TEX_SETTINGS);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
     // Cache screen dimensions as floats so every layout calc can use them directly.
@@ -369,6 +289,8 @@ void MainMenu_Init() {
     instructionsButton = { 0.0f, startY - btnGap,       btnW, btnH, 1.0f, 1.0f, "INSTRUCTIONS", false };
     creditsButton      = { 0.0f, startY - btnGap * 2.0f, btnW, btnH, 1.0f, 1.0f, "CREDITS",     false };
     quitButton         = { 0.0f, startY - btnGap * 3.0f, btnW, btnH, 1.0f, 1.0f, "QUIT",        false };
+    settingBtn         = { -750.f, -400.f, 64.f, 64.f, 1.0f, 1.0f, "", false };
+
     Confirmation_Init(yesButton, noButton);
 
     // Back button (sub-menus): slightly smaller, near bottom of screen
@@ -408,6 +330,7 @@ void UpdateMainMenu() {
         MenuHelpers::updateButtonHover(instructionsButton);
         MenuHelpers::updateButtonHover(creditsButton);
         MenuHelpers::updateButtonHover(quitButton);
+        MenuHelpers::updateButtonHover(settingBtn);
     }
     else {
         Confirmation_Update(yesButton, noButton, leave);
@@ -446,6 +369,9 @@ void UpdateMainMenu() {
                 leave = 0;
             }
             printf("Exiting game!\n");
+        }
+        else if (settingBtn.isHovered) {
+            next = GS_LEVELEDITOR;
         }
     }
 }
@@ -591,9 +517,24 @@ void DrawMainMenu() {
     MenuHelpers::TexdrawButton(instructionsButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(creditsButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(quitButton, btnMesh, menuFont, btnTex);
+    MenuHelpers::TexdrawButton(settingBtn, btnMesh, menuFont, setting);
 
     if (destructive) {
         Confirmation_Draw(menuFont, yesButton, noButton);
+    }
+
+    //AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+    //AEGfxSetTransparency(0.5f);
+    sprintf_s(strBuffer, "Level Editor");
+    if (settingBtn.isHovered) {
+        s32 mouseX, mouseY;
+        AEInputGetCursorPosition(&mouseX, &mouseY);
+        f32 worldMouseX = static_cast<f32>(mouseX) - (screenWidth / 2.0f);
+        f32 worldMouseY = (screenLength / 2.0f) - static_cast<f32>(mouseY);
+        renderlogic::drawTexture(worldMouseX + 150.f, worldMouseY + 40.f, errorOverlayTex, quadMesh, 228.f, 64.f);
+        f32 normalizedX = (static_cast<f32>(mouseX) / screenWidth) * 2.0f - 1.0f;
+        f32 normalizedY = 1.0f - (static_cast<f32>(mouseY) / screenLength) * 2.0f;
+        AEGfxPrint(menuFont, strBuffer, normalizedX + 0.078f, normalizedY + 0.065f, 0.6f, 1.f, 1.f, 1.f, 1.f);
     }
 }
 

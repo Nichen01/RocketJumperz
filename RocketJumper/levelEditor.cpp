@@ -446,6 +446,10 @@ void LevelEditor_Initialize() {
 
 void LevelEditor_Update() {
 
+	if (AEInputCheckCurr(AEVK_ESCAPE)) {
+		next = GS_MAINMENU;
+	}
+
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
 		level = 1;
 		currentGameLevel = 1;
