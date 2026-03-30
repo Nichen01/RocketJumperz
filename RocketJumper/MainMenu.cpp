@@ -241,7 +241,7 @@ namespace MenuHelpers {
             }
         }
     }
-    void TexdrawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture) {
+    void TexdrawButton(const SettingButton& button, AEGfxVertexList* mesh, s8 fontID, AEGfxTexture* texture) {
         // Draw button background
         AEMtx33 scale, translate, transform;
         AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
@@ -261,13 +261,9 @@ namespace MenuHelpers {
         AEGfxTextureSet(texture, 0, 0);
         AEGfxSetTransform(transform.m);
         AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-
-        // Draw button text
-        drawTextCentered(button.text, button.x, button.y, button.scale * 0.7f, fontID);
-        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
     }
-
-    void drawButton(const MenuButton& button, AEGfxVertexList* mesh, s8 fontID) {
+   
+    void drawButton(const SettingButton& button, AEGfxVertexList* mesh, s8 fontID) {
         // Draw button background
         AEMtx33 scale, translate, transform;
         AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
@@ -286,11 +282,6 @@ namespace MenuHelpers {
 
         AEGfxSetTransform(transform.m);
         AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-
-        // Draw button text
-        drawTextCentered(button.text, button.x, button.y, button.scale, fontID);
-        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-
     }
 }
 
