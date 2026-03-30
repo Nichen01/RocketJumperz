@@ -419,26 +419,22 @@ void LevelEditor_Initialize() {
 	switch (level) {
 		case 1: {
 			ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0});
-			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
-			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ -185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Tut", false, 0 });
+			buttonArr.push_back({ 185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 2", false, 1 });
 			break;
 		}
 		case 2: {
 			ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
-			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
-			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ -185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 1", false, 1 });
+			buttonArr.push_back({ 185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 3", false, 2 });
 			break;
 		}
 		case 3: {
 			ImportMapDataFromFile("Assets/Map/Level3_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
-			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
-			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ 0.f, 0.f, 680.f, 80.f, 1.f, 1.f, "Level 2", false, 2 });
 			break;
 		}
 	}
@@ -469,6 +465,7 @@ void LevelEditor_Update() {
 			if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
 				if (currentButton.id == -1) { // Close button
 					errorPromptAlpha = 1.0f;
+					break;
 				}
 
 				// check individual door counter
@@ -554,8 +551,10 @@ void LevelEditor_Update() {
 	}
 
 	if (resetBtn.isHovered && AEInputCheckCurr(AEVK_LBUTTON)) {
+		actionHistory.clear();
 		ResetMapData();
 	}
+
 }
 
 void LevelEditor_Draw() {
@@ -782,7 +781,19 @@ void LevelEditor_Draw() {
 					action.prevValue = MapData[row][col];
 					action.newValue = 0;
 
-					if (MapData[row][col] == 67) {
+					if (MapData[row][col] == 21) {
+						tutDoorCount = 0;
+					}
+					else if (MapData[row][col] == 22) {
+						door1Count = 0;
+					}
+					else if (MapData[row][col] == 23) {
+						door2Count = 0;
+					}
+					else if (MapData[row][col] == 24) {
+						door2Count = 0;
+					}
+					else if (MapData[row][col] == 67) {
 						if (level == 1) keyCountLevel1 = 0;
 						else if (level == 2) keyCountLevel2 = 0;
 					}
