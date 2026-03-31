@@ -264,9 +264,7 @@ void MainMenu_Init() {
 
     errorOverlayTex = AssetManager::GetTexture(TEX_BUTTON);
     setting = AssetManager::GetTexture(TEX_SETTINGS);
-    menuTex = AssetManager::GetTexture(TEX_MENU);
-    buttonTex = AssetManager::GetTexture(TEX_BUTTON);
-    buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
+    
 
     // Cache screen dimensions as floats so every layout calc can use them directly.
     // These come from the global extern ints defined in Main.cpp.
@@ -519,7 +517,9 @@ void DrawMainMenu() {
     // Draw all buttons using the black-vertex button mesh from AssetManager
     AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_MENU_BUTTON);
     AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
-    
+    menuTex = AssetManager::GetTexture(TEX_MENU);
+    buttonTex = AssetManager::GetTexture(TEX_BUTTON);
+    buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
     // draw the textured buttons
     MenuHelpers::TexdrawButton(playButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(instructionsButton, btnMesh, menuFont, btnTex);
