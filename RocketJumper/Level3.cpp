@@ -735,6 +735,7 @@ void Level3_Draw()
 	if (playerNearBrokenDoor) {
 		renderlogic::flashingTexture(finalDoor.worldX, finalDoor.worldY + 60.f, eButton, 50.f);
 	}
+	traps::drawTraps();
 }
 
 void Level3_Free()

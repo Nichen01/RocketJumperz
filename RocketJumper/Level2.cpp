@@ -706,6 +706,7 @@ void Level2_Draw()
 			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 		}
 	}
+	traps::drawTraps();
 }
 
 void Level2_Free()
