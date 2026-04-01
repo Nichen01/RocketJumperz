@@ -19,11 +19,15 @@ static bool destructive = false;
 static s8 leave = 0;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
+AEAudio win;
+
 static AEGfxTexture* menutex;
 static AEGfxTexture* buttontex;
 extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void VictoryScreen_Load() {
+    win = AEAudioLoadMusic("Assets/Sounds/Victory.wav");
+    bgm = AEAudioCreateGroup();
 
     load::pauseMenu();
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
@@ -36,6 +40,8 @@ void VictoryScreen_Load() {
     victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void VictoryScreen_Init() {
+    AEAudioPlay(win, bgm, 0.5f, 1.f, -1);
+
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
@@ -163,6 +169,8 @@ void VictoryScreen_Free() {
         backgroundMesh = nullptr;
     }
     AssetManager::FreeAllMeshes();
+    AEAudioUnloadAudio(win);
+    AEAudioUnloadAudioGroup(bgm);
 }
 void VictoryScreen_Unload() {
     if (TitleTex) {

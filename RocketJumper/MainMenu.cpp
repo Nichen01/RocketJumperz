@@ -520,6 +520,7 @@ void DrawMainMenu() {
     menuTex = AssetManager::GetTexture(TEX_MENU);
     buttonTex = AssetManager::GetTexture(TEX_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
+
     // draw the textured buttons
     MenuHelpers::TexdrawButton(playButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(instructionsButton, btnMesh, menuFont, btnTex);
