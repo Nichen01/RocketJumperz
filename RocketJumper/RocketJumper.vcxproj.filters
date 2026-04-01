@@ -97,6 +97,9 @@
     <ClCompile Include="Confirmation.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="InstructionsMenu.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AimingInterface.h">
@@ -196,6 +199,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Confirmation.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="InstructionsMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include "WeaponSprite.h"
 #include "ParticleSystem.h"
 #include "Player.h"
+#include "InstructionsMenu.h"
 
 static s32* map = nullptr;
 static int x;
@@ -68,6 +69,7 @@ void Level1_Load()
 {
 	audio::loadsound();
 
+	InstructionsMenu::Load();
 	load::platform();
 	load::ui();
 	load::cooldownBar();
@@ -154,6 +156,8 @@ void Level1_Load()
 
 void Level1_Initialize()
 {
+	InstructionsMenu::Init();
+
 	// Only reset if this is the very first time entering Level1
 	if (!playerEnteredDoor1 && !keycardCollected1) {
 		key.active = true;   // spawn card
@@ -277,6 +281,9 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
+	// If the instructions overlay is open, skip all gameplay logic (pause)
+	if (InstructionsMenu::Update()) return;
+
 	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL2;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
@@ -729,6 +736,9 @@ void Level1_Draw()
 			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 		}
 	}
+
+	// Draw the "?" icon (or the full overlay if it is open) on top of everything
+	InstructionsMenu::Draw();
 	traps::drawTraps();
 }
 
@@ -747,6 +757,8 @@ void Level1_Free()
 
 void Level1_Unload()
 {
+	InstructionsMenu::Unload();
+
 	// Unload all AssetManager-tracked textures (auto-nulls internal sTextures[]).
 	AssetManager::UnloadAllTextures();
 

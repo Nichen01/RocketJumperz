@@ -712,13 +712,6 @@ void MainMenu_Unload() {
 
     audio::unloadsound();
 
-    /*
-    if (titleTexture) {
-        AEGfxTextureUnload(titleTexture);
-        titleTexture = nullptr;
-    }
-    */
-
     if (menuFont >= 0) {
         AEGfxDestroyFont(menuFont);
         menuFont = -1;

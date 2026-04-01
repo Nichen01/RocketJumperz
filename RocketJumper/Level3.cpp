@@ -3,6 +3,7 @@
 #include "Level3.h"
 #include "ParticleSystem.h"
 #include "traps.h"
+#include "InstructionsMenu.h"
 
 static s32* map = nullptr;
 static int x;
@@ -66,6 +67,8 @@ extern bool prevCleared3 = 0;
 void Level3_Load()
 {
 	audio::loadsound();
+
+	InstructionsMenu::Load();
 
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
@@ -152,6 +155,8 @@ void Level3_Load()
 
 void Level3_Initialize()
 {
+	InstructionsMenu::Init();
+
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
 	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
@@ -282,6 +287,9 @@ void Level3_Initialize()
 
 void Level3_Update()
 {
+	// If the instructions overlay is open, skip all gameplay logic (pause)
+	if (InstructionsMenu::Update()) return;
+
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		level = 3;
@@ -735,6 +743,9 @@ void Level3_Draw()
 	if (playerNearBrokenDoor) {
 		renderlogic::flashingTexture(finalDoor.worldX, finalDoor.worldY + 60.f, eButton, 50.f);
 	}
+
+	// Draw the "?" icon (or the full overlay if it is open) on top of everything
+	InstructionsMenu::Draw();
 	traps::drawTraps();
 }
 
@@ -753,6 +764,8 @@ void Level3_Free()
 
 void Level3_Unload()
 {
+	InstructionsMenu::Unload();
+
 	// Unload all AssetManager-tracked textures (auto-nulls internal sTextures[]).
 	AssetManager::UnloadAllTextures();
 

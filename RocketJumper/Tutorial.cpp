@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "AimingInterface.h"
 #include "WeaponSprite.h"
 #include "Drops.h"
+#include "InstructionsMenu.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -66,6 +67,8 @@ void Tutorial_Load()
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 	audio::loadsound();
 
+	InstructionsMenu::Load();
+
 	// Load textures via AssetManager (enum-based IDs)
 	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
 	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
@@ -100,6 +103,8 @@ void Tutorial_Load()
 
 void Tutorial_Initialize()
 {
+	InstructionsMenu::Init();
+
 	currentGameLevel = 0;
 	AEAudioPlay(Level, bgm, 0.1f, 1.f, -1);
 
@@ -193,6 +198,9 @@ void Tutorial_Initialize()
 
 void Tutorial_Update()
 {
+	// If the instructions overlay is open, skip all gameplay logic (pause)
+	if (InstructionsMenu::Update()) return;
+
 	if (AEInputCheckCurr(AEVK_1)) next = GS_LEVEL1;
 
 	//====== AUDIO CONTROLS ======//
@@ -592,6 +600,8 @@ void Tutorial_Draw()
 	// ====== WIRE INVENTORY (shows wire count 0-3) ====== //
 	renderlogic::drawWireInventory(wireCount);
 
+	// Draw the "?" icon (or the full overlay if it is open) on top of everything
+	InstructionsMenu::Draw();
 }
 
 void Tutorial_Free()
@@ -608,6 +618,8 @@ void Tutorial_Free()
 
 void Tutorial_Unload()
 {
+	InstructionsMenu::Unload();
+
 	AssetManager::UnloadAllTextures();
 
 	if (glassMap) {

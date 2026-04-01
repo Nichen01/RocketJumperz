@@ -4,6 +4,7 @@
 #include "traps.h"
 #include "WeaponSprite.h"
 #include "ParticleSystem.h"
+#include "InstructionsMenu.h"
 
 static s32* map = nullptr;
 static int x;
@@ -65,6 +66,8 @@ extern bool prevCleared2 = 0;
 void Level2_Load()
 {
 	audio::loadsound();
+
+	InstructionsMenu::Load();
 
 	// Load platform tile textures
 	load::platform();
@@ -154,6 +157,8 @@ void Level2_Load()
 
 void Level2_Initialize()
 {
+	InstructionsMenu::Init();
+
 	// Spawn card only if not yet collected and not already progressed
 	if (!keycardCollected2 && !playerEnteredDoor2) {
 		key.active = true;
@@ -277,6 +282,9 @@ void Level2_Initialize()
 
 void Level2_Update()
 {
+	// If the instructions overlay is open, skip all gameplay logic (pause)
+	if (InstructionsMenu::Update()) return;
+
 	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL3;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
@@ -706,6 +714,9 @@ void Level2_Draw()
 			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 		}
 	}
+
+	// Draw the "?" icon (or the full overlay if it is open) on top of everything
+	InstructionsMenu::Draw();
 	traps::drawTraps();
 }
 
@@ -724,6 +735,8 @@ void Level2_Free()
 
 void Level2_Unload()
 {
+	InstructionsMenu::Unload();
+
 	// Unload all AssetManager-tracked textures (auto-nulls internal sTextures[]).
 	AssetManager::UnloadAllTextures();
 

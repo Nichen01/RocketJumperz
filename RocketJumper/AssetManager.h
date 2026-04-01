@@ -150,6 +150,9 @@ enum TextureID {
     // Instructions menu full-screen image
     TEX_INSTRUCTIONS_MENU,
 
+    // "?" icon shown in gameplay HUD (opens instructions overlay)
+    TEX_INSTRUCTIONS_ICON,
+
     // Health pack drop
     TEX_HEALTH,
 

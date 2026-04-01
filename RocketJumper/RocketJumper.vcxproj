@@ -23,6 +23,7 @@
     <ClCompile Include="Enemies.cpp" />
     <ClCompile Include="Gameover.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
+    <ClCompile Include="InstructionsMenu.cpp" />
     <ClCompile Include="Level1.cpp" />
     <ClCompile Include="Level2.cpp" />
     <ClCompile Include="Level3.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="Gameover.h" />
     <ClInclude Include="GameStateList.h" />
     <ClInclude Include="GameStateManager.h" />
+    <ClInclude Include="InstructionsMenu.h" />
     <ClInclude Include="Level1.h" />
     <ClInclude Include="Level2.h" />
     <ClInclude Include="Level3.h" />
