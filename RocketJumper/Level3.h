@@ -1,11 +1,9 @@
 #pragma once
 /* Start Header ************************************************************************/
 /*!
-\file		  Level1.h
-\author       Ivan Chong, i.chong, 2503476
-\par          i.chong@digipen.edu
-\date         January, 16, 2026
-\brief        Contain declarations for Variables and functions in GameStateManager.cpp
+\file		  Level2.h
+\date         April, 01, 2026
+\brief        Header file for level 3
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

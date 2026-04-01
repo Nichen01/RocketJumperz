@@ -1,5 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Draw.cpp
+\author       Chan Joraye (c.joraye)
+\date         April, 01, 2026
+\brief        File to render different types of texture eg. Flashing texture, normal texture and the assets from the txt file
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "Draw.h"
-#include "traps.h"
+#include "Traps.h"
 #include "AssetManager.h"
 
 // Global texture pointers -- declared extern in draw.h, defined here
@@ -41,6 +54,7 @@ namespace renderlogic {
 
 	}
 
+	// Render assets based on the number in the text file
 	void drawMapWallFloor(int map[], int mapX, int mapY, int mapS) {
 		int xo, yo;
 		map = map;
@@ -266,6 +280,7 @@ namespace renderlogic {
 		}
 	}
 
+	// The platforms at the bottom of the screen
 	void drawTileArray() {
 
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

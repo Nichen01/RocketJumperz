@@ -1,9 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file		BinaryMap.h
-\author 	DigiPen, DigiPen, DigiPen
-\par    	DigiPen@digipen.edu
-\date   	February, 10, 2026
+\author 	Chan Joraye (c.joraye)
+\date   	April, 01, 2026
 \brief		File contains binary map collision function declaration and various variables
 
 Copyright (C) 2026 DigiPen Institute of Technology.

@@ -1,3 +1,19 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  LevelEditor.h
+\date         April, 01, 2026
+\brief        Header file for the Level Editor system. 
+			  Defines core data structures for editor actions and UI buttons, 
+			  and declares lifecycle functions (load, initialize, update, draw, free, unload) 
+			  used to manage the Level Editor within the game.
+			  
+			  Copyright (C) 2026 DigiPen Institute of Technology.
+			  Reproduction or disclosure of this file or its contents
+			  without the prior written consent of DigiPen Institute of
+			  Technology is prohibited.
+
+/* End Header **************************************************************************/
+
 #pragma once
 #include "pch.h"
 #include <vector>

@@ -2,9 +2,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  GameStateList.h
-\author       Ivan Chong, i.chong, 2503476
-\par          i.chong@digipen.edu
-\date         January, 16, 2026
+\date         April, 01, 2026
 \brief        Contain enum GS_STATES
 
 Copyright (C) 2026 DigiPen Institute of Technology.
@@ -13,6 +11,7 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+
 enum GS_STATES
 {
 	GS_SPLASH = 0,

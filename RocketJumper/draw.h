@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file		Draw.h
+\author 	Chan Joraye (c.joraye), Ivan Chong (i.chong)
+\date   	April, 01, 2026
+\brief		Header file for the functions to render different types of assets
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "pch.h"
 #include "AEEngine.h"

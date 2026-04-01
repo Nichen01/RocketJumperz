@@ -4,7 +4,7 @@
 \author 	Chan Joraye (c.joraye)
 \par    	c.joraye@digipen.edu
 \date   	16/02/26
-\brief		
+\brief		File that reads txt file and creates the different 2D arrays that will store seperate values such as collision array, glass array, map array
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
