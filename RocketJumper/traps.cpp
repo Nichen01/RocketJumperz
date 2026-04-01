@@ -80,26 +80,20 @@ namespace traps {
 			suckPlayer(objectinfo[player], nearestTrap, s);
 			f32 relativeX = objectinfo[player].xPos - nearestTrap.x;
 			f32 relativeY = objectinfo[player].yPos - nearestTrap.y;
-			/*f32 relativeX = nearestTrap.x - objectinfo[player].xPos;
-			f32 relativeY = nearestTrap.y - objectinfo[player].yPos;*/
 
 			//Drawing tentacle
 			//scale to distance between player and trap
 			AEMtx33 scale = { 0 };
 			tentacleMagnifier = static_cast<f32>(sqrt(relativeY * relativeY + relativeX * relativeX) / sqrt(2));
-			//AEMtx33Scale(&scale, s/4+relativeX, s/4+relativeY);
 			AEMtx33Scale(&scale, tentacleMagnifier, tentacleMagnifier);
 
 			AEMtx33 rotate = { 0 };
-			//angle of player to trap;
-			//angle = static_cast<f32>(atan(relativeY/relativeX));
 			angle = static_cast<f32>(atan2(relativeY, relativeX));
 			angle -= PI / 4;
 			AEMtx33Rot(&rotate, angle);
 
 			AEMtx33 translate = { 0 };
 			AEMtx33Trans(&translate, nearestTrap.x+ relativeX/2, nearestTrap.y+ relativeY/2);
-			//AEMtx33Trans(&translate, nearestTrap.x - relativeX / 2, nearestTrap.y - relativeY / 2);
 
 			trapTransform = { 0 };
 			AEMtx33Concat(&trapTransform, &rotate, &scale);
