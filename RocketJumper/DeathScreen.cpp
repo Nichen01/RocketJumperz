@@ -21,12 +21,18 @@ static bool destructive = false;
 static s8 leave = 0;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
+AEAudio lose;
+
 static AEGfxTexture* menutex;
 static AEGfxTexture* buttontex;
 extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void DeathScreen_Load() {
+    lose = AEAudioLoadMusic("Assets/Sounds/Lose.wav");
+    bgm = AEAudioCreateGroup();
+
     load::pauseMenu();
+
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
 
@@ -37,9 +43,10 @@ void DeathScreen_Load() {
     deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void DeathScreen_Init() {
+    AEAudioPlay(lose, bgm, 0.5f, 1.f, -1);
+
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
-
     AEGfxTriAdd(
         -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
         0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
@@ -175,6 +182,9 @@ void DeathScreen_Free() {
     AssetManager::FreeAllMeshes();
 }
 void DeathScreen_Unload() {
+    AEAudioUnloadAudio(lose);
+    AEAudioUnloadAudioGroup(bgm);
+
     if (TitleTex) {
         AEGfxTextureUnload(TitleTex);
         TitleTex = nullptr;

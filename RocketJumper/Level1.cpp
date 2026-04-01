@@ -283,19 +283,7 @@ void Level1_Update()
 		next = GS_LEVELEDITOR;
 	}
 
-	//====== AUDIO CONTROLS ======//
-	if (AEInputCheckTriggered(AEVK_1)) {
-		bgVolume -= 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
-	if (AEInputCheckTriggered(AEVK_2)) {
-		bgVolume += 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
+	
 
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;

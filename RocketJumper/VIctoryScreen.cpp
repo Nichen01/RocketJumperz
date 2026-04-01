@@ -169,10 +169,12 @@ void VictoryScreen_Free() {
         backgroundMesh = nullptr;
     }
     AssetManager::FreeAllMeshes();
-    AEAudioUnloadAudio(win);
-    AEAudioUnloadAudioGroup(bgm);
+
 }
 void VictoryScreen_Unload() {
+    AEAudioUnloadAudio(win);
+    AEAudioUnloadAudioGroup(bgm);
+
     if (TitleTex) {
         AEGfxTextureUnload(TitleTex);
         TitleTex = nullptr;
@@ -181,7 +183,8 @@ void VictoryScreen_Unload() {
         AEGfxTextureUnload(backgroundTexture);
         backgroundTexture = nullptr;
     }
-    
+
+
     if (victoryfont != -1) { AEGfxDestroyFont(victoryfont); victoryfont = -1; }
     AssetManager::UnloadAllTextures();
 }

@@ -14,6 +14,7 @@
 
 bool pause = false;
 bool canpause = true;
+f32 MainVolume = 1.0f;
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -41,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 	
-	GSM_Initialize(GS_VICTORY);
+	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
 	{
@@ -74,6 +75,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		if (canpause) {
 			Pause_Initialize();
+			
 		}
 		fpInitialize();
 
@@ -96,7 +98,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				
 
 				if (!pause) {
-					audio::audiolevel(1.0f);
+					audio::audiolevel(MainVolume);
 					fpUpdate();
 				}
 
@@ -105,7 +107,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				if (pause) {
 					Pause_Update();
 					Pause_Draw();
-					audio::audiolevel(0.2f);
 				}
 			}
 			else {

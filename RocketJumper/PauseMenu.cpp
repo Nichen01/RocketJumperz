@@ -13,6 +13,7 @@ static MenuButton exitButton;
 static MenuButton tomenuButton;
 static MenuButton yesButton;
 static MenuButton noButton;
+static s8 sCount;
 
 static bool destructive = false;
 static s8 leave = 0;
@@ -30,8 +31,9 @@ void Pause_Initialize() {
 	AssetManager::BuildSqrMesh(MESH_BUTTON);
 	buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
-	Confirmation_Init(yesButton,noButton);
+	sCount = 10;
 
+	Confirmation_Init(yesButton,noButton);
 	float buttonwidth = 390.0f;
 	float buttonlength = 80.0f;
 	resumeButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESUME", false };
@@ -47,6 +49,21 @@ void Pause_Update() {
 	else {
 		Confirmation_Update(yesButton, noButton,leave);
 	}
+
+	//====== AUDIO CONTROLS ======//
+	if (AEInputCheckTriggered(AEVK_1)) {
+		MainVolume -= 0.1f;
+		MainVolume = MainVolume <= 0.f ? 0.0f : MainVolume;
+		sCount = static_cast<int>(MainVolume * 10.0f);
+		AEAudioSetGroupVolume(bgm, MainVolume);
+	}
+	if (AEInputCheckTriggered(AEVK_2)) {
+		MainVolume += 0.1f;
+		MainVolume = MainVolume >= 1.f ? 1.0f : MainVolume;
+		sCount = static_cast<int>(MainVolume * 10.0f);
+		AEAudioSetGroupVolume(bgm, MainVolume);
+	}
+
 	if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (resumeButton.isHovered) {
 			pause = false;  // Change to test file if needed
@@ -93,6 +110,10 @@ void Pause_Draw() {
 	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttonTex);
+
+	for (s8 i{}; i < sCount; ++i) {
+		renderlogic::drawTexture(-400.f, -500.f+(static_cast<f32>(i)*100), menuTex, buttonMesh, 100.f, 100.f);
+	}
 
 	if (destructive) {
 		Confirmation_Draw(pausefont, yesButton,noButton);
