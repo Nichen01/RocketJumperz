@@ -23,7 +23,7 @@ namespace traps {
 	s8 trapRange = 3;
 	bool nearTrap = 0;
 	AEVec2 nearestTrap = {};
-	f32 angle;
+	f32 angle, tentacleMagnifier;
 	AEMtx33 trapTransform;
 
 	void initTraps() {
@@ -59,13 +59,11 @@ namespace traps {
 		return temp;
 	}
 	void suckPlayer(objectsquares& player, AEVec2 trap,float s) {
-		float trapX = gamelogic::index_to_posX(static_cast<f32>(trap.x+0.5), s);
-		float trapY = gamelogic::index_to_posY(static_cast<f32>(trap.y+0.5), s);
-		f32 dx = player.xPos - trapX;
-		f32 dy = player.yPos - trapY;
+		f32 dx = player.xPos - trap.x;
+		f32 dy = player.yPos - trap.y;
 		f32 dist = sqrtf(dx * dx + dy * dy);
-		player.velocityX -= dx / dist * (trapSuction * 0.22f);
-		player.velocityY -= dy / dist * (trapSuction * 0.22f);
+		player.velocityX -= dx / dist * trapSuction;
+		player.velocityY -= dy / dist * trapSuction;
 		
 	}
 	void updateTraps(Enemy enemies[],objectsquares objectinfo[],int* map,int x, int y, float s) {
@@ -76,32 +74,43 @@ namespace traps {
 		float NScaleX = objectinfo[player].xScale / s;
 		float NScaleY = objectinfo[player].yScale / s;
 		nearestTrap = checkNearestTrap(NposX, NposY, map, x,y);
+		nearestTrap.x = gamelogic::index_to_posX(static_cast<f32>(nearestTrap.x + 0.5), s);
+		nearestTrap.y = gamelogic::index_to_posY(static_cast<f32>(nearestTrap.y + 0.5), s);
 		if (nearTrap) {
 			suckPlayer(objectinfo[player], nearestTrap, s);
-			/*
+			f32 relativeX = objectinfo[player].xPos - nearestTrap.x;
+			f32 relativeY = objectinfo[player].yPos - nearestTrap.y;
+			/*f32 relativeX = nearestTrap.x - objectinfo[player].xPos;
+			f32 relativeY = nearestTrap.y - objectinfo[player].yPos;*/
+
 			//Drawing tentacle
+			//scale to distance between player and trap
 			AEMtx33 scale = { 0 };
-			AEMtx33Scale(&scale, objectinfo[player].xScale * 3, objectinfo[player].yScale * 3);
+			tentacleMagnifier = static_cast<f32>(sqrt(relativeY * relativeY + relativeX * relativeX) / sqrt(2));
+			//AEMtx33Scale(&scale, s/4+relativeX, s/4+relativeY);
+			AEMtx33Scale(&scale, tentacleMagnifier, tentacleMagnifier);
 
 			AEMtx33 rotate = { 0 };
-			//angle = movement::getMouse(player).y/ movement::getMouse(player).x;
-			angle = static_cast<f32>(atan2(movement::getMouse(objectinfo[player]).y, movement::getMouse(objectinfo[player]).x));
-			angle += 5 * PI / 4;
+			//angle of player to trap;
+			//angle = static_cast<f32>(atan(relativeY/relativeX));
+			angle = static_cast<f32>(atan2(relativeY, relativeX));
+			angle -= PI / 4;
 			AEMtx33Rot(&rotate, angle);
 
 			AEMtx33 translate = { 0 };
-			AEMtx33Trans(&translate, objectinfo[player].xPos, objectinfo[player].yPos);
+			AEMtx33Trans(&translate, nearestTrap.x+ relativeX/2, nearestTrap.y+ relativeY/2);
+			//AEMtx33Trans(&translate, nearestTrap.x - relativeX / 2, nearestTrap.y - relativeY / 2);
 
 			trapTransform = { 0 };
 			AEMtx33Concat(&trapTransform, &rotate, &scale);
-			AEMtx33Concat(&trapTransform, &translate, &trapTransform);*/
+			AEMtx33Concat(&trapTransform, &translate, &trapTransform); 
 		}
 		if (gamelogic::CheckInstanceBinaryMapCollision(NposX, NposY, NScaleX, NScaleY, map, 2, x)) {
 			if (trapInstanceCooldown <= 0.0f)
 			{
 				if (PlayerTakeDamage(objectinfo[player], trapDamage))
 				{
-					trapInstanceCooldown = trapCooldown;
+					trapInstanceCooldown = trapCooldown; 
 				}
 			}
 			// Trap-tile collision resolution is handled by the level's own
@@ -111,12 +120,14 @@ namespace traps {
 			// entities out of the map and trigger access violations.
 		}
 	}
-	/*void drawTraps() {
-		AEGfxTextureSet(trapBeam, 0, 0);
-		AEGfxSetTransform(trapTransform.m);
-		AEGfxSetColorToMultiply(1, 1, 1, 1);
-		AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	}*/
+	void drawTraps() {
+		if (nearTrap) {
+			AEGfxTextureSet(trapBeam, 0, 0);
+			AEGfxSetTransform(trapTransform.m);
+			AEGfxSetColorToMultiply(1, 1, 1, 1);
+			AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+		}
+	}
 
 	// Advance the saw spin animation by one frame's worth of delta time
 	void UpdateSawAnim(f32 deltaTime) {
