@@ -347,9 +347,9 @@ void UpdateMainMenu() {
             doorState = 0;             // Reset Final Door
 
             // Reset checkpoint variables so a new game starts fresh
-            savedAmmo      = 50;
+            savedAmmo      = 500 ;
             savedWireCount = 0;
-            savedHealth    = 100;
+            savedHealth    = 1000;
 
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");

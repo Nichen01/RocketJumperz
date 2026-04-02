@@ -31,7 +31,7 @@ void Pause_Initialize() {
 	AssetManager::BuildSqrMesh(MESH_BUTTON);
 	buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
-	sCount = 10;
+	sCount = static_cast<int>(MainVolume * 10);
 
 	Confirmation_Init(yesButton,noButton);
 	float buttonwidth = 390.0f;
@@ -53,14 +53,14 @@ void Pause_Update() {
 	//====== AUDIO CONTROLS ======//
 	if (AEInputCheckTriggered(AEVK_1)) {
 		MainVolume -= 0.1f;
-		MainVolume = MainVolume <= 0.f ? 0.0f : MainVolume;
-		sCount = static_cast<int>(MainVolume * 10.0f);
+		MainVolume = MainVolume <= 0.0f ? 0.0f : MainVolume;
+		--sCount;
 		AEAudioSetGroupVolume(bgm, MainVolume);
 	}
 	if (AEInputCheckTriggered(AEVK_2)) {
 		MainVolume += 0.1f;
 		MainVolume = MainVolume >= 1.f ? 1.0f : MainVolume;
-		sCount = static_cast<int>(MainVolume * 10.0f);
+		++sCount;
 		AEAudioSetGroupVolume(bgm, MainVolume);
 	}
 
@@ -110,9 +110,9 @@ void Pause_Draw() {
 	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttonTex);
-
+	printf("%f,%d\n", MainVolume,sCount);
 	for (s8 i{}; i < sCount; ++i) {
-		renderlogic::drawTexture(-400.f, -500.f+(static_cast<f32>(i)*100), menuTex, buttonMesh, 100.f, 100.f);
+		renderlogic::drawTexture(-400.f, -400.f+(static_cast<f32>(i)*50), menuTex, buttonMesh, 50.f, 50.f);
 	}
 
 	if (destructive) {
