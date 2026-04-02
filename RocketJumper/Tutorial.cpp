@@ -55,9 +55,6 @@ bool playerEnteredDoor0 = false;
 
 static bool keycardCollectedAudio = false;
 
-static bool keycardCollected;
-static bool keycardCollectedAudio = false;
-
 // Font resource (must be destroyed in Unload to avoid leak)
 static s8 fontLevel1 = -1;
 
@@ -169,9 +166,6 @@ void Tutorial_Initialize()
 	// Initialize player health from saved checkpoint (max on fresh game)
 	InitPlayerHealth(objectinfoTut[player]);
 	objectinfoTut[player].health = savedHealth;
-
-	// Start with the plasma gun equipped (default weapon)
-	objectinfoTut[player].currentWeapon = WEAPON_PLASMA;
 
 	// Start with the plasma gun equipped (default weapon)
 	objectinfoTut[player].currentWeapon = WEAPON_PLASMA;

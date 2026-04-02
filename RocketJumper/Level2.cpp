@@ -243,9 +243,6 @@ void Level2_Initialize()
 	// Start with the plasma gun equipped (default weapon)
 	objectinfo2[player].currentWeapon = WEAPON_PLASMA;
 
-	// Start with the plasma gun equipped (default weapon)
-	objectinfo2[player].currentWeapon = WEAPON_PLASMA;
-
 	//======== INIT ENEMIES DATA =======================//
 	// Initialize enemy system
 	enemySystem::initEnemies(enemies, MAX_ENEMIES);
