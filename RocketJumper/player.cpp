@@ -9,7 +9,7 @@ int wireCount = 0;
 // Reset to defaults when starting a new game from the main menu.
 int savedWireCount  = 0;
 int savedAmmo       = 50;
-int savedHealth     = 100;
+int savedHealth     = kPlayerMaxHealth;
 
 bool keycardCollected0 = false;
 bool keycardCollected1 = false;
