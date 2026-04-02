@@ -31,7 +31,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		return 0;
 	}
-	//AESysSetFullScreen(1);
+	AESysSetFullScreen(1);
 	// Using custom window procedure
 	//int gGameRunning = 1;
 
@@ -42,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 	
-	GSM_Initialize(GS_LEVEL1);
+	GSM_Initialize(GS_MAINMENU);
 
 	while (current != GS_QUIT)
 	{
