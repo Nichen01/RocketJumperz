@@ -70,11 +70,11 @@ void Tutorial_Load()
 	InstructionsMenu::Load();
 
 	// Load textures via AssetManager (enum-based IDs)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/Enemy/Character.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/Enemy/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/Platform/DoorOpen.png");
 	//AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/Enemy/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
 	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
 	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");

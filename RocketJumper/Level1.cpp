@@ -80,12 +80,12 @@ void Level1_Load()
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/Enemy/Character.png");
 	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/Enemy/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/Platform/DoorOpen.png");
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/Enemy/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 
 	// Ranged enemy state spritesheets (1 row each, variable columns)

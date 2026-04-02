@@ -31,7 +31,7 @@ void VictoryScreen_Load() {
 
     load::pauseMenu();
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
-    backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
+    backgroundTexture = AEGfxTextureLoad("Assets/UI/MainMenu.png");
 
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");

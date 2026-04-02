@@ -44,7 +44,7 @@ extern AEGfxTexture* platformTex2;
 extern AEGfxTexture* platformTex3;
 extern AEGfxTexture* plasma;
 
-// DoorOpen.jpg: 224 x 32 pixels, single row of 7 frames (32x32 each)
+// DoorOpen.png: 224 x 32 pixels, single row of 7 frames (32x32 each)
 // ---------------------------------------------------------------------------
 extern int  doorFrameCount;
 extern f32  doorFrameDelay;   // ~12 fps

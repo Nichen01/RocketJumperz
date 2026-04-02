@@ -222,7 +222,7 @@ void MainMenu_Load() {
         printf("Warning: MainMenu.png not found. Using solid color background.\n");
     }
 
-    AssetManager::LoadTexture(TEX_TITLE, "Assets/Title.png");
+    AssetManager::LoadTexture(TEX_TITLE, "Assets/UI/Title.png");
     if (!AssetManager::GetTexture(TEX_TITLE)) {
         printf("Warning: Title.png not found. Title banner will not render.\n");
     }
@@ -251,7 +251,7 @@ void MainMenu_Load() {
     AssetManager::LoadTexture(TEX_MENU, "Assets/UI/Menus/Menu.png");
 
     // Instructions screen image (full panel showing controls / objectives)
-    AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/instructionsMenu.png");
+    AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/UI/instructionsMenu.png");
     if (!AssetManager::GetTexture(TEX_INSTRUCTIONS_MENU)) {
         printf("Warning: instructionsMenu.png not found. Instructions screen will fall back to text.\n");
     }
