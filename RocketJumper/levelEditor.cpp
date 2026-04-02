@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  LevelEditor.cpp
+\author       Chan Joraye (c.joraye)
+\date         April, 01, 2026
+\brief        File to edit the level, render tiles, enemies and items in the game
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 
 #include "LevelEditor.h"
 
@@ -16,13 +29,328 @@ static std::vector<TileAction> actionHistory;
 static f32 doorPromptAlpha = 1.0f;
 static bool showDoorPrompt = false;
 static f32 errorPromptAlpha = 1.0f;
-static bool showErrorPrompt = false;
 static u32 doorID{};
 
 static int promptRow = -1;
 static int promptCol = -1;
  
 static char strBuffer[100];
+static char errorMessage[256];
+
+resetButton resetBtn;
+
+errorPromptButton errorPromptBtn;
+static bool enemyExistError = false;
+static bool finaldoorLevelError = false;
+static bool finaldoorExistError = false;
+static bool healthExistError = false;
+static bool doorlinkExistError = false;
+static bool keycardExistError = false;
+static bool wrongKeyLevelError = false;
+
+// ==================== FORWARD DECLARATIONS ====================//
+static bool isMouseOverDoorButton(const doorButton& button);
+static bool isMouseOverCloseButton(const errorPromptButton& button);
+static bool isMouseOverResetButton(const resetButton& button);
+static void updateDoorButtonHover(doorButton& button);
+static void updateCloseButtonHover(errorPromptButton& button);
+static void updateResetButtonHover(resetButton& button);
+static void drawDoorButton(const doorButton& button, AEGfxVertexList* mesh, s8 fontID);
+static void drawErrorButton(const errorPromptButton& button, AEGfxVertexList* mesh, s8 fontID);
+static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
+static void drawResetTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
+
+// ==================== BUTTON ARRAY ==================== //
+static const f32 BUTTON_SCALE_NORMAL = 1.0f;
+static const f32 BUTTON_SCALE_HOVER = 1.15f;
+static const f32 BUTTON_SCALE_SPEED = 0.15f;
+static std::vector<doorButton> buttonArr;
+
+static bool placeFinalDoor = false;
+
+static AEGfxTexture* errorOverlayTex;
+static AEGfxTexture* errorCloseTex;
+
+static bool isMouseOverDoorButton(const doorButton& button) {
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	f32 halfWidth = (button.width * button.scale) / 2.0f;
+	f32 halfHeight = (button.height * button.scale) / 2.0f;
+
+	return (worldMouseX >= button.x - halfWidth &&
+		worldMouseX <= button.x + halfWidth &&
+		worldMouseY >= button.y - halfHeight &&
+		worldMouseY <= button.y + halfHeight);
+}
+
+static bool isMouseOverCloseButton(const errorPromptButton& button) {
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	f32 halfWidth = (button.width * button.scale) / 2.0f;
+	f32 halfHeight = (button.height * button.scale) / 2.0f;
+
+	return (worldMouseX >= button.x - halfWidth &&
+		worldMouseX <= button.x + halfWidth &&
+		worldMouseY >= button.y - halfHeight &&
+		worldMouseY <= button.y + halfHeight);
+}
+
+static bool isMouseOverResetButton(const resetButton& button) {
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	f32 halfWidth = (button.width * button.scale) / 2.0f;
+	f32 halfHeight = (button.height * button.scale) / 2.0f;
+
+	return (worldMouseX >= button.x - halfWidth &&
+		worldMouseX <= button.x + halfWidth &&
+		worldMouseY >= button.y - halfHeight &&
+		worldMouseY <= button.y + halfHeight);
+}
+
+static void updateDoorButtonHover(doorButton& button) {
+	button.isHovered = isMouseOverDoorButton(button);
+
+	// Set target scale based on hover state
+	button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
+
+	// Smooth interpolation towards target scale
+	if (button.scale < button.targetScale) {
+		button.scale += BUTTON_SCALE_SPEED;
+		if (button.scale > button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+	else if (button.scale > button.targetScale) {
+		button.scale -= BUTTON_SCALE_SPEED;
+		if (button.scale < button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+}
+
+static void updateCloseButtonHover(errorPromptButton& button) {
+	button.isHovered = isMouseOverCloseButton(button);
+
+	// Set target scale based on hover state
+	button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
+
+	// Smooth interpolation towards target scale
+	if (button.scale < button.targetScale) {
+		button.scale += BUTTON_SCALE_SPEED;
+		if (button.scale > button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+	else if (button.scale > button.targetScale) {
+		button.scale -= BUTTON_SCALE_SPEED;
+		if (button.scale < button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+}
+
+static void updateResetButtonHover(resetButton& button) {
+	button.isHovered = isMouseOverResetButton(button);
+
+	// Set target scale based on hover state
+	button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
+
+	// Smooth interpolation towards target scale
+	if (button.scale < button.targetScale) {
+		button.scale += BUTTON_SCALE_SPEED;
+		if (button.scale > button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+	else if (button.scale > button.targetScale) {
+		button.scale -= BUTTON_SCALE_SPEED;
+		if (button.scale < button.targetScale) {
+			button.scale = button.targetScale;
+		}
+	}
+}
+
+static void drawDoorButton(const doorButton& button, AEGfxVertexList* mesh, s8 fontID) {
+	// Draw button background
+	AEMtx33 scale, translate, transform;
+	AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+	AEMtx33Trans(&translate, button.x, button.y);
+	AEMtx33Concat(&transform, &translate, &scale);
+
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 1.0f);  // black multiply so add color is pure
+
+	// Color based on hover state
+	if (button.id == -1) {
+		if (button.isHovered) {
+			AEGfxSetColorToAdd(0.9f, 0.2f, 0.2f, 0.8f);  // Bright red when hovered
+		}
+		else {
+			AEGfxSetColorToAdd(0.7f, 0.2f, 0.2f, 0.8f);  // Dark red normally
+		}
+	}
+	else {
+		if (button.isHovered) {
+			AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
+		}
+		else {
+			AEGfxSetColorToAdd(0.15f, 0.15f, 0.3f, 0.7f); // Dark blue-gray normally
+		}
+	}
+
+	AEGfxSetTransform(transform.m);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	// Draw button text
+	drawDoorTextCentered(button.text, button.x, button.y, button.scale, fontID);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+static void drawErrorButton(const errorPromptButton& button, AEGfxVertexList* mesh, s8 fontID) {
+	// Build transform for button quad
+	AEMtx33 scale, translate, transform;
+	AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+	AEMtx33Trans(&translate, button.x, button.y);
+	AEMtx33Concat(&transform, &translate, &scale);
+
+	// Render textured button (redButton)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxTextureSet(redButton, 0, 0);
+	AEGfxSetTransform(transform.m);
+
+	// Apply hover tint
+	if (button.isHovered) {
+		// Slight brightening tint when hovered
+		AEGfxSetColorToAdd(0.2f, 0.2f, 0.2f, 0.3f);
+	}
+	else {
+		// No tint normally
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	// Reset color state
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Draw button text (e.g. "Close")
+	drawDoorTextCentered(button.text, button.x, button.y, button.scale, fontID);
+}
+
+static void drawResetButton(const resetButton& button, AEGfxVertexList* mesh, s8 fontID) {
+	// Build transform for button quad
+	AEMtx33 scale, translate, transform;
+	AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+	AEMtx33Trans(&translate, button.x, button.y);
+	AEMtx33Concat(&transform, &translate, &scale);
+
+	// Render textured button (redButton)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxTextureSet(errorOverlayTex, 0, 0);
+	AEGfxSetTransform(transform.m);
+
+	// Apply hover tint
+	if (button.isHovered) {
+		// Slight brightening tint when hovered
+		AEGfxSetColorToAdd(0.2f, 0.2f, 0.2f, 0.3f);
+	}
+	else {
+		// No tint normally
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	// Reset color state
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Draw button text (e.g. "Close")
+	drawResetTextCentered(button.text, button.x, button.y, button.scale - 0.3f, fontID);
+}
+
+static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID) {
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	if (fontID < 0) {
+		printf("FONT IS NOT LOADED."); return;
+	}
+
+	// Get text dimensions in normalized units (0 to 2 range per AE docs)
+	f32 textWidth, textHeight;
+	AEGfxGetPrintSize(fontID, text, scale, &textWidth, &textHeight);
+
+	// Convert world coordinates to normalized coordinates for AEGfxPrint.
+	// AEGfxPrint uses [-1, 1] range where (-1,-1) = bottom-left, (1,1) = top-right.
+	// Our world coords have (0,0) = center, so dividing by half-screen gives normalized.
+	f32 halfW = screenWidth / 2.0f;
+	f32 halfH = screenLength / 2.0f;
+	f32 normalizedX = x / halfW;
+	f32 normalizedY = y / halfH;
+
+	// Center the text by offsetting half the text dimensions
+	f32 printX = normalizedX - textWidth / 2.0f;
+	f32 printY = normalizedY - textHeight / 2.0f;
+
+	// Switch to TEXTURE mode so the font glyph atlas can be sampled
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	// Reset color modifiers so the font renders with its own colors
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxPrint(fontID, text, printX, printY,
+		scale, 1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+static void drawResetTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID) {
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	if (fontID < 0) {
+		printf("FONT IS NOT LOADED."); return;
+	}
+
+	// Get text dimensions in normalized units (0 to 2 range per AE docs)
+	f32 textWidth, textHeight;
+	AEGfxGetPrintSize(fontID, text, scale, &textWidth, &textHeight);
+
+	// Convert world coordinates to normalized coordinates for AEGfxPrint.
+	// AEGfxPrint uses [-1, 1] range where (-1,-1) = bottom-left, (1,1) = top-right.
+	// Our world coords have (0,0) = center, so dividing by half-screen gives normalized.
+	f32 halfW = screenWidth / 2.0f;
+	f32 halfH = screenLength / 2.0f;
+	f32 normalizedX = x / halfW;
+	f32 normalizedY = y / halfH;
+
+	// Center the text by offsetting half the text dimensions
+	f32 printX = normalizedX - textWidth / 2.0f;
+	f32 printY = normalizedY - textHeight / 2.0f;
+
+	// Switch to TEXTURE mode so the font glyph atlas can be sampled
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	// Reset color modifiers so the font renders with its own colors
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxPrint(fontID, text, printX, printY,
+		scale, 1.0f, 1.0f, 1.0f, 1.0f);
+}
 
 // ==================== FORWARD DECLARATIONS ====================//
 static bool isMouseOverDoorButton(const doorButton& button);
@@ -152,11 +480,16 @@ void LevelEditor_Load() {
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	load::ui();
-	load::errorPrompt();
 	load::redButtonOption();
 	load::brokenDoor();
 	// Load sound
 	audio::loadsound();
+
+	AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");      // overlay panel
+	AssetManager::LoadTexture(TEX_REDBUTTON, "Assets/UI/Menus/redbutton.png"); // close
+
+	errorOverlayTex = AssetManager::GetTexture(TEX_BUTTON);
+	redButton = AssetManager::GetTexture(TEX_REDBUTTON);
 
 	// Load textures via AssetManager (enum-based IDs)
 	AssetManager::LoadTexture(TEX_PLATFORM1, "Assets/Platform/platform1.png");
@@ -217,31 +550,27 @@ void LevelEditor_Initialize() {
 	platformMesh = AssetManager::GetMesh(MESH_QUAD);
 	uiMesh       = AssetManager::GetMesh(MESH_QUAD);
 
-	// ideally should be separated into loading the imported file, and initialising the map from the file
+	// To load the buttons for the door link
 	buttonArr.clear();
 	switch (level) {
 		case 1: {
 			ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0});
-			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
-			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ -185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Tut", false, 0 });
+			buttonArr.push_back({ 185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 2", false, 1 });
 			break;
 		}
 		case 2: {
 			ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
-			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
-			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "03", false, 3 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ -185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 1", false, 1 });
+			buttonArr.push_back({ 185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 3", false, 2 });
 			break;
 		}
 		case 3: {
 			ImportMapDataFromFile("Assets/Map/Level3_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 60.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "Tut", false, 0 });
-			buttonArr.push_back({ 0.f, 0.f, 150.f, 60.f, 1.f, 1.f, "01", false, 1 });
-			buttonArr.push_back({ 270.f, 0.f, 150.f, 60.f, 1.f, 1.f, "02", false, 2 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
+			buttonArr.push_back({ 0.f, 0.f, 680.f, 80.f, 1.f, 1.f, "Level 2", false, 2 });
 			break;
 		}
 	}
@@ -251,25 +580,28 @@ void LevelEditor_Update() {
 
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
 		level = 1;
+		currentGameLevel = 1;
 		next = GS_RESTART;
 	}
 	else if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_2)) {
 		level = 2;
+		currentGameLevel = 2;
 		next = GS_RESTART;
 	}
 	else if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_3)) {
 		level = 3;
+		currentGameLevel = 3;
 		next = GS_RESTART;
 	}
 	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : (level == 2) ? GS_LEVEL2 : GS_LEVEL3;
 
+	// When user is at the door's tile index, this prompt will be shown to ask the user to pick a level to link to the current level they are at.
 	if (showDoorPrompt) {
 		for (doorButton& currentButton : buttonArr) {
 			updateDoorButtonHover(currentButton);
 			if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
-				if (currentButton.id == -1) {
-					showDoorPrompt = false;
-					doorPromptAlpha = 0.f;
+				if (currentButton.id == -1) { // Close button
+					errorPromptAlpha = 1.0f;
 					break;
 				}
 
@@ -298,11 +630,10 @@ void LevelEditor_Update() {
 					doorPromptAlpha = 0.f;
 				}
 				else {
-					std::cout << "This door link already exists!" << std::endl;
+					doorlinkExistError = true;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 					showDoorPrompt = false;
 					doorPromptAlpha = 0.f;
-					showErrorPrompt = true;
 					errorPromptAlpha = 1.0f;
 				}
 				break;
@@ -310,7 +641,7 @@ void LevelEditor_Update() {
 		}
 	}
 
-	// selecting asset
+	// Cycling through the assets
 	if (AEInputCheckTriggered(AEVK_RIGHT)) {
 		AEAudioPlay(ArrowSound, soundEffects, 1.f, 1.f, 0);
 		currentTileIndex++;
@@ -322,16 +653,17 @@ void LevelEditor_Update() {
 		if (currentTileIndex < 0) currentTileIndex = 24;
 	}
 
-	// undo
+	// Keybind to undo the action
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_Z)) {
 		if (!actionHistory.empty()) {
 			TileAction last = actionHistory.back();
 			actionHistory.pop_back();
-
+			// Restores the action before they assigned it to a new one
 			MapData[last.row][last.col] = last.prevValue;
 		}
 	}
 
+	// Saves and export the array back to the txt file
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_S)) {
 		if (level == 1) {
 			ExportMapDataToFile("Assets/Map/Level1_Map.txt");
@@ -348,12 +680,18 @@ void LevelEditor_Update() {
 	if (currentTileIndex == 10 && AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (level == 1 && keyCountLevel1 >= 1) {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
-			std::cout << "Keycard already exists" << std::endl;
+			keycardExistError = true;
 		}
 		else if (level == 2 && keyCountLevel2 >= 1) {
-			std::cout << "Keycard already exists" << std::endl;
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
+			keycardExistError = true;
 		}
+	}
+
+	// If user clicks on the "RESET" button
+	if (resetBtn.isHovered && AEInputCheckCurr(AEVK_LBUTTON)) {
+		actionHistory.clear();
+		ResetMapData();
 	}
 }
 
@@ -366,18 +704,18 @@ void LevelEditor_Draw() {
 	// Reset additive color to prevent leftover tint from other draw functions
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 
-	// getting mouse coordinates
+	// Getting mouse coordinates
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 	float worldMouseX = static_cast<f32>(mouseX) - AEGfxGetWindowWidth() / 2.f;
 	float worldMouseY = AEGfxGetWindowHeight() / 2.f - static_cast<f32>(mouseY);
 
-	// text to print
+	// Text to print
 	f32 levelWidth, levelHeight;
 	float offsetX = 10.0f / (AEGfxGetWindowWidth() / 2.0f); 
 	float offsetY = 10.0f / (AEGfxGetWindowHeight() / 2.0f);
 	if (level == 1) {
-		AEGfxGetPrintSize(font, pText1, 1.f, &levelWidth, &levelHeight);
+		AEGfxGetPrintSize(font, pText1, 2.f, &levelWidth, &levelHeight);
 		AEGfxPrint(font, pText1, -1.f + offsetX, -1.f + offsetY, 1, 1, 1, 1, 1);
 	}
 	else if (level == 2) {
@@ -389,7 +727,7 @@ void LevelEditor_Draw() {
 		AEGfxPrint(font, pText3, -1.f + offsetX, -1.f + offsetY, 1, 1, 1, 1, 1);
 	}
 
-	// display level in a grid system
+	// Display level in a grid system
 	const float tileSizeLE = 65.f;
 	const float gap = 3.f;
 	for (s32 row = 0; row < BINARY_MAP_HEIGHT; ++row) {
@@ -402,16 +740,17 @@ void LevelEditor_Draw() {
 			bool isGridHovered = (worldMouseX >= xPos - halfSize && worldMouseX <= xPos + halfSize &&
 				worldMouseY >= yPos - halfSize && worldMouseY <= yPos + halfSize);
 
+			// Checks what grid the mouse is currently hovering on and edits that value in the array
 			if (isGridHovered) {
 				AEGfxSetColorToMultiply(0.4f, 0.37f, 0.42f, 1.0f); // purple highlight
 				if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
-					if (currentTileIndex == 9) {
+					if (currentTileIndex == 9) { // Door
 						promptRow = row;
 						promptCol = col;
 						showDoorPrompt = true;
 						doorPromptAlpha = 1.0f;
 					}
-					else if (currentTileIndex >= 0 && currentTileIndex <= 8) {
+					else if (currentTileIndex >= 0 && currentTileIndex <= 8) { // Platforms
 						TileAction action;
 						action.row = row;
 						action.col = col;
@@ -421,10 +760,11 @@ void LevelEditor_Draw() {
 						MapData[row][col] = action.newValue;
 						actionHistory.push_back(action);
 					}
-					else if (currentTileIndex == 10) {
+					else if (currentTileIndex == 10) { // Keycard
 						bool placeKey = false;
 						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
 						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
+						else if (level == 3) wrongKeyLevelError = true;
 
 						if (placeKey) {
 							TileAction action;
@@ -437,13 +777,38 @@ void LevelEditor_Draw() {
 							actionHistory.push_back(action);
 
 							// increment the counter right here
-							if (level == 1) keyCountLevel1++;
-							else if (level == 2) keyCountLevel2++;
+							if (level == 1) keyCountLevel1 = 1;
+							else if (level == 2) keyCountLevel2 = 1;
 						}
 					}
-					else if (currentTileIndex == 11) {
+					else if (currentTileIndex == 11) { // Healthpack
+						bool placeHealth = false;
+						if (level == 1 && healthCountLevel1 == 0) placeHealth = true;
+						else if (level == 2 && healthCountLevel2 == 0) placeHealth = true;
+						else if (level == 3 && healthCountLevel3 == 0) placeHealth = true;
+
+						if (placeHealth) {
+							TileAction action;
+							action.row = row;
+							action.col = col;
+							action.prevValue = MapData[row][col];
+							action.newValue = 60;
+
+							MapData[row][col] = action.newValue;
+							actionHistory.push_back(action);
+
+							if (level == 1) healthCountLevel1++;
+							else if (level == 2) healthCountLevel2++;
+							else if (level == 3) healthCountLevel3++;
+						}
+						else {
+							healthExistError = true;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						}
+					}
+					else if (currentTileIndex == 12) { // Final Door
 						if (level != 3) {
-							std::cout << "Final Door can only be placed in Level 3!" << std::endl;
+							finaldoorLevelError = true;
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
 						else {
@@ -460,12 +825,12 @@ void LevelEditor_Draw() {
 								finalDoorCount = 1;
 							}
 							else {
-								std::cout << "Final Door already exists in this level!" << std::endl;
+								finaldoorExistError = true;
 								AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 							}
 						}
 					}
-					else if (currentTileIndex == 12) {
+					else if (currentTileIndex == 13) { // Suction Trap
 						TileAction action;
 						action.row = row;
 						action.col = col;
@@ -475,7 +840,7 @@ void LevelEditor_Draw() {
 						MapData[row][col] = action.newValue;
 						actionHistory.push_back(action);
 					}
-					else if (currentTileIndex == 13) {
+					else if (currentTileIndex == 14) { // Saw Trap
 						TileAction action;
 						action.row = row;
 						action.col = col;
@@ -485,27 +850,116 @@ void LevelEditor_Draw() {
 						MapData[row][col] = action.newValue;
 						actionHistory.push_back(action);
 					}
+					else if (currentTileIndex == 15) { // Ranged enemy
+						bool placeEnemy = false;
 
+						if (level == 1 && rEnemyLevel1 == 0) placeEnemy = true;
+						else if (level == 2 && rEnemyLevel2 == 0) placeEnemy = true;
+						else if (level == 3 && rEnemyLevel3 == 0) placeEnemy = true;
+
+						if (placeEnemy) {
+							TileAction action;
+							action.row = row;
+							action.col = col;
+							action.prevValue = MapData[row][col];
+							action.newValue = 81;
+
+							MapData[row][col] = action.newValue;
+							actionHistory.push_back(action);
+
+							if (level == 1) rEnemyLevel1 = 1;
+							else if (level == 2) rEnemyLevel2 = 1;
+							else if (level == 3) rEnemyLevel3 = 1;
+						}
+						else {
+							enemyExistError = true;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						}
+					}
+					else if (currentTileIndex == 16) { // Melee Enemy
+						bool placeEnemy = false;
+
+						if (level == 1 && mEnemyLevel1 == 0) placeEnemy = true;
+						else if (level == 2 && mEnemyLevel2 == 0) placeEnemy = true;
+						else if (level == 3 && mEnemyLevel3 == 0) placeEnemy = true;
+
+						if (placeEnemy) {
+							TileAction action;
+							action.row = row;
+							action.col = col;
+							action.prevValue = MapData[row][col];
+							action.newValue = 82;
+
+							MapData[row][col] = action.newValue;
+							actionHistory.push_back(action);
+
+							if (level == 1) mEnemyLevel1 = 1;
+							else if (level == 2) mEnemyLevel2 = 1;
+							else if (level == 3) mEnemyLevel3 = 1;
+						}
+						else {
+							enemyExistError = true;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						}
+					}
+					else if (currentTileIndex >= 17 && currentTileIndex <= 24) { // Aesthetic Tiles
+						TileAction action;
+						action.row = row;
+						action.col = col;
+						action.prevValue = MapData[row][col];
+						action.newValue = 54 + currentTileIndex;
+
+						MapData[row][col] = action.newValue;
+						actionHistory.push_back(action);
+					}
 				}
-				if (AEInputCheckTriggered(AEVK_RBUTTON)) {
+				if (AEInputCheckTriggered(AEVK_RBUTTON)) { // Right Click to Erase
 					TileAction action;
 					action.row = row;
 					action.col = col;
 					action.prevValue = MapData[row][col];
 					action.newValue = 0;
 
-					if (MapData[row][col] == 67) {
+					if (MapData[row][col] == 21) {
+						tutDoorCount = 0;
+					}
+					else if (MapData[row][col] == 22) {
+						door1Count = 0;
+					}
+					else if (MapData[row][col] == 23) {
+						door2Count = 0;
+					}
+					else if (MapData[row][col] == 24) {
+						door2Count = 0;
+					}
+					else if (MapData[row][col] == 67) {
 						if (level == 1) keyCountLevel1 = 0;
 						else if (level == 2) keyCountLevel2 = 0;
 					}
 					else if (MapData[row][col] == 69) {
 						finalDoorCount = 0;
 					}
+					else if (MapData[row][col] == 60) {
+						if (level == 1) healthCountLevel1 = 0;
+						else if (level == 2) healthCountLevel2 = 0;
+						else if (level == 3) healthCountLevel3 = 0;
+					}
+					else if (MapData[row][col] == 81) {
+						if (level == 1) rEnemyLevel1 = 0;
+						else if (level == 2) rEnemyLevel2 = 0;
+						else if (level == 3) rEnemyLevel3 = 0;
+					}
+					else if (MapData[row][col] == 82) {
+						if (level == 1) mEnemyLevel1 = 0;
+						else if (level == 2) mEnemyLevel2 = 0;
+						else if (level == 3) mEnemyLevel3 = 0;
+					}
 
 					MapData[row][col] = action.newValue;
 					actionHistory.push_back(action);
 				}
-			}                                                           
+			}
+			// Drawing the colors in the LE
 			else if (MapData[row][col] >= 11 && MapData[row][col] <= 19) {
 				AEGfxSetColorToMultiply(0.49f, 0.49f, 0.49f, 1.0f); // dark gray
 			}
@@ -548,6 +1002,7 @@ void LevelEditor_Draw() {
 
 			float textW, textH;
 
+			// On hover features
 			if (isGridHovered && (MapData[row][col] >= 11 && MapData[row][col] <= 19)) {
 				// normalize tile center
 				AEGfxGetPrintSize(font, "Tile", 0.4f, &textW, &textH);
@@ -610,7 +1065,7 @@ void LevelEditor_Draw() {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "1", normX, normY, 0.5f, 1, 1, 1, 1);
-			} 
+			}
 			else if (!isGridHovered && (MapData[row][col] == 12 || MapData[row][col] == 22)) {
 				float normX = xPos / (AEGfxGetWindowWidth() / 2.0f);
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
@@ -651,6 +1106,24 @@ void LevelEditor_Draw() {
 				float normY = yPos / (AEGfxGetWindowHeight() / 2.0f);
 				AEGfxPrint(font, "9", normX, normY, 0.5f, 1, 1, 1, 1);
 			}
+			else if (!isGridHovered && currentTileIndex == 13) {
+				if (MapData[row][col] == 50) {
+					float W, H;
+					AEGfxGetPrintSize(font, "This", 0.5f, &W, &H);
+					float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - W / 2.0f;
+					float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - H / 2.0f;
+					AEGfxPrint(font, "This", normX, normY, 0.5f, 1, 1, 1, 1);
+				}
+			}
+			else if (!isGridHovered && currentTileIndex == 14) {
+				if (MapData[row][col] == 51) {
+					float W, H;
+					AEGfxGetPrintSize(font, "This", 0.5f, &W, &H);
+					float normX = xPos / (AEGfxGetWindowWidth() / 2.0f) - W / 2.0f;
+					float normY = yPos / (AEGfxGetWindowHeight() / 2.0f) - H / 2.0f;
+					AEGfxPrint(font, "This", normX, normY, 0.5f, 1, 1, 1, 1);
+				}
+			}
 		}
 	}
 
@@ -664,9 +1137,13 @@ void LevelEditor_Draw() {
 	AEMtx33Concat(&tileTransf, &tileTransl, &tileTransf);
 
 	// Reset color modifiers before rendering textured tile preview
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	// Drawing the asset when the user cycles through the LE
 	if (currentTileIndex >= 0 && currentTileIndex < 25 && tileTextures[currentTileIndex]) {
 		AEGfxTextureSet(tileTextures[currentTileIndex], 0, 0);
 	}
@@ -674,6 +1151,7 @@ void LevelEditor_Draw() {
 	AEGfxSetTransform(tileTransf.m);
 	AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
+	// Printing the text below to render the specific words
 	memset(strBuffer, 0, 100 * sizeof(char));
 	f32 tileTextWidth, tileTextHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.3f, &tileTextWidth, &tileTextHeight);
@@ -725,7 +1203,7 @@ void LevelEditor_Draw() {
 		break;
 	case 11:
 		sprintf_s(strBuffer, "Health Pack");
-		AEGfxPrint(font, strBuffer, -0.2f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, strBuffer, -0.25f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
 	case 12:
 		sprintf_s(strBuffer, "Final Door");
@@ -739,6 +1217,46 @@ void LevelEditor_Draw() {
 		sprintf_s(strBuffer, "Trap: Damages Player");
 		AEGfxPrint(font, strBuffer, -0.35f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
 		break;
+	case 15:
+		sprintf_s(strBuffer, "Ranged Enemy");
+		AEGfxPrint(font, strBuffer, -0.28f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 16:
+		sprintf_s(strBuffer, "Melee Enemy");
+		AEGfxPrint(font, strBuffer, -0.26f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 17:
+		sprintf_s(strBuffer, "Decoration: Top Left");
+		AEGfxPrint(font, strBuffer, -0.35f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 18:
+		sprintf_s(strBuffer, "Decoration: Top Middle");
+		AEGfxPrint(font, strBuffer, -0.37f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 19:
+		sprintf_s(strBuffer, "Decoration: Top Right");
+		AEGfxPrint(font, strBuffer, -0.36f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 20:
+		sprintf_s(strBuffer, "Decoration: Middle Left");
+		AEGfxPrint(font, strBuffer, -0.38f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 21:
+		sprintf_s(strBuffer, "Decoration: Middle Right");
+		AEGfxPrint(font, strBuffer, -0.38f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 22:
+		sprintf_s(strBuffer, "Decoration: Bottom Left");
+		AEGfxPrint(font, strBuffer, -0.4f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 23:
+		sprintf_s(strBuffer, "Decoration: Bottom Middle");
+		AEGfxPrint(font, strBuffer, -0.4f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
+	case 24:
+		sprintf_s(strBuffer, "Decoration: Bottom Right");
+		AEGfxPrint(font, strBuffer, -0.4f, -0.9f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		break;
 	}
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -746,21 +1264,21 @@ void LevelEditor_Draw() {
 	renderlogic::drawTexture(-170.f, -330.f, leftArrow, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(-20.f, -330.f, rightArrow, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, 400.f, ctrl1, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(610.f, 400.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(620.f, 400.f, ctrl2, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(670.f, 400.f, leftClick, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, 170.f, ctrl1, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(610.f, 170.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(620.f, 170.f, ctrl2, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(670.f, 170.f, sButton, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, 280.f, rightClick, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, 60.f, ctrl1, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(610.f, 60.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(620.f, 60.f, ctrl2, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(670.f, 60.f, zButton, uiMesh, 50.f, 50.f);
 	renderlogic::drawTexture(570.f, -60.f, ctrl1, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(610.f, -60.f, ctrl2, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh, 50.f, 50.f);
-	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(620.f, -60.f, ctrl2, uiMesh, 50.f, 50.f);
+	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh, 45.f, 50.f);
+	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh, 45.f, 45.f);
+	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh, 45.f, 45.f);
 
 	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;
@@ -783,12 +1301,16 @@ void LevelEditor_Draw() {
 	sprintf_s(strBuffer, "for Level");
 	AEGfxPrint(font, strBuffer, 0.67f, -0.35f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetBlendMode(AE_GFX_BM_NONE);   // no blending, just solid fill
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
 	// door prompt background box
 	if (showDoorPrompt && doorPromptAlpha > 0.0f) {
 		// Main prompt panel
 		float boxWidth = 850.0f;
 		float boxHeight = 400.0f;
-		AEGfxSetColorToMultiply(0.1f, 0.1f, 0.3f, doorPromptAlpha); // dark blue background
+		AEGfxSetColorToMultiply(0.f, 0.f, 0.f, doorPromptAlpha); // dark blue background
 		renderlogic::drawSquare(0, 0, boxWidth, boxHeight);
 		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
@@ -806,17 +1328,19 @@ void LevelEditor_Draw() {
 		}
 	}
 
-	if (showErrorPrompt && errorPromptAlpha > 0.0f) {
+	// Printing the error prompt
+	if (errorPromptAlpha > 0.0f) {
 		if (showDoorPrompt) {
 			for (doorButton& currentButton : buttonArr) {
 				updateDoorButtonHover(currentButton);
 				if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
-					if (currentButton.id == -1) {
+					if (currentButton.id == -1) { // Cancel button
 						showDoorPrompt = false;
 						doorPromptAlpha = 0.f;
+						doorlinkExistError = false;
+						errorPromptAlpha = 0.f;
 						break;
 					}
-
 					// check individual door counter
 					bool canPlace = false;
 					if (currentButton.id == 0 && tutDoorCount == 0) canPlace = true;
@@ -851,6 +1375,102 @@ void LevelEditor_Draw() {
 			}
 		}
 	}
+
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+	// ERROR PROMPT for different conditions
+	if (keycardExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Keycard already exists!");
+		AEGfxPrint(font, errorMessage, -0.37f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			keycardExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (wrongKeyLevelError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Keycard can't be placed in this level!");
+		AEGfxPrint(font, errorMessage, -0.4f, -0.05f, 0.7f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			wrongKeyLevelError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (doorlinkExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Door already exists!");
+		AEGfxPrint(font, errorMessage, -0.31f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			doorlinkExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (healthExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Health Pack already exists!");
+		AEGfxPrint(font, errorMessage, -0.43f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			healthExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (finaldoorLevelError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Door can't be placed in this level!");
+		AEGfxPrint(font, errorMessage, -0.42f, -0.05f, 0.8f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			finaldoorLevelError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (finaldoorExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Final Door already exists!");
+		AEGfxPrint(font, errorMessage, -0.41f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			finaldoorExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+	if (enemyExistError) {
+		renderlogic::drawTexture(0.f, 0.f, errorOverlayTex, uiMesh, 855.f, 240.f);
+		sprintf_s(errorMessage, "Enemy already exists!");
+		AEGfxPrint(font, errorMessage, -0.35f, -0.05f, 1.f, 1.f, 1.f, 1.f, 1.f);
+		drawErrorButton(errorPromptBtn, uiMesh, font);
+		updateCloseButtonHover(errorPromptBtn);
+
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && errorPromptBtn.isHovered) {
+			enemyExistError = false;
+			errorPromptAlpha = 0.f;
+		}
+	}
+
+	//========== DRAW RESET BUTTON ==========//
+	drawResetButton(resetBtn, uiMesh, font);
+	updateResetButtonHover(resetBtn);
 }
 
 void LevelEditor_Free() {

@@ -10,11 +10,11 @@
 #include "Confirmation.h"
 
 // ---------------------------------------------------------------------------
-// main
+// main 
 
 bool pause = false;
 bool canpause = true;
-
+f32 MainVolume = 1.0f;
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -35,8 +35,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	//int gGameRunning = 1;
 
-
-
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
 
@@ -44,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 	
-	GSM_Initialize(GS_DEATH);
+	GSM_Initialize(GS_LEVEL1);
 
 	while (current != GS_QUIT)
 	{
@@ -77,18 +75,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		if (canpause) {
 			Pause_Initialize();
+			
 		}
 		fpInitialize();
 
 		while (next == current)
 		{
 			AESysFrameStart();
-			if (AEInputCheckTriggered(AEVK_ESCAPE)) {
-				if (pause) {
-					pause = false;
-				}
-				else {
-					pause = true;
+
+			if (canpause) {
+				if (AEInputCheckTriggered(AEVK_ESCAPE)) {
+					if (pause) {
+						pause = false;
+					}
+					else {
+						pause = true;
+					}
 				}
 			}
 			
@@ -96,7 +98,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				
 
 				if (!pause) {
-					audio::audiolevel(1.0f);
+					audio::audiolevel(MainVolume);
 					fpUpdate();
 				}
 
@@ -105,7 +107,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				if (pause) {
 					Pause_Update();
 					Pause_Draw();
-					audio::audiolevel(0.2f);
 				}
 			}
 			else {

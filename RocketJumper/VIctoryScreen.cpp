@@ -18,9 +18,15 @@ static bool destructive = false;
 static s8 leave = 0;
 static AEGfxVertexList* backgroundMesh = nullptr;
 
+AEAudio win;
 
+static AEGfxTexture* menutex;
+static AEGfxTexture* buttontex;
+extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void VictoryScreen_Load() {
+    win = AEAudioLoadMusic("Assets/Sounds/Victory.wav");
+    bgm = AEAudioCreateGroup();
 
     load::pauseMenu();
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
@@ -33,6 +39,8 @@ void VictoryScreen_Load() {
     victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void VictoryScreen_Init() {
+    AEAudioPlay(win, bgm, 0.5f, 1.f, -1);
+
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
@@ -70,9 +78,13 @@ void VictoryScreen_Update() {
         if (restartButton.isHovered) {
             movement::bulletCount = 50;
             wireCount = 0;             // Reset Wires
+            keycardCollected0 = false;  // Reset Keycard
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            playerEnteredDoor0 = false;
+            playerEnteredDoor1 = false;
+            playerEnteredDoor2 = false;
             wireDropsSpawned = 0;
             doorState = 0;             // Reset Final Door
             destructive = true;
@@ -88,10 +100,17 @@ void VictoryScreen_Update() {
         }
         if (tomenuButton.isHovered) {
             wireCount = 0;             // Reset Wires
+            keycardCollected0 = false;  // Reset Keycard
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
+            playerEnteredDoor0 = false;
+            playerEnteredDoor1 = false;
+            playerEnteredDoor2 = false;
             wireDropsSpawned = 0;
+            prevCleared1 = 0;
+            prevCleared2 = 0;
+            prevCleared3 = 0;
             doorState = 0;             // Reset Final Door
             destructive = true;
             if (leave == 1) {
@@ -149,8 +168,12 @@ void VictoryScreen_Free() {
         backgroundMesh = nullptr;
     }
     AssetManager::FreeAllMeshes();
+
 }
 void VictoryScreen_Unload() {
+    AEAudioUnloadAudio(win);
+    AEAudioUnloadAudioGroup(bgm);
+
     if (TitleTex) {
         AEGfxTextureUnload(TitleTex);
         TitleTex = nullptr;
@@ -159,7 +182,8 @@ void VictoryScreen_Unload() {
         AEGfxTextureUnload(backgroundTexture);
         backgroundTexture = nullptr;
     }
-    
+
+
     if (victoryfont != -1) { AEGfxDestroyFont(victoryfont); victoryfont = -1; }
     AssetManager::UnloadAllTextures();
 }

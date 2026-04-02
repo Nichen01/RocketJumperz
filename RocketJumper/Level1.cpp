@@ -5,6 +5,7 @@
 #include "WeaponSprite.h"
 #include "ParticleSystem.h"
 #include "Player.h"
+#include "InstructionsMenu.h"
 
 static s32* map = nullptr;
 static int x;
@@ -52,6 +53,15 @@ static s8 fontLevel1 = -1;
 
 // bool for checking player proximity with door
 static bool playerNear;
+bool playerEnteredDoor1 = false;
+
+//bool for checking if player previously cleared level
+extern bool prevCleared1 = 0;
+
+// bool for keycard in inventory
+static bool healthCollected;
+//static bool keycardCollected;
+static bool keycardCollectedAudio = false;
 
 // bool for keycard in inventory
 static bool healthCollected;
@@ -64,6 +74,7 @@ void Level1_Load()
 {
 	audio::loadsound();
 
+	InstructionsMenu::Load();
 	load::platform();
 	load::ui();
 	load::cooldownBar();
@@ -150,6 +161,16 @@ void Level1_Load()
 
 void Level1_Initialize()
 {
+	InstructionsMenu::Init();
+
+	// Only reset if this is the very first time entering Level1
+	if (!playerEnteredDoor1 && !keycardCollected1) {
+		key.active = true;   // spawn card
+	}
+	else {
+		key.active = false;  // prevent respawn
+	}
+
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
 	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
@@ -195,20 +216,17 @@ void Level1_Initialize()
 	bool spawnSet = false;
 	if (playerEnteredDoorId != -1) {
 		for (auto& door : doors) {
-			// Lock all doors
 			door.isLocked = true;
-			if (door.id == 21) {
-				door.isLocked = false;
-			}
-
+			if (door.id == 21) door.isLocked = false; // tutorial entry always unlocked
+			if (keycardCollected1) door.isLocked = false; // keep unlocked if card collected
 			if (door.id == playerEnteredDoorId) {
 				objectinfo1[player].xPos = door.worldX;
 				objectinfo1[player].yPos = door.worldY;
 				spawnSet = true;
-				break;
 			}
 		}
 	}
+
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
 		objectinfo1[player].xPos = 0.f;
@@ -217,8 +235,13 @@ void Level1_Initialize()
 	objectinfo1[player].xScale = PlayerScale;
 	objectinfo1[player].yScale = PlayerScale;
 
-	// Initialize player health to 100 HP with no invincibility active
+	// Initialize player health from saved checkpoint (max on fresh game)
 	InitPlayerHealth(objectinfo1[player]);
+	objectinfo1[player].health = savedHealth;
+
+	// Load saved checkpoint stats so progress from previous levels is preserved
+	movement::bulletCount = savedAmmo;
+	wireCount             = savedWireCount;
 
 	// Start with the plasma gun equipped (default weapon)
 	objectinfo1[player].currentWeapon = WEAPON_PLASMA;
@@ -229,8 +252,8 @@ void Level1_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy1X, enemy1Y);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy2X, enemy2Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
+	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -264,25 +287,16 @@ void Level1_Initialize()
 
 void Level1_Update()
 {
+	// If the instructions overlay is open, skip all gameplay logic (pause)
+	if (InstructionsMenu::Update()) return;
+
 	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL2;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		next = GS_LEVELEDITOR;
 	}
 
-	//====== AUDIO CONTROLS ======//
-	if (AEInputCheckTriggered(AEVK_1)) {
-		bgVolume -= 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
-	if (AEInputCheckTriggered(AEVK_2)) {
-		bgVolume += 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
+	
 
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
@@ -321,8 +335,8 @@ void Level1_Update()
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	// Fire using the currently equipped weapon (toggled with Q)
-	if (movement::bulletCount) {
-		if (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN) {
+	if (movement::bulletCount>0) {
+		if (objectinfo1[player].currentWeapon == WEAPON_SHOTGUN && movement::bulletCount>2) {
 			// Shotgun: 5-pellet cone spread
 			projectileSystem::FireShotgun(
 				static_cast<s32>(worldMouseX),
@@ -333,7 +347,7 @@ void Level1_Update()
 				LaserBlast,
 				soundEffects);
 		}
-		else {
+		else if (objectinfo1[player].currentWeapon!=WEAPON_SHOTGUN){
 			// Plasma (default): single shot toward mouse
 			projectileSystem::fireProjectiles(
 				static_cast<s32>(worldMouseX),
@@ -360,7 +374,7 @@ void Level1_Update()
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo1[player], L1Drop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects,
+		dt, LaserBlast, soundEffects, prevCleared1,
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
@@ -444,18 +458,24 @@ void Level1_Update()
 			nearAnyDoor = true; 
 
 			// open door if closed and not animating
-			if (!door.isOpen && door.anim.playMode == ANIM_IDLE) {
+			if (!door.isLocked && !door.isOpen && door.anim.playMode == ANIM_IDLE) {
 				animSystem::play(door.anim, ANIM_PLAY_ONCE);
 			}
 				
 			// Handle E key transition
-			if (door.isOpen && AEInputCheckTriggered(AEVK_E)) {
+			if (nearThisDoor && AEInputCheckTriggered(AEVK_E)) {
 				if (door.isLocked && !keycardCollected1) {
-					std::cout << "Door is locked!" << std::endl;
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
 				else {
 					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+
+					// Save current stats as a checkpoint before leaving the level
+					savedAmmo      = movement::bulletCount;
+					savedWireCount = wireCount;
+					savedHealth    = objectinfo1[player].health;
+
+					playerEnteredDoor1 = true;
 					playerEnteredDoorId = door.id; // remember which door was used
 					switch (toLevel) {
 					case 0: next = GS_TUTORIAL; break;
@@ -514,7 +534,19 @@ void Level1_Update()
 		key.active = false;
 		keycardCollected1 = true;
 		AEAudioPlay(Pickup, soundEffects, 1, 1, 0);
+
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
 	}
+
+	// Ensure doors stay unlocked once the keycard is collected
+	if (keycardCollected1) {
+		for (auto& door : doors) {
+			door.isLocked = false;
+		}
+	}
+
 }
 
 void Level1_Draw()
@@ -531,6 +563,14 @@ void Level1_Draw()
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, static_cast<int>(tileSize));
+
+	// ====== RENDERING PADLOCK ====== //
+	for (auto& door : doors) {
+		if (door.isLocked) {
+			// Draw padlock texture at the door�s position
+			renderlogic::drawTexture(door.worldX, door.worldY, padlock, uiMesh, 50.f, 50.f);
+		}
+	}
 
 	// ==== ENEMIES RENDER =======//
 	enemySystem::renderEnemies(enemies,
@@ -575,7 +615,6 @@ void Level1_Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
 	AEGfxTextureSet(characterPictest, 0, 0);
-
 
 	// Flip sprite horizontally when the player is aiming left.
 	// Negating xScale mirrors the quad along the Y axis.
@@ -689,15 +728,24 @@ void Level1_Draw()
 	renderlogic::drawWireInventory(wireCount);
 
 	// ====== DISPLAY KEYCARD IN INVENTORY ====== //
-	if (keycardCollected1) {
-		renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
-		for (auto& door : doors) {
-			door.isLocked = false;
-		}
-	}
-	else {
+	if (playerEnteredDoor1) {
 		renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
 	}
+	else {
+		if (keycardCollected1) {
+			renderlogic::drawTexture(-750.f, -400.f, keycardInventory, uiMesh, 100.f, 100.f);
+			for (auto& door : doors) {
+				door.isLocked = false;
+			}
+		}
+		else {
+			renderlogic::drawTexture(-750.f, -400.f, inventory, uiMesh, 100.f, 100.f);
+		}
+	}
+
+	// Draw the "?" icon (or the full overlay if it is open) on top of everything
+	InstructionsMenu::Draw();
+	traps::drawTraps();
 }
 
 void Level1_Free()
@@ -715,6 +763,8 @@ void Level1_Free()
 
 void Level1_Unload()
 {
+	InstructionsMenu::Unload();
+
 	// Unload all AssetManager-tracked textures (auto-nulls internal sTextures[]).
 	AssetManager::UnloadAllTextures();
 

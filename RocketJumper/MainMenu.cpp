@@ -18,6 +18,8 @@ Technology is prohibited.
 #include "GameStateManager.h"
 #include "GameStateList.h"
 #include "Load.h"
+#include "Confirmation.h"
+#include "player.h"
 #include <cmath>
 
 // ==================== FORWARD DECLARATIONS ====================
@@ -54,15 +56,23 @@ static MenuButton playButton;
 static MenuButton instructionsButton;
 static MenuButton creditsButton;
 static MenuButton quitButton;
+static MenuButton yesButton;
+static MenuButton noButton;
+static MenuButton settingBtn;
 
 // Back button for sub-menus
 static MenuButton backButton;
 
+static bool destructive = false;
+static s8 leave = 0;
 
 // Animation constants
 static const f32 BUTTON_SCALE_NORMAL = 1.0f;
 static const f32 BUTTON_SCALE_HOVER  = 1.15f;
 static const f32 BUTTON_SCALE_SPEED  = 0.15f;
+
+static char strBuffer[100];
+static AEGfxTexture* errorOverlayTex;
 
 // ==================== HELPER FUNCTIONS ======================================================================================
 namespace MenuHelpers {
@@ -223,6 +233,10 @@ void MainMenu_Load() {
         printf("Warning: DigiPenWhite.png not found. Credits logo will not render.\n");
     }
 
+    AssetManager::LoadTexture(TEX_SETTINGS, "Assets/UI/Menus/settings.png");
+    if (!AssetManager::GetTexture(TEX_SETTINGS)) {
+        printf("Warning: settings.png not found. Credits logo will not render.\n");
+    }
     // Load font
     menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 48);
     if (menuFont < 0) {
@@ -233,6 +247,8 @@ void MainMenu_Load() {
     // for menu buttons
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");
+
+    AssetManager::LoadTexture(TEX_MENU, "Assets/UI/Menus/Menu.png");
 
     // Instructions screen image (full panel showing controls / objectives)
     AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/instructionsMenu.png");
@@ -246,6 +262,9 @@ void MainMenu_Load() {
 void MainMenu_Init() {
     AEAudioPlay(MainMenu, bgm, 0.5f, 1.f, -1);
 
+    errorOverlayTex = AssetManager::GetTexture(TEX_BUTTON);
+    setting = AssetManager::GetTexture(TEX_SETTINGS);
+    
 
     // Cache screen dimensions as floats so every layout calc can use them directly.
     // These come from the global extern ints defined in Main.cpp.
@@ -269,6 +288,9 @@ void MainMenu_Init() {
     instructionsButton = { 0.0f, startY - btnGap,       btnW, btnH, 1.0f, 1.0f, "INSTRUCTIONS", false };
     creditsButton      = { 0.0f, startY - btnGap * 2.0f, btnW, btnH, 1.0f, 1.0f, "CREDITS",     false };
     quitButton         = { 0.0f, startY - btnGap * 3.0f, btnW, btnH, 1.0f, 1.0f, "QUIT",        false };
+    settingBtn         = { -750.f, -400.f, 64.f, 64.f, 1.0f, 1.0f, "", false };
+
+    Confirmation_Init(yesButton, noButton);
 
     // Back button (sub-menus): slightly smaller, near bottom of screen
     f32 backBtnW = scrW * 0.156f;   // ~250 / 1600
@@ -302,21 +324,33 @@ void MainMenu_Update() {
 
 void UpdateMainMenu() {
     // Update button hover states
-    MenuHelpers::updateButtonHover(playButton);
-    MenuHelpers::updateButtonHover(instructionsButton);
-    MenuHelpers::updateButtonHover(creditsButton);
-    MenuHelpers::updateButtonHover(quitButton);
-
+    if (!destructive) {
+        MenuHelpers::updateButtonHover(playButton);
+        MenuHelpers::updateButtonHover(instructionsButton);
+        MenuHelpers::updateButtonHover(creditsButton);
+        MenuHelpers::updateButtonHover(quitButton);
+        MenuHelpers::updateButtonHover(settingBtn);
+    }
+    else {
+        Confirmation_Update(yesButton, noButton, leave);
+    }
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (playButton.isHovered) {
-            movement::bulletCount = 10;
+            movement::bulletCount = 50;
             playerEnteredDoorId = -1;
             wireCount = 0;             // Reset Wires
+            keycardCollected0 = false;  // Reset Keycard
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
             doorState = 0;             // Reset Final Door
+
+            // Reset checkpoint variables so a new game starts fresh
+            savedAmmo      = 50;
+            savedWireCount = 0;
+            savedHealth    = 100;
+
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
         }
@@ -330,8 +364,20 @@ void UpdateMainMenu() {
             printf("Credits button clicked!\n");
         }
         else if (quitButton.isHovered) {
-            next = GS_QUIT;
+            destructive = true;
+            if (leave == 1) {
+                destructive = false;
+                leave = 0;
+                next = GS_QUIT;  // Change to test file if needed
+            }
+            else if (leave == 2) {
+                destructive = false;
+                leave = 0;
+            }
             printf("Exiting game!\n");
+        }
+        else if (settingBtn.isHovered) {
+            next = GS_LEVELEDITOR;
         }
     }
 }
@@ -457,6 +503,7 @@ void DrawMainMenu() {
 
         AEGfxSetTransform(bannerTransform.m);
         AEGfxMeshDraw(quadMesh, AE_GFX_MDM_TRIANGLES);
+        
     }
     else {
         // Fallback: render the title as text if the texture failed to load
@@ -469,12 +516,34 @@ void DrawMainMenu() {
     // Draw all buttons using the black-vertex button mesh from AssetManager
     AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_MENU_BUTTON);
     AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
-    
+    menuTex = AssetManager::GetTexture(TEX_MENU);
+    buttonTex = AssetManager::GetTexture(TEX_BUTTON);
+    buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
+
     // draw the textured buttons
     MenuHelpers::TexdrawButton(playButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(instructionsButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(creditsButton, btnMesh, menuFont, btnTex);
     MenuHelpers::TexdrawButton(quitButton, btnMesh, menuFont, btnTex);
+    MenuHelpers::TexdrawButton(settingBtn, btnMesh, menuFont, setting);
+
+    if (destructive) {
+        Confirmation_Draw(menuFont, yesButton, noButton);
+    }
+
+    //AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+    //AEGfxSetTransparency(0.5f);
+    sprintf_s(strBuffer, "Level Editor");
+    if (settingBtn.isHovered) {
+        s32 mouseX, mouseY;
+        AEInputGetCursorPosition(&mouseX, &mouseY);
+        f32 worldMouseX = static_cast<f32>(mouseX) - (screenWidth / 2.0f);
+        f32 worldMouseY = (screenLength / 2.0f) - static_cast<f32>(mouseY);
+        renderlogic::drawTexture(worldMouseX + 150.f, worldMouseY + 40.f, errorOverlayTex, quadMesh, 228.f, 64.f);
+        f32 normalizedX = (static_cast<f32>(mouseX) / screenWidth) * 2.0f - 1.0f;
+        f32 normalizedY = 1.0f - (static_cast<f32>(mouseY) / screenLength) * 2.0f;
+        AEGfxPrint(menuFont, strBuffer, normalizedX + 0.078f, normalizedY + 0.065f, 0.6f, 1.f, 1.f, 1.f, 1.f);
+    }
 }
 
 void DrawInstructionsMenu() {
@@ -641,13 +710,6 @@ void MainMenu_Unload() {
     AssetManager::UnloadAllTextures();
 
     audio::unloadsound();
-
-    /*
-    if (titleTexture) {
-        AEGfxTextureUnload(titleTexture);
-        titleTexture = nullptr;
-    }
-    */
 
     if (menuFont >= 0) {
         AEGfxDestroyFont(menuFont);

@@ -4,7 +4,7 @@
 \author 	Chan Joraye (c.joraye)
 \par    	c.joraye@digipen.edu
 \date   	16/02/26
-\brief		
+\brief		File that reads txt file and creates the different 2D arrays that will store seperate values such as collision array, glass array, map array
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -27,6 +27,7 @@ int BINARY_MAP_HEIGHT;
 //This will contain all the data of the map, which will be retreived from a file
 //when the "ImportMapDataFromFile" function is called
 int** MapData;
+static int** OriginalMapData;
 
 int** BinaryCollisionArray;
 int** glassMap;
@@ -35,9 +36,21 @@ int** glassMap;
 Key key{};
 HealthPack hp;
 
+int keyCountLevel0 = 0;
 int keyCountLevel1 = 0;
 int keyCountLevel2 = 0;
 int finalDoorCount = 0;
+
+int healthCountLevel1 = 0;
+int healthCountLevel2 = 0;
+int healthCountLevel3 = 0;
+
+int rEnemyLevel1;
+int mEnemyLevel1;
+int rEnemyLevel2;
+int mEnemyLevel2;
+int rEnemyLevel3;
+int mEnemyLevel3;
 
 int tutDoorCount = 0, door1Count = 0, door2Count = 0, door3Count = 0;
 
@@ -60,12 +73,14 @@ int ImportMapDataFromFile(const char* FileName)
 	ifs >> BINARY_MAP_WIDTH;
 	ifs >> BINARY_MAP_HEIGHT;
 
+	OriginalMapData = new int* [BINARY_MAP_HEIGHT];
 	MapData = new int* [BINARY_MAP_HEIGHT];
 	BinaryCollisionArray = new int* [BINARY_MAP_HEIGHT];
 	glassMap = new int* [BINARY_MAP_HEIGHT];   // allocate glassMap rows
 
 	for (int row = 0; row < BINARY_MAP_HEIGHT; row++) {
 		MapData[row] = new int[BINARY_MAP_WIDTH];
+		OriginalMapData[row] = new int[BINARY_MAP_WIDTH];
 		BinaryCollisionArray[row] = new int[BINARY_MAP_WIDTH];
 		glassMap[row] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
 	}
@@ -75,7 +90,7 @@ int ImportMapDataFromFile(const char* FileName)
 			int value;
 			ifs >> value;
 			// assign random glass type if tile is "air"
-
+			OriginalMapData[row][col] = value;
 			MapData[row][col] = value;
 			// FOR BINARY COLLIISION
 			if (value / 10 == 1) {
@@ -95,17 +110,33 @@ int ImportMapDataFromFile(const char* FileName)
 				hp.size = (float)tileSize;
 				hp.active = true;
 				hp.collected = false;
+				if (currentGameLevel == 1) healthCountLevel1 = 1;
+				else if (currentGameLevel == 2) healthCountLevel2 = 1;
+				else healthCountLevel3 = 1;
 			}
 
 			// SAVING COORDINATES OF KEY
 			else if (value == 67) {
-				key.row = row;
-				key.col = col;
-				key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
-				key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
-				key.active = true;
-				if (currentGameLevel == 1) keyCountLevel1 = 1;
-				else if (currentGameLevel == 2) keyCountLevel2 = 1;
+				if ((currentGameLevel == 0 && keycardCollected0) ||
+					(currentGameLevel == 1 && keycardCollected1) ||
+					(currentGameLevel == 2 && keycardCollected2)) {
+
+					MapData[row][col] = 0;
+					BinaryCollisionArray[row][col] = 0;
+					key.active = false;
+				}
+				else {
+					// spawn key normally
+					key.row = row;
+					key.col = col;
+					key.worldX = (col * key.size + key.size / 2.f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
+					key.worldY = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * key.size + key.size / 2.0f);
+					key.active = true;
+
+					if (currentGameLevel == 0) keyCountLevel0 = 1;
+					else if (currentGameLevel == 1) keyCountLevel1 = 1;
+					else if (currentGameLevel == 2) keyCountLevel2 = 1;
+				}
 			}
 
 			// SAVING COORDINATES OF BROKEN DOOR
@@ -134,10 +165,16 @@ int ImportMapDataFromFile(const char* FileName)
 			else if (value == 81) {
 				enemy1X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				enemy1Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+				if (currentGameLevel == 1) rEnemyLevel1 = 1;
+				else if (currentGameLevel == 2) rEnemyLevel2 = 1;
+				else if (currentGameLevel == 3) rEnemyLevel3 = 1;
 			}
 			else if (value == 82) {
 				enemy2X = (col * tileSize + tileSize / 2.0f) - static_cast<f32>(AEGfxGetWindowWidth() / 2);
 				enemy2Y = static_cast<f32>(AEGfxGetWindowHeight() / 2) - (row * tileSize + tileSize / 2.0f);
+				if (currentGameLevel == 1) mEnemyLevel1 = 1;
+				else if (currentGameLevel == 2) mEnemyLevel2 = 1;
+				else if (currentGameLevel == 3) mEnemyLevel3 = 1;
 			}
 
 
@@ -185,10 +222,13 @@ void FreeMapData(void){
 		delete[] MapData[i];
 		delete[] BinaryCollisionArray[i];
 		delete[] glassMap[i];
+		delete[] OriginalMapData[i];
 	}
 	delete[] MapData;
 	delete[] BinaryCollisionArray;
 	delete[] glassMap;
+	delete[] OriginalMapData;
+	OriginalMapData = nullptr;
 	MapData = nullptr;
 	BinaryCollisionArray = nullptr;
 	glassMap = nullptr;
@@ -236,7 +276,15 @@ int ExportMapDataToFile(const char* FileName)
 		ofs << std::endl;
 	}
 	ofs.close();
-	std::cout << "Map succesfully exported to " << FileName << std::endl;
 	return 1;
 
 }
+
+void ResetMapData() {
+	for (int row = 0; row < BINARY_MAP_HEIGHT; ++row) {
+		for (int col = 0; col < BINARY_MAP_WIDTH; ++col) {
+			MapData[row][col] = OriginalMapData[row][col];
+		}
+	}
+}
+

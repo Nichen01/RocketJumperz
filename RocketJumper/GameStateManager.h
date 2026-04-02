@@ -1,16 +1,16 @@
 /* Start Header ************************************************************************/
 /*!
-\file	GameStateManager.h
-\author Chan Joraye, c.joraye, 2503791
-\par	c.joraye@digipen.edu
-\date	18/1/26
-\brief	This file declares the function in GameStateManager.c
-Copyright (C) 20xx DigiPen Institute of Technology.
+\file		  GameStateList.h
+\date         April, 01, 2026
+\brief        File that manages the different game states
+
+Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
 without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
-/* End Header **************************************************************************/\
+/* End Header **************************************************************************/
+
 #include "pch.h"
 #include "MainMenu.h"
 #include "GameStateList.h"

@@ -1,3 +1,19 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Load.h
+\date         April, 01, 2026
+\brief        Header file for the asset loading system.
+			  Declares global texture and mesh pointers used throughout the game,
+			  and provides function prototypes within the load namespace to
+			  initialize and manage these assets (platforms, UI, traps, inventory,
+			  backgrounds, etc.).
+
+			  Copyright (C) 2026 DigiPen Institute of Technology.
+			  Reproduction or disclosure of this file or its contents
+			  without the prior written consent of DigiPen Institute of
+			  Technology is prohibited.
+
+/* End Header **************************************************************************/
 #pragma once
 #include "AEEngine.h" 
 
@@ -29,6 +45,8 @@ extern AEGfxTexture* borderTL, * borderT, * borderTR;
 extern AEGfxTexture* borderCL, * borderCR;
 extern AEGfxTexture* borderBL, * borderB, * borderBR;
 extern AEGfxTexture* staticDoor;
+extern AEGfxTexture* padlock;
+extern AEGfxTexture* setting;
 
 extern int keyX, keyY;
 extern int brokenDoorX, brokenDoorY;
@@ -37,7 +55,6 @@ namespace load {
 	void platform();
 	void ui();
 	void key();
-	void errorPrompt();
 	void redButtonOption();
 	void greenButtonOption();
 	void brokenDoor();
@@ -46,5 +63,4 @@ namespace load {
 	void pauseMenu();
 	void background();
 	void background2();
-
 }

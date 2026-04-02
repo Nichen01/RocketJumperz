@@ -3,6 +3,7 @@
 #include "Level3.h"
 #include "ParticleSystem.h"
 #include "traps.h"
+#include "InstructionsMenu.h"
 
 static s32* map = nullptr;
 static int x;
@@ -58,11 +59,16 @@ static bool keycardCollectedAudio = false;
 
 //static int doorState = 0;
 
+//bool for checking if player previously cleared level
+extern bool prevCleared3 = 0;
+
 // Note: characterPictest, base5test, and pMesh are defined in draw.cpp. access them through draw.h
 
 void Level3_Load()
 {
 	audio::loadsound();
+
+	InstructionsMenu::Load();
 
 	// Load wire item texture (world drop) and wire inventory textures
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
@@ -149,6 +155,8 @@ void Level3_Load()
 
 void Level3_Initialize()
 {
+	InstructionsMenu::Init();
+
 	characterPictest = AssetManager::GetTexture(TEX_PLAYER);
 	base5test = AssetManager::GetTexture(TEX_BASE5TEST);
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
@@ -213,8 +221,13 @@ void Level3_Initialize()
 	objectinfo3[player].xScale = PlayerScale;
 	objectinfo3[player].yScale = PlayerScale;
 
-	// Initialize player health to 100 HP with no invincibility active
+	// Initialize player health from saved checkpoint (max on fresh game)
 	InitPlayerHealth(objectinfo3[player]);
+	objectinfo3[player].health = savedHealth;
+
+	// Load saved checkpoint stats so progress from previous levels is preserved
+	movement::bulletCount = savedAmmo;
+	wireCount             = savedWireCount;
 
 	// Start with the plasma gun equipped (default weapon)
 	objectinfo3[player].currentWeapon = WEAPON_PLASMA;
@@ -225,8 +238,10 @@ void Level3_Initialize()
 	projectileSystem::initProjectiles(enemyProjectiles, MAX_PROJECTILES);
 
 	// SPAWN test enemies
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
-	enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
+	if (!prevCleared3) {
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_MELEE, enemy2X, enemy2Y);
+		enemySystem::spawnEnemy(enemies, MAX_ENEMIES, ENEMY_RANGED, enemy1X, enemy1Y);
+	}
 
 	//MUSHROOM ANIM TEST
 	AssetManager::BuildSqrMesh(MESH_MELEE_ENEMY, 2, 3);
@@ -272,6 +287,9 @@ void Level3_Initialize()
 
 void Level3_Update()
 {
+	// If the instructions overlay is open, skip all gameplay logic (pause)
+	if (InstructionsMenu::Update()) return;
+
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		level = 3;
@@ -329,8 +347,8 @@ void Level3_Update()
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
 	// Fire using the currently equipped weapon (toggled with Q)
-	if (movement::bulletCount) {
-		if (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN) {
+	if (movement::bulletCount>0) {
+		if (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN && movement::bulletCount > 2) {
 			// Shotgun: 5-pellet cone spread
 			projectileSystem::FireShotgun(
 				static_cast<s32>(worldMouseX),
@@ -341,7 +359,7 @@ void Level3_Update()
 				LaserBlast,
 				soundEffects);
 		}
-		else {
+		else if(objectinfo3[player].currentWeapon != WEAPON_SHOTGUN) {
 			// Plasma (default): single shot toward mouse
 			projectileSystem::fireProjectiles(
 				static_cast<s32>(worldMouseX),
@@ -372,7 +390,7 @@ void Level3_Update()
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
 		objectinfo3[player], L3Drop,
 		enemyProjectiles, MAX_PROJECTILES,
-		dt, LaserBlast, soundEffects,
+		dt, LaserBlast, soundEffects, prevCleared3,
 		wireDrops, MAX_ENEMIES);
 
 	// Update enemy projectiles
@@ -459,6 +477,12 @@ void Level3_Update()
 				}
 				else {
 					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+
+					// Save current stats as a checkpoint before leaving the level
+					savedAmmo      = movement::bulletCount;
+					savedWireCount = wireCount;
+					savedHealth    = objectinfo3[player].health;
+
 					playerEnteredDoorId = door.id; // remember which door was used
 					switch (toLevel) {
 					case 0: next = GS_TUTORIAL; break;
@@ -719,6 +743,10 @@ void Level3_Draw()
 	if (playerNearBrokenDoor) {
 		renderlogic::flashingTexture(finalDoor.worldX, finalDoor.worldY + 60.f, eButton, 50.f);
 	}
+
+	// Draw the "?" icon (or the full overlay if it is open) on top of everything
+	InstructionsMenu::Draw();
+	traps::drawTraps();
 }
 
 void Level3_Free()
@@ -736,6 +764,8 @@ void Level3_Free()
 
 void Level3_Unload()
 {
+	InstructionsMenu::Unload();
+
 	// Unload all AssetManager-tracked textures (auto-nulls internal sTextures[]).
 	AssetManager::UnloadAllTextures();
 

@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file		Draw.h
+\author 	Chan Joraye (c.joraye), Ivan Chong (i.chong)
+\date   	April, 01, 2026
+\brief		Header file for the functions to render different types of assets
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "pch.h"
 #include "AEEngine.h"
@@ -18,6 +32,7 @@ namespace renderlogic {
 	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
 	void drawWireInventory(int);
 	void drawCooldownHUD(f32, f32);
+	void drawPadlock(f32, f32);
 }
 
 // Declare these as extern - they will be defined in Level1.cpp

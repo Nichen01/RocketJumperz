@@ -96,8 +96,6 @@ enum TextureID {
     // Key texture
     TEX_KEYCARD,
 
-    // Error prompt
-    TEX_ERRORPROMPT,
     TEX_REDBUTTON,
     TEX_GREENBUTTON,
 
@@ -138,6 +136,7 @@ enum TextureID {
     TEX_COOLDOWNBAR4,
     TEX_COOLDOWNBAR5,
 
+    TEX_PADLOCK,
     TEX_MENU,
     TEX_BUTTON,
 
@@ -151,8 +150,13 @@ enum TextureID {
     // Instructions menu full-screen image
     TEX_INSTRUCTIONS_MENU,
 
+    // "?" icon shown in gameplay HUD (opens instructions overlay)
+    TEX_INSTRUCTIONS_ICON,
+
     // Health pack drop
     TEX_HEALTH,
+
+    TEX_SETTINGS,
 
     // Background wall tile (non-collidable, drawn over glass)
     TEX_WALL_BG_1,

@@ -1,3 +1,19 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  LevelEditor.h
+\date         April, 01, 2026
+\brief        Header file for the Level Editor system. 
+			  Defines core data structures for editor actions and UI buttons, 
+			  and declares lifecycle functions (load, initialize, update, draw, free, unload) 
+			  used to manage the Level Editor within the game.
+			  
+			  Copyright (C) 2026 DigiPen Institute of Technology.
+			  Reproduction or disclosure of this file or its contents
+			  without the prior written consent of DigiPen Institute of
+			  Technology is prohibited.
+
+/* End Header **************************************************************************/
+
 #pragma once
 #include "pch.h"
 #include <vector>
@@ -25,6 +41,25 @@ struct doorButton {
 	const char* text;
 	bool isHovered;
 	int id;
+};
+
+struct errorPromptButton {
+	f32 x = 0.f, y = -100.f; // position
+	f32 width = 220.f, height = 80.f; // size
+	f32 scale = 1.0f; // current scale
+	f32 targetScale;
+	const char* text = "CLOSE"; // button label
+	bool isHovered = false; // hover state
+	int id;
+};
+
+struct resetButton {
+	f32 x = 620.f, y = -380.f;
+	f32 width = 313.5f, height = 88.f;
+	f32 scale = 1.0f;
+	f32 targetScale;
+	const char* text = "RESET LEVEL";
+	bool isHovered = false;
 };
 
 void LevelEditor_Load();
