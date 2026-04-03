@@ -123,8 +123,6 @@ void ParticleSystem::Emit(const EmitterProps& props) {
             // exhaust) look exactly the same as before this change.
             p.r = 1.0f; p.g = 0.7f; p.b = 0.2f;
         }
-        p.a = 1.0f; // Fully opaque at spawn
-
         ++spawned;
     }
 }

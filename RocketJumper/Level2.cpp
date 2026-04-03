@@ -276,6 +276,9 @@ void Level2_Initialize()
 	pickup::ResetWireDropTracker();
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
+	// Ammo pool: spawns 80px to the right of the player's start position
+	pickup::InitAmmoPool(objectinfo2[player].xPos + 80.0f, objectinfo2[player].yPos, 60.0f);
+
 	traps::initTraps();
 
 }
@@ -327,6 +330,7 @@ void Level2_Update()
 	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo2[player]);
+	pickup::UpdateAmmoPool(objectinfo2[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -575,6 +579,7 @@ void Level2_Draw()
 
 	pickup::drawDrops(L2Drop, MAX_ENEMIES);
 	pickup::DrawWireDrops(wireDrops, MAX_ENEMIES);
+	pickup::DrawAmmoPool();
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player

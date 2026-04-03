@@ -25,7 +25,7 @@ struct Particle {
     float lifetime;     // remaining seconds before this particle dies
     float maxLifetime;  // original lifetime (used to compute fade alpha)
     float scale;        // render size in world units
-    float r, g, b, a;  // per-particle colour (set at spawn time)
+    float r, g, b;      // per-particle colour (set at spawn time)
     bool  isActive;     // true = alive and updating, false = free slot
 };
 

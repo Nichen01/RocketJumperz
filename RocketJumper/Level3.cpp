@@ -265,6 +265,9 @@ void Level3_Initialize()
 	pickup::ResetWireDropTracker();
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
+	// Ammo pool: spawns 80px to the right of the player's start position
+	pickup::InitAmmoPool(objectinfo3[player].xPos - 80.0f, objectinfo3[player].yPos, 60.0f);
+
 	for (int row = 0; row < y; ++row) {
 		for (int col = 0; col < x; ++col) {
 			int tile = BinaryCollisionArray[row][col];
@@ -329,6 +332,7 @@ void Level3_Update()
 	weaponSprite::Update(objectinfo3[player]);
 	pickup::updateDrops(L3Drop, MAX_ENEMIES, objectinfo3[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo3[player]);
+	pickup::UpdateAmmoPool(objectinfo3[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -610,6 +614,7 @@ void Level3_Draw()
 
 	pickup::drawDrops(L3Drop, MAX_ENEMIES);
 	pickup::DrawWireDrops(wireDrops, MAX_ENEMIES);
+	pickup::DrawAmmoPool();
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player

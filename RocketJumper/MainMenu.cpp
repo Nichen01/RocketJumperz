@@ -346,7 +346,7 @@ void UpdateMainMenu() {
             doorState = 0;             // Reset Final Door
 
             // Reset checkpoint variables so a new game starts fresh
-            savedAmmo      = 500;
+            savedAmmo      = 50;
             savedWireCount = 0;
             savedHealth    = 1000;
 
