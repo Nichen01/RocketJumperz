@@ -26,7 +26,7 @@ namespace renderlogic {
 	void drawSquare(f32 xPos, f32 yPos, f32 xsize, f32 ysize);
 	void drawMapWallFloor(int map[], int mapX, int mapY, int mapS);
 	void drawTileArray();
-	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX = 80.f, f32 scaleY = 80.f);
+	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX = 80.f, f32 scaleY = 80.f, f32 rot = 0.0f);
 	void flashingTexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);
 	void drawGlass(int row, int col, int mapS, AEGfxVertexList* platformMesh);
 	void drawUITexture(f32 x, f32 y, AEGfxTexture* textureAsset, f32 scale);

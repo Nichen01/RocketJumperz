@@ -43,7 +43,7 @@ void DeathScreen_Load() {
     deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void DeathScreen_Init() {
-    AEAudioPlay(lose, bgm, 0.5f, 1.f, -1);
+    AEAudioPlay(lose, bgm, MainVolume, 1.f, -1);
 
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);

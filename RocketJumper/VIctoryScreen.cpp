@@ -40,7 +40,7 @@ void VictoryScreen_Load() {
     victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void VictoryScreen_Init() {
-    AEAudioPlay(win, bgm, 0.5f, 1.f, -1);
+    AEAudioPlay(win, bgm, MainVolume, 1.f, -1);
 
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);

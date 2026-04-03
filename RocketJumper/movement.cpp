@@ -120,12 +120,12 @@ namespace movement {
             jetPackCooldown--;
         }
 
-        // Toggle gravity with G -- play sound effect on each toggle
-        if (AEInputCheckTriggered(AEVK_G)) {
-            enableGravity = !enableGravity;
-            AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
-            printf("Gravity: %d\n", enableGravity);
-        }
+        //// Toggle gravity with G -- play sound effect on each toggle
+        //if (AEInputCheckTriggered(AEVK_G)) {
+        //    enableGravity = !enableGravity;
+        //    AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
+        //    printf("Gravity: %d\n", enableGravity);
+        //}
 
         // Toggle drag with D
         if (AEInputCheckTriggered(AEVK_D)) {

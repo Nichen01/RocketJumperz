@@ -173,7 +173,7 @@ void Level1_Initialize()
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	currentGameLevel = 1;
 
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level1_Load -- do NOT recreate here.
 	// Recreating would leak the previous font handle each time the level reinitializes.

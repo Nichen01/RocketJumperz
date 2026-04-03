@@ -260,8 +260,7 @@ void MainMenu_Load() {
 }
 
 void MainMenu_Init() {
-    AEAudioPlay(MainMenu, bgm, 0.5f, 1.f, -1);
-
+    AEAudioPlay(MainMenu, bgm, MainVolume,1.0f, -1);
     errorOverlayTex = AssetManager::GetTexture(TEX_BUTTON);
     setting = AssetManager::GetTexture(TEX_SETTINGS);
     
@@ -347,9 +346,9 @@ void UpdateMainMenu() {
             doorState = 0;             // Reset Final Door
 
             // Reset checkpoint variables so a new game starts fresh
-            savedAmmo      = 50;
+            savedAmmo      = 500;
             savedWireCount = 0;
-            savedHealth    = 100;
+            savedHealth    = 1000;
 
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");

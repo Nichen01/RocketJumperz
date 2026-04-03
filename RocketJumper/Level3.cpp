@@ -164,7 +164,7 @@ void Level3_Initialize()
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	currentGameLevel = 3;
 
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level3_Load -- do NOT recreate here.
 	// Recreating would leak the previous font handle each time the level reinitializes.
@@ -294,20 +294,6 @@ void Level3_Update()
 	if (AEInputCheckTriggered(AEVK_L)) {
 		level = 3;
 		next = GS_LEVELEDITOR;
-	}
-
-	//====== AUDIO CONTROLS ======//
-	if (AEInputCheckTriggered(AEVK_1)) {
-		bgVolume -= 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
-	if (AEInputCheckTriggered(AEVK_2)) {
-		bgVolume += 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
 
 	//=============== GET MOUSE INPUTS =====================//

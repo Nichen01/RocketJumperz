@@ -20,6 +20,7 @@ Technology is prohibited.
 #include "Drops.h"
 #include "InstructionsMenu.h"
 
+
 static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
@@ -106,7 +107,7 @@ void Tutorial_Initialize()
 	InstructionsMenu::Init();
 
 	currentGameLevel = 0;
-	AEAudioPlay(Level, bgm, 0.1f, 1.f, -1);
+	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);

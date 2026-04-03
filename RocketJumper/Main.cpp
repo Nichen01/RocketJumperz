@@ -14,7 +14,6 @@
 
 bool pause = false;
 bool canpause = true;
-f32 MainVolume = 1.0f;
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -31,7 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		return 0;
 	}
-	AESysSetFullScreen(1);
+	//AESysSetFullScreen(1);
 	// Using custom window procedure
 	//int gGameRunning = 1;
 

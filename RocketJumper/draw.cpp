@@ -301,11 +301,11 @@ namespace renderlogic {
 
 	}
 
-	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX, f32 scaleY) {
+	void drawTexture(f32 x, f32 y, AEGfxTexture* textureAsset, AEGfxVertexList* mesh, f32 scaleX, f32 scaleY,f32 rot) {
 		if (!textureAsset) return;
 		AEMtx33 uiScl, uiRot, uiTransl, uiTransf;
 		AEMtx33Scale(&uiScl, scaleX, scaleY);
-		AEMtx33Rot(&uiRot, 0);
+		AEMtx33Rot(&uiRot, rot);
 		
 		AEMtx33Trans(&uiTransl, x, y);
 		AEMtx33Concat(&uiTransf, &uiRot, &uiScl);

@@ -10,6 +10,7 @@ AEAudio GravityToggle;
 AEAudio MainMenu;
 AEAudioGroup bgm;
 AEAudioGroup soundEffects;
+f32 MainVolume = 1.0f;
 
 namespace audio {
 	void loadsound() {
@@ -33,6 +34,7 @@ namespace audio {
 	void audiolevel( f32 level) {
 		AEAudioSetGroupVolume(bgm, level);
 	}
+
 	void unloadsound() {
 		AEAudioUnloadAudio(Level);
 		AEAudioUnloadAudio(LaserBlast);
