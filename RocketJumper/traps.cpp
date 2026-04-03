@@ -23,7 +23,7 @@ namespace traps {
 
 	s8 trapDamage = 5;
 	s8 trapInstanceCooldown = 0;
-	s8 trapRange = 3;
+	s8 trapRange = 2;
 	bool nearTrap = 0;
 	AEVec2 nearestTrap = {};
 	f32 angle, tentacleMagnifier;
