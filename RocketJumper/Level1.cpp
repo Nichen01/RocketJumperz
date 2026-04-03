@@ -300,6 +300,9 @@ void Level1_Update()
 	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
 	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
 
+	//========== GRAVITY TOGGLE (LShift) ===============//
+	movement::UpdateGravityToggle();
+
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
 	movement::physicsInput(objectinfo1[player]);
@@ -695,19 +698,24 @@ void Level1_Draw()
 		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 100.f, 50.f);
 
 		// ---- Gravity indicator (top center) ----
-		// Text changes colour: Green when gravity is ON, Red when OFF
+		// Shows "Gravity: OFF | Timer: X.Xs" in red when disabled,
+		// or "Gravity: ON" in green when active.
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		if (movement::enableGravity) {
-			// Green text -- gravity is active
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
-		}
-		else {
-			// Red text -- gravity is disabled
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		{
+			char gravityBuf[64];
+			if (movement::isGravityDisabled) {
+				sprintf_s(gravityBuf, sizeof(gravityBuf),
+					"Gravity: OFF | Timer: %.1fs", movement::gravityTimer);
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel1, gravityBuf, -0.25f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+			}
+			else {
+				sprintf_s(gravityBuf, sizeof(gravityBuf), "Gravity: ON");
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel1, gravityBuf, -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+			}
 		}
 	}
 

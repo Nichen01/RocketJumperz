@@ -21,9 +21,26 @@ namespace movement {
     // Used by the HUD to display red/green gravity indicator.
     extern bool enableGravity;
 
+    // When true, gravity is temporarily disabled (toggled with LShift).
+    // Automatically reverts to false after the timer expires.
+    extern bool isGravityDisabled;
+
+    // Countdown timer (seconds) for the gravity-disable duration.
+    // Starts at 7.0f when LShift activates the disable; ticks down each frame.
+    extern f32 gravityTimer;
+
+    // Cooldown timer (seconds) after gravity auto-reverts.
+    // While > 0, the player cannot toggle gravity off with LShift again.
+    // Set to 3.0f when the gravityTimer expires; decremented each frame.
+    extern f32 gravityCooldown;
+
     // True when the player's aim direction points to the left (mouse is left of player).
     // Updated each frame by UpdatePlayerFacing(). Used by draw code to flip the sprite.
     extern bool playerFacingLeft;
+
+    // Handles LShift gravity-disable toggle and its countdown timer.
+    // Call once per frame in the level Update function.
+    void UpdateGravityToggle();
 
     // Initialize player velocities (call in Load)
     void initPlayerMovement(objectsquares& player);
