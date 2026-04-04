@@ -45,11 +45,9 @@ namespace audio {
 		soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
 	}
-	void audiolevel( f32 level) {
-		AEAudioSetGroupVolume(bgm, level);
-	}
 
 	void unloadsound() {
+		//unload sounds
 		AEAudioUnloadAudio(Level);
 		AEAudioUnloadAudio(LaserBlast);
 		AEAudioUnloadAudio(Punch);
