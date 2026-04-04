@@ -11,6 +11,7 @@ AEAudio MainMenu;
 AEAudioGroup bgm;
 AEAudioGroup soundEffects;
 f32 MainVolume = 1.0f;
+s8 sCount = 10;
 
 namespace audio {
 	void loadsound() {

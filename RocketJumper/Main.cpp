@@ -97,7 +97,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				
 
 				if (!pause) {
-					audio::audiolevel(MainVolume);
 					fpUpdate();
 				}
 

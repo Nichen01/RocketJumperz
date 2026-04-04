@@ -2,6 +2,7 @@
 #include "AEEngine.h"
 
 extern f32 MainVolume;
+extern s8 sCount;
 
 extern AEAudio Level;
 extern AEAudio LaserBlast;
