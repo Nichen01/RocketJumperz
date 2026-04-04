@@ -229,4 +229,67 @@ namespace pickup {
 		// Reset color state
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	}
+
+	// ====================================================================
+	// INFINITE AMMO POOL
+	// ====================================================================
+
+	InfiniteAmmoPool ammoPool;
+
+	// Set position and scale; starts inactive until player runs out of ammo.
+	void InitAmmoPool(f32 spawnX, f32 spawnY, f32 scale)
+	{
+		ammoPool.shape.xPos   = spawnX;
+		ammoPool.shape.yPos   = spawnY;
+		ammoPool.shape.xScale = scale;
+		ammoPool.shape.yScale = scale;
+		ammoPool.isActive     = false;
+	}
+
+	// Activate when bulletCount hits 0; on collision, refill ammo.
+	void UpdateAmmoPool(objectsquares& player)
+	{
+		// Show the pool once the player is out of ammo
+		if (movement::bulletCount <= 0)
+			ammoPool.isActive = true;
+
+		if (!ammoPool.isActive)
+			return;
+
+		// Check overlap with the player
+		if (gamelogic::static_collision(&player, &ammoPool.shape))
+		{
+			movement::bulletCount = 50;
+			ammoPool.isActive = false;
+			AEAudioPlay(Pickup, soundEffects, 1.0f, 1.0f, 0);
+		}
+	}
+
+	// Draw the ammo pool with a vertical bob when active.
+	void DrawAmmoPool()
+	{
+		if (!ammoPool.isActive)
+			return;
+
+		static f32 bobTimer = 0.0f;
+		bobTimer += static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+		f32 yOffset = sinf(bobTimer * 1.0f * 2.0f * kPi) * 5.0f;
+
+		AEGfxTexture* ammoTex = AssetManager::GetTexture(TEX_DROP);
+		if (!ammoTex) return;
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxTextureSet(ammoTex, 0.0f, 0.0f);
+
+		renderlogic::drawSquare(
+			ammoPool.shape.xPos,
+			ammoPool.shape.yPos + yOffset,
+			ammoPool.shape.xScale,
+			ammoPool.shape.yScale);
+		AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	}
 }

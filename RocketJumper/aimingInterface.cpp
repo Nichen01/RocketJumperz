@@ -5,7 +5,7 @@ namespace aiming {
 	AEGfxTexture* aimingInterface = nullptr;
 	s8 pFont = 0;
 	void loadAiming() {
-		aimingInterface = AEGfxTextureLoad("Assets/aim.png");
+		aimingInterface = AEGfxTextureLoad("Assets/UI/aim.png");
 		if (!aimingInterface)  printf("\ntexture failed\n"); 
 		pFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 48);
 		if (!pFont) printf("\nfont failed\n");

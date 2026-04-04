@@ -34,7 +34,7 @@ void DeathScreen_Load() {
     load::pauseMenu();
 
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
-    backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
+    backgroundTexture = AEGfxTextureLoad("Assets/UI/MainMenu.png");
 
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
@@ -43,7 +43,7 @@ void DeathScreen_Load() {
     deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void DeathScreen_Init() {
-    AEAudioPlay(lose, bgm, 0.5f, 1.f, 0);
+    AEAudioPlay(lose, bgm, MainVolume, 1.f, -1);
 
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);

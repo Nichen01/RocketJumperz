@@ -52,4 +52,19 @@ namespace pickup {
 	// Call in Level Initialize to reset the per-level kill tracker
 	// so the first/second-kill guarantee logic starts fresh.
 	void ResetWireDropTracker();
+
+	// ---- Infinite Ammo Pool ----
+	// Spawns beside the level door when the player runs out of ammo.
+	// Picking it up restores bulletCount to 50.
+
+	struct InfiniteAmmoPool {
+		objectsquares shape;
+		bool isActive;
+	};
+
+	extern InfiniteAmmoPool ammoPool;
+
+	void InitAmmoPool(f32 spawnX, f32 spawnY, f32 scale);
+	void UpdateAmmoPool(objectsquares& player);
+	void DrawAmmoPool();
 }

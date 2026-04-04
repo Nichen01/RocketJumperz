@@ -81,12 +81,12 @@ void Level3_Load()
 	load::background();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/Enemy/Character.png");
 	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/Enemy/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/Platform/DoorOpen.png");
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/Enemy/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 
 	// Ranged enemy state spritesheets (1 row each, variable columns)
@@ -164,7 +164,7 @@ void Level3_Initialize()
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	currentGameLevel = 3;
 
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level3_Load -- do NOT recreate here.
 	// Recreating would leak the previous font handle each time the level reinitializes.
@@ -265,6 +265,9 @@ void Level3_Initialize()
 	pickup::ResetWireDropTracker();
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
+	// Ammo pool: spawns 80px to the right of the player's start position
+	pickup::InitAmmoPool(objectinfo3[player].xPos - 80.0f, objectinfo3[player].yPos, 60.0f);
+
 	for (int row = 0; row < y; ++row) {
 		for (int col = 0; col < x; ++col) {
 			int tile = BinaryCollisionArray[row][col];
@@ -294,20 +297,6 @@ void Level3_Update()
 	if (AEInputCheckTriggered(AEVK_L)) {
 		level = 3;
 		next = GS_LEVELEDITOR;
-	}
-
-	//====== AUDIO CONTROLS ======//
-	if (AEInputCheckTriggered(AEVK_1)) {
-		bgVolume -= 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
-	if (AEInputCheckTriggered(AEVK_2)) {
-		bgVolume += 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
 	}
 
 	//=============== GET MOUSE INPUTS =====================//
@@ -343,6 +332,7 @@ void Level3_Update()
 	weaponSprite::Update(objectinfo3[player]);
 	pickup::updateDrops(L3Drop, MAX_ENEMIES, objectinfo3[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo3[player]);
+	pickup::UpdateAmmoPool(objectinfo3[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -624,6 +614,7 @@ void Level3_Draw()
 
 	pickup::drawDrops(L3Drop, MAX_ENEMIES);
 	pickup::DrawWireDrops(wireDrops, MAX_ENEMIES);
+	pickup::DrawAmmoPool();
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player

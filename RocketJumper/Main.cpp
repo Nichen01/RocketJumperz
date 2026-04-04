@@ -14,7 +14,6 @@
 
 bool pause = false;
 bool canpause = true;
-f32 MainVolume = 1.0f;
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -42,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 	printf("Team project test\n");
 	
-	GSM_Initialize(GS_SPLASH);
+	GSM_Initialize(GS_MAINMENU);
 
 	while (current != GS_QUIT)
 	{

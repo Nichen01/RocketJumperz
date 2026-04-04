@@ -48,7 +48,7 @@ namespace InstructionsMenu {
 // =========================================================================
 void Load() {
     // Load the full-screen instructions image
-    AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/instructionsMenu.png");
+    AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/UI/instructionsMenu.png");
 
     // Load the "?" icon texture
     AssetManager::LoadTexture(TEX_INSTRUCTIONS_ICON, "Assets/UI/Menus/settings.png");

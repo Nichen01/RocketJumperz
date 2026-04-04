@@ -80,12 +80,12 @@ void Level1_Load()
 	AssetManager::LoadTexture(TEX_WIRE, "Assets/Items/wire.png");
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/Enemy/Character.png");
 	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/Enemy/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/Platform/DoorOpen.png");
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/Enemy/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 
 	// Ranged enemy state spritesheets (1 row each, variable columns)
@@ -173,7 +173,7 @@ void Level1_Initialize()
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	currentGameLevel = 1;
 
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level1_Load -- do NOT recreate here.
 	// Recreating would leak the previous font handle each time the level reinitializes.
@@ -277,6 +277,9 @@ void Level1_Initialize()
 	pickup::ResetWireDropTracker();
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
+	// Ammo pool: spawns 80px to the right of the player's start position
+	pickup::InitAmmoPool(objectinfo1[player].xPos - 80.0f, objectinfo1[player].yPos, 60.0f);
+
 	traps::initTraps();
 }
 
@@ -300,6 +303,9 @@ void Level1_Update()
 	// Convert screen coordinates to world coordinates
 	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
 	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	//========== GRAVITY TOGGLE (LShift) ===============//
+	movement::UpdateGravityToggle();
 
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
@@ -326,6 +332,7 @@ void Level1_Update()
 	weaponSprite::Update(objectinfo1[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo1[player]);
+	pickup::UpdateAmmoPool(objectinfo1[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -585,6 +592,7 @@ void Level1_Draw()
 
 	pickup::drawDrops(L1Drop, MAX_ENEMIES);
 	pickup::DrawWireDrops(wireDrops, MAX_ENEMIES);
+	pickup::DrawAmmoPool();
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
@@ -696,19 +704,24 @@ void Level1_Draw()
 		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 100.f, 50.f);
 
 		// ---- Gravity indicator (top center) ----
-		// Text changes colour: Green when gravity is ON, Red when OFF
+		// Shows "Gravity: OFF | Timer: X.Xs" in red when disabled,
+		// or "Gravity: ON" in green when active.
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		if (movement::enableGravity) {
-			// Green text -- gravity is active
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
-		}
-		else {
-			// Red text -- gravity is disabled
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		{
+			char gravityBuf[64];
+			if (movement::isGravityDisabled) {
+				sprintf_s(gravityBuf, sizeof(gravityBuf),
+					"Gravity: OFF | Timer: %.1fs", movement::gravityTimer);
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel1, gravityBuf, -0.25f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+			}
+			else {
+				sprintf_s(gravityBuf, sizeof(gravityBuf), "Gravity: ON");
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel1, gravityBuf, -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+			}
 		}
 	}
 

@@ -61,8 +61,8 @@ namespace load {
 		AssetManager::LoadTexture(TEX_GLASS4, "Assets/Platform/glass4.jpg");
 		AssetManager::LoadTexture(TEX_SAW, "Assets/Items/saw.png");
 		AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
-		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/tentacle.png");
-		AssetManager::LoadTexture(TEX_DROP, "Assets/bullets.png");
+		AssetManager::LoadTexture(TEX_TRAPBEAM, "Assets/Enemy/tentacle.png");
+		AssetManager::LoadTexture(TEX_DROP, "Assets/Items/bullets.png");
 		AssetManager::LoadTexture(TEX_HEALTH, "Assets/Items/health.png");
 
 		// Saw trap spritesheet (1 row, 7 cols spinning saw blade)

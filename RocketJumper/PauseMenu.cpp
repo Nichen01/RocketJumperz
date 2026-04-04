@@ -1,5 +1,6 @@
 #include "PauseMenu.h"
 #include "Draw.h"
+#include "Sound.h"
 #include "Main.h"
 #include "Confirmation.h"
 
@@ -13,6 +14,8 @@ static MenuButton exitButton;
 static MenuButton tomenuButton;
 static MenuButton yesButton;
 static MenuButton noButton;
+
+AEGfxTexture* sCounttex;
 static s8 sCount;
 
 static bool destructive = false;
@@ -22,7 +25,7 @@ extern bool prevCleared1, prevCleared2, prevCleared3;
 void Pause_Load() {
 
 	load::pauseMenu();
-	
+	sCounttex = AEGfxTextureLoad("Assets/UI/Menus/greenButton.png");
 	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 
@@ -31,7 +34,7 @@ void Pause_Initialize() {
 	AssetManager::BuildSqrMesh(MESH_BUTTON);
 	buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
-	sCount = static_cast<int>(MainVolume * 10);
+	sCount = static_cast<s8>(MainVolume * 10.0f);
 
 	Confirmation_Init(yesButton,noButton);
 	float buttonwidth = 390.0f;
@@ -53,14 +56,16 @@ void Pause_Update() {
 	//====== AUDIO CONTROLS ======//
 	if (AEInputCheckTriggered(AEVK_1)) {
 		MainVolume -= 0.1f;
-		MainVolume = MainVolume <= 0.0f ? 0.0f : MainVolume;
 		--sCount;
+		MainVolume = MainVolume <= 0.f ? 0.0f : MainVolume;
+		sCount = sCount <= 0? 0:sCount ;
 		AEAudioSetGroupVolume(bgm, MainVolume);
 	}
 	if (AEInputCheckTriggered(AEVK_2)) {
 		MainVolume += 0.1f;
-		MainVolume = MainVolume >= 1.f ? 1.0f : MainVolume;
 		++sCount;
+		MainVolume = MainVolume >= 1.f ? 1.0f : MainVolume;
+		sCount = sCount >= 10 ? 10 : sCount;
 		AEAudioSetGroupVolume(bgm, MainVolume);
 	}
 
@@ -110,9 +115,11 @@ void Pause_Draw() {
 	MenuHelpers::TexdrawButton(resumeButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttonTex);
-	printf("%f,%d\n", MainVolume,sCount);
+
+	renderlogic::drawTexture(-400.f, 0.0f, buttonTex, buttonMesh, 640.0f, 150.0f,PI/2.0f);
+	printf("%d\n", sCount);
 	for (s8 i{}; i < sCount; ++i) {
-		renderlogic::drawTexture(-400.f, -400.f+(static_cast<f32>(i)*50), menuTex, buttonMesh, 50.f, 50.f);
+		renderlogic::drawTexture(-400.f, -250.f+(static_cast<f32>(i)*56), sCounttex, buttonMesh, 45.f, 45.f);
 	}
 
 	if (destructive) {
@@ -123,6 +130,10 @@ void Pause_Draw() {
 void Pause_Free() {
 
 	AssetManager::FreeAllMeshes();
+	if (sCounttex) {
+		AEGfxTextureUnload(sCounttex);
+		sCounttex = nullptr;
+	}
 }
 void Pause_Unload() {
 	AssetManager::UnloadAllTextures();

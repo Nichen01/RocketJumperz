@@ -82,12 +82,12 @@ void Level2_Load()
 	load::background2();
 
 	// Load textures via AssetManager (prevents duplicate loads across level reloads)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/Enemy/Character.png");
 	AssetManager::LoadTexture(TEX_BASE5TEST, "Assets/Base5.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/Enemy/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/Platform/DoorOpen.png");
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE_SHEET, "Assets/Enemy/MushroomIdle/MushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/Enemy/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_KEYCARD, "Assets/Items/keycard.png");
 
 	// Ranged enemy state spritesheets (1 row each, variable columns)
@@ -174,7 +174,7 @@ void Level2_Initialize()
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	currentGameLevel = 2;
 
-	AEAudioPlay(Level, bgm, 0.5f, 1.f, -1);
+	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level2_Load -- do NOT recreate here.
 	// Recreating would leak the previous font handle each time the level reinitializes.
@@ -276,6 +276,9 @@ void Level2_Initialize()
 	pickup::ResetWireDropTracker();
 	pickup::InitWireDrops(wireDrops, MAX_ENEMIES, PlayerScale);
 
+	// Ammo pool: spawns 80px to the right of the player's start position
+	pickup::InitAmmoPool(objectinfo2[player].xPos + 80.0f, objectinfo2[player].yPos, 60.0f);
+
 	traps::initTraps();
 
 }
@@ -292,19 +295,6 @@ void Level2_Update()
 		next = GS_LEVELEDITOR;
 	}
 
-	//====== AUDIO CONTROLS ======//
-	if (AEInputCheckTriggered(AEVK_1)) {
-		bgVolume -= 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
-	if (AEInputCheckTriggered(AEVK_2)) {
-		bgVolume += 0.1f;
-		if (bgVolume <= 0.f)
-			bgVolume = 0.f;
-		AEAudioSetGroupVolume(bgm, bgVolume);
-	}
 	//=============== GET MOUSE INPUTS =====================//
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -312,6 +302,9 @@ void Level2_Update()
 	// Convert screen coordinates to world coordinates
 	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
 	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	//========== GRAVITY TOGGLE (LShift) ===============//
+	movement::UpdateGravityToggle();
 
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
@@ -337,6 +330,7 @@ void Level2_Update()
 	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo2[player]);
+	pickup::UpdateAmmoPool(objectinfo2[player]);
 	//===================================================//
 
 	// ========== PROJECTILE SYSTEM UPDATE =============//
@@ -585,6 +579,7 @@ void Level2_Draw()
 
 	pickup::drawDrops(L2Drop, MAX_ENEMIES);
 	pickup::DrawWireDrops(wireDrops, MAX_ENEMIES);
+	pickup::DrawAmmoPool();
 
 	//====== PLAYER RENDER =========//
 	// Reset render state so leftover color tints from enemies/projectiles don't affect the player
@@ -679,13 +674,19 @@ void Level2_Draw()
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		if (movement::enableGravity) {
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel2, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
-		}
-		else {
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel2, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		{
+			char gravityBuf[64];
+			if (movement::isGravityDisabled) {
+				sprintf_s(gravityBuf, sizeof(gravityBuf),
+					"Gravity: OFF | Timer: %.1fs", movement::gravityTimer);
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel2, gravityBuf, -0.25f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+			}
+			else {
+				sprintf_s(gravityBuf, sizeof(gravityBuf), "Gravity: ON");
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel2, gravityBuf, -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+			}
 		}
 	}
 

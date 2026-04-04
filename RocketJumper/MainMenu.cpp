@@ -222,7 +222,7 @@ void MainMenu_Load() {
         printf("Warning: MainMenu.png not found. Using solid color background.\n");
     }
 
-    AssetManager::LoadTexture(TEX_TITLE, "Assets/Title.png");
+    AssetManager::LoadTexture(TEX_TITLE, "Assets/UI/Title.png");
     if (!AssetManager::GetTexture(TEX_TITLE)) {
         printf("Warning: Title.png not found. Title banner will not render.\n");
     }
@@ -251,7 +251,7 @@ void MainMenu_Load() {
     AssetManager::LoadTexture(TEX_MENU, "Assets/UI/Menus/Menu.png");
 
     // Instructions screen image (full panel showing controls / objectives)
-    AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/instructionsMenu.png");
+    AssetManager::LoadTexture(TEX_INSTRUCTIONS_MENU, "Assets/UI/instructionsMenu.png");
     if (!AssetManager::GetTexture(TEX_INSTRUCTIONS_MENU)) {
         printf("Warning: instructionsMenu.png not found. Instructions screen will fall back to text.\n");
     }
@@ -260,8 +260,7 @@ void MainMenu_Load() {
 }
 
 void MainMenu_Init() {
-    AEAudioPlay(MainMenu, bgm, 0.5f, 1.f, -1);
-
+    AEAudioPlay(MainMenu, bgm, MainVolume,1.0f, -1);
     errorOverlayTex = AssetManager::GetTexture(TEX_BUTTON);
     setting = AssetManager::GetTexture(TEX_SETTINGS);
     
@@ -349,7 +348,7 @@ void UpdateMainMenu() {
             // Reset checkpoint variables so a new game starts fresh
             savedAmmo      = 500 ;
             savedWireCount = 0;
-            savedHealth    = 1000;
+            savedHealth    = 150;
 
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");

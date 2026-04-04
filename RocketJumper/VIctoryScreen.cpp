@@ -30,7 +30,7 @@ void VictoryScreen_Load() {
 
     load::pauseMenu();
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
-    backgroundTexture = AEGfxTextureLoad("Assets/MainMenu.png");
+    backgroundTexture = AEGfxTextureLoad("Assets/UI/MainMenu.png");
 
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
@@ -39,7 +39,7 @@ void VictoryScreen_Load() {
     victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void VictoryScreen_Init() {
-    AEAudioPlay(win, bgm, 0.5f, 1.f, -1);
+    AEAudioPlay(win, bgm, MainVolume, 1.f, -1);
 
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);

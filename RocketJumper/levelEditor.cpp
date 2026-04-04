@@ -383,7 +383,7 @@ void LevelEditor_Load() {
 	AssetManager::LoadTexture(TEX_HEALTH, "Assets/Items/health.png");
 	AssetManager::LoadTexture(TEX_EYETRAP, "Assets/Items/eye.png");
 	AssetManager::LoadTexture(TEX_STATICSAW, "Assets/Traps/staticSaw.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/Enemy/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_MUSHROOM_IDLE0, "Assets/Enemy/MushroomIdle/mushroomIdle0.png");
 	AssetManager::LoadTexture(TEX_BORDER_TL, "Assets/Platform/borderTL.png");
 	AssetManager::LoadTexture(TEX_BORDER_T, "Assets/Platform/borderT.png");

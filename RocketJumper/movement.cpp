@@ -8,7 +8,7 @@ int totalFrame = 40;
 int numImages = 6;
 
 namespace movement {
-    // initialize the velocity 
+    // initialize the velocity
     bool enableGravity, enableDrag;
     u8 jetPackCooldown;
     s32 mouseX,mouseY;
@@ -16,6 +16,70 @@ namespace movement {
     AEVec2 directionVector;
     int bulletCount = 25;
     bool playerFacingLeft = false; // starts facing right
+
+    // LShift gravity-disable state -- when true, gravity is temporarily off
+    bool isGravityDisabled = false;
+    // Countdown in seconds; starts at 7.0 when the disable is activated
+    f32 gravityTimer = 0.0f;
+    // Cooldown after gravity auto-reverts; blocks LShift re-toggle while > 0
+    f32 gravityCooldown = 0.0f;
+
+    // ----------------------------------------------------------
+    // UpdateGravityToggle()
+    // Handles the LShift gravity-disable mechanic:
+    //   - Pressing LShift toggles isGravityDisabled on/off.
+    //   - When activated, a 7-second timer starts counting down.
+    //   - When the timer runs out, gravity re-enables automatically.
+    // Call once per frame in each level's Update function.
+    // ----------------------------------------------------------
+    void UpdateGravityToggle()
+    {
+        // Get how much time passed since the last frame (in seconds)
+        f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+        // Tick down the post-revert cooldown each frame
+        if (gravityCooldown > 0.0f)
+        {
+            gravityCooldown -= dt;
+        }
+
+        // LShift toggles the gravity-disable state
+        // Only allow toggling OFF if the cooldown has expired
+        if (AEInputCheckTriggered(AEVK_LSHIFT))
+        {
+            if (!isGravityDisabled && gravityCooldown <= 0.0f)
+            {
+                // Turn OFF gravity -- start the 7-second countdown
+                isGravityDisabled = true;
+                gravityTimer = 7.0f;
+                AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
+            }
+            else if (isGravityDisabled)
+            {
+                // Manually re-enabled gravity before the timer expired
+                // No cooldown penalty for manual re-enable
+                isGravityDisabled = false;
+                gravityTimer = 0.0f;
+                AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
+            }
+        }
+
+        // If gravity is disabled, tick down the timer each frame
+        if (isGravityDisabled)
+        {
+            gravityTimer -= dt;
+
+            // Timer expired -- automatically re-enable gravity and
+            // start a 3-second cooldown before LShift can be used again
+            if (gravityTimer <= 0.0f)
+            {
+                isGravityDisabled = false;
+                gravityTimer = 0.0f;
+                gravityCooldown = 3.0f;
+                AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
+            }
+        }
+    }
 
     void initPlayerMovement(objectsquares& player)
     {
@@ -56,12 +120,12 @@ namespace movement {
             jetPackCooldown--;
         }
 
-        // Toggle gravity with G -- play sound effect on each toggle
-        if (AEInputCheckTriggered(AEVK_G)) {
-            enableGravity = !enableGravity;
-            AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
-            printf("Gravity: %d\n", enableGravity);
-        }
+        //// Toggle gravity with G -- play sound effect on each toggle
+        //if (AEInputCheckTriggered(AEVK_G)) {
+        //    enableGravity = !enableGravity;
+        //    AEAudioPlay(GravityToggle, soundEffects, 1.0f, 1.0f, 0);
+        //    printf("Gravity: %d\n", enableGravity);
+        //}
 
         // Toggle drag with D
         if (AEInputCheckTriggered(AEVK_D)) {
@@ -155,7 +219,9 @@ namespace movement {
 
     void updatePlayerPhysics(objectsquares& player)
     {
-        if (enableGravity) {
+        // Only apply gravity when the standard toggle is on AND the
+        // temporary LShift disable is not active.
+        if (enableGravity && !isGravityDisabled) {
             player.velocityY -= GRAVITY;
         }
         // Apply drag to velocities (exponential decay)

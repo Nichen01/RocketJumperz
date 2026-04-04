@@ -20,6 +20,7 @@ Technology is prohibited.
 #include "Drops.h"
 #include "InstructionsMenu.h"
 
+
 static s32* map = nullptr;
 static int x = 16;
 static int y = 9;
@@ -70,11 +71,11 @@ void Tutorial_Load()
 	InstructionsMenu::Load();
 
 	// Load textures via AssetManager (enum-based IDs)
-	AssetManager::LoadTexture(TEX_PLAYER, "Assets/charactertest.png");
-	AssetManager::LoadTexture(TEX_PLASMA, "Assets/plasma.png");
-	AssetManager::LoadTexture(TEX_DOOR, "Assets/DoorOpen.png");
+	AssetManager::LoadTexture(TEX_PLAYER, "Assets/Enemy/Character.png");
+	AssetManager::LoadTexture(TEX_PLASMA, "Assets/Enemy/plasma.png");
+	AssetManager::LoadTexture(TEX_DOOR, "Assets/Platform/DoorOpen.png");
 	//AssetManager::LoadTexture(TEX_MELEE_ENEMY, "Assets/Enemy/MushroomIdle/mushroomIdle.png");
-	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/RangedEnemy.png");
+	AssetManager::LoadTexture(TEX_RANGED_ENEMY, "Assets/Enemy/RangedEnemy.png");
 	AssetManager::LoadTexture(TEX_RANGED_MOVE,   "Assets/Enemy/RangedMove.png");
 	AssetManager::LoadTexture(TEX_RANGED_ATTACK,  "Assets/Enemy/RangedAttack.png");
 	AssetManager::LoadTexture(TEX_RANGED_DEATH,   "Assets/Enemy/RangedDeath.png");
@@ -106,7 +107,7 @@ void Tutorial_Initialize()
 	InstructionsMenu::Init();
 
 	currentGameLevel = 0;
-	AEAudioPlay(Level, bgm, 0.1f, 1.f, -1);
+	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);
@@ -223,6 +224,9 @@ void Tutorial_Update()
 	// Convert screen coordinates to world coordinates
 	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
 	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	//========== GRAVITY TOGGLE (LShift) ===============//
+	movement::UpdateGravityToggle();
 
 	//========== JETPACK MOVEMENT SYSTEM ===============//
 	//Apply thrust when spacebar is pressed
@@ -408,28 +412,28 @@ void Tutorial_Draw()
 	f32 textWidth, textHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.6f, &textWidth, &textHeight);
 	sprintf_s(strBuffer, "Left Click to Shoot");
-	AEGfxPrint(font, strBuffer, 0.52f, -0.6f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.52f, -0.6f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "towards Mouse Cursor");
-	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "Right Click to Advance");
-	AEGfxPrint(font, strBuffer, 0.f, -0.6f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.f, -0.6f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "towards Mouse Cursor");
-	AEGfxPrint(font, strBuffer, 0.f, -0.67f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.f, -0.67f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "Spacebar to Jump");
-	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "G To Toggle Gravity");
-	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "Q to Switch Weapon");
-	AEGfxPrint(font, strBuffer, -0.7f, -0.65f, 0.6f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.65f, 0.6f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "E to Enter");
-	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
@@ -556,19 +560,22 @@ void Tutorial_Draw()
 		renderlogic::drawTexture(weaponIconX, weaponIconY, weaponIcon, uiMesh, 100.f, 50.f);
 
 		// ---- Gravity indicator (top center) ----
-		// Text changes colour: Green when gravity is ON, Red when OFF
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		if (movement::enableGravity) {
-			// Green text -- gravity is active
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
-		}
-		else {
-			// Red text -- gravity is disabled
-			AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-			AEGfxPrint(fontLevel1, "Gravity", -0.12f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+		{
+			char gravityBuf[64];
+			if (movement::isGravityDisabled) {
+				sprintf_s(gravityBuf, sizeof(gravityBuf),
+					"Gravity: OFF | Timer: %.1fs", movement::gravityTimer);
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel1, gravityBuf, -0.25f, 0.90f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f);
+			}
+			else {
+				sprintf_s(gravityBuf, sizeof(gravityBuf), "Gravity: ON");
+				AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+				AEGfxPrint(fontLevel1, gravityBuf, -0.12f, 0.90f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f);
+			}
 		}
 	}
 	

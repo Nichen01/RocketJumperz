@@ -1,7 +1,7 @@
 #pragma once
 #include "AEEngine.h"
 
-
+extern f32 MainVolume;
 
 extern AEAudio Level;
 extern AEAudio LaserBlast;

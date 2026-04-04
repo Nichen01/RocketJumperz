@@ -5,7 +5,7 @@
 
 namespace traps {
 	constexpr s8 trapCooldown = 2;
-	constexpr f32 trapSuction = 0.7f;
+	constexpr f32 trapSuction = 0.55f;
 
 	// Saw animation state -- shared across all saw trap tiles (they all spin in sync)
 	extern SpriteAnimation sawAnim;

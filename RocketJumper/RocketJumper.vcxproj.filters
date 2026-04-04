@@ -10,40 +10,22 @@
     <ClCompile Include="Collision.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="DeathScreen.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="DoorSystem.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Drops.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Gameover.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenu.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Movement.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="PauseMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Projectile.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="SplashScreen.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="VictoryScreen.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="WeaponSprite.cpp">
@@ -94,11 +76,29 @@
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
+    <ClCompile Include="DeathScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
     <ClCompile Include="Confirmation.cpp">
-      <Filter>Source</Filter>
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseMenu.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="SplashScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="VictoryScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameover.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="InstructionsMenu.cpp">
-      <Filter>Source</Filter>
+      <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Tutorial.cpp">
       <Filter>Levels</Filter>
@@ -213,9 +213,6 @@
     <ClInclude Include="Collision.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="DeathScreen.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="DoorSystem.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -294,10 +291,13 @@
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Confirmation.h">
+    <ClInclude Include="InstructionsMenu.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="InstructionsMenu.h">
+    <ClInclude Include="DeathScreen.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Confirmation.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -319,6 +319,9 @@
     </Filter>
     <Filter Include="Entities">
       <UniqueIdentifier>{3da6e690-b004-4460-8b61-b7c84ba2d804}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{dcd3ec47-8ae7-4f03-83be-49c417e4fe2c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

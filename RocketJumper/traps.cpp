@@ -13,14 +13,17 @@ static const int   kSawRows       = 1;
 static const int   kSawTotalFrames = 6;
 static const f32   kSawFrameDelay  = 0.08f; // ~12 fps spin speed
 
+
 namespace traps {
+	//for testing, compiles faster in cpp
+	//f32 trapSuction = 0.55f;
 
 	// Saw animation instance -- all saw tiles share the same playback state
 	SpriteAnimation sawAnim;
 
 	s8 trapDamage = 5;
 	s8 trapInstanceCooldown = 0;
-	s8 trapRange = 3;
+	s8 trapRange = 2;
 	bool nearTrap = 0;
 	AEVec2 nearestTrap = {};
 	f32 angle, tentacleMagnifier;
@@ -58,7 +61,7 @@ namespace traps {
 		}
 		return temp;
 	}
-	void suckPlayer(objectsquares& player, AEVec2 trap,float s) {
+	void suckPlayer(objectsquares& player, AEVec2 trap) {
 		f32 dx = player.xPos - trap.x;
 		f32 dy = player.yPos - trap.y;
 		f32 dist = sqrtf(dx * dx + dy * dy);
@@ -77,7 +80,7 @@ namespace traps {
 		nearestTrap.x = gamelogic::index_to_posX(static_cast<f32>(nearestTrap.x + 0.5), s);
 		nearestTrap.y = gamelogic::index_to_posY(static_cast<f32>(nearestTrap.y + 0.5), s);
 		if (nearTrap) {
-			suckPlayer(objectinfo[player], nearestTrap, s);
+			suckPlayer(objectinfo[player], nearestTrap);
 			f32 relativeX = objectinfo[player].xPos - nearestTrap.x;
 			f32 relativeY = objectinfo[player].yPos - nearestTrap.y;
 
