@@ -1157,27 +1157,31 @@ void LevelEditor_Draw() {
 	renderlogic::drawTexture(650.f, -60.f, button1, uiMesh, 45.f, 50.f);
 	renderlogic::drawTexture(690.f, -60.f, button2, uiMesh, 45.f, 45.f);
 	renderlogic::drawTexture(730.f, -60.f, button3, uiMesh, 45.f, 45.f);
+	renderlogic::drawTexture(570.f, -210.f, lButton, uiMesh, 50.f, 50.f);
 
 	// UI TEXT
 	f32 uiTextWidth, uiTextHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.5f, &uiTextWidth, &uiTextHeight);
-	sprintf_s(strBuffer, "CTRL + Left Click to Set");
+	sprintf_s(strBuffer, "CTRL + Left Click - Set");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.76f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
-	sprintf_s(strBuffer, "Right Click to Clear");
+	sprintf_s(strBuffer, "Right Click - Clear");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.5f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
-	sprintf_s(strBuffer, "CTRL + S to Save");
+	sprintf_s(strBuffer, "CTRL + S - Save");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.25f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
-	sprintf_s(strBuffer, "CTRL + Z to Undo");
+	sprintf_s(strBuffer, "CTRL + Z - Undo");
 	AEGfxPrint(font, strBuffer, 0.67f, 0.f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "CTRL + (Number)");
 	AEGfxPrint(font, strBuffer, 0.67f, -0.3f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
-	sprintf_s(strBuffer, "for Level");
+	sprintf_s(strBuffer, "- Level");
 	AEGfxPrint(font, strBuffer, 0.67f, -0.35f, 0.4f, 1.f, 1.f, 1.f, 1.f);
+
+	sprintf_s(strBuffer, "L - Return to Level");
+	AEGfxPrint(font, strBuffer, 0.67f, -0.6f, 0.4f, 1.f, 1.f, 1.f, 1.f);
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_NONE);   // no blending, just solid fill

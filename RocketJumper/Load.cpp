@@ -13,7 +13,7 @@ AEGfxTexture* cooldownFrame[6] = { nullptr };
 	// different types of platforms
 	AEGfxTexture* platform1 = NULL, * platform2 = NULL, * platform3 = NULL, * platform4 = NULL, * platform5 = NULL, * platform6 = NULL, * platform7 = NULL, * platform8 = NULL, * platform9 = NULL;
 	AEGfxTexture* glass0 = NULL, * glass1 = NULL, * glass2 = NULL, * glass3 = NULL, * glass4 = NULL;
-	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, * sButton = NULL, *qButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
+	AEGfxTexture* ctrl1 = NULL, * ctrl2 = NULL, * leftArrow = NULL, * rightArrow = NULL, * leftClick = NULL, * rightClick = NULL,* eButton = NULL, * gButton = NULL, *lButton = NULL, * sButton = NULL, *qButton = NULL, * zButton = NULL, * button1 = NULL, * button2 = NULL, * button3 = NULL, * spacebar = NULL;
 	AEGfxTexture* eyeTrap = NULL, * sawTrap = NULL, * trapBeam = NULL;
 	AEGfxTexture* keyTexture = NULL;
 	AEGfxTexture* redButton = NULL, * greenButton = NULL;
@@ -123,6 +123,7 @@ namespace load {
 		AssetManager::LoadTexture(TEX_RIGHT_CLICK, "Assets/UI/rightClick.png");
 		AssetManager::LoadTexture(TEX_E_BUTTON, "Assets/UI/eButton.png");
 		AssetManager::LoadTexture(TEX_G_BUTTON, "Assets/UI/gButton.png");
+		AssetManager::LoadTexture(TEX_L_BUTTON, "Assets/UI/lButton.png");
 		AssetManager::LoadTexture(TEX_S_BUTTON, "Assets/UI/sButton.png");
 		AssetManager::LoadTexture(TEX_Q_BUTTON, "Assets/UI/qButton.png");
 		AssetManager::LoadTexture(TEX_Z_BUTTON, "Assets/UI/zButton.png");
@@ -145,6 +146,7 @@ namespace load {
 		rightClick = AssetManager::GetTexture(TEX_RIGHT_CLICK);
 		eButton = AssetManager::GetTexture(TEX_E_BUTTON);
 		gButton = AssetManager::GetTexture(TEX_G_BUTTON);
+		lButton = AssetManager::GetTexture(TEX_L_BUTTON);
 		sButton = AssetManager::GetTexture(TEX_S_BUTTON);
 		qButton = AssetManager::GetTexture(TEX_Q_BUTTON);
 		zButton = AssetManager::GetTexture(TEX_Z_BUTTON);
