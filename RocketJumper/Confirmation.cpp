@@ -53,7 +53,7 @@ void Confirmation_Draw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
 void fsDraw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     f32 width, height;
     AEGfxGetPrintSize(font, "RocketJumper is best experienced in", 1.f, &width, &height);
-    renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, 3*screenWidth/5, 640.f);
+    renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, static_cast<f32>(3*screenWidth/5), 640.f);
     AEGfxPrint(font, "RocketJumper is best experienced in ", -width / 2, 0.40f - height / 2, 1, 1, 1, 1, 1);
     AEGfxPrint(font, "fullscreen. Go into fullscreen mode?", -width / 2, 0.40f - 3*height / 2, 1, 1, 1, 1, 1);
 

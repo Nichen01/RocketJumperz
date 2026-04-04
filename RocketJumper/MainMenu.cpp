@@ -348,17 +348,12 @@ void UpdateMainMenu() {
         if (playButton.isHovered) {
             movement::bulletCount = 50;
             playerEnteredDoorId = -1;
-            wireCount = 2;             // Reset Wires
+            wireCount = 1;             // Reset Wires
             keycardCollected0 = false;  // Reset Keycard
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
             doorState = 0;             // Reset Final Door
-
-            // Reset checkpoint variables so a new game starts fresh
-            savedAmmo      = 500 ;
-            savedWireCount = 2;
-            savedHealth    = 1000;
 
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
