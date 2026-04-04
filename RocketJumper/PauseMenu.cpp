@@ -65,14 +65,14 @@ void Pause_Update() {
 	}
 
 	//====== AUDIO CONTROLS ======//
-	if (AEInputCheckTriggered(AEVK_1)) {
+	if (AEInputCheckTriggered(AEVK_MINUS)) {
 		MainVolume -= 0.1f;
 		--sCount;
 		MainVolume = MainVolume <= 0.f ? 0.0f : MainVolume;
 		sCount = sCount <= 0? 0:sCount ;
 		AEAudioSetGroupVolume(bgm, MainVolume);
 	}
-	if (AEInputCheckTriggered(AEVK_2)) {
+	if (AEInputCheckTriggered(AEVK_EQUAL)) {
 		MainVolume += 0.1f;
 		++sCount;
 		MainVolume = MainVolume >= 1.f ? 1.0f : MainVolume;
