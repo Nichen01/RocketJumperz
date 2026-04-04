@@ -355,6 +355,7 @@ static void drawResetTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 
 
 void LevelEditor_Load() {
 
+	currentGameLevel = 1;
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	load::ui();
@@ -430,7 +431,8 @@ void LevelEditor_Initialize() {
 
 	// To load the buttons for the door link
 	buttonArr.clear();
-	switch (level) {
+	std::cout << currentGameLevel;
+	switch (currentGameLevel) {
 		case 1: {
 			ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
 			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
