@@ -39,8 +39,6 @@ static AEGfxTexture* base5test = nullptr;
 // The active font handle is fontLevel1 (declared below), which is
 // created in Initialize and destroyed in Unload.
 
-// Sound and volume
-static f32 bgVolume = 1.f;
 
 // Door variables (doorX, doorY, doorAnim, doorMesh, doorIsOpen, doorTex)
 // are defined in draw.cpp and declared extern in draw.h.
@@ -172,7 +170,6 @@ void Level1_Initialize()
 	doorTex = AssetManager::GetTexture(TEX_DOOR);
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
 	currentGameLevel = 1;
-
 	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level1_Load -- do NOT recreate here.
@@ -206,7 +203,6 @@ void Level1_Initialize()
 			map[row * x + col] = BinaryCollisionArray[row][col];
 		}
 	}
-	PrintRetrievedInformation();
 	// Spawn player at the door they came from
 	bool spawnSet = false;
 	if (playerEnteredDoorId != -1) {
@@ -470,7 +466,7 @@ void Level1_Update()
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
 				else {
-					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+					int toLevel = 3;// (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
 
 					// Save current stats as a checkpoint before leaving the level
 					savedAmmo      = movement::bulletCount;

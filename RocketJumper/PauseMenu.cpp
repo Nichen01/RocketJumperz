@@ -36,6 +36,9 @@ void Pause_Initialize() {
 
 	sCount = static_cast<s8>(MainVolume * 10.0f);
 
+	printf("Mvol %f\n", MainVolume);
+	printf("sCount %d\n", sCount);
+
 	Confirmation_Init(yesButton,noButton);
 	float buttonwidth = 390.0f;
 	float buttonlength = 80.0f;
@@ -116,8 +119,9 @@ void Pause_Draw() {
 	MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, pausefont, buttonTex);
 	MenuHelpers::TexdrawButton(exitButton, buttonMesh, pausefont, buttonTex);
 
+	printf("Mvol %f\n", MainVolume);
+	printf("sCount %d\n", sCount);
 	renderlogic::drawTexture(-400.f, 0.0f, buttonTex, buttonMesh, 640.0f, 150.0f,PI/2.0f);
-	printf("%d\n", sCount);
 	for (s8 i{}; i < sCount; ++i) {
 		renderlogic::drawTexture(-400.f, -250.f+(static_cast<f32>(i)*56), sCounttex, buttonMesh, 45.f, 45.f);
 	}

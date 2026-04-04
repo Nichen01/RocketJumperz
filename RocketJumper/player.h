@@ -58,7 +58,7 @@ struct objectsquares {
 };
 
 // Maximum health the player can have
-constexpr int kPlayerMaxHealth    = 150;
+constexpr int kPlayerMaxHealth    = 1000;
 
 // How long the player is invincible after taking a hit (seconds)
 constexpr f32 kHitInvincibilityDuration = 0.5f;
