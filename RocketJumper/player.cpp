@@ -8,7 +8,7 @@ int wireCount = 0;
 // Saved at each level transition so the player keeps progress from prior levels.
 // Reset to defaults when starting a new game from the main menu.
 int savedWireCount  = 0;
-int savedAmmo       = 500;
+int savedAmmo       = 50;
 int savedHealth     = kPlayerMaxHealth;
 
 bool keycardCollected0 = false;

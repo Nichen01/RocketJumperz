@@ -348,7 +348,7 @@ void UpdateMainMenu() {
             // Reset checkpoint variables so a new game starts fresh
             savedAmmo      = 50;
             savedWireCount = 0;
-            savedHealth    = 1000;
+            savedHealth    = 150;
 
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
