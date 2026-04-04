@@ -48,6 +48,7 @@ enum TextureID {
     TEX_RIGHT_CLICK,
     TEX_E_BUTTON,
     TEX_G_BUTTON,
+    TEX_L_BUTTON,
     TEX_S_BUTTON,
     TEX_Q_BUTTON,
     TEX_Z_BUTTON,

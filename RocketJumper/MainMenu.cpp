@@ -64,6 +64,7 @@ static MenuButton settingBtn;
 static MenuButton backButton;
 
 static bool destructive = false;
+static bool fsPrompted=false;
 static s8 leave = 0;
 
 // Animation constants
@@ -308,6 +309,15 @@ void MainMenu_Init() {
 
 // ==================== UPDATE FUNCTIONS ========================================================================================
 void MainMenu_Update() {
+    if (!fsPrompted) {
+        s8 fsTemp;
+        Confirmation_Update(yesButton, noButton, fsTemp);
+        switch (fsTemp) {
+        case 1: AESysSetFullScreen(1);
+        case 2:fsPrompted = true; break;
+        }
+        return;
+    }
     switch (currentMenuState) {
     case MENU_MAIN:
         UpdateMainMenu();
@@ -430,7 +440,7 @@ void UpdateCreditsMenu() {
 void MainMenu_Draw() {
     // Draw background
     DrawBackground();
-
+    
     switch (currentMenuState) {
     case MENU_MAIN:
         DrawMainMenu();
@@ -441,6 +451,9 @@ void MainMenu_Draw() {
     case MENU_CREDITS:
         DrawCreditsMenu();
         break;
+    }
+    if (!fsPrompted) {
+        fsDraw(menuFont, yesButton, noButton);
     }
 }
 

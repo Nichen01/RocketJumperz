@@ -298,7 +298,7 @@ void Level3_Update()
 
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
-		level = 3;
+		currentGameLevel = 3;
 		next = GS_LEVELEDITOR;
 	}
 
