@@ -16,7 +16,6 @@ static MenuButton yesButton;
 static MenuButton noButton;
 
 AEGfxTexture* sCounttex;
-static s8 sCount;
 
 static bool destructive = false;
 static s8 leave = 0;
@@ -34,7 +33,6 @@ void Pause_Initialize() {
 	AssetManager::BuildSqrMesh(MESH_BUTTON);
 	buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
-	sCount = static_cast<s8>(MainVolume * 10.0f);
 
 	printf("Mvol %f\n", MainVolume);
 	printf("sCount %d\n", sCount);
@@ -122,6 +120,8 @@ void Pause_Draw() {
 	printf("Mvol %f\n", MainVolume);
 	printf("sCount %d\n", sCount);
 	renderlogic::drawTexture(-400.f, 0.0f, buttonTex, buttonMesh, 640.0f, 150.0f,PI/2.0f);
+	printf("%f\n", MainVolume);
+	printf("%d\n", sCount);
 	for (s8 i{}; i < sCount; ++i) {
 		renderlogic::drawTexture(-400.f, -250.f+(static_cast<f32>(i)*56), sCounttex, buttonMesh, 45.f, 45.f);
 	}
