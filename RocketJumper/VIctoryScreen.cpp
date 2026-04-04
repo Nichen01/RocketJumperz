@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  VictoryScreen.cpp
+\date         April, 04, 2026
+\brief        functions used to create Victory Screen
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "VictoryScreen.h"
 #include "Draw.h"
 #include "Confirmation.h"
@@ -25,9 +38,11 @@ static AEGfxTexture* buttontex;
 extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void VictoryScreen_Load() {
+    //load audio
     win = AEAudioLoadMusic("Assets/Sounds/Victory.wav");
     bgm = AEAudioCreateGroup();
 
+    // load textures
     load::pauseMenu();
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     backgroundTexture = AEGfxTextureLoad("Assets/UI/MainMenu.png");
@@ -35,12 +50,14 @@ void VictoryScreen_Load() {
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
     }
-
+    // load font
     victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void VictoryScreen_Init() {
+    //play audio
     AEAudioPlay(win, bgm, MainVolume, 1.f, -1);
 
+    //initilise meshes
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
 
@@ -55,7 +72,7 @@ void VictoryScreen_Init() {
         -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
     backgroundMesh = AEGfxMeshEnd();
-
+    // initialize data
     Confirmation_Init(yesButton, noButton);
 
     float buttonwidth = 390.0f;
@@ -65,6 +82,7 @@ void VictoryScreen_Init() {
     exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
 void VictoryScreen_Update() {
+    //checks if button are hovered over
     if (!destructive) {
         MenuHelpers::updateButtonHover(restartButton);
         MenuHelpers::updateButtonHover(tomenuButton);
@@ -75,6 +93,8 @@ void VictoryScreen_Update() {
     }
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
+        // Restore checkpoint stats so the player keeps progress from prior levels
+        // but loses anything collected during the level they died on.
         if (restartButton.isHovered) {
             movement::bulletCount = 50;
             wireCount = 0;             // Reset Wires
@@ -87,6 +107,7 @@ void VictoryScreen_Update() {
             playerEnteredDoor2 = false;
             wireDropsSpawned = 0;
             doorState = 0;             // Reset Final Door
+            //confirmation check
             destructive = true;
             if (leave == 1) {
                 next = GS_TUTORIAL;
@@ -112,6 +133,7 @@ void VictoryScreen_Update() {
             prevCleared2 = 0;
             prevCleared3 = 0;
             doorState = 0;             // Reset Final Door
+            //confirmation check
             destructive = true;
             if (leave == 1) {
                 destructive = false;
@@ -126,6 +148,7 @@ void VictoryScreen_Update() {
             printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {
+            //confirmation check
             destructive = true;
             if (leave == 1) {
                 destructive = false;
@@ -141,6 +164,7 @@ void VictoryScreen_Update() {
     }
 }
 void VictoryScreen_Draw() {
+    // render victoryscreen
 	VDrawBackground();
 
     float multi = 1.3f;
@@ -156,13 +180,14 @@ void VictoryScreen_Draw() {
     MenuHelpers::TexdrawButton(restartButton, buttonMesh, victoryfont, buttonTex);
     MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, victoryfont, buttonTex);
     MenuHelpers::TexdrawButton(exitButton, buttonMesh, victoryfont, buttonTex);
-
+    // render conformation screen
     if (destructive) {
         Confirmation_Draw(victoryfont, yesButton, noButton);
     }
 
 }
 void VictoryScreen_Free() {
+    // Free meshes
     if (backgroundMesh) {
         AEGfxMeshFree(backgroundMesh);
         backgroundMesh = nullptr;
@@ -171,6 +196,7 @@ void VictoryScreen_Free() {
 
 }
 void VictoryScreen_Unload() {
+    // unload textures and sound
     AEAudioUnloadAudio(win);
     AEAudioUnloadAudioGroup(bgm);
 

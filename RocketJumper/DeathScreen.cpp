@@ -1,3 +1,15 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  DeathScreen.cpp
+\date         April, 04, 2026
+\brief        functions used to create Death Screen
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "DeathScreen.h"
 #include "Draw.h"
 #include "movement.h"
@@ -28,23 +40,26 @@ static AEGfxTexture* buttontex;
 extern bool prevCleared1, prevCleared2, prevCleared3;
 
 void DeathScreen_Load() {
+    //load audio
     lose = AEAudioLoadMusic("Assets/Sounds/Lose.wav");
     bgm = AEAudioCreateGroup();
 
+    // load textures
     load::pauseMenu();
-
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     backgroundTexture = AEGfxTextureLoad("Assets/UI/MainMenu.png");
 
     if (!backgroundTexture) {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
     }
-
+    // load font
     deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 }
 void DeathScreen_Init() {
+    //play audio
     AEAudioPlay(lose, bgm, MainVolume, 1.f, -1);
-
+    
+    //initilise meshes
     AssetManager::BuildSqrMesh(MESH_BUTTON);
     buttonMesh = AssetManager::GetMesh(MESH_BUTTON);
     AEGfxTriAdd(
@@ -59,6 +74,7 @@ void DeathScreen_Init() {
 
     backgroundMesh = AEGfxMeshEnd();
 
+    // initialize data
     Confirmation_Init(yesButton, noButton);
     float buttonwidth = 390.0f;
     float buttonlength = 80.0f;
@@ -67,6 +83,7 @@ void DeathScreen_Init() {
     exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
 void DeathScreen_Update() {
+    //checks if button are hovered over
     if (!destructive) {
         MenuHelpers::updateButtonHover(restartButton);
         MenuHelpers::updateButtonHover(tomenuButton);
@@ -75,6 +92,7 @@ void DeathScreen_Update() {
     else {
         Confirmation_Update(yesButton, noButton, leave);
     }
+    // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (restartButton.isHovered) {
             // Restore checkpoint stats so the player keeps progress from prior levels
@@ -89,7 +107,7 @@ void DeathScreen_Update() {
             case 2: keycardCollected2 = false; playerEnteredDoor2 = false; break;
             case 3: keycardCollected3 = false; break;
             }
-
+            //confirmation check
             destructive = true;
             if (leave == 1) {
                 destructive = false;
@@ -124,6 +142,7 @@ void DeathScreen_Update() {
             prevCleared3 = 0;
             wireDropsSpawned = 0;
             doorState = 0;
+            //confirmation check
             destructive = true;
             if (leave == 1) {
                 destructive = false;
@@ -153,6 +172,7 @@ void DeathScreen_Update() {
     }
 }
 void DeathScreen_Draw() {
+    // render deathscreen
     DDrawBackground();
 
     float multi = 1.3f;
@@ -168,13 +188,14 @@ void DeathScreen_Draw() {
     MenuHelpers::TexdrawButton(restartButton, buttonMesh, deathfont, buttonTex);
     MenuHelpers::TexdrawButton(tomenuButton, buttonMesh, deathfont, buttonTex);
     MenuHelpers::TexdrawButton(exitButton, buttonMesh, deathfont, buttonTex);
-
+    // render conformation screen
     if (destructive) {
         Confirmation_Draw(deathfont, yesButton, noButton);
     }
 
 }
 void DeathScreen_Free() {
+    // Free meshes
     if (backgroundMesh) {
         AEGfxMeshFree(backgroundMesh);
         backgroundMesh = nullptr;
@@ -182,6 +203,7 @@ void DeathScreen_Free() {
     AssetManager::FreeAllMeshes();
 }
 void DeathScreen_Unload() {
+    // unload textures and sound
     AEAudioUnloadAudio(lose);
     AEAudioUnloadAudioGroup(bgm);
 

@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Collision.h
+\date         April, 04, 2026
+\brief        Header file for Collision.cpp
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
@@ -44,18 +57,18 @@ namespace gamelogic {
 		//Step 2 until 5
 		return dynamic_collision(player, obstacle,firstTimeOfCollision);
 	}
-
+	//change x world position to normalized coordinate
 	float posX_to_index(float pos, float MS);
-
+	//change y world position to normalized coordinate
 	float posY_to_index(float pos, float MS);
-
+	//change x normalized coordinate to world position
 	float index_to_posX(float pos, float MS);
-
+	//change y normalized coordinate to world position
 	float index_to_posY(float pos, float MS);
 
 	// Hotspot check and binary map collision
 	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX);
-
+	// calculate collision and movement of object
 	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index);
 
 }
