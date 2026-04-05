@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  sound.h
+\date         April, 04, 2026
+\brief        Header file for sound.cpp
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "AEEngine.h"
 
@@ -18,5 +31,4 @@ extern AEAudioGroup soundEffects;
 namespace audio {
 	void loadsound();
 	void unloadsound();
-	void audiolevel(f32 level);
 }

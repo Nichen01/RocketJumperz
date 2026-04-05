@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  sound.cpp
+\date         April, 04, 2026
+\brief        Contain functions to handle audio
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "Sound.h"
 
 AEAudio Level;
@@ -32,11 +45,9 @@ namespace audio {
 		soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
 	}
-	void audiolevel( f32 level) {
-		AEAudioSetGroupVolume(bgm, level);
-	}
 
 	void unloadsound() {
+		//unload sounds
 		AEAudioUnloadAudio(Level);
 		AEAudioUnloadAudio(LaserBlast);
 		AEAudioUnloadAudio(Punch);

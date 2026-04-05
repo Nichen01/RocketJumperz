@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Collision.cpp
+\date         April, 04, 2026
+\brief        contain functions that calculate collision
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "main.h"
 #include "collision.h"
 #include "binaryMap.h"
@@ -138,25 +151,6 @@ namespace gamelogic {
 				player->yPos + (player->yScale / 2.0f) > obstacle->yPos - (obstacle->yScale / 2.0f)));
 	}
 
-	// Hotspot check and binary map collision.
-	// mapX = number of tile columns. index = tile value to treat as solid.
-	// Collision flags (COLLISION_LEFT, etc.) are defined in binaryMap.h.
-
-	float posX_to_index(float pos, float MS) {
-		return (pos + 800) / (float)MS;
-	}
-
-	float posY_to_index(float pos, float MS) {
-		return -((pos - 450) / (float)MS);
-	}
-
-	float index_to_posX(float pos, float MS) {
-		return (pos * MS - 800);
-	}
-
-	float index_to_posY(float pos, float MS) {
-		return -(pos*MS-450);
-	}
 
 	// Helper: safely read 1D map array, returns 0 if out of bounds
 	static inline int safeMapRead(int map[], int ix, int iy, int mapX, int mapY)
@@ -166,12 +160,15 @@ namespace gamelogic {
 		return map[iy * mapX + ix];
 	}
 
+	// Hotspot check and binary map collision.
+	// mapX = number of tile columns. index = tile value to treat as solid.
+	// Collision flags (COLLISION_LEFT, etc.) are defined in binaryMap.h.
 	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY, int map[], int index, int mapX)
 	{
 		int mapY = BINARY_MAP_HEIGHT;
 		float x1, y1, x2, y2;
 		int flag = 0;
-		// right
+		// check right collision
 
 		x1 = PosX + scaleX / 2.0f;
 		y1 = PosY + scaleY / 4.0f;
@@ -184,7 +181,7 @@ namespace gamelogic {
 			flag = flag | COLLISION_RIGHT;
 		}
 
-		// left
+		// check left collision
 		x1 = PosX - scaleX / 2.0f;
 		y1 = PosY - scaleY / 4.0f;
 
@@ -196,7 +193,7 @@ namespace gamelogic {
 			flag = flag | COLLISION_LEFT;
 		}
 
-		// top
+		// check top collision
 		x1 = PosX - scaleX / 4.0f;
 		y1 = PosY + scaleY / 2.0f;
 
@@ -208,7 +205,7 @@ namespace gamelogic {
 			flag = flag | COLLISION_TOP;
 		}
 
-		// bottom
+		// check bottom collision
 		x1 = PosX - scaleX / 4.0f;
 		y1 = PosY - scaleY / 2.0f;
 
@@ -222,34 +219,58 @@ namespace gamelogic {
 
 		return flag;
 	}
+	// ====== Functions That convert coordinates ======//
 
+	//change x world position to normalized coordinate
+	float posX_to_index(float pos, float MS) {
+		return (pos + 800) / (float)MS;
+	}
+	//change y world position to normalized coordinate
+	float posY_to_index(float pos, float MS) {
+		return -((pos - 450) / (float)MS);
+	}
+	//change x normalized coordinate to world position
+	float index_to_posX(float pos, float MS) {
+		return (pos * MS - 800);
+	}
+	//change y normalized coordinate to world position
+	float index_to_posY(float pos, float MS) {
+		return -(pos * MS - 450);
+	}
+
+	// calculate movement and collision
 	void Collision_movement(objectsquares* object, int map[], int mapX, int mapS, int index) {
+		// add velocity to object
 		object->xPos += object->velocityX;
 		object->yPos += object->velocityY;
-
+		// nomalize variables
 		float NposX = posX_to_index(object->xPos, (float)mapS);
 		float NposY = posY_to_index(object->yPos, (float)mapS);
 		float NScaleX = object->xScale/ mapS;
 		float NScaleY = object->xScale / mapS;
 		
+		// find collisions
 		object->gridCollisionFlag = CheckInstanceBinaryMapCollision(NposX, NposY, NScaleX, NScaleY, map, index, mapX);
 
-
+		// check bottom collision
 		if ((object->gridCollisionFlag & COLLISION_BOTTOM) == COLLISION_BOTTOM) {
 			SnapToCell(&NposY);
 			object->yPos= (float)(screenLength / 2) -(NposY * mapS);
 			object->velocityY = 0;
 		}
+		// check top collision
 		if ((object->gridCollisionFlag & COLLISION_TOP) == COLLISION_TOP) {
 			SnapToCell(&NposY);
 			object->yPos = (float)(screenLength / 2) -(NposY * mapS);
 			object->velocityY = 0;
 		}
+		// check left collision
 		if ((object->gridCollisionFlag & COLLISION_LEFT) == COLLISION_LEFT) {
 			SnapToCell(&NposX);
 			object->xPos = mapS * NposX - (float)(screenWidth/2);
 			object->velocityX = 0;
 		}
+		// check right collision
 		if ((object->gridCollisionFlag & COLLISION_RIGHT) == COLLISION_RIGHT) {
 			SnapToCell(&NposX);
 			object->xPos = mapS * NposX - (float)(screenWidth / 2);

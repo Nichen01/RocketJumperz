@@ -106,7 +106,6 @@ void Tutorial_Initialize()
 
 	currentGameLevel = 0;
 	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
-
 	// Initialize player movement system
 	movement::initPlayerMovement(objectinfoTut[player]);
 	projectileSystem::initProjectiles(Projectiles, MAX_PROJECTILES);
