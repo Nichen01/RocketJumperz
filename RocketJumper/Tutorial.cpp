@@ -410,28 +410,28 @@ void Tutorial_Draw()
 	f32 textWidth, textHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.6f, &textWidth, &textHeight);
 	sprintf_s(strBuffer, "Left Click to Shoot");
-	AEGfxPrint(font, strBuffer, 0.52f, -0.6f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.52f, -0.6f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "towards Mouse Cursor");
-	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Right Click to Advance");
-	AEGfxPrint(font, strBuffer, 0.f, -0.6f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.f, -0.6f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "towards Mouse Cursor");
-	AEGfxPrint(font, strBuffer, 0.f, -0.67f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.f, -0.67f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Spacebar to Jump");
-	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Left Shift To Toggle Gravity");
-	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Q to Switch Weapon");
-	AEGfxPrint(font, strBuffer, -0.7f, -0.65f, 0.6f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.65f, 0.6f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "E to Enter");
-	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);

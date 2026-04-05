@@ -604,10 +604,18 @@ void DrawCreditsMenu() {
         f32 nameScale      = 0.75f;                // scale for individual names
         f32 smallScale     = 0.65f;                // scale for copyright / fine print
 
+        // ---------- Copyright ----------
+        MenuHelpers::drawTextCentered("All content (C) 2026 DigiPen Institute of Technology Singapore",
+            0.0f, y, smallScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("All Rights Reserved", 0.0f, y, smallScale, menuFont);
+
         // ---------- Team Name ----------
+        y -= sectionGap;
         MenuHelpers::drawTextCentered("A Game by Team RocketJumperz", 0.0f, y, headerScale, menuFont);
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Dead Weight", 0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
 
         // ---------- Development Team ----------
         y -= sectionGap;
@@ -630,6 +638,7 @@ void DrawCreditsMenu() {
         MenuHelpers::drawTextCentered("Soroor Malekmohammadi Faradounbeh", 0.0f, y, nameScale, menuFont);
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Tommy Tan",      0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
 
         // ---------- DigiPen Logo (drawn as a textured quad) ----------
         y -= sectionGap;
@@ -654,8 +663,11 @@ void DrawCreditsMenu() {
             AEGfxSetTransform(logoXform.m);
             AEGfxMeshDraw(quadMesh, AE_GFX_MDM_TRIANGLES);
         }
+        
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Created at DigiPen Institute of Technology", 0.0f, y, nameScale, menuFont);
+
+        
 
         // ---------- President ----------
         y -= sectionGap;
@@ -685,16 +697,11 @@ void DrawCreditsMenu() {
         y -= sectionGap;
         MenuHelpers::drawTextCentered("ADDITIONAL CREDITS", 0.0f, y, headerScale, menuFont);
         y -= lineSpacing;
-        MenuHelpers::drawTextCentered("Sprite Assets: Craftpix, itch.io creators", 0.0f, y, nameScale, menuFont);
+        MenuHelpers::drawTextCentered("Assets: Craftpix, itch.io creators, Pixabay", 0.0f, y, nameScale, menuFont);
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Game Engine: Alpha Engine", 0.0f, y, nameScale, menuFont);
 
-        // ---------- Copyright ----------
-        y -= sectionGap;
-        MenuHelpers::drawTextCentered("All content (C) 2026 DigiPen Institute of Technology Singapore",
-                                       0.0f, y, smallScale, menuFont);
-        y -= lineSpacing;
-        MenuHelpers::drawTextCentered("All Rights Reserved", 0.0f, y, smallScale, menuFont);
+        
     }
 
     // ---- Fixed "BACK" button at the bottom of the screen ----
