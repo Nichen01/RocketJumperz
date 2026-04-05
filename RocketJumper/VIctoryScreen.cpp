@@ -52,7 +52,7 @@ void VictoryScreen_Load() {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
     }
     // load font
-    victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(72 * screenscale));
+    victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(48 * screenscale));
 }
 void VictoryScreen_Init() {
     //play audio

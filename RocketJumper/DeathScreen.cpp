@@ -54,7 +54,7 @@ void DeathScreen_Load() {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
     }
     // load font
-    deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(72 * screenscale));
+    deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(48 * screenscale));
 }
 void DeathScreen_Init() {
     //play audio
