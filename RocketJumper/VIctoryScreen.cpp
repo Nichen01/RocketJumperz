@@ -49,9 +49,6 @@ void VictoryScreen_Load() {
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     backgroundTexture = AEGfxTextureLoad("Assets/UI/MainMenu.png");
 
-    if (!backgroundTexture) {
-        printf("Warning: MenuBackground.png not found. Using solid color background.\n");
-    }
     // load font
     victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(48 * screenscale));
 }
@@ -119,7 +116,6 @@ void VictoryScreen_Update() {
                 leave = 0;
             }
             
-            printf("Play button clicked - Starting game!\n");
         }
         if (tomenuButton.isHovered) {
             wireCount = 0;             // Reset Wires
@@ -146,8 +142,6 @@ void VictoryScreen_Update() {
                 destructive = false;
                 leave = 0;
             }
-
-            printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {
             //confirmation check
@@ -161,7 +155,6 @@ void VictoryScreen_Update() {
                 destructive = false;
                 leave = 0;
             }
-            printf("Exiting game!\n");
         }
     }
 }

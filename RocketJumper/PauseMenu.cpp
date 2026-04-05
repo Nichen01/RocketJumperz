@@ -125,7 +125,6 @@ void Pause_Update() {
 	if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (resumeButton.isHovered) {
 			pause = false;  // Change to test file if needed
-			printf("Play button clicked - Starting game!\n");
 		}
 		if (tomenuButton.isHovered) {
 			//confirmation check
@@ -142,7 +141,6 @@ void Pause_Update() {
 			prevCleared1 = 0;
 			prevCleared2 = 0;
 			prevCleared3 = 0;
-			printf("Play button clicked - Starting game!\n");
 		}
 		else if (exitButton.isHovered) {
 			//confirmation check
