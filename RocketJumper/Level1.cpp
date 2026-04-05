@@ -295,13 +295,12 @@ void Level1_Update()
 {
 	// DEBUGGING FEATURE TO TRANSIT TO DIFFERENT LEVELS
 	if (AEInputCheckCurr(AEVK_1)) next = GS_TUTORIAL;
-	else if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
-	else if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
+	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
+	if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
 
 	// If the instructions overlay is open, skip all gameplay logic (pause)
 	if (InstructionsMenu::Update()) return;
 
-	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL2;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		next = GS_LEVELEDITOR;
