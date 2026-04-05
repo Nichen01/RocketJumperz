@@ -210,7 +210,6 @@ namespace MenuHelpers {
 void MainMenu_Load() {
     // load audio for the menu
     audio::loadsound();
-
     // Build meshes via AssetManager instead of manually creating them here.
     // MESH_QUAD = white-vertex unit quad (used for textured background & title).
     // MESH_MENU_BUTTON = black-vertex unit quad (used for color-mode button rects).

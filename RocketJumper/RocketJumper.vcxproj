@@ -21,7 +21,6 @@
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Drops.cpp" />
     <ClCompile Include="Enemies.cpp" />
-    <ClCompile Include="Gameover.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="InstructionsMenu.cpp" />
     <ClCompile Include="Level1.cpp" />
