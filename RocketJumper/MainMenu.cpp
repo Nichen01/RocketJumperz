@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "MainMenu.h"
+#include "main.h"
 #include "AssetManager.h"
 #include "AEEngine.h"
 #include "GameStateManager.h"
@@ -238,9 +239,9 @@ void MainMenu_Load() {
         printf("Warning: settings.png not found. Credits logo will not render.\n");
     }
     // Load font
-    menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 48);
+    menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(48 * screenscale));
     if (menuFont < 0) {
-        menuFont = AEGfxCreateFont("Arial.ttf", 48);
+        menuFont = AEGfxCreateFont("Arial.ttf", static_cast<int>(48 * screenscale));
         printf("(UI) Warning: MenuFont.ttf not found. Text will not render.\n");
     }
 
