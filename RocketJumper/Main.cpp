@@ -149,6 +149,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			previous = current;
 		}
 		canpause = true;
+		if (next == GS_SPLASH) {
+			canpause = false;
+		}
+		if (next == GS_MAINMENU) {
+			canpause = false;
+		}
+		if (next == GS_VICTORY) {
+			canpause = false;
+		}
+		if (next == GS_DEATH) {
+			canpause = false;
+		}
+		if (next == GS_LEVELEDITOR) {
+			canpause = false;
+		}
+		
 		current = next;
 	}
 
