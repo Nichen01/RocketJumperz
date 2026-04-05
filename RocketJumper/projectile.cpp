@@ -1,3 +1,14 @@
+/* Start Header ************************************************************************/
+/*!
+\file         Projectile.cpp
+\author       Nicholas Chen (c.chen)
+\brief        Code regarding projectiles: projectile initialisation, calculation, detection, deletion etc
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "Projectile.h"
 #include "BinaryMap.h"  // BINARY_MAP_HEIGHT for tile-collision bounds check
 #include <cmath>    // sinf, cosf, sqrtf

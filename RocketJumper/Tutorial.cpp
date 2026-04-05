@@ -14,10 +14,10 @@
 #include "pch.h"
 #include "AssetManager.h"
 #include "Level1.h"
-#include "AimingInterface.h"
 #include "WeaponSprite.h"
 #include "Drops.h"
 #include "InstructionsMenu.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -96,8 +96,10 @@ void Tutorial_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	//aiming::loadAiming();
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool (needed for jetpack exhaust)
+	ParticleSystem::Load();
 }
 
 void Tutorial_Initialize()
@@ -190,7 +192,7 @@ void Tutorial_Initialize()
 
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");
-	pickup::initDrops(TutDrop, MAX_ENEMIES, PlayerScale);
+	pickup::initDrops(TutDrop, MAX_ENEMIES, PlayerScale-20);
 
 }
 
@@ -198,13 +200,11 @@ void Tutorial_Update()
 {
 	// DEBUGGING FEATURE TO TRANSIT TO DIFFERENT LEVELS
 	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL1;
-	else if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
-	else if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
+	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
+	if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
 
 	// If the instructions overlay is open, skip all gameplay logic (pause)
 	if (InstructionsMenu::Update()) return;
-
-	if (AEInputCheckCurr(AEVK_1)) next = GS_LEVEL1;
 
 	//====== AUDIO CONTROLS ======//
 	if (AEInputCheckTriggered(AEVK_1)) {
@@ -288,6 +288,9 @@ void Tutorial_Update()
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Step all active particles forward (jetpack exhaust, etc.)
+	ParticleSystem::Update(dt);
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
@@ -380,7 +383,6 @@ void Tutorial_Update()
 	}
 
 
-	//aiming::updateAiming(objectinfoTut[player]);
 	weaponSprite::Update(objectinfoTut[player]);
 
 	objectsquares healthObj;
@@ -506,6 +508,15 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
+	// ====== PARTICLE SYSTEM RENDER (jetpack exhaust) ====== //
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfoTut[player].xPos, objectinfoTut[player].yPos - 50.f);
 
@@ -586,7 +597,6 @@ void Tutorial_Draw()
 	if (playerNear) {
 		renderlogic::flashingTexture(objectinfoTut[player].xPos, objectinfoTut[player].yPos + 60.f, eButton, 50.f);
 	}
-	//aiming::drawAiming();
 	weaponSprite::Draw();
 	pickup::drawDrops(TutDrop, MAX_ENEMIES);
 
@@ -637,13 +647,15 @@ void Tutorial_Unload()
 		delete[] glassMap;
 		glassMap = nullptr;
 	}
-	//aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Destroy the font created in Load (tutorial text labels)
 	if (font != -1) { AEGfxDestroyFont(font); font = -1; }
 
 	// Destroy the font created in Initialize (HUD health text)
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 	audio::unloadsound();

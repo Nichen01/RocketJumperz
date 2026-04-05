@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AimingInterface.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="BinaryMap.cpp" />
     <ClCompile Include="Collision.cpp" />
@@ -45,7 +44,6 @@
     <ClCompile Include="WeaponSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AimingInterface.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="BinaryMap.h" />

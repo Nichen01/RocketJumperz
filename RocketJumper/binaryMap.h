@@ -56,7 +56,7 @@ struct Key {
 struct HealthPack {
 	f32 worldX;
 	f32 worldY;
-	f32 size{ 80.f };
+	f32 size{ 60.f };
 	bool active{ true };
 	bool collected = false;
 };
@@ -95,6 +95,6 @@ int		ImportMapDataFromFile(const char *FileName);
 void	FreeMapData(void);
 void	PrintRetrievedInformation(void);
 int		ExportMapDataToFile(const char* FileName);
-void	ResetMapData();
+void	ResetMapData(const char* FileName);
 
 #endif // BINARY_MAP_H_

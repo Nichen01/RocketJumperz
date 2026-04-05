@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Main.cpp
+\date         April, 04, 2026
+\brief        Entry Point file 
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 // ---------------------------------------------------------------------------
 // includes
 #pragma once
@@ -31,9 +44,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		return 0;
 	}
-	//AESysSetFullScreen(1);
-	// Using custom window procedure
-	//int gGameRunning = 1;
+
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");
@@ -137,7 +148,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			pause = false;
 			previous = current;
 		}
-		canpause = true;
 		current = next;
 	}
 

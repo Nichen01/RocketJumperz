@@ -36,6 +36,7 @@ void Confirmation_Update(MenuButton& yesButton, MenuButton& noButton,s8& leave) 
         }
     }
 }
+
 void Confirmation_Draw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     // draw backgoround and buttons
     f32 width, height;
@@ -53,6 +54,11 @@ void Confirmation_Draw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     MenuHelpers::TexdrawButton(noButton, buttonMesh, font, buttonTex);
 }
 
+// ----------------------------------------------------------
+    /*!
+    \brief adds a prompt on launch, that will not come up after interacting with it
+    */
+    // ----------------------------------------------------------
 void fsDraw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     f32 width, height;
 

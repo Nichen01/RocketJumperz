@@ -13,7 +13,6 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "pch.h"
-#include "AimingInterface.h"
 #include "Animation.h"
 #include "AssetManager.h"
 #include "BinaryMap.h"

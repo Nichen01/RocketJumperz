@@ -2,7 +2,6 @@
 /*!
 \file		  Draw.cpp
 \author       Chan Joraye (c.joraye), Ivan Chong (i.chong)
-\date         April, 01, 2026
 \brief        File to render different types of texture eg. Flashing texture, normal texture and the assets from the txt file
 
 Copyright (C) 2026 DigiPen Institute of Technology.
@@ -195,7 +194,7 @@ namespace renderlogic {
 							f32 yPos = AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2) + yOffset;
 
 							AEGfxTextureSet(healthDrop, 0, 0);
-							renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+							renderlogic::drawSquare(xPos, yPos, hp.size, hp.size);
 							AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 						}
 						break;

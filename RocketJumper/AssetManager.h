@@ -194,6 +194,7 @@ enum MeshID {
     MESH_RANGED_HURT,   // spritesheet mesh (1 row, 2 cols)
     MESH_BUTTON,
     MESH_SAW,       // spritesheet mesh (1 row, 7 cols) for saw trap animation
+    MESH_PARTICLE,  // 1x1 white quad used by the particle system
     // Add new meshes above this line
     MESH_MAX
 };

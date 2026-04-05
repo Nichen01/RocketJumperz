@@ -160,7 +160,6 @@ void Level2_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel2 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	//aiming::loadAiming();
 	weaponSprite::Load();
 
 	// Build the particle system mesh and reset the pool
@@ -282,7 +281,7 @@ void Level2_Initialize()
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
 
-	pickup::initDrops(L2Drop, MAX_ENEMIES, PlayerScale);
+	pickup::initDrops(L2Drop, MAX_ENEMIES, PlayerScale-20);
 
 	// Wire drops: reset per-level tracker and initialize wire drop array
 	pickup::ResetWireDropTracker();
@@ -299,13 +298,12 @@ void Level2_Update()
 {
 	// DEBUGGING FEATURE TO TRANSIT TO DIFFERENT LEVELS
 	if (AEInputCheckCurr(AEVK_1)) next = GS_TUTORIAL;
-	else if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL1;
-	else if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
+	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL1;
+	if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
 
 	// If the instructions overlay is open, skip all gameplay logic (pause)
 	if (InstructionsMenu::Update()) return;
 
-	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL3;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
 		currentGameLevel = 2;
@@ -343,7 +341,6 @@ void Level2_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo2[player]);
 	movement::UpdatePlayerFacing(objectinfo2[player]);
-	//aiming::updateAiming(objectinfo2[player]);
 	weaponSprite::Update(objectinfo2[player]);
 	pickup::updateDrops(L2Drop, MAX_ENEMIES, objectinfo2[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo2[player]);
@@ -613,7 +610,6 @@ void Level2_Draw()
 	renderlogic::drawSquare(objectinfo2[player].xPos, objectinfo2[player].yPos,
 		playerDrawScaleX, objectinfo2[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -763,7 +759,6 @@ void Level2_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	//::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 

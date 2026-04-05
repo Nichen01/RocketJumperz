@@ -15,6 +15,7 @@
 /* End Header **************************************************************************/
 
 #include "LevelEditor.h"
+#include "main.h"
 
 // ==================== GLOBAL RESOURCES ==================== //
 static AEGfxTexture* door;
@@ -23,7 +24,6 @@ static const char* pText1{ "Level 1" };
 static const char* pText2{ "Level 2" };
 static const char* pText3{ "Level 3" };
 static s8 font;
-int level{ 1 };
 s32 currentTileIndex{}, doorCount{ 1 };
 static std::vector<TileAction> actionHistory;
 
@@ -51,6 +51,7 @@ static bool healthExistError = false;
 static bool doorlinkExistError = false;
 static bool keycardExistError = false;
 static bool wrongKeyLevelError = false;
+
 
 // ==================== FORWARD DECLARATIONS ====================//
 static bool isMouseOverDoorButton(const doorButton& button);
@@ -418,7 +419,6 @@ static void drawResetTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 
 
 void LevelEditor_Load() {
 
-	currentGameLevel = 1;
 	font = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 50);
 
 	load::ui();
@@ -525,21 +525,21 @@ void LevelEditor_Initialize() {
 void LevelEditor_Update() {
 
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_1)) {
-		level = 1;
 		currentGameLevel = 1;
 		next = GS_RESTART;
 	}
 	else if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_2)) {
-		level = 2;
 		currentGameLevel = 2;
 		next = GS_RESTART;
 	}
 	else if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_3)) {
-		level = 3;
 		currentGameLevel = 3;
 		next = GS_RESTART;
 	}
-	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : (level == 2) ? GS_LEVEL2 : GS_LEVEL3;
+	if (AEInputCheckTriggered(AEVK_L)) {
+		next = (currentGameLevel == 1) ? GS_LEVEL1 : (currentGameLevel == 2) ? GS_LEVEL2 : GS_LEVEL3;
+		canpause = true;
+	}
 
 	// When user is at the door's tile index, this prompt will be shown to ask the user to pick a level to link to the current level they are at.
 	if (showDoorPrompt) {
@@ -620,24 +620,24 @@ void LevelEditor_Update() {
 
 	// Saves and export the array back to the txt file
 	if (AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_S)) {
-		if (level == 1) {
+		if (currentGameLevel == 1) {
 			ExportMapDataToFile("Assets/Map/Level1_Map.txt");
 		}
-		else if (level == 2) {
+		else if (currentGameLevel == 2) {
 			ExportMapDataToFile("Assets/Map/Level2_Map.txt");
 		}
-		else if (level == 3) {
+		else if (currentGameLevel == 3) {
 			ExportMapDataToFile("Assets/Map/Level3_Map.txt");
 		}
 	}
 
 	// Check if there's a keycard when left click & error plays when there's  more than one keycard
 	if (currentTileIndex == 10 && AEInputCheckCurr(AEVK_LCTRL) && AEInputCheckTriggered(AEVK_LBUTTON)) {
-		if (level == 1 && keyCountLevel1 >= 1) {
+		if (currentGameLevel == 1 && keyCountLevel1 >= 1) {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 			keycardExistError = true;
 		}
-		else if (level == 2 && keyCountLevel2 >= 1) {
+		else if (currentGameLevel == 2 && keyCountLevel2 >= 1) {
 			AEAudioPlay(Error, soundEffects, 1, 1, 0);
 			keycardExistError = true;
 		}
@@ -646,7 +646,15 @@ void LevelEditor_Update() {
 	// If user clicks on the "RESET" button
 	if (resetBtn.isHovered && AEInputCheckCurr(AEVK_LBUTTON)) {
 		actionHistory.clear();
-		ResetMapData();
+		if (currentGameLevel == 1) {
+			ResetMapData("Assets/Map/Level1Original.txt");
+		}
+		if (currentGameLevel == 2) {
+			ResetMapData("Assets/Map/Level2Original.txt");
+		}
+		if (currentGameLevel == 3) {
+			ResetMapData("Assets/Map/Level3Original.txt");
+		}
 	}
 }
 
@@ -669,20 +677,20 @@ void LevelEditor_Draw() {
 	f32 levelWidth, levelHeight;
 	float offsetX = 10.0f / (AEGfxGetWindowWidth() / 2.0f); 
 	float offsetY = 10.0f / (AEGfxGetWindowHeight() / 2.0f);
-	if (level == 1) {
+	if (currentGameLevel == 1) {
 		AEGfxGetPrintSize(font, pText1, 2.f, &levelWidth, &levelHeight);
 		AEGfxPrint(font, pText1, -1.f + offsetX, -1.f + offsetY, 1, 1, 1, 1, 1);
 	}
-	else if (level == 2) {
+	else if (currentGameLevel == 2) {
 		AEGfxGetPrintSize(font, pText2, 1.f, &levelWidth, &levelHeight);
 		AEGfxPrint(font, pText2, -1.f + offsetX, -1.f + offsetY, 1, 1, 1, 1, 1);
 	}
-	else if (level == 3) {
+	else if (currentGameLevel == 3) {
 		AEGfxGetPrintSize(font, pText3, 1.f, &levelWidth, &levelHeight);
 		AEGfxPrint(font, pText3, -1.f + offsetX, -1.f + offsetY, 1, 1, 1, 1, 1);
 	}
 
-	// Display level in a grid system
+	// Display currentGameLevel in a grid system
 	const float tileSizeLE = 65.f;
 	const float gap = 3.f;
 	for (s32 row = 0; row < BINARY_MAP_HEIGHT; ++row) {
@@ -717,9 +725,12 @@ void LevelEditor_Draw() {
 					}
 					else if (currentTileIndex == 10) { // Keycard
 						bool placeKey = false;
-						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
-						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
-						else if (level == 3) wrongKeyLevelError = true;
+						if (currentGameLevel == 1 && keyCountLevel1 == 0) placeKey = true;
+						else if (currentGameLevel == 2 && keyCountLevel2 == 0) placeKey = true;
+						else if (currentGameLevel == 3) {
+							wrongKeyLevelError = true;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						}
 
 						if (placeKey) {
 							TileAction action;
@@ -732,15 +743,15 @@ void LevelEditor_Draw() {
 							actionHistory.push_back(action);
 
 							// increment the counter right here
-							if (level == 1) keyCountLevel1 = 1;
-							else if (level == 2) keyCountLevel2 = 1;
+							if (currentGameLevel == 1) keyCountLevel1 = 1;
+							else if (currentGameLevel == 2) keyCountLevel2 = 1;
 						}
 					}
 					else if (currentTileIndex == 11) { // Healthpack
 						bool placeHealth = false;
-						if (level == 1 && healthCountLevel1 == 0) placeHealth = true;
-						else if (level == 2 && healthCountLevel2 == 0) placeHealth = true;
-						else if (level == 3 && healthCountLevel3 == 0) placeHealth = true;
+						if (currentGameLevel == 1 && healthCountLevel1 == 0) placeHealth = true;
+						else if (currentGameLevel == 2 && healthCountLevel2 == 0) placeHealth = true;
+						else if (currentGameLevel == 3 && healthCountLevel3 == 0) placeHealth = true;
 
 						if (placeHealth) {
 							TileAction action;
@@ -752,9 +763,9 @@ void LevelEditor_Draw() {
 							MapData[row][col] = action.newValue;
 							actionHistory.push_back(action);
 
-							if (level == 1) healthCountLevel1++;
-							else if (level == 2) healthCountLevel2++;
-							else if (level == 3) healthCountLevel3++;
+							if (currentGameLevel == 1) healthCountLevel1++;
+							else if (currentGameLevel == 2) healthCountLevel2++;
+							else if (currentGameLevel == 3) healthCountLevel3++;
 						}
 						else {
 							healthExistError = true;
@@ -762,7 +773,7 @@ void LevelEditor_Draw() {
 						}
 					}
 					else if (currentTileIndex == 12) { // Final Door
-						if (level != 3) {
+						if (currentGameLevel != 3) {
 							finaldoorLevelError = true;
 							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 						}
@@ -808,9 +819,9 @@ void LevelEditor_Draw() {
 					else if (currentTileIndex == 15) { // Ranged enemy
 						bool placeEnemy = false;
 
-						if (level == 1 && rEnemyLevel1 == 0) placeEnemy = true;
-						else if (level == 2 && rEnemyLevel2 == 0) placeEnemy = true;
-						else if (level == 3 && rEnemyLevel3 == 0) placeEnemy = true;
+						if (currentGameLevel == 1 && rEnemyLevel1 == 0) placeEnemy = true;
+						else if (currentGameLevel == 2 && rEnemyLevel2 == 0) placeEnemy = true;
+						else if (currentGameLevel == 3 && rEnemyLevel3 == 0) placeEnemy = true;
 
 						if (placeEnemy) {
 							TileAction action;
@@ -822,9 +833,9 @@ void LevelEditor_Draw() {
 							MapData[row][col] = action.newValue;
 							actionHistory.push_back(action);
 
-							if (level == 1) rEnemyLevel1 = 1;
-							else if (level == 2) rEnemyLevel2 = 1;
-							else if (level == 3) rEnemyLevel3 = 1;
+							if (currentGameLevel == 1) rEnemyLevel1 = 1;
+							else if (currentGameLevel == 2) rEnemyLevel2 = 1;
+							else if (currentGameLevel == 3) rEnemyLevel3 = 1;
 						}
 						else {
 							enemyExistError = true;
@@ -834,9 +845,9 @@ void LevelEditor_Draw() {
 					else if (currentTileIndex == 16) { // Melee Enemy
 						bool placeEnemy = false;
 
-						if (level == 1 && mEnemyLevel1 == 0) placeEnemy = true;
-						else if (level == 2 && mEnemyLevel2 == 0) placeEnemy = true;
-						else if (level == 3 && mEnemyLevel3 == 0) placeEnemy = true;
+						if (currentGameLevel == 1 && mEnemyLevel1 == 0) placeEnemy = true;
+						else if (currentGameLevel == 2 && mEnemyLevel2 == 0) placeEnemy = true;
+						else if (currentGameLevel == 3 && mEnemyLevel3 == 0) placeEnemy = true;
 
 						if (placeEnemy) {
 							TileAction action;
@@ -848,9 +859,9 @@ void LevelEditor_Draw() {
 							MapData[row][col] = action.newValue;
 							actionHistory.push_back(action);
 
-							if (level == 1) mEnemyLevel1 = 1;
-							else if (level == 2) mEnemyLevel2 = 1;
-							else if (level == 3) mEnemyLevel3 = 1;
+							if (currentGameLevel == 1) mEnemyLevel1 = 1;
+							else if (currentGameLevel == 2) mEnemyLevel2 = 1;
+							else if (currentGameLevel == 3) mEnemyLevel3 = 1;
 						}
 						else {
 							enemyExistError = true;
@@ -888,26 +899,26 @@ void LevelEditor_Draw() {
 						door2Count = 0;
 					}
 					else if (MapData[row][col] == 67) {
-						if (level == 1) keyCountLevel1 = 0;
-						else if (level == 2) keyCountLevel2 = 0;
+						if (currentGameLevel == 1) keyCountLevel1 = 0;
+						else if (currentGameLevel == 2) keyCountLevel2 = 0;
 					}
 					else if (MapData[row][col] == 69) {
 						finalDoorCount = 0;
 					}
 					else if (MapData[row][col] == 60) {
-						if (level == 1) healthCountLevel1 = 0;
-						else if (level == 2) healthCountLevel2 = 0;
-						else if (level == 3) healthCountLevel3 = 0;
+						if (currentGameLevel == 1) healthCountLevel1 = 0;
+						else if (currentGameLevel == 2) healthCountLevel2 = 0;
+						else if (currentGameLevel == 3) healthCountLevel3 = 0;
 					}
 					else if (MapData[row][col] == 81) {
-						if (level == 1) rEnemyLevel1 = 0;
-						else if (level == 2) rEnemyLevel2 = 0;
-						else if (level == 3) rEnemyLevel3 = 0;
+						if (currentGameLevel == 1) rEnemyLevel1 = 0;
+						else if (currentGameLevel == 2) rEnemyLevel2 = 0;
+						else if (currentGameLevel == 3) rEnemyLevel3 = 0;
 					}
 					else if (MapData[row][col] == 82) {
-						if (level == 1) mEnemyLevel1 = 0;
-						else if (level == 2) mEnemyLevel2 = 0;
-						else if (level == 3) mEnemyLevel3 = 0;
+						if (currentGameLevel == 1) mEnemyLevel1 = 0;
+						else if (currentGameLevel == 2) mEnemyLevel2 = 0;
+						else if (currentGameLevel == 3) mEnemyLevel3 = 0;
 					}
 
 					MapData[row][col] = action.newValue;

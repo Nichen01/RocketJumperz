@@ -157,7 +157,6 @@ void Level1_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	//aiming::loadAiming();
 	weaponSprite::Load();
 
 	// Build the particle system mesh and reset the pool
@@ -167,7 +166,7 @@ void Level1_Load()
 void Level1_Initialize()
 {
 	InstructionsMenu::Init();
-
+	currentGameLevel = 1;
 	// Only reset if this is the very first time entering Level1
 	if (!playerEnteredDoor1 && !keycardCollected1) {
 		key.active = true;   // spawn card
@@ -181,7 +180,6 @@ void Level1_Initialize()
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
 	doorTex = AssetManager::GetTexture(TEX_DOOR);
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
-	currentGameLevel = 1;
 	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level1_Load -- do NOT recreate here.
@@ -279,7 +277,7 @@ void Level1_Initialize()
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
-	pickup::initDrops(L1Drop, MAX_ENEMIES,PlayerScale);
+	pickup::initDrops(L1Drop, MAX_ENEMIES,PlayerScale-20);
 
 	// Wire drops: reset per-level tracker and initialize wire drop array
 	pickup::ResetWireDropTracker();
@@ -295,15 +293,15 @@ void Level1_Update()
 {
 	// DEBUGGING FEATURE TO TRANSIT TO DIFFERENT LEVELS
 	if (AEInputCheckCurr(AEVK_1)) next = GS_TUTORIAL;
-	else if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
-	else if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
+	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
+	if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
 
 	// If the instructions overlay is open, skip all gameplay logic (pause)
 	if (InstructionsMenu::Update()) return;
 
-	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL2;
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
+		currentGameLevel = 1;
 		next = GS_LEVELEDITOR;
 	}
 
@@ -341,7 +339,6 @@ void Level1_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo1[player]);
 	movement::UpdatePlayerFacing(objectinfo1[player]);
-	//aiming::updateAiming(objectinfo1[player]);
 	weaponSprite::Update(objectinfo1[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo1[player]);
@@ -483,7 +480,7 @@ void Level1_Update()
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
 				else {
-					int toLevel = 3;// (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
 
 					// Save current stats as a checkpoint before leaving the level
 					savedAmmo      = movement::bulletCount;
@@ -641,7 +638,6 @@ void Level1_Draw()
 	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
 		playerDrawScaleX, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -794,7 +790,6 @@ void Level1_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	//aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 

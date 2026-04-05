@@ -1,3 +1,15 @@
+/* Start Header ************************************************************************/
+/*!
+\file         drops.cpp
+\author       Jeremiah He Shuo (jeremiahhe.shuo), Nicholas Chen (c.chen)
+\brief        Code regarding drop mechanics and types
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "Drops.h"
 #include "Collision.h"
 #include "Draw.h"
@@ -14,7 +26,18 @@ namespace pickup {
 	AEMtx33 dropTransform = { 0 };
 	static const f32 kPi = 3.14159f;
 
-	void initDrops(drop instance[], int max,f32 scale) {
+	// ----------------------------------------------------------
+	/*!
+	\brief Initializes drop instances.
+
+	\param instance Array of drop objects.
+	\param max Maximum number of drops.
+	\param scale Scale applied to each drop.
+
+	Sets default scale, type, and inactive state.
+	*/
+	// ----------------------------------------------------------
+	void initDrops(drop instance[], int max, f32 scale) {
 		for (int i{};i < max;i++) {
 			instance[i].info.xScale = scale;
 			instance[i].info.yScale = scale;
@@ -22,29 +45,55 @@ namespace pickup {
 			instance[i].type = DROP_AMMO;
 		}
 	}
-	void updateDrops(drop instance[],int max,objectsquares& player) {
+
+	// ----------------------------------------------------------
+	/*!
+	\brief Updates drop interactions with the player.
+
+	\param instance Array of drop objects.
+	\param max Maximum number of drops.
+	\param player Reference to player object.
+
+	Handles pickup logic:
+	- Health drops increase player health.
+	- Ammo drops increase bullet count.
+	*/
+	// ----------------------------------------------------------
+	void updateDrops(drop instance[], int max, objectsquares& player) {
 		for (int i{};i < max;i++) {
 			if (instance[i].info.flag == 0) continue;
 			else if (gamelogic::static_collision(&player, &instance[i].info)) {
 				instance[i].info.flag = 0;
 				if (instance[i].type == DROP_HEALTH) {
 					player.health += 50;
-				} else {
+				}
+				else {
 					movement::bulletCount += 50;
 				}
 				AEAudioPlay(Pickup, soundEffects, 1.0f, 1.0f, 0);
 			}
 		}
 	}
+
+	// ----------------------------------------------------------
+	/*!
+	\brief Renders all active drops with a bobbing animation.
+
+	\param instance Array of drop objects.
+	\param max Maximum number of drops.
+
+	Applies a sinusoidal vertical offset for visual feedback.
+	*/
+	// ----------------------------------------------------------
 	void drawDrops(drop instance[], int max) {
 		static f32 bobTimer = 0.0f;
 		f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 		bobTimer += dt;
 
-		const f32 bobPixels    = 5.0f;
+		const f32 bobPixels = 5.0f;
 		const f32 bobFrequency = 1.0f;
 
-		AEGfxTexture* ammoTex   = AssetManager::GetTexture(TEX_DROP);
+		AEGfxTexture* ammoTex = AssetManager::GetTexture(TEX_DROP);
 		AEGfxTexture* healthTex = AssetManager::GetTexture(TEX_HEALTH);
 
 		for (int i{}; i < max; i++) {
@@ -76,51 +125,68 @@ namespace pickup {
 	// WIRE DROP SYSTEM
 	// ====================================================================
 
-	// Per-level tracking: how many enemies have died and whether we have
-	// already dropped a wire on this level.  Reset when the level loads.
 	static int  enemiesKilledThisLevel = 0;
-	static bool wireDroppedThisLevel   = false;
+	static bool wireDroppedThisLevel = false;
 
-	// Probability that the FIRST kill drops a wire (50%).
-	// If the first kill misses, the second kill is guaranteed.
 	static const int kWireDropChancePercent = 50;
 
-	// ---- ResetWireDropTracker ----
-	// Call at the start of every level Initialize so the chance logic
-	// begins fresh for each level.
+	// ----------------------------------------------------------
+	/*!
+	\brief Resets wire drop tracking for a new level.
+
+	Resets:
+	- Enemy kill counter
+	- Drop occurrence flag
+	*/
+	// ----------------------------------------------------------
 	void ResetWireDropTracker()
 	{
 		enemiesKilledThisLevel = 0;
-		wireDroppedThisLevel   = false;
+		wireDroppedThisLevel = false;
 	}
 
-	// ---- InitWireDrops ----
-	// Zeroes out the wire drop array so none are active at level start.
+	// ----------------------------------------------------------
+	/*!
+	\brief Initializes wire drop array.
+
+	\param wireDrops Array of wire drop objects.
+	\param maxCount Maximum number of drops.
+	\param scale Scale applied to each drop.
+
+	Sets all drops to inactive state.
+	*/
+	// ----------------------------------------------------------
 	void InitWireDrops(WireDrop wireDrops[], int maxCount, f32 scale)
 	{
 		for (int i = 0; i < maxCount; ++i)
 		{
-			wireDrops[i].info.xPos   = 0.0f;
-			wireDrops[i].info.yPos   = 0.0f;
+			wireDrops[i].info.xPos = 0.0f;
+			wireDrops[i].info.yPos = 0.0f;
 			wireDrops[i].info.xScale = scale;
 			wireDrops[i].info.yScale = scale;
-			wireDrops[i].info.flag   = 0;   // 0 = inactive
+			wireDrops[i].info.flag = 0;   // 0 = inactive
 		}
 	}
 
-	// ---- TrySpawnWireDrop ----
-	// Called when an enemy dies.  Uses the first/second-kill guarantee
-	// logic described in the design prompt.
-	//
-	// Returns true if a wire was actually placed on the ground.
+	// ----------------------------------------------------------
+	/*!
+	\brief Attempts to spawn a wire drop when an enemy dies.
+
+	\param wireDrops Array of wire drops.
+	\param maxCount Maximum number of drops.
+	\param xPos Spawn X position.
+	\param yPos Spawn Y position.
+	\return True if a wire was spawned.
+
+	Uses first/second kill probability logic and caps total wires.
+	*/
+	// ----------------------------------------------------------
 	bool TrySpawnWireDrop(WireDrop wireDrops[], int maxCount,
 		f32 xPos, f32 yPos)
 	{
-		// If we already spawned 3 wires total, stop
 		if (wireDropsSpawned >= 3)
 			return false;
 
-		// If we already dropped a wire on this level, skip
 		if (wireDroppedThisLevel)
 			return false;
 
@@ -161,12 +227,21 @@ namespace pickup {
 		return false;
 	}
 
+	// ----------------------------------------------------------
+	/*!
+	\brief Updates wire drops and handles player pickup.
 
-	// ---- UpdateWireDrops ----
-	// Checks every active wire drop for overlap with the player.
-	// On pickup: deactivate the drop, increment wireCount, cap at 3.
+	\param wireDrops Array of wire drops.
+	\param maxCount Maximum number of drops.
+	\param playerObj Reference to player object.
+
+	On pickup:
+	- Deactivates drop
+	- Increments wire count (capped)
+	*/
+	// ----------------------------------------------------------
 	void UpdateWireDrops(WireDrop wireDrops[], int maxCount,
-	                     objectsquares& playerObj)
+		objectsquares& playerObj)
 	{
 		for (int i = 0; i < maxCount; ++i)
 		{
@@ -187,28 +262,32 @@ namespace pickup {
 		}
 	}
 
-	// ---- DrawWireDrops ----
-	// Renders every active wire drop with a gentle up-and-down bob,
-	// matching the keycard floating style from draw.cpp.
+	// ----------------------------------------------------------
+	/*!
+	\brief Draws all active wire drops.
+
+	\param wireDrops Array of wire drops.
+	\param maxCount Maximum number of drops.
+
+	Renders with vertical bob animation.
+	*/
+	// ----------------------------------------------------------
 	void DrawWireDrops(WireDrop wireDrops[], int maxCount)
 	{
-		// Shared bob timer -- persists across frames
 		static f32 bobTimer = 0.0f;
 		f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
 		bobTimer += dt;
 
-		// Bob parameters (same as keycard in drawMapWallFloor)
-		const f32 bobPixels    = 5.0f;   // amplitude in pixels
-		const f32 bobFrequency = 1.0f;   // cycles per second
+		const f32 bobPixels = 5.0f;
+		const f32 bobFrequency = 1.0f;
 
 		AEGfxTexture* wireTex = AssetManager::GetTexture(TEX_WIRE);
-		if (!wireTex) return;  // safety: texture not loaded yet
+		if (!wireTex) return;
 
 		for (int i = 0; i < maxCount; ++i)
 		{
 			if (wireDrops[i].info.flag == 0) continue;
 
-			// Calculate floating Y offset
 			f32 yOffset = sinf(bobTimer * bobFrequency * 2.0f * kPi) * bobPixels;
 
 			AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -226,7 +305,6 @@ namespace pickup {
 			AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 		}
 
-		// Reset color state
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
@@ -236,27 +314,43 @@ namespace pickup {
 
 	InfiniteAmmoPool ammoPool;
 
-	// Set position and scale; starts inactive until player runs out of ammo.
+	// ----------------------------------------------------------
+	/*!
+	\brief Initializes infinite ammo pool.
+
+	\param spawnX X position.
+	\param spawnY Y position.
+	\param scale Scale of pool.
+
+	Starts inactive until triggered.
+	*/
+	// ----------------------------------------------------------
 	void InitAmmoPool(f32 spawnX, f32 spawnY, f32 scale)
 	{
-		ammoPool.shape.xPos   = spawnX;
-		ammoPool.shape.yPos   = spawnY;
+		ammoPool.shape.xPos = spawnX;
+		ammoPool.shape.yPos = spawnY;
 		ammoPool.shape.xScale = scale;
 		ammoPool.shape.yScale = scale;
-		ammoPool.isActive     = false;
+		ammoPool.isActive = false;
 	}
 
-	// Activate when bulletCount hits 0; on collision, refill ammo.
+	// ----------------------------------------------------------
+	/*!
+	\brief Updates ammo pool state and handles pickup.
+
+	\param player Reference to player object.
+
+	Activates when ammo reaches zero and refills on collision.
+	*/
+	// ----------------------------------------------------------
 	void UpdateAmmoPool(objectsquares& player)
 	{
-		// Show the pool once the player is out of ammo
 		if (movement::bulletCount <= 0)
 			ammoPool.isActive = true;
 
 		if (!ammoPool.isActive)
 			return;
 
-		// Check overlap with the player
 		if (gamelogic::static_collision(&player, &ammoPool.shape))
 		{
 			movement::bulletCount = 50;
@@ -265,7 +359,13 @@ namespace pickup {
 		}
 	}
 
-	// Draw the ammo pool with a vertical bob when active.
+	// ----------------------------------------------------------
+	/*!
+	\brief Draws infinite ammo pool when active.
+
+	Applies vertical bobbing animation.
+	*/
+	// ----------------------------------------------------------
 	void DrawAmmoPool()
 	{
 		if (!ammoPool.isActive)
