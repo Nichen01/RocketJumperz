@@ -31,7 +31,6 @@ static std::vector<TileAction> actionHistory;
 static f32 doorPromptAlpha = 1.0f;
 static bool showDoorPrompt = false;
 static f32 errorPromptAlpha = 1.0f;
-
 static u32 doorID{};
 
 static int promptRow = -1;

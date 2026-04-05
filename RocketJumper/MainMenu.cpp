@@ -348,17 +348,12 @@ void UpdateMainMenu() {
         if (playButton.isHovered) {
             movement::bulletCount = 50;
             playerEnteredDoorId = -1;
-            wireCount = 0;             // Reset Wires
+            wireCount = 2;             // Reset Wires
             keycardCollected0 = false;  // Reset Keycard
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
             keycardCollected3 = false;  // Reset Keycard
             doorState = 0;             // Reset Final Door
-
-            // Reset checkpoint variables so a new game starts fresh
-            savedAmmo      = 50;
-            savedWireCount = 0;
-            savedHealth    = 150;
 
             next = GS_TUTORIAL;
             printf("Play button clicked - Starting game!\n");
@@ -460,7 +455,6 @@ void MainMenu_Draw() {
 void DrawBackground() {
     AEGfxTexture* bgTex = AssetManager::GetTexture(TEX_MAIN_MENU_BG);
     AEGfxVertexList* quadMesh = AssetManager::GetMesh(MESH_QUAD);
-
 
     if (bgTex && quadMesh) {
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

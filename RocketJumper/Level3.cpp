@@ -215,6 +215,9 @@ void Level3_Initialize()
 		// Lock all doors except for Tutorial -> Level 1
 		door.isLocked = true;
 		if (door.id == 23) {
+			objectinfo3[player].xPos = door.worldX;
+			objectinfo3[player].yPos = door.worldY;
+			spawnSet = true;
 			door.isLocked = false;
 		}
 
