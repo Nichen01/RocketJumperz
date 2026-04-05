@@ -44,7 +44,7 @@ void Pause_Load() {
 	load::pauseMenu();
 	sCounttex = AEGfxTextureLoad("Assets/UI/Menus/greenButton.png");
 	// load font
-	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(72 * screenscale));
+	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(48 * screenscale));
 
 	// Load volume button textures
 	AssetManager::LoadTexture(TEX_VOLUME_UP,   "Assets/UI/volumeUp.png");
@@ -71,8 +71,8 @@ void Pause_Initialize() {
 	// Volume Up sits above the top of the bar, Volume Down below the bottom.
 	const f32 volBtnSize = 50.0f *  screenscale;
 	const f32 soundBarX  = -400.0f *  screenscale;
-	volumeUpButton   = { soundBarX *  screenscale, 310.0f *  screenscale,  volBtnSize *  screenscale, volBtnSize *  screenscale, 1.0f, 1.0f, "", false };
-	volumeDownButton = { soundBarX *  screenscale, -310.0f *  screenscale, volBtnSize *  screenscale, volBtnSize *  screenscale, 1.0f, 1.0f, "", false };
+	volumeUpButton   = { soundBarX , 310.0f *  screenscale,  volBtnSize , volBtnSize , 1.0f, 1.0f, "", false };
+	volumeDownButton = { soundBarX , -310.0f *  screenscale, volBtnSize , volBtnSize , 1.0f, 1.0f, "", false };
 }
 void Pause_Update() {
 	//checks if button are hovered over
