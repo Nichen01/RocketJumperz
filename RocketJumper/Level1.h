@@ -13,7 +13,6 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "pch.h"
-#include "AimingInterface.h"
 #include "Draw.h"
 #include "Collision.h"
 #include "GameStateManager.h"

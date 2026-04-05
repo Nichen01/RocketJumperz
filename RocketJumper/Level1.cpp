@@ -157,7 +157,6 @@ void Level1_Load()
 
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
-	//aiming::loadAiming();
 	weaponSprite::Load();
 
 	// Build the particle system mesh and reset the pool
@@ -336,7 +335,6 @@ void Level1_Update()
 	// Update player physics (drag + position)
 	movement::updatePlayerPhysics(objectinfo1[player]);
 	movement::UpdatePlayerFacing(objectinfo1[player]);
-	//aiming::updateAiming(objectinfo1[player]);
 	weaponSprite::Update(objectinfo1[player]);
 	pickup::updateDrops(L1Drop, MAX_ENEMIES, objectinfo1[player]);
 	pickup::UpdateWireDrops(wireDrops, MAX_ENEMIES, objectinfo1[player]);
@@ -636,7 +634,6 @@ void Level1_Draw()
 	renderlogic::drawSquare(objectinfo1[player].xPos, objectinfo1[player].yPos,
 		playerDrawScaleX, objectinfo1[player].yScale);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-	//aiming::drawAiming();
 	weaponSprite::Draw();
 
 	// Render player projectiles with plasma texture
@@ -789,7 +786,6 @@ void Level1_Unload()
 	for (int i = 0; i < 9; ++i) { mushroomDieTexture[i] = nullptr; }
 	for (int i = 0; i < 5; ++i) { mushroomHitTexture[i] = nullptr; }
 	for (int i = 0; i < 9; ++i) { mushroomIdleTexture[i] = nullptr; }
-	//aiming::unloadAiming();
 	weaponSprite::Unload();
 	// Platform and UI textures are already freed by AssetManager::UnloadAllTextures() above.
 
