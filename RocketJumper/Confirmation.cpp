@@ -70,15 +70,6 @@ void fsDraw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     AEGfxPrint(font, "Our game is best experienced ", -0.25f, 0.3f, 0.55f, 1, 1, 1, 1);
     AEGfxPrint(font, "with fullscreen.", -0.13f, 0.2f, 0.55f, 1, 1, 1, 1);
     AEGfxPrint(font, "Would you like to try that?", -0.25f, 0.f, 0.6f, 1, 1, 1, 1);
-    f32 scrW = static_cast<f32>(screenWidth);
-    f32 scrH = static_cast<f32>(screenLength);
-    AEGfxGetPrintSize(font, "RocketJumper is best experienced in", 1.f, &width, &height);
-    // Scale the panel to 60% of screen width and ~71% of screen height
-    f32 panelW = scrW * 0.6f;
-    f32 panelH = scrH * 0.711f;  // ~640 / 900
-    renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, panelW, panelH);
-    AEGfxPrint(font, "RocketJumper is best experienced in ", -width / 2, 0.40f - height / 2, 1, 1, 1, 1, 1);
-    AEGfxPrint(font, "fullscreen. Go into fullscreen mode?", -width / 2, 0.40f - 3*height / 2, 1, 1, 1, 1, 1);
 
     MenuHelpers::TexdrawButton(yesButton, buttonMesh, font, buttonTex);
     MenuHelpers::TexdrawButton(noButton, buttonMesh, font, buttonTex);
