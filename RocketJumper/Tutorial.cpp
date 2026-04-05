@@ -192,7 +192,7 @@ void Tutorial_Initialize()
 
 	if (!doorTex) printf("DOOR TEXTURE NOT FOUND!\n");
 	else printf("DOOR OK\n");
-	pickup::initDrops(TutDrop, MAX_ENEMIES, PlayerScale);
+	pickup::initDrops(TutDrop, MAX_ENEMIES, PlayerScale-10);
 
 }
 
