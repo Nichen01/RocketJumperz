@@ -18,6 +18,7 @@
 #include "WeaponSprite.h"
 #include "Drops.h"
 #include "InstructionsMenu.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -98,6 +99,9 @@ void Tutorial_Load()
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	//aiming::loadAiming();
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool (needed for jetpack exhaust)
+	ParticleSystem::Load();
 }
 
 void Tutorial_Initialize()
@@ -286,6 +290,9 @@ void Tutorial_Update()
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Step all active particles forward (jetpack exhaust, etc.)
+	ParticleSystem::Update(dt);
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
@@ -504,6 +511,15 @@ void Tutorial_Draw()
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
 
+	// ====== PARTICLE SYSTEM RENDER (jetpack exhaust) ====== //
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfoTut[player].xPos, objectinfoTut[player].yPos - 50.f);
 
@@ -642,6 +658,9 @@ void Tutorial_Unload()
 
 	// Destroy the font created in Initialize (HUD health text)
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 	audio::unloadsound();

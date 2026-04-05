@@ -26,6 +26,8 @@ extern AEAudio Pickup;
 extern AEAudio ArrowSound;
 extern AEAudio GravityToggle;
 extern AEAudio MainMenu;
+extern AEAudio EnergyHum;
+extern AEAudio JetpackThrust;
 extern AEAudioGroup bgm;
 extern AEAudioGroup soundEffects;
 
