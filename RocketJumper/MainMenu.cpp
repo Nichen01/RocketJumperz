@@ -301,8 +301,10 @@ void MainMenu_Init() {
     // Reset menu state
     currentMenuState = MENU_MAIN;
 
-    // Credits scroll starts below the visible screen area
-    creditsScrollY = -scrH * 0.667f;
+    // Credits scroll starts one line-height below the visible screen bottom
+    // so the first line scrolls in smoothly from below.
+    f32 initLineSpacing = scrH * 0.080f;
+    creditsScrollY = -halfH - initLineSpacing;
 
     printf("MainMenu_Init: Main menu initialized\n");
 }
@@ -362,9 +364,10 @@ void UpdateMainMenu() {
             currentMenuState = MENU_INSTRUCTIONS;
             printf("Instructions button clicked!\n");
         }
-        else if (creditsButton.isHovered) { 
+        else if (creditsButton.isHovered) {
             currentMenuState = MENU_CREDITS;
-            creditsScrollY = -scrH * 0.667f; // Reset scroll position
+            f32 resetLineSpacing = scrH * 0.080f;
+            creditsScrollY = -halfH - resetLineSpacing; // Reset scroll to below screen
             printf("Credits button clicked!\n");
         }
         else if (quitButton.isHovered) {
@@ -412,12 +415,24 @@ void UpdateCreditsMenu() {
     // Scroll credits upward each frame
     creditsScrollY += scrollSpeed;
 
-    // The credits content is tall (~28 lines). Once it scrolls far enough past the
-    // top of the screen, wrap back to the starting position below the viewport.
-    // Total content height is roughly 28 lines * lineSpacing (~60px) = ~1680px,
-    // so we allow scrolling up to about 2x screen height before resetting.
-    if (creditsScrollY > scrH * 2.2f) {
-        creditsScrollY = -scrH * 0.667f;
+    // Calculate the total height of the credits content so we know exactly when
+    // the last line has scrolled completely off the top of the screen.
+    // These spacing values must match the ones used in DrawCreditsMenu().
+    f32 lineSpacing = scrH * 0.080f;   // vertical gap between lines
+    f32 sectionGap  = scrH * 0.100f;   // extra gap between sections
+
+    // The draw function steps y downward 22 times by lineSpacing and
+    // 7 times by sectionGap (count derived from DrawCreditsMenu layout).
+    f32 totalContentHeight = 22.0f * lineSpacing + 7.0f * sectionGap;
+
+    // The top edge of the screen in world coordinates is at halfH (scrH / 2).
+    // The bottommost credit line is at (creditsScrollY - totalContentHeight).
+    // Add one extra lineSpacing of margin so the last line fully exits the top
+    // before the reset fires -- this prevents the text from visibly popping.
+    if (creditsScrollY - totalContentHeight > halfH + lineSpacing) {
+        // Place the first line below the bottom of the screen so it scrolls
+        // in smoothly from below, matching the initial entrance behavior.
+        creditsScrollY = -halfH - lineSpacing;
     }
 
     // Handle back button click
@@ -704,7 +719,7 @@ void DrawCreditsMenu() {
         
     }
 
-    // ---- Fixed "BACK" button at the bottom of the screen ----
+    // Back button at the bottom of the screen
     AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_BUTTON);
     AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
     MenuHelpers::TexdrawButton(backButton, btnMesh, menuFont, btnTex);

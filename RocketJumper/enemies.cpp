@@ -375,13 +375,13 @@ namespace enemySystem {
             // ==============================================================
             if (enemies[i].type == ENEMY_RANGED)
             {
-                // --- Update facing direction based on horizontal velocity ---
+                // Update facing direction based on horizontal velocity
                 if (enemies[i].shape.velocityX > 0.1f)
                     enemies[i].facingRight = 1;
                 else if (enemies[i].shape.velocityX < -0.1f)
                     enemies[i].facingRight = 0;
 
-                // --- State transitions (highest priority first) ---
+                // State transitions (highest priority first) 
                 if (enemies[i].health <= 0.0f)
                 {
                     // Transition to death state, stop all movement
@@ -414,7 +414,7 @@ namespace enemySystem {
                 }
                 else if (enemies[i].attackCooldown > (RANGED_ATTACK_COOLDOWN - kRangedFrameDelay * kRangedAttackCols))
                 {
-                    // Enemy just fired -- play attack anim for attack-anim duration
+                    // Enemy just fired, play attack anim for attack-anim duration
                     SetEnemyState(enemies[i], STATE_ATTACK);
                 }
                 else if (fabsf(enemies[i].shape.velocityX) > 0.1f)
