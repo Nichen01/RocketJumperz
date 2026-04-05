@@ -285,7 +285,7 @@ void MainMenu_Init() {
     f32 startY = 0.0f;
 
     playButton         = { 0.0f, startY,                btnW, btnH, 1.0f, 1.0f, "PLAY",         false };
-    instructionsButton = { 0.0f, startY - btnGap,       btnW, btnH, 1.0f, 1.0f, "INSTRUCTIONS", false };
+    instructionsButton = { 0.0f, startY - btnGap,       btnW, btnH, 1.0f, 1.0f, "CONTROLS", false };
     creditsButton      = { 0.0f, startY - btnGap * 2.0f, btnW, btnH, 1.0f, 1.0f, "CREDITS",     false };
     quitButton         = { 0.0f, startY - btnGap * 3.0f, btnW, btnH, 1.0f, 1.0f, "QUIT",        false };
     settingBtn         = { -750.f, -400.f, 64.f, 64.f, 1.0f, 1.0f, "", false };

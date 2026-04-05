@@ -59,7 +59,7 @@ void fsDraw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, 470.f * screenscale, 600.f * screenscale);
     AEGfxPrint(font, "Fullscreen Mode", -0.26f, 0.5f, 0.8f, 1, 1, 1, 1);
     AEGfxPrint(font, "Our game is best experienced ", -0.25f, 0.3f, 0.55f, 1, 1, 1, 1);
-    AEGfxPrint(font, "with fullscreen.", -0.13f, 0.2f, 0.55f, 1, 1, 1, 1);
+    AEGfxPrint(font, "in fullscreen.", -0.13f, 0.2f, 0.55f, 1, 1, 1, 1);
     AEGfxPrint(font, "Would you like to try that?", -0.25f, 0.f, 0.6f, 1, 1, 1, 1);
 
     MenuHelpers::TexdrawButton(yesButton, buttonMesh, font, buttonTex);
