@@ -278,7 +278,7 @@ void Level1_Initialize()
 
 	animSystem::init(doorAnim, 7, 1, DOOR_FRAME_COUNT, DOOR_FRAME_DELAY, ANIM_IDLE, 0);
 	doorIsOpen = false;
-	pickup::initDrops(L1Drop, MAX_ENEMIES,PlayerScale-10);
+	pickup::initDrops(L1Drop, MAX_ENEMIES,PlayerScale-20);
 
 	// Wire drops: reset per-level tracker and initialize wire drop array
 	pickup::ResetWireDropTracker();

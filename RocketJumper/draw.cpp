@@ -194,7 +194,7 @@ namespace renderlogic {
 							f32 yPos = AEGfxGetWindowHeight() / 2 - ((float)yo + mapS / 2) + yOffset;
 
 							AEGfxTextureSet(healthDrop, 0, 0);
-							renderlogic::drawSquare(xPos, yPos, (float)mapS, (float)mapS);
+							renderlogic::drawSquare(xPos, yPos, hp.size, hp.size);
 							AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 						}
 						break;
