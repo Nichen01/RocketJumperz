@@ -1,8 +1,9 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  Confirmation.cpp
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
-\brief        Contatins functions that create confirmation screen
+\brief        Contatins functions that create Confirmation screen
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

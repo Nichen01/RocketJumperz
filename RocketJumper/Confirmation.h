@@ -1,8 +1,9 @@
 /* Start Header ************************************************************************/
 /*!
-\file		  Collision.h
+\file		  Confirmation.h
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
-\brief        Header file for Collision.cpp
+\brief        Header file for Confirmation.cpp
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

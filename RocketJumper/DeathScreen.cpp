@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  DeathScreen.cpp
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
 \brief        functions used to create Death Screen
 

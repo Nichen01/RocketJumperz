@@ -1,8 +1,9 @@
 /* Start Header ************************************************************************/
 /*!
-\file		  sound.h
+\file		  Sound.h
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
-\brief        Header file for sound.cpp
+\brief        Header file for Sound.cpp
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  Collision.cpp
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
 \brief        contain functions that calculate collision
 

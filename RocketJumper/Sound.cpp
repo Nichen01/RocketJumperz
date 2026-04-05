@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  sound.cpp
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
 \brief        Contain functions to handle audio
 
