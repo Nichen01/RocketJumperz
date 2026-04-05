@@ -173,6 +173,10 @@ enum TextureID {
     TEX_BORDER_B,   // bottom edge
     TEX_BORDER_BR,  // bottom-right corner
 
+    // Volume control button textures (pause menu sound bar)
+    TEX_VOLUME_UP,
+    TEX_VOLUME_DOWN,
+
     // Add new textures above this line
     TEX_MAX
 };

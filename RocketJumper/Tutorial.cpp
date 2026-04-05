@@ -424,7 +424,7 @@ void Tutorial_Draw()
 	sprintf_s(strBuffer, "Spacebar to Jump");
 	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
-	sprintf_s(strBuffer, "G To Toggle Gravity");
+	sprintf_s(strBuffer, "Left Shift To Toggle Gravity");
 	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 1.f, 1.f, 1.f, 1.f);
 
 	sprintf_s(strBuffer, "Q to Switch Weapon");
@@ -440,7 +440,7 @@ void Tutorial_Draw()
 	renderlogic::drawTileArray();
 	renderlogic::drawUITexture(350.f, -280.f, leftClick, 55.f);
 	renderlogic::drawUITexture(-50.f, -280.f, rightClick, 55.f);
-	renderlogic::drawUITexture(200.f, 50.f, gButton, 55.f);
+	renderlogic::drawUITexture(200.f, 50.f, shiftButton, 55.f);
 	renderlogic::drawUITexture(-600.f, -280.f, qButton, 55.f);
 	renderlogic::drawUITexture(-600.f, 10.f, spacebar, 55.f);
 	renderlogic::drawUITexture(280.f, 250.f, eButton, 55.f);

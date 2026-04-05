@@ -216,7 +216,13 @@ namespace animSystem
             static_cast<f32>(anim.cols);
     }
 
-    // same as getUoffset but for V
+    /*!*************************************************************************
+     * GET V OFFSET
+     * @brief Calculates the vertical (V) UV coordinate for texture mapping
+     *
+     * @param anim                Constant reference to the animation struct
+     * @return f32                The resulting v offset float
+     ***************************************************************************/
     f32 getVOffset(const SpriteAnimation& anim)
     {
         // Guard: avoid integer division by zero if cols or rows was never set
