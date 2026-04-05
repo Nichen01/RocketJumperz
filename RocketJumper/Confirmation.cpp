@@ -47,7 +47,7 @@ void Confirmation_Draw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, panelW, panelH);
 
     AEGfxGetPrintSize(font, "YOU SURE?", 0.8f, &width, &height);
-    AEGfxPrint(font, "YOU SURE?", -0.26f, 0.51f, 0.8f, 1, 1, 1, 1);
+    AEGfxPrint(font, "YOU SURE?", -0.2f, 0.53f, 0.9f, 1, 1, 1, 1);
     MenuHelpers::TexdrawButton(yesButton, buttonMesh, font, buttonTex);
     MenuHelpers::TexdrawButton(noButton, buttonMesh, font, buttonTex);
 }
