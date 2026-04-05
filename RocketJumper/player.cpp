@@ -2,13 +2,13 @@
 #include "Collision.h"
 #include <cstdio>
 
-int wireCount = 0;
+int wireCount = 1;
 
 // ---- Checkpoint Variables ----
 // Saved at each level transition so the player keeps progress from prior levels.
 // Reset to defaults when starting a new game from the main menu.
-int savedWireCount  = 0;
-int savedAmmo       = 50;
+int savedWireCount  = 1;
+int savedAmmo       = 500;
 int savedHealth     = kPlayerMaxHealth;
 
 bool keycardCollected0 = false;

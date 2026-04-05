@@ -348,7 +348,7 @@ void UpdateMainMenu() {
         if (playButton.isHovered) {
             movement::bulletCount = 50;
             playerEnteredDoorId = -1;
-            wireCount = 0;             // Reset Wires
+            wireCount = 1;             // Reset Wires
             keycardCollected0 = false;  // Reset Keycard
             keycardCollected1 = false;  // Reset Keycard
             keycardCollected2 = false;  // Reset Keycard
