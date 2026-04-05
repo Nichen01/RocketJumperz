@@ -166,7 +166,7 @@ void Level1_Load()
 void Level1_Initialize()
 {
 	InstructionsMenu::Init();
-
+	currentGameLevel = 1;
 	// Only reset if this is the very first time entering Level1
 	if (!playerEnteredDoor1 && !keycardCollected1) {
 		key.active = true;   // spawn card
@@ -180,7 +180,6 @@ void Level1_Initialize()
 	plasma = AssetManager::GetTexture(TEX_PLASMA);
 	doorTex = AssetManager::GetTexture(TEX_DOOR);
 	keyTexture = AssetManager::GetTexture(TEX_KEYCARD);
-	currentGameLevel = 1;
 	AEAudioPlay(Level, bgm, MainVolume, 1.0f, -1);
 
 	// Font is already created in Level1_Load -- do NOT recreate here.
@@ -302,6 +301,7 @@ void Level1_Update()
 
 	//====== TOGGLE LEVEL EDITOR GAME STATE ======//
 	if (AEInputCheckTriggered(AEVK_L)) {
+		currentGameLevel = 1;
 		next = GS_LEVELEDITOR;
 	}
 

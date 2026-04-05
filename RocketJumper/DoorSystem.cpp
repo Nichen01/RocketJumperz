@@ -18,7 +18,7 @@
 #include "pch.h"
 #include "DoorSystem.h"
 
-int currentGameLevel = 0;
+int currentGameLevel = 1;
 int playerEnteredDoorId = 0;
 
 std::vector<DoorLink> doors;

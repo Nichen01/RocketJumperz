@@ -98,13 +98,13 @@ void DeathScreen_Update() {
             // but loses anything collected during the level they died on.
             movement::bulletCount = savedAmmo;
             wireCount             = savedWireCount;
-
+            
             // Only reset the keycard for the level the player died on
             switch (currentGameLevel) {
-            case 0: keycardCollected0 = false; playerEnteredDoor0 = false; break;
-            case 1: keycardCollected1 = false; playerEnteredDoor1 = false; break;
-            case 2: keycardCollected2 = false; playerEnteredDoor2 = false; break;
-            case 3: keycardCollected3 = false; break;
+            case 0: keycardCollected0 = false; playerEnteredDoor0 = false; currentGameLevel = 0; break;
+            case 1: keycardCollected1 = false; playerEnteredDoor1 = false; currentGameLevel = 1; break;
+            case 2: keycardCollected2 = false; playerEnteredDoor2 = false; currentGameLevel = 2; break;
+            case 3: keycardCollected3 = false; currentGameLevel = 3; break;
             }
             //confirmation check
             destructive = true;
@@ -114,10 +114,10 @@ void DeathScreen_Update() {
                 canpause = true;
                 // Send the player back to the level they died on, not the tutorial
                 switch (currentGameLevel) {
-                case 0: next = GS_TUTORIAL; break;
-                case 1: next = GS_LEVEL1;   break;
-                case 2: next = GS_LEVEL2;   break;
-                case 3: next = GS_LEVEL3;   break;
+                case 0: next = GS_TUTORIAL;  currentGameLevel = 0; break;
+                case 1: next = GS_LEVEL1;   currentGameLevel = 1; break;
+                case 2: next = GS_LEVEL2;   currentGameLevel = 2; break;
+                case 3: next = GS_LEVEL3;   currentGameLevel = 3; break;
                 default: next = GS_TUTORIAL; break;
                 }
             }
