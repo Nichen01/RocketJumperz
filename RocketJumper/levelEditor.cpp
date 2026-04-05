@@ -15,6 +15,7 @@
 /* End Header **************************************************************************/
 
 #include "LevelEditor.h"
+#include "main.h"
 
 // ==================== GLOBAL RESOURCES ==================== //
 static AEGfxTexture* door;
@@ -539,7 +540,10 @@ void LevelEditor_Update() {
 		currentGameLevel = 3;
 		next = GS_RESTART;
 	}
-	if (AEInputCheckTriggered(AEVK_L)) next = (level == 1) ? GS_LEVEL1 : (level == 2) ? GS_LEVEL2 : GS_LEVEL3;
+	if (AEInputCheckTriggered(AEVK_L)) {
+		next = (level == 1) ? GS_LEVEL1 : (level == 2) ? GS_LEVEL2 : GS_LEVEL3;
+		canpause = true;
+	}
 
 	// When user is at the door's tile index, this prompt will be shown to ask the user to pick a level to link to the current level they are at.
 	if (showDoorPrompt) {

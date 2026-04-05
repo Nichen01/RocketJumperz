@@ -348,6 +348,7 @@ void UpdateMainMenu() {
     // Handle button clicks
     if (AEInputCheckTriggered(AEVK_LBUTTON)) {
         if (playButton.isHovered) {
+            canpause = true;
             movement::bulletCount = 50;
             playerEnteredDoorId = -1;
             wireCount = 0;             // Reset Wires

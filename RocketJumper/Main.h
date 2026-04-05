@@ -19,5 +19,6 @@ Technology is prohibited.
 #include "GameStateList.h"
 
 extern bool pause;
+extern bool canpause;
 extern f32  screenscale;
 #endif
