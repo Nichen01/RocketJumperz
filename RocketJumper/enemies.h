@@ -3,7 +3,6 @@
 /*!
 \file		  enemy.h
 \author       Nicholas Chen (c.chen)
-\date         January, 31, 2026
 \brief        Enemy system with melee and ranged enemy types
 
 Copyright (C) 2026 DigiPen Institute of Technology.

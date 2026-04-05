@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file         WeaponSprite.cpp
+\author       Nicholas Chen (c.chen)
 \brief        Implements 360-degree mouse-aimed weapon sprite rendering.
 
               The gun sprite continuously rotates to point at the mouse cursor.

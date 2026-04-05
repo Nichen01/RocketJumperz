@@ -1,3 +1,14 @@
+/* Start Header ************************************************************************/
+/*!
+\file         InstructionsMenu.cpp
+\author       Jeremiah He
+\brief        In-game instructions overlay triggered by a "?" icon.
+              When active the level's Update is skipped (game pauses).
+              Closed via a "Back" button or the Escape key.
+*/
+/* End Header **************************************************************************/
+
+
 #include "Movement.h"
 #include "Sound.h"
 #include "ParticleSystem.h"

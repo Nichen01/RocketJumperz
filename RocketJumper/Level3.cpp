@@ -677,7 +677,7 @@ void Level3_Draw()
 		AEGfxPrint(fontLevel3, healthText, -0.88f, 0.88f, 0.8f, 0.0f, 1.0f, 0.0f, 1.0f);
 
 		// ---- Ammo icon + count (right beside health) ----
-		f32 ammoIconX = healthIconX + 200.f;  // offset to the right of health (increased for readability)
+		f32 ammoIconX = healthIconX + 225.f;  // offset to the right of health (increased for readability)
 		f32 ammoIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
@@ -690,14 +690,14 @@ void Level3_Draw()
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxPrint(fontLevel3, ammoText, -0.63f, 0.88f, 0.8f, 1.0f, 1.0f, 0.0f, 1.0f);
+		AEGfxPrint(fontLevel3, ammoText, -0.59f, 0.88f, 0.8f, 1.0f, 1.0f, 0.0f, 1.0f);
 
 		// ---- Current weapon sprite (below health row) ----
 		// Show the sprite of the currently equipped weapon
 		AEGfxTexture* weaponIcon = (objectinfo3[player].currentWeapon == WEAPON_SHOTGUN)
 			? AssetManager::GetTexture(TEX_SHOTGUN)
 			: AssetManager::GetTexture(TEX_PLASMA_GUN);
-		f32 weaponIconX = healthIconX + 400.f;
+		f32 weaponIconX = healthIconX + 475.f;
 		f32 weaponIconY = healthIconY;
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
