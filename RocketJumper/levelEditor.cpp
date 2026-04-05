@@ -719,7 +719,10 @@ void LevelEditor_Draw() {
 						bool placeKey = false;
 						if (level == 1 && keyCountLevel1 == 0) placeKey = true;
 						else if (level == 2 && keyCountLevel2 == 0) placeKey = true;
-						else if (level == 3) wrongKeyLevelError = true;
+						else if (level == 3) {
+							wrongKeyLevelError = true;
+							AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
+						}
 
 						if (placeKey) {
 							TileAction action;
