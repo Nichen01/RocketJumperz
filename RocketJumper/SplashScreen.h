@@ -3,7 +3,6 @@
 /*!
 \file         SplashScreen.h
 \author       Nicholas Chen
-\date         March 20, 2026
 \brief        DigiPen splash screen shown on game launch. Displays the DigiPen logo
               centered on screen with a fade-in/hold/fade-out animation.
               Press SPACE to skip directly to the main menu.

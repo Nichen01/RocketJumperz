@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file         AssetManager.h
+\author       Nicholas Chen (c.chen)
 \brief        Centralized cache for AEGfxTexture* and AEGfxVertexList* assets.
 */
 /* End Header **************************************************************************/

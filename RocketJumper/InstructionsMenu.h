@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file         InstructionsMenu.h
+\author       Nicholas Chen (c.chen)
 \brief        In-game "?" icon overlay that pauses gameplay and shows an instructions image.
               Integrated into each level's Load/Init/Update/Draw/Unload cycle.
 */
