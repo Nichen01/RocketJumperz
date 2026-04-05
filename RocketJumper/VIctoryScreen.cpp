@@ -14,6 +14,7 @@ Technology is prohibited.
 #include "VictoryScreen.h"
 #include "Draw.h"
 #include "Confirmation.h"
+#include "main.h"
 
 static s8 victoryfont = -1;
 static f32 width, height;
@@ -51,7 +52,7 @@ void VictoryScreen_Load() {
         printf("Warning: MenuBackground.png not found. Using solid color background.\n");
     }
     // load font
-    victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+    victoryfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(72 * screenscale));
 }
 void VictoryScreen_Init() {
     //play audio
@@ -75,11 +76,11 @@ void VictoryScreen_Init() {
     // initialize data
     Confirmation_Init(yesButton, noButton);
 
-    float buttonwidth = 390.0f;
-    float buttonlength = 80.0f;
+    float buttonwidth = 390.0f * screenscale;
+    float buttonlength = 80.0f * screenscale;
     restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESTART", false };
-    tomenuButton = { 0.0f, -120.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
-    exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
+    tomenuButton = { 0.0f, -120.0f * screenscale, buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
+    exitButton = { 0.0f, -240.0f * screenscale, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
 void VictoryScreen_Update() {
     //checks if button are hovered over
@@ -171,7 +172,7 @@ void VictoryScreen_Draw() {
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxTextureSet(TitleTex, 0, 0);
     AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-    renderlogic::drawSquare(0.0f, 247.0f, 285.0f*multi, 115.0f * multi);
+    renderlogic::drawSquare(0.0f, 247.0f * screenscale, 285.0f*multi * screenscale, 115.0f * multi * screenscale);
     AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
 
     AEGfxGetPrintSize(victoryfont, "VICTORY", 1.f, &width, &height);

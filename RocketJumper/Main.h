@@ -8,5 +8,5 @@
 #include "GameStateList.h"
 
 extern bool pause;
-
+extern f32  screenscale;
 #endif

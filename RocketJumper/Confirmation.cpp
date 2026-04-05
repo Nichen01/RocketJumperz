@@ -16,11 +16,11 @@ Technology is prohibited.
 #include "Main.h"
 
 void Confirmation_Init(MenuButton &yesButton, MenuButton &noButton) {
-    float buttonwidth = 350.0f;
-    float buttonlength = 70.0f;
-    yesButton = {0.0f, -110.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "YES", false };
-    noButton = {0.0f, -210.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "NO", false };
-    // Scale button dimensions relative to screen size so they look correct
+    //float buttonwidth = 350.0f;
+    //float buttonlength = 70.0f;
+    //yesButton = {0.0f, -110.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "YES", false };
+    //noButton = {0.0f, -210.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "NO", false };
+    //// Scale button dimensions relative to screen size so they look correct
     // in both windowed and fullscreen modes.
     f32 scrW = static_cast<f32>(screenWidth);
     f32 scrH = static_cast<f32>(screenLength);
@@ -47,7 +47,6 @@ void Confirmation_Update(MenuButton& yesButton, MenuButton& noButton,s8& leave) 
 void Confirmation_Draw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     // draw backgoround and buttons
     f32 width, height;
-    renderlogic::drawTexture(0.f, 0.f, menuTex, buttonMesh, 500.f, 640.f);
     // Scale the confirmation panel relative to screen size
     f32 scrW = static_cast<f32>(screenWidth);
     f32 scrH = static_cast<f32>(screenLength);
@@ -58,8 +57,6 @@ void Confirmation_Draw(s8 font, MenuButton& yesButton, MenuButton& noButton) {
     AEGfxGetPrintSize(font, "YOU SURE?", 1.f, &width, &height);
     AEGfxPrint(font, "YOU SURE?", -0.06f -width / 2, 0.55f - height / 2, 1, 1, 1, 1, 1);
 
-    AEGfxGetPrintSize(font, "YOU SURE?", 0.8f, &width, &height);
-    AEGfxPrint(font, "YOU SURE?", -0.26f, 0.51f, 0.8f, 1, 1, 1, 1);
     MenuHelpers::TexdrawButton(yesButton, buttonMesh, font, buttonTex);
     MenuHelpers::TexdrawButton(noButton, buttonMesh, font, buttonTex);
 }

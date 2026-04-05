@@ -16,6 +16,7 @@ bool pause = false;
 bool canpause = true;
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
+f32  screenscale = static_cast<f32>(screenWidth) / 1600.0f;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR    lpCmdLine,
