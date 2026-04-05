@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
-\file         Animation.cpp
-\author       Nicholas Chen
+\file         animation.cpp
+\author       Nicholas Chen (c.chen)
 \date         February, 22, 2026
 \brief        Implementation of the modular sprite animation system.
 

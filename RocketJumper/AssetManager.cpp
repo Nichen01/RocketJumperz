@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file         AssetManager.cpp
+\author       Nicholas Chen (c.chen)
 \brief        Implementation of the centralized asset registry.
 */
 /* End Header **************************************************************************/

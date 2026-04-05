@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file         ParticleSystem.cpp
+\author       Nicholas Chen (c.chen)
 \brief        Implementation of the object-pool particle system.
               Uses a fixed-size static array for zero runtime allocations.
 

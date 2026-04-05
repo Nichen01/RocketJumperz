@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  Tutorial.h
-\date         April, 01, 2026
+\author		  Nicholas Chen (c.chen), Joraye Chan (c.joraye)	
 \brief        Header file for tutorial
 
 Copyright (C) 2026 DigiPen Institute of Technology.
