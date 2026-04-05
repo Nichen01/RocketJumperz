@@ -107,7 +107,7 @@ int ImportMapDataFromFile(const char* FileName)
 			if (value == 60) {
 				hp.worldX = ((float)col * tileSize + tileSize / 2) - 800.f;
 				hp.worldY = 450.f - ((float)row * tileSize + tileSize / 2);
-				hp.size = (float)tileSize;
+				hp.size = static_cast<f32>(tileSize-20);
 				hp.active = true;
 				hp.collected = false;
 				if (currentGameLevel == 1) healthCountLevel1 = 1;

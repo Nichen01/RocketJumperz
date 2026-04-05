@@ -56,7 +56,7 @@ struct Key {
 struct HealthPack {
 	f32 worldX;
 	f32 worldY;
-	f32 size{ 80.f };
+	f32 size{ 60.f };
 	bool active{ true };
 	bool collected = false;
 };
