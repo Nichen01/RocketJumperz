@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "Sound.h"
 #include "Main.h"
 #include "Confirmation.h"
+#include "AssetManager.h"
 
 static s8 pausefont = -1;
 static f32 width, height;
@@ -25,6 +26,12 @@ static MenuButton exitButton;
 static MenuButton tomenuButton;
 static MenuButton yesButton;
 static MenuButton noButton;
+
+// Volume control buttons (positioned at top/bottom of the sound bar)
+static MenuButton volumeUpButton;
+static MenuButton volumeDownButton;
+static AEGfxTexture* volumeUpTex   = nullptr;
+static AEGfxTexture* volumeDownTex = nullptr;
 
 AEGfxTexture* sCounttex;
 
@@ -38,6 +45,12 @@ void Pause_Load() {
 	sCounttex = AEGfxTextureLoad("Assets/UI/Menus/greenButton.png");
 	// load font
 	pausefont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+
+	// Load volume button textures
+	AssetManager::LoadTexture(TEX_VOLUME_UP,   "Assets/UI/volumeUp.png");
+	AssetManager::LoadTexture(TEX_VOLUME_DOWN,  "Assets/UI/volumeDown.png");
+	volumeUpTex   = AssetManager::GetTexture(TEX_VOLUME_UP);
+	volumeDownTex = AssetManager::GetTexture(TEX_VOLUME_DOWN);
 }
 
 void Pause_Initialize() {
@@ -52,6 +65,14 @@ void Pause_Initialize() {
 	resumeButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESUME", false };
 	tomenuButton = { 0.0f, -120.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
 	exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
+
+	// Volume up/down buttons, aligned with the sound bar at x=-400.
+	// The sound bar squares start at y=-250 and go up by 56px each (10 max).
+	// Volume Up sits above the top of the bar, Volume Down below the bottom.
+	const f32 volBtnSize = 50.0f;
+	const f32 soundBarX  = -400.0f;
+	volumeUpButton   = { soundBarX, 310.0f,  volBtnSize, volBtnSize, 1.0f, 1.0f, "", false };
+	volumeDownButton = { soundBarX, -310.0f, volBtnSize, volBtnSize, 1.0f, 1.0f, "", false };
 }
 void Pause_Update() {
 	//checks if button are hovered over
@@ -59,6 +80,8 @@ void Pause_Update() {
 		MenuHelpers::updateButtonHover(resumeButton);
 		MenuHelpers::updateButtonHover(tomenuButton);
 		MenuHelpers::updateButtonHover(exitButton);
+		MenuHelpers::updateButtonHover(volumeUpButton);
+		MenuHelpers::updateButtonHover(volumeDownButton);
 	}
 	else {
 		Confirmation_Update(yesButton, noButton,leave);
@@ -79,7 +102,25 @@ void Pause_Update() {
 		sCount = sCount >= 10 ? 10 : sCount;
 		AEAudioSetGroupVolume(bgm, MainVolume);
 	}
-	// Handle button clicks
+
+	//====== AUDIO CONTROLS (clickable volume buttons) ======//
+	if (AEInputCheckTriggered(AEVK_LBUTTON)) {
+		if (volumeUpButton.isHovered) {
+			MainVolume += 0.1f;
+			++sCount;
+			MainVolume = MainVolume >= 1.f ? 1.0f : MainVolume;
+			sCount = sCount >= 10 ? 10 : sCount;
+			AEAudioSetGroupVolume(bgm, MainVolume);
+		}
+		if (volumeDownButton.isHovered) {
+			MainVolume -= 0.1f;
+			--sCount;
+			MainVolume = MainVolume <= 0.f ? 0.0f : MainVolume;
+			sCount = sCount <= 0 ? 0 : sCount;
+			AEAudioSetGroupVolume(bgm, MainVolume);
+		}
+	}
+
 	if (AEInputCheckTriggered(AEVK_LBUTTON)) {
 		if (resumeButton.isHovered) {
 			pause = false;  // Change to test file if needed
@@ -134,7 +175,21 @@ void Pause_Draw() {
 	for (s8 i{}; i < sCount; ++i) {
 		renderlogic::drawTexture(-400.f, -250.f+(static_cast<f32>(i)*56), sCounttex, buttonMesh, 45.f, 45.f);
 	}
-	// render conformation screen
+
+	// Draw volume up button (above the sound bar) and volume down button (below)
+	if (volumeUpTex) {
+		renderlogic::drawTexture(volumeUpButton.x, volumeUpButton.y,
+			volumeUpTex, buttonMesh,
+			volumeUpButton.width * volumeUpButton.scale,
+			volumeUpButton.height * volumeUpButton.scale);
+	}
+	if (volumeDownTex) {
+		renderlogic::drawTexture(volumeDownButton.x, volumeDownButton.y,
+			volumeDownTex, buttonMesh,
+			volumeDownButton.width * volumeDownButton.scale,
+			volumeDownButton.height * volumeDownButton.scale);
+	}
+
 	if (destructive) {
 		Confirmation_Draw(pausefont, yesButton,noButton);
 	}

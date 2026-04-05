@@ -171,9 +171,6 @@
     <ClInclude Include="Enemies.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Gameover.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="GameStateList.h">
       <Filter>Header</Filter>
     </ClInclude>
