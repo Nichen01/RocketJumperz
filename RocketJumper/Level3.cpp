@@ -302,6 +302,11 @@ void Level3_Initialize()
 
 void Level3_Update()
 {
+	// DEBUGGING FEATURE TO TRANSIT TO DIFFERENT LEVELS
+	if (AEInputCheckCurr(AEVK_1)) next = GS_TUTORIAL;
+	else if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL1;
+	else if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
+
 	// If the instructions overlay is open, skip all gameplay logic (pause)
 	if (InstructionsMenu::Update()) return;
 
@@ -421,8 +426,6 @@ void Level3_Update()
 	gamelogic::Collision_movement(&enemies[0].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&enemies[1].shape, map, x, static_cast<int>(tileSize), 1);
 	gamelogic::Collision_movement(&objectinfo3[player], map, x, static_cast<int>(tileSize), 1);
-
-	if (AEInputCheckCurr(AEVK_4)) wireCount = 2;
 
 	// -----------------------------------------------------------------------
 	// Door animation

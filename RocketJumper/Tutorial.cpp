@@ -196,6 +196,11 @@ void Tutorial_Initialize()
 
 void Tutorial_Update()
 {
+	// DEBUGGING FEATURE TO TRANSIT TO DIFFERENT LEVELS
+	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL1;
+	else if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
+	else if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
+
 	// If the instructions overlay is open, skip all gameplay logic (pause)
 	if (InstructionsMenu::Update()) return;
 
