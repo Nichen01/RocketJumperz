@@ -16,19 +16,10 @@ Technology is prohibited.
 #include "Main.h"
 
 void Confirmation_Init(MenuButton &yesButton, MenuButton &noButton) {
-    //float buttonwidth = 350.0f;
-    //float buttonlength = 70.0f;
-    //yesButton = {0.0f, -110.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "YES", false };
-    //noButton = {0.0f, -210.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "NO", false };
-    //// Scale button dimensions relative to screen size so they look correct
-    // in both windowed and fullscreen modes.
-    f32 scrW = static_cast<f32>(screenWidth);
-    f32 scrH = static_cast<f32>(screenLength);
-    float buttonwidth  = scrW * 0.244f;   // ~390 / 1600
-    float buttonheight = scrH * 0.089f;   // ~80  / 900
-    float btnGap       = scrH * 0.056f;   // ~50  / 900 (vertical offset from center)
-    yesButton = {0.0f,  btnGap, buttonwidth, buttonheight, 1.0f, 1.0f, "YES", false };
-    noButton  = {0.0f, -btnGap, buttonwidth, buttonheight, 1.0f, 1.0f, "NO",  false };
+    float buttonwidth = 350.0f;
+    float buttonlength = 70.0f;
+    yesButton = {0.0f, -110.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "YES", false };
+    noButton = {0.0f, -210.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "NO", false };
 }
 void Confirmation_Update(MenuButton& yesButton, MenuButton& noButton,s8& leave) {
     MenuHelpers::updateButtonHover(yesButton);
