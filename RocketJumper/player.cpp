@@ -1,3 +1,25 @@
+/* Start Header ************************************************************************/
+/*!
+\file         player.cpp
+\author       Nicholas Chen
+\date         February, 22, 2026
+\brief        Player State & Damage System
+
+Handles player progression data, health, and damage logic.
+
+Global state: Tracks wires, keycards, door state, and checkpoint values (ammo, health, wires) for persistence across levels.
+InitPlayerHealth: Resets health to max and clears invincibility timer.
+PlayerTakeDamage: Applies damage if not invincible, clamps health, and starts invincibility window.
+UpdatePlayerInvincibility: Decrements invincibility timer each frame.
+
+Ensures controlled damage intake and consistent state across gameplay.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "Player.h"
 #include "Collision.h"
 #include <cstdio>
