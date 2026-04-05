@@ -227,7 +227,7 @@ void Level3_Initialize()
 	}
 	// fallback if no door found (first time loading)
 	if (!spawnSet) {
-		objectinfo3[player].xPos = 0.f;
+		objectinfo3[player].xPos = -80.f;
 		objectinfo3[player].yPos = 0.f;
 	}
 	objectinfo3[player].xScale = PlayerScale;
