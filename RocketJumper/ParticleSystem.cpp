@@ -14,6 +14,7 @@ Technology is prohibited.
 
 #include "pch.h"           // Brings in AEEngine.h, cmath, cstdlib, etc.
 #include "ParticleSystem.h"
+#include "AssetManager.h"  // For MESH_PARTICLE and centralized mesh management
 
 // -----------------------------------------------------------------------
 // File-local (private) data -- only accessible inside this .cpp
@@ -21,11 +22,6 @@ Technology is prohibited.
 
 // The object pool: a fixed array of particles. No new/delete at runtime.
 static Particle sParticles[MAX_PARTICLES];
-
-// A small white quad mesh built once in Load() and freed in Unload().
-// We manage this locally instead of adding an entry to AssetManager
-// so the particle system stays fully self-contained.
-static AEGfxVertexList* sParticleMesh = nullptr;
 
 // -----------------------------------------------------------------------
 // Helper: returns a random float in [0.0, 1.0]
@@ -54,26 +50,11 @@ void ParticleSystem::Load() {
         sParticles[i].isActive = false;
     }
 
-    // Build a 1x1 unit quad mesh with white vertex colour (0xFFFFFFFF).
+    // Build a 1x1 unit quad with white vertex colour (0xFFFFFFFF) via AssetManager.
     // White vertices let us control the final colour entirely through
     // AEGfxSetColorToMultiply / AEGfxSetColorToAdd at draw time.
-    if (sParticleMesh != nullptr) {
-        AEGfxMeshFree(sParticleMesh);
-        sParticleMesh = nullptr;
-    }
-
-    AEGfxMeshStart();
-    AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,   // bottom-left
-         0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right
-        -0.5f,  0.5f, 0xFFFFFFFF, 0.0f, 0.0f    // top-left
-    );
-    AEGfxTriAdd(
-         0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right
-         0.5f,  0.5f, 0xFFFFFFFF, 1.0f, 0.0f,   // top-right
-        -0.5f,  0.5f, 0xFFFFFFFF, 0.0f, 0.0f    // top-left
-    );
-    sParticleMesh = AEGfxMeshEnd();
+    // AssetManager handles freeing any previous mesh at this ID automatically.
+    AssetManager::BuildSqrMesh(MESH_PARTICLE);
 }
 
 // -----------------------------------------------------------------------
@@ -170,8 +151,12 @@ void ParticleSystem::Update(float dt) {
 // so it smoothly disappears before being recycled.
 // -----------------------------------------------------------------------
 void ParticleSystem::Draw() {
+    // Retrieve the particle mesh from AssetManager each frame.
+    // This is an O(1) array lookup so there is no performance concern.
+    AEGfxVertexList* particleMesh = AssetManager::GetMesh(MESH_PARTICLE);
+
     // Early out if the mesh was never built (safety check)
-    if (sParticleMesh == nullptr) {
+    if (particleMesh == nullptr) {
         return;
     }
 
@@ -212,7 +197,7 @@ void ParticleSystem::Draw() {
         AEMtx33Concat(&transform, &translate, &scale);
 
         AEGfxSetTransform(transform.m);
-        AEGfxMeshDraw(sParticleMesh, AE_GFX_MDM_TRIANGLES);
+        AEGfxMeshDraw(particleMesh, AE_GFX_MDM_TRIANGLES);
     }
 
     // Reset transparency so subsequent draw calls are not affected
@@ -233,8 +218,7 @@ void ParticleSystem::Free() {
 // Releases the mesh created in Load.  Call once in Level_Unload.
 // -----------------------------------------------------------------------
 void ParticleSystem::Unload() {
-    if (sParticleMesh != nullptr) {
-        AEGfxMeshFree(sParticleMesh);
-        sParticleMesh = nullptr;
-    }
+    // The particle mesh (MESH_PARTICLE) is now owned by AssetManager.
+    // It will be freed automatically when AssetManager::FreeAllMeshes()
+    // is called during the level unload cycle. No manual cleanup needed here.
 }

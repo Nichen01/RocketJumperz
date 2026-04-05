@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Main.cpp
+\date         April, 04, 2026
+\brief        Entry Point file 
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 // ---------------------------------------------------------------------------
 // includes
 #pragma once
@@ -16,6 +29,7 @@ bool pause = false;
 bool canpause = true;
 
 int screenWidth = 1600, screenLength = 900; // change main screen values here, include with extern int
+f32  screenscale = static_cast<f32>(screenWidth) / 1600.0f;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR    lpCmdLine,
@@ -26,13 +40,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-	if (AESysInit(hInstance, nCmdShow, screenWidth, screenLength, 1, 60, true, NULL) == 0)
+	if (AESysInit(hInstance, nCmdShow, screenWidth, screenLength,0, 60, true, NULL) == 0)
 	{
 		return 0;
 	}
-	//AESysSetFullScreen(1);
-	// Using custom window procedure
-	//int gGameRunning = 1;
+
 
 	// Changing the window title
 	AESysSetWindowTitle("Rocket Jumperz");

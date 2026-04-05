@@ -179,6 +179,9 @@ namespace movement {
         // Jetpack thrust with SPACE (only if cooldown is 0)
         if (AEInputCheckTriggered(AEVK_SPACE) && jetPackCooldown == 0)
         {
+            // Play jetpack thrust sound effect (one-shot, no loop)
+            AEAudioPlay(JetpackThrust, soundEffects, 0.8f, 1.0f, 0);
+
             // Calculate direction vector from player to mouse
             getMouse(player);
 

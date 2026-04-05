@@ -15,6 +15,7 @@ Technology is prohibited.
 #include "enemies.h"
 #include "binaryMap.h"
 #include "AssetManager.h"
+#include "Sound.h"
 
 // ---------------------------------------------------------------------------
 // Saw animation constants
@@ -29,16 +30,20 @@ namespace traps {
 	//for testing, compiles faster in cpp
 	//f32 trapSuction = 0.55f;
 
-	// Saw animation instance -- all saw tiles share the same playback state
+	// Saw animation instance, all saw tiles share the same playback state
 	SpriteAnimation sawAnim;
 
 	s8 trapDamage = 5;
 	s8 trapInstanceCooldown = 0;
 	s8 trapRange = 2;
 	bool nearTrap = 0;
+	bool wasNearTrap = false;   // tracks previous frame's nearTrap state for one-shot sound
 	AEVec2 nearestTrap = {};
 	f32 angle, tentacleMagnifier;
 	AEMtx33 trapTransform;
+
+	// Volume for the suction trap hum (0.0 to 1.0).
+	const f32 SuctionHumVolume = 0.3f;
 
 	// ----------------------------------------------------------
 	/*!
@@ -51,6 +56,7 @@ namespace traps {
 	// ----------------------------------------------------------
 	void initTraps() {
 		nearTrap = 0;
+		wasNearTrap = false;
 		AEVec2Zero(&nearestTrap);
 
 		// Initialize the saw animation to loop continuously from frame 0
@@ -145,6 +151,10 @@ namespace traps {
 		nearestTrap.x = gamelogic::index_to_posX(static_cast<f32>(nearestTrap.x + 0.5), s);
 		nearestTrap.y = gamelogic::index_to_posY(static_cast<f32>(nearestTrap.y + 0.5), s);
 		if (nearTrap) {
+			// Play energyHum sound ONCE when suction first begins (not every frame)
+			if (!wasNearTrap) {
+				AEAudioPlay(EnergyHum, soundEffects, SuctionHumVolume, 1.0f, 0);
+			}
 			suckPlayer(objectinfo[player], nearestTrap);
 			f32 relativeX = objectinfo[player].xPos - nearestTrap.x;
 			f32 relativeY = objectinfo[player].yPos - nearestTrap.y;
@@ -177,10 +187,12 @@ namespace traps {
 			}
 			// Trap-tile collision resolution is handled by the level's own
 			// Collision_movement calls (index=1 for walls already keeps entities
-			// in bounds).  Calling Collision_movement here with index=2 caused a
-			// double-move per frame (velocity applied twice), which could push
-			// entities out of the map and trigger access violations.
+			// in bounds). 
 		}
+
+		// Remember this frame's suction state so we can detect the
+		// rising edge (not-near -> near) on the next frame.
+		wasNearTrap = nearTrap;
 	}
 
 	// ----------------------------------------------------------

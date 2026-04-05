@@ -24,7 +24,7 @@ Technology is prohibited.
 // ==================== TIMING CONSTANTS ====================
 // All durations are in seconds. Total splash duration = fade in + hold + fade out.
 const float kFadeInDuration  = 1.0f;   // How long the logo takes to appear
-const float kHoldDuration    = 1.5f;   // How long the logo stays fully visible
+const float kHoldDuration    = 2.0f;   // How long the logo stays fully visible
 const float kFadeOutDuration = 1.0f;   // How long the logo takes to disappear
 
 // ==================== SPLASH STATE ====================

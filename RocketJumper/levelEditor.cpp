@@ -3,8 +3,8 @@
 \file		  LevelEditor.cpp
 \author       Chan Joraye (c.joraye)
 \date         April, 01, 2026
-\brief        Provides functions, resources, and UI logic for building and modifying level maps in the game. Handles tile placement, door linking, traps, enemies, and collectible items. 
-			  Includes input handling for editor shortcuts (undo, save, reset), hover states for buttons, and error prompts when invalid placements occur. 
+\brief        Provides functions, resources, and UI logic for building and modifying level maps in the game. Handles tile placement, door linking, traps, enemies, and collectible items.
+			  Includes input handling for editor shortcuts (undo, save, reset), hover states for buttons, and error prompts when invalid placements occur.
 			  Tracks the current game level, tile indices, and action history to support editing and exporting map data back to text files.
 
 			  Copyright (C) 2026 DigiPen Institute of Technology.
@@ -41,6 +41,8 @@ static char errorMessage[256];
 
 resetButton resetBtn;
 
+cancelButton cnclBtn;
+
 errorPromptButton errorPromptBtn;
 static bool enemyExistError = false;
 static bool finaldoorLevelError = false;
@@ -54,10 +56,13 @@ static bool wrongKeyLevelError = false;
 static bool isMouseOverDoorButton(const doorButton& button);
 static bool isMouseOverCloseButton(const errorPromptButton& button);
 static bool isMouseOverResetButton(const resetButton& button);
+static bool isMouseOverCancelButton(const cancelButton& button);
 static void updateDoorButtonHover(doorButton& button);
 static void updateCloseButtonHover(errorPromptButton& button);
 static void updateResetButtonHover(resetButton& button);
+static void updateCancelButtonHover(cancelButton& button);
 static void drawDoorButton(const doorButton& button, AEGfxVertexList* mesh, s8 fontID);
+static void drawCancelButton(const cancelButton& button, AEGfxVertexList* mesh);
 static void drawErrorButton(const errorPromptButton& button, AEGfxVertexList* mesh, s8 fontID);
 static void drawDoorTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
 static void drawResetTextCentered(const char* text, f32 x, f32 y, f32 scale, s8 fontID);
@@ -72,6 +77,8 @@ static bool placeFinalDoor = false;
 
 static AEGfxTexture* errorOverlayTex;
 static AEGfxTexture* errorCloseTex;
+static AEGfxTexture* doorPrompt;
+static AEGfxTexture* cancelBtn;
 
 static bool isMouseOverDoorButton(const doorButton& button) {
 	s32 mouseX, mouseY;
@@ -185,42 +192,97 @@ static void updateResetButtonHover(resetButton& button) {
 }
 
 static void drawDoorButton(const doorButton& button, AEGfxVertexList* mesh, s8 fontID) {
-	// Draw button background
+	// Build transform for button quad
 	AEMtx33 scale, translate, transform;
 	AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
 	AEMtx33Trans(&translate, button.x, button.y);
 	AEMtx33Concat(&transform, &translate, &scale);
 
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 1.0f);  // black multiply so add color is pure
+	// Render textured button (redButton)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxTextureSet(errorOverlayTex, 0, 0);
+	AEGfxSetTransform(transform.m);
 
-	// Color based on hover state
-	if (button.id == -1) {
-		if (button.isHovered) {
-			AEGfxSetColorToAdd(0.9f, 0.2f, 0.2f, 0.8f);  // Bright red when hovered
-		}
-		else {
-			AEGfxSetColorToAdd(0.7f, 0.2f, 0.2f, 0.8f);  // Dark red normally
-		}
+	// Apply hover tint
+	if (button.isHovered) {
+		// Slight brightening tint when hovered
+		AEGfxSetColorToAdd(0.2f, 0.2f, 0.2f, 0.3f);
 	}
 	else {
-		if (button.isHovered) {
-			AEGfxSetColorToAdd(0.3f, 0.6f, 1.0f, 0.8f);  // Bright blue when hovered
-		}
-		else {
-			AEGfxSetColorToAdd(0.15f, 0.15f, 0.3f, 0.7f); // Dark blue-gray normally
-		}
+		// No tint normally
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
-	AEGfxSetTransform(transform.m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 
-	// Draw button text
+	// Reset color state
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Draw button text (e.g. "Close")
 	drawDoorTextCentered(button.text, button.x, button.y, button.scale, fontID);
+}
+
+static void drawCancelButton(const cancelButton& button, AEGfxVertexList* mesh) {
+	// Build transform for button quad
+	AEMtx33 scale, translate, transform;
+	AEMtx33Scale(&scale, button.width * button.scale, button.height * button.scale);
+	AEMtx33Trans(&translate, button.x, button.y);
+	AEMtx33Concat(&transform, &translate, &scale);
+
+	// Render textured button (redButton)
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxTextureSet(cancelBtn, 0, 0);
+	AEGfxSetTransform(transform.m);
+
+	// Apply hover tint
+	if (button.isHovered) {
+		// Slight brightening tint when hovered
+		AEGfxSetColorToAdd(0.2f, 0.2f, 0.2f, 0.3f);
+	}
+	else {
+		// No tint normally
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	// Reset color state
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 }
+
+static bool isMouseOverCancelButton(const cancelButton& button) {
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	f32 worldMouseX = static_cast<f32>(mouseX) - static_cast<f32>(screenWidth / 2);
+	f32 worldMouseY = static_cast<f32>(screenLength / 2) - static_cast<f32>(mouseY);
+
+	f32 halfWidth = (button.width * button.scale) / 2.0f;
+	f32 halfHeight = (button.height * button.scale) / 2.0f;
+
+	return (worldMouseX >= button.x - halfWidth &&
+		worldMouseX <= button.x + halfWidth &&
+		worldMouseY >= button.y - halfHeight &&
+		worldMouseY <= button.y + halfHeight);
+}
+
+static void updateCancelButtonHover(cancelButton& button) {
+	button.isHovered = isMouseOverCancelButton(button);
+
+	button.targetScale = button.isHovered ? BUTTON_SCALE_HOVER : BUTTON_SCALE_NORMAL;
+
+	if (button.scale < button.targetScale) {
+		button.scale += BUTTON_SCALE_SPEED;
+		if (button.scale > button.targetScale) button.scale = button.targetScale;
+	}
+	else if (button.scale > button.targetScale) {
+		button.scale -= BUTTON_SCALE_SPEED;
+		if (button.scale < button.targetScale) button.scale = button.targetScale;
+	}
+}
+
 
 static void drawErrorButton(const errorPromptButton& button, AEGfxVertexList* mesh, s8 fontID) {
 	// Build transform for button quad
@@ -365,9 +427,13 @@ void LevelEditor_Load() {
 	// Load sound
 	audio::loadsound();
 
+	AssetManager::LoadTexture(TEX_CANCEL, "Assets/UI/Menus/Cancel.png");
+	AssetManager::LoadTexture(TEX_DOORPROMPT, "Assets/UI/Menus/DoorPrompt.png");
 	AssetManager::LoadTexture(TEX_BUTTON, "Assets/UI/Menus/button.png");      // overlay panel
 	AssetManager::LoadTexture(TEX_REDBUTTON, "Assets/UI/Menus/redbutton.png"); // close
 
+	cancelBtn = AssetManager::GetTexture(TEX_CANCEL);
+	doorPrompt = AssetManager::GetTexture(TEX_DOORPROMPT);
 	errorOverlayTex = AssetManager::GetTexture(TEX_BUTTON);
 	redButton = AssetManager::GetTexture(TEX_REDBUTTON);
 
@@ -432,26 +498,25 @@ void LevelEditor_Initialize() {
 
 	// To load the buttons for the door link
 	buttonArr.clear();
-	std::cout << currentGameLevel;
 	switch (currentGameLevel) {
 		case 1: {
 			ImportMapDataFromFile("Assets/Map/Level1_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Tut", false, 0 });
-			buttonArr.push_back({ 185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 2", false, 1 });
+			buttonArr.push_back({ -185.f, -120.f, 300.f, 80.f, 1.f, 1.f, "Tut", false, 0 });
+			buttonArr.push_back({ 185.f, -120.f, 300.f, 80.f, 1.f, 1.f, "Level 2", false, 1 });
+			cnclBtn = { -400.f, 140.f, 64.f, 64.f, 1.f, 1.f, false };
 			break;
 		}
 		case 2: {
 			ImportMapDataFromFile("Assets/Map/Level2_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ -185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 1", false, 1 });
-			buttonArr.push_back({ 185.f, 0.f, 300.f, 80.f, 1.f, 1.f, "Level 3", false, 2 });
+			buttonArr.push_back({ -185.f, -120.f, 300.f, 80.f, 1.f, 1.f, "Level 1", false, 1 });
+			buttonArr.push_back({ 185.f, -120.f, 300.f, 80.f, 1.f, 1.f, "Level 3", false, 2 });
+			cnclBtn = { -400.f, 140.f, 64.f, 64.f, 1.f, 1.f, false };
 			break;
 		}
 		case 3: {
 			ImportMapDataFromFile("Assets/Map/Level3_Map.txt");
-			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Cancel", false, -1 });
-			buttonArr.push_back({ 0.f, 0.f, 680.f, 80.f, 1.f, 1.f, "Level 2", false, 2 });
+			buttonArr.push_back({ 0.f, -120.f, 680.f, 80.f, 1.f, 1.f, "Level 2", false, 2 });
+			cnclBtn = { -400.f, 140.f, 64.f, 64.f, 1.f, 1.f, false };
 			break;
 		}
 	}
@@ -520,6 +585,15 @@ void LevelEditor_Update() {
 				break;
 			}
 		}
+		updateCancelButtonHover(cnclBtn);
+		// Handle cancel button click
+		if (cnclBtn.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
+			showDoorPrompt = false;
+			doorPromptAlpha = 0.f;
+			errorPromptAlpha = 0.f;
+			doorlinkExistError = false;
+		}
+
 	}
 
 	// Cycling through the assets
@@ -1192,25 +1266,25 @@ void LevelEditor_Draw() {
 
 	// door prompt background box
 	if (showDoorPrompt && doorPromptAlpha > 0.0f) {
-		// Main prompt panel
-		float boxWidth = 850.0f;
-		float boxHeight = 400.0f;
-		AEGfxSetColorToMultiply(0.f, 0.f, 0.f, doorPromptAlpha); // dark blue background
-		renderlogic::drawSquare(0, 0, boxWidth, boxHeight);
-		AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		renderlogic::drawTexture(0.f, 0.f, doorPrompt, uiMesh, 855.f, 345.f);
 
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
 		// Title text
-		AEGfxPrint(font, "What level does this door lead to?", -0.44f, 0.25f, 0.8f, 1, 1, 1, 1);
+		AEGfxPrint(font, "What level does this door lead to?", -0.44f, 0.07f, 0.8f, 1, 1, 1, 1);
 
 		// Assign the buttons
-
 		for (doorButton& currentButton : buttonArr) {
 			drawDoorButton(currentButton, uiMesh, font);
 		}
+		drawCancelButton(cnclBtn, uiMesh);
 	}
 
 	// Printing the error prompt
@@ -1218,7 +1292,7 @@ void LevelEditor_Draw() {
 		if (showDoorPrompt) {
 			for (doorButton& currentButton : buttonArr) {
 				updateDoorButtonHover(currentButton);
-				if (currentButton.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
+				if (cnclBtn.isHovered && AEInputCheckTriggered(AEVK_LBUTTON)) {
 					if (currentButton.id == -1) { // Cancel button
 						showDoorPrompt = false;
 						doorPromptAlpha = 0.f;

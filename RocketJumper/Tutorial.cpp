@@ -17,6 +17,7 @@
 #include "WeaponSprite.h"
 #include "Drops.h"
 #include "InstructionsMenu.h"
+#include "ParticleSystem.h"
 
 static s32* map = nullptr;
 static int x = 16;
@@ -96,6 +97,9 @@ void Tutorial_Load()
 	// Create font for gameover text (stored so we can destroy it in Unload)
 	fontLevel1 = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
 	weaponSprite::Load();
+
+	// Build the particle system mesh and reset the pool (needed for jetpack exhaust)
+	ParticleSystem::Load();
 }
 
 void Tutorial_Initialize()
@@ -194,10 +198,13 @@ void Tutorial_Initialize()
 
 void Tutorial_Update()
 {
+	// DEBUGGING FEATURE TO TRANSIT TO DIFFERENT LEVELS
+	if (AEInputCheckCurr(AEVK_2)) next = GS_LEVEL1;
+	if (AEInputCheckCurr(AEVK_3)) next = GS_LEVEL2;
+	if (AEInputCheckCurr(AEVK_4)) next = GS_LEVEL3;
+
 	// If the instructions overlay is open, skip all gameplay logic (pause)
 	if (InstructionsMenu::Update()) return;
-
-	if (AEInputCheckCurr(AEVK_1)) next = GS_LEVEL1;
 
 	//====== AUDIO CONTROLS ======//
 	if (AEInputCheckTriggered(AEVK_1)) {
@@ -281,6 +288,9 @@ void Tutorial_Update()
 	//============= UPDATE ENEMIES ===================/
 	// Get delta time for enemy AI
 	f32 dt = static_cast<f32>(AEFrameRateControllerGetFrameTime());
+
+	// Step all active particles forward (jetpack exhaust, etc.)
+	ParticleSystem::Update(dt);
 
 	// Update enemies
 	enemySystem::updateEnemies(enemies, MAX_ENEMIES,
@@ -407,28 +417,28 @@ void Tutorial_Draw()
 	f32 textWidth, textHeight;
 	AEGfxGetPrintSize(font, strBuffer, 0.6f, &textWidth, &textHeight);
 	sprintf_s(strBuffer, "Left Click to Shoot");
-	AEGfxPrint(font, strBuffer, 0.52f, -0.6f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.52f, -0.6f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "towards Mouse Cursor");
-	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.5f, -0.67f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Right Click to Advance");
-	AEGfxPrint(font, strBuffer, 0.f, -0.6f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.f, -0.6f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "towards Mouse Cursor");
-	AEGfxPrint(font, strBuffer, 0.f, -0.67f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.f, -0.67f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Spacebar to Jump");
-	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.0f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Left Shift To Toggle Gravity");
-	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.3f, 0.1f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "Q to Switch Weapon");
-	AEGfxPrint(font, strBuffer, -0.7f, -0.65f, 0.6f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, -0.7f, -0.65f, 0.6f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	sprintf_s(strBuffer, "E to Enter");
-	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 1.f, 1.f, 1.f, 1.f);
+	AEGfxPrint(font, strBuffer, 0.42f, 0.53f, 0.5f, 0.7f, 0.7f, 0.7f, 1.f);
 
 	// ===== RENDER WALLS ======= //
 	renderlogic::drawMapWallFloor(map, x, y, s);
@@ -497,6 +507,15 @@ void Tutorial_Draw()
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	projectileSystem::renderProjectiles(Projectiles, MAX_PROJECTILES, plasma, projectileMesh);
+
+	// ====== PARTICLE SYSTEM RENDER (jetpack exhaust) ====== //
+	ParticleSystem::Draw();
+
+	// Reset render state after particles (they use RM_COLOR) so the
+	// cooldown bar and HUD text render correctly with textures.
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 
 	//====== PLAYER THRUST COOLDOWN BAR RENDER =========//
 	renderlogic::drawCooldownHUD(objectinfoTut[player].xPos, objectinfoTut[player].yPos - 50.f);
@@ -634,6 +653,9 @@ void Tutorial_Unload()
 
 	// Destroy the font created in Initialize (HUD health text)
 	if (fontLevel1 != -1) { AEGfxDestroyFont(fontLevel1); fontLevel1 = -1; }
+
+	// Free the particle system mesh
+	ParticleSystem::Unload();
 
 	// Unload ALL audio resources that were loaded in Load
 	audio::unloadsound();

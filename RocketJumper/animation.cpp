@@ -2,7 +2,6 @@
 /*!
 \file         animation.cpp
 \author       Nicholas Chen (c.chen)
-\date         February, 22, 2026
 \brief        Implementation of the modular sprite animation system.
 
 Copyright (C) 2026 DigiPen Institute of Technology.

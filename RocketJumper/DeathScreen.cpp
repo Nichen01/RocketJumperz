@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  DeathScreen.cpp
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
 \brief        functions used to create Death Screen
 
@@ -16,6 +17,7 @@ Technology is prohibited.
 #include "Confirmation.h"
 #include "DoorSystem.h"
 #include "player.h"
+#include "main.h"
 
 static s8 deathfont = -1;
 static f32 width, height;
@@ -49,15 +51,12 @@ void DeathScreen_Load() {
     TitleTex = AEGfxTextureLoad("Assets/UI/Menus/TitleFrame.png");
     backgroundTexture = AEGfxTextureLoad("Assets/UI/MainMenu.png");
 
-    if (!backgroundTexture) {
-        printf("Warning: MenuBackground.png not found. Using solid color background.\n");
-    }
     // load font
-    deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 72);
+    deathfont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(48 * screenscale));
 }
 void DeathScreen_Init() {
     //play audio
-    AEAudioPlay(lose, bgm, MainVolume, 1.f, -1);
+    AEAudioPlay(lose, bgm, MainVolume, 1.f, 0);
     
     //initilise meshes
     AssetManager::BuildSqrMesh(MESH_BUTTON);
@@ -76,11 +75,11 @@ void DeathScreen_Init() {
 
     // initialize data
     Confirmation_Init(yesButton, noButton);
-    float buttonwidth = 390.0f;
-    float buttonlength = 80.0f;
+    float buttonwidth = 390.0f * screenscale;
+    float buttonlength = 80.0f * screenscale;
     restartButton = { 0.0f, 0.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "RESTART", false };
-    tomenuButton = { 0.0f, -120.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
-    exitButton = { 0.0f, -240.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
+    tomenuButton = { 0.0f, -120.0f * screenscale , buttonwidth, buttonlength, 1.0f, 1.0f, "MAIN MENU", false };
+    exitButton = { 0.0f, -240.0f * screenscale , buttonwidth, buttonlength, 1.0f, 1.0f, "EXIT", false };
 }
 void DeathScreen_Update() {
     //checks if button are hovered over
@@ -126,7 +125,6 @@ void DeathScreen_Update() {
                 destructive = false;
                 leave = 0;
             }
-            printf("Restart button clicked - Restarting level %d!\n", currentGameLevel);
         }
         if (tomenuButton.isHovered) {
             wireCount = 0;             // Reset Wires
@@ -154,7 +152,6 @@ void DeathScreen_Update() {
                 leave = 0;
             }
             
-            printf("Play button clicked - Starting game!\n");
         }
         else if (exitButton.isHovered) {
             destructive = true;
@@ -167,7 +164,6 @@ void DeathScreen_Update() {
                 destructive = false;
                 leave = 0;
             }
-            printf("Exiting game!\n");
         }
     }
 }
@@ -179,7 +175,7 @@ void DeathScreen_Draw() {
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxTextureSet(TitleTex, 0, 0);
     AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-    renderlogic::drawSquare(0.0f, 247.0f, 285.0f * multi, 115.0f * multi);
+    renderlogic::drawSquare(0.0f, 247.0f * screenscale, (285.0f * multi) * screenscale, (115.0f * multi) * screenscale);
     AEGfxMeshDraw(buttonMesh, AE_GFX_MDM_TRIANGLES);
 
     AEGfxGetPrintSize(deathfont, "DEATH", 1.f, &width, &height);

@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  sound.cpp
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
 \brief        Contain functions to handle audio
 
@@ -21,10 +22,12 @@ AEAudio Pickup;
 AEAudio ArrowSound;
 AEAudio GravityToggle;
 AEAudio MainMenu;
+AEAudio EnergyHum;
+AEAudio JetpackThrust;
 AEAudioGroup bgm;
 AEAudioGroup soundEffects;
-f32 MainVolume = 0.1f;
-s8 sCount = 1;
+f32 MainVolume = 0.3f;
+s8 sCount = 3;
 
 namespace audio {
 	void loadsound() {
@@ -42,6 +45,8 @@ namespace audio {
 		Pickup = AEAudioLoadSound("Assets/Sounds/Pickup.wav");
 		ArrowSound = AEAudioLoadSound("Assets/Sounds/ArrowSound.wav");
 		GravityToggle = AEAudioLoadSound("Assets/Sounds/gravity.mp3");
+		EnergyHum = AEAudioLoadSound("Assets/Sounds/energyHum.mp3");
+		JetpackThrust = AEAudioLoadSound("Assets/Sounds/jetpack.mp3");
 		soundEffects = AEAudioCreateGroup();   // short for 'sound effect'
 
 	}
@@ -55,6 +60,8 @@ namespace audio {
 		AEAudioUnloadAudio(Pickup);
 		AEAudioUnloadAudio(ArrowSound);
 		AEAudioUnloadAudio(GravityToggle);
+		AEAudioUnloadAudio(EnergyHum);
+		AEAudioUnloadAudio(JetpackThrust);
 		AEAudioUnloadAudio(MainMenu);
 		AEAudioUnloadAudioGroup(bgm);
 		AEAudioUnloadAudioGroup(soundEffects);

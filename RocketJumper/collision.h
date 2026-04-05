@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  Collision.h
+\author 	  Ivan Chong (i.chong)
 \date         April, 04, 2026
 \brief        Header file for Collision.cpp
 

@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "MainMenu.h"
+#include "main.h"
 #include "AssetManager.h"
 #include "AEEngine.h"
 #include "GameStateManager.h"
@@ -238,9 +239,9 @@ void MainMenu_Load() {
         printf("Warning: settings.png not found. Credits logo will not render.\n");
     }
     // Load font
-    menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", 48);
+    menuFont = AEGfxCreateFont("Assets/Fonts/gameover.ttf", static_cast<int>(48 * screenscale));
     if (menuFont < 0) {
-        menuFont = AEGfxCreateFont("Arial.ttf", 48);
+        menuFont = AEGfxCreateFont("Arial.ttf", static_cast<int>(48 * screenscale));
         printf("(UI) Warning: MenuFont.ttf not found. Text will not render.\n");
     }
 
@@ -284,7 +285,7 @@ void MainMenu_Init() {
     f32 startY = 0.0f;
 
     playButton         = { 0.0f, startY,                btnW, btnH, 1.0f, 1.0f, "PLAY",         false };
-    instructionsButton = { 0.0f, startY - btnGap,       btnW, btnH, 1.0f, 1.0f, "INSTRUCTIONS", false };
+    instructionsButton = { 0.0f, startY - btnGap,       btnW, btnH, 1.0f, 1.0f, "CONTROLS", false };
     creditsButton      = { 0.0f, startY - btnGap * 2.0f, btnW, btnH, 1.0f, 1.0f, "CREDITS",     false };
     quitButton         = { 0.0f, startY - btnGap * 3.0f, btnW, btnH, 1.0f, 1.0f, "QUIT",        false };
     settingBtn         = { -750.f, -400.f, 64.f, 64.f, 1.0f, 1.0f, "", false };
@@ -300,8 +301,10 @@ void MainMenu_Init() {
     // Reset menu state
     currentMenuState = MENU_MAIN;
 
-    // Credits scroll starts below the visible screen area
-    creditsScrollY = -scrH * 0.667f;
+    // Credits scroll starts one line-height below the visible screen bottom
+    // so the first line scrolls in smoothly from below.
+    f32 initLineSpacing = scrH * 0.080f;
+    creditsScrollY = -halfH - initLineSpacing;
 
     printf("MainMenu_Init: Main menu initialized\n");
 }
@@ -361,9 +364,10 @@ void UpdateMainMenu() {
             currentMenuState = MENU_INSTRUCTIONS;
             printf("Instructions button clicked!\n");
         }
-        else if (creditsButton.isHovered) { 
+        else if (creditsButton.isHovered) {
             currentMenuState = MENU_CREDITS;
-            creditsScrollY = -scrH * 0.667f; // Reset scroll position
+            f32 resetLineSpacing = scrH * 0.080f;
+            creditsScrollY = -halfH - resetLineSpacing; // Reset scroll to below screen
             printf("Credits button clicked!\n");
         }
         else if (quitButton.isHovered) {
@@ -411,12 +415,24 @@ void UpdateCreditsMenu() {
     // Scroll credits upward each frame
     creditsScrollY += scrollSpeed;
 
-    // The credits content is tall (~28 lines). Once it scrolls far enough past the
-    // top of the screen, wrap back to the starting position below the viewport.
-    // Total content height is roughly 28 lines * lineSpacing (~60px) = ~1680px,
-    // so we allow scrolling up to about 2x screen height before resetting.
-    if (creditsScrollY > scrH * 2.2f) {
-        creditsScrollY = -scrH * 0.667f;
+    // Calculate the total height of the credits content so we know exactly when
+    // the last line has scrolled completely off the top of the screen.
+    // These spacing values must match the ones used in DrawCreditsMenu().
+    f32 lineSpacing = scrH * 0.080f;   // vertical gap between lines
+    f32 sectionGap  = scrH * 0.100f;   // extra gap between sections
+
+    // The draw function steps y downward 22 times by lineSpacing and
+    // 7 times by sectionGap (count derived from DrawCreditsMenu layout).
+    f32 totalContentHeight = 22.0f * lineSpacing + 7.0f * sectionGap;
+
+    // The top edge of the screen in world coordinates is at halfH (scrH / 2).
+    // The bottommost credit line is at (creditsScrollY - totalContentHeight).
+    // Add one extra lineSpacing of margin so the last line fully exits the top
+    // before the reset fires -- this prevents the text from visibly popping.
+    if (creditsScrollY - totalContentHeight > halfH + lineSpacing) {
+        // Place the first line below the bottom of the screen so it scrolls
+        // in smoothly from below, matching the initial entrance behavior.
+        creditsScrollY = -halfH - lineSpacing;
     }
 
     // Handle back button click
@@ -603,10 +619,18 @@ void DrawCreditsMenu() {
         f32 nameScale      = 0.75f;                // scale for individual names
         f32 smallScale     = 0.65f;                // scale for copyright / fine print
 
+        // ---------- Copyright ----------
+        MenuHelpers::drawTextCentered("All content (C) 2026 DigiPen Institute of Technology Singapore",
+            0.0f, y, smallScale, menuFont);
+        y -= lineSpacing;
+        MenuHelpers::drawTextCentered("All Rights Reserved", 0.0f, y, smallScale, menuFont);
+
         // ---------- Team Name ----------
+        y -= sectionGap;
         MenuHelpers::drawTextCentered("A Game by Team RocketJumperz", 0.0f, y, headerScale, menuFont);
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Dead Weight", 0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
 
         // ---------- Development Team ----------
         y -= sectionGap;
@@ -629,6 +653,7 @@ void DrawCreditsMenu() {
         MenuHelpers::drawTextCentered("Soroor Malekmohammadi Faradounbeh", 0.0f, y, nameScale, menuFont);
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Tommy Tan",      0.0f, y, nameScale, menuFont);
+        y -= lineSpacing;
 
         // ---------- DigiPen Logo (drawn as a textured quad) ----------
         y -= sectionGap;
@@ -653,8 +678,11 @@ void DrawCreditsMenu() {
             AEGfxSetTransform(logoXform.m);
             AEGfxMeshDraw(quadMesh, AE_GFX_MDM_TRIANGLES);
         }
+        
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Created at DigiPen Institute of Technology", 0.0f, y, nameScale, menuFont);
+
+        
 
         // ---------- President ----------
         y -= sectionGap;
@@ -684,19 +712,14 @@ void DrawCreditsMenu() {
         y -= sectionGap;
         MenuHelpers::drawTextCentered("ADDITIONAL CREDITS", 0.0f, y, headerScale, menuFont);
         y -= lineSpacing;
-        MenuHelpers::drawTextCentered("Sprite Assets: Craftpix, itch.io creators", 0.0f, y, nameScale, menuFont);
+        MenuHelpers::drawTextCentered("Assets: Craftpix, itch.io creators, Pixabay", 0.0f, y, nameScale, menuFont);
         y -= lineSpacing;
         MenuHelpers::drawTextCentered("Game Engine: Alpha Engine", 0.0f, y, nameScale, menuFont);
 
-        // ---------- Copyright ----------
-        y -= sectionGap;
-        MenuHelpers::drawTextCentered("All content (C) 2026 DigiPen Institute of Technology Singapore",
-                                       0.0f, y, smallScale, menuFont);
-        y -= lineSpacing;
-        MenuHelpers::drawTextCentered("All Rights Reserved", 0.0f, y, smallScale, menuFont);
+        
     }
 
-    // ---- Fixed "BACK" button at the bottom of the screen ----
+    // Back button at the bottom of the screen
     AEGfxVertexList* btnMesh = AssetManager::GetMesh(MESH_BUTTON);
     AEGfxTexture* btnTex = AssetManager::GetTexture(TEX_BUTTON);
     MenuHelpers::TexdrawButton(backButton, btnMesh, menuFont, btnTex);
