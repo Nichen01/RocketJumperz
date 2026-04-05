@@ -16,10 +16,10 @@ Technology is prohibited.
 #include "Main.h"
 
 void Confirmation_Init(MenuButton &yesButton, MenuButton &noButton) {
-    float buttonwidth = 350.0f;
-    float buttonlength = 70.0f;
-    yesButton = {0.0f, -110.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "YES", false };
-    noButton = {0.0f, -210.0f, buttonwidth, buttonlength, 1.0f, 1.0f, "NO", false };
+    float buttonWidth = AEGfxGetWindowWidth() * 0.25f;  // 25% of screen width
+    float buttonHeight = AEGfxGetWindowHeight() * 0.1f;   // 10% of screen height
+    yesButton = {0.0f, -110.0f, buttonWidth, buttonHeight, 1.0f, 1.0f, "YES", false };
+    noButton = {0.0f, -210.0f, buttonWidth, buttonHeight, 1.0f, 1.0f, "NO", false };
 }
 void Confirmation_Update(MenuButton& yesButton, MenuButton& noButton,s8& leave) {
     MenuHelpers::updateButtonHover(yesButton);
