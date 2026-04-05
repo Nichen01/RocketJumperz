@@ -111,7 +111,7 @@ void DeathScreen_Update() {
             if (leave == 1) {
                 destructive = false;
                 leave = 0;
-
+                canpause = true;
                 // Send the player back to the level they died on, not the tutorial
                 switch (currentGameLevel) {
                 case 0: next = GS_TUTORIAL; break;

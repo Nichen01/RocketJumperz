@@ -109,6 +109,7 @@ void VictoryScreen_Update() {
             //confirmation check
             destructive = true;
             if (leave == 1) {
+                canpause = true;
                 next = GS_TUTORIAL;
             }
             else if (leave == 2) {
