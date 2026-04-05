@@ -2,12 +2,12 @@
 /*!
 \file		  Level2.cpp
 \date         April, 01, 2026
-\brief        File for level 2
+\brief        Provides functions and resources for editing maps, placing tiles, doors, traps, enemies, and items. Handles input shortcuts, error prompts, and exporting map data.
 
-Copyright (C) 2026 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
+			  Copyright (C) 2026 DigiPen Institute of Technology.
+			  Reproduction or disclosure of this file or its contents
+			  without the prior written consent of DigiPen Institute of
+			  Technology is prohibited.
 */
 /* End Header **************************************************************************/
 

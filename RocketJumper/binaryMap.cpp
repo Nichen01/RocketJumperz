@@ -6,10 +6,10 @@
 \date   	16/02/26
 \brief		File that reads txt file and creates the different 2D arrays that will store seperate values such as collision array, glass array, map array
 
-Copyright (C) 2026 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
+		    Copyright (C) 2026 DigiPen Institute of Technology.
+		    Reproduction or disclosure of this file or its contents
+		    without the prior written consent of DigiPen Institute of
+		    Technology is prohibited.
 */
 /* End Header **************************************************************************/
 

@@ -3,12 +3,14 @@
 \file		DoorSystem.h
 \author 	Chan Joraye (c.joraye)
 \date   	April, 01, 2026
-\brief		Header file for the doors in the game & the transition between doors
+\brief		Provides data structures and declarations for managing doors in the game, including linked doors between levels, broken doors, and door animations. 
+            Tracks player entry, current game level, and door states such as locked/open.
+            Used to handle transitions between levels, door interactions, and visual effects like sparks and animations.
 
-Copyright (C) 2026 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
+            Copyright (C) 2026 DigiPen Institute of Technology.
+            Reproduction or disclosure of this file or its contents
+            without the prior written consent of DigiPen Institute of
+            Technology is prohibited.
 */
 /* End Header **************************************************************************/
 

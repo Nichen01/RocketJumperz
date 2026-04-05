@@ -3,12 +3,14 @@
 \file		Draw.h
 \author 	Chan Joraye (c.joraye), Ivan Chong (i.chong)
 \date   	April, 01, 2026
-\brief		Header file for the functions to render different types of assets
+\brief		Declares functions and extern resources used to render core game elements, including tiles, walls, traps, UI textures, inventory icons, and animated doors. Provides the `renderlogic` namespace with reusable draw functions
+  			for both world geometry and HUD elements. Extern variables expose meshes, textures, and animation data defined in Level1.cpp for use across modules.
+			This header centralizes rendering logic so gameplay systems can consistent draw routines without duplicating graphics code.
 
-Copyright (C) 2026 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
+			Copyright (C) 2026 DigiPen Institute of Technology.
+			Reproduction or disclosure of this file or its contents
+			without the prior written consent of DigiPen Institute of
+			Technology is prohibited.
 */
 /* End Header **************************************************************************/
 

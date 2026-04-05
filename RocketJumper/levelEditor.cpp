@@ -3,12 +3,14 @@
 \file		  LevelEditor.cpp
 \author       Chan Joraye (c.joraye)
 \date         April, 01, 2026
-\brief        File to edit the level, render tiles, enemies and items in the game
+\brief        Provides functions, resources, and UI logic for building and modifying level maps in the game. Handles tile placement, door linking, traps, enemies, and collectible items. 
+			  Includes input handling for editor shortcuts (undo, save, reset), hover states for buttons, and error prompts when invalid placements occur. 
+			  Tracks the current game level, tile indices, and action history to support editing and exporting map data back to text files.
 
-Copyright (C) 2026 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
+			  Copyright (C) 2026 DigiPen Institute of Technology.
+			  Reproduction or disclosure of this file or its contents
+			  without the prior written consent of DigiPen Institute of
+			  Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
