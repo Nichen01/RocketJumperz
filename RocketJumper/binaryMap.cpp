@@ -27,7 +27,6 @@ int BINARY_MAP_HEIGHT;
 //This will contain all the data of the map, which will be retreived from a file
 //when the "ImportMapDataFromFile" function is called
 int** MapData;
-static int** OriginalMapData;
 
 int** BinaryCollisionArray;
 int** glassMap;
@@ -73,14 +72,12 @@ int ImportMapDataFromFile(const char* FileName)
 	ifs >> BINARY_MAP_WIDTH;
 	ifs >> BINARY_MAP_HEIGHT;
 
-	OriginalMapData = new int* [BINARY_MAP_HEIGHT];
 	MapData = new int* [BINARY_MAP_HEIGHT];
 	BinaryCollisionArray = new int* [BINARY_MAP_HEIGHT];
 	glassMap = new int* [BINARY_MAP_HEIGHT];   // allocate glassMap rows
 
 	for (int row = 0; row < BINARY_MAP_HEIGHT; row++) {
 		MapData[row] = new int[BINARY_MAP_WIDTH];
-		OriginalMapData[row] = new int[BINARY_MAP_WIDTH];
 		BinaryCollisionArray[row] = new int[BINARY_MAP_WIDTH];
 		glassMap[row] = new int[BINARY_MAP_WIDTH]; // allocate glassMap cols
 	}
@@ -90,7 +87,6 @@ int ImportMapDataFromFile(const char* FileName)
 			int value;
 			ifs >> value;
 			// assign random glass type if tile is "air"
-			OriginalMapData[row][col] = value;
 			MapData[row][col] = value;
 			// FOR BINARY COLLIISION
 			if (value / 10 == 1) {
@@ -222,13 +218,10 @@ void FreeMapData(void){
 		delete[] MapData[i];
 		delete[] BinaryCollisionArray[i];
 		delete[] glassMap[i];
-		delete[] OriginalMapData[i];
 	}
 	delete[] MapData;
 	delete[] BinaryCollisionArray;
 	delete[] glassMap;
-	delete[] OriginalMapData;
-	OriginalMapData = nullptr;
 	MapData = nullptr;
 	BinaryCollisionArray = nullptr;
 	glassMap = nullptr;
@@ -280,10 +273,17 @@ int ExportMapDataToFile(const char* FileName)
 
 }
 
-void ResetMapData() {
+void ResetMapData(const char* FileName) {
+	std::ifstream ifs(FileName, std::ios::in);
+	if (!ifs) return;
+
+	ifs >> BINARY_MAP_WIDTH;
+	ifs >> BINARY_MAP_HEIGHT;
 	for (int row = 0; row < BINARY_MAP_HEIGHT; ++row) {
 		for (int col = 0; col < BINARY_MAP_WIDTH; ++col) {
-			MapData[row][col] = OriginalMapData[row][col];
+			int value;
+			ifs >> value;
+			MapData[row][col] = value;
 		}
 	}
 }

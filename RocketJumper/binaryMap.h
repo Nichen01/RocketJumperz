@@ -95,6 +95,6 @@ int		ImportMapDataFromFile(const char *FileName);
 void	FreeMapData(void);
 void	PrintRetrievedInformation(void);
 int		ExportMapDataToFile(const char* FileName);
-void	ResetMapData();
+void	ResetMapData(const char* FileName);
 
 #endif // BINARY_MAP_H_

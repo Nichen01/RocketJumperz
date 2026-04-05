@@ -646,7 +646,15 @@ void LevelEditor_Update() {
 	// If user clicks on the "RESET" button
 	if (resetBtn.isHovered && AEInputCheckCurr(AEVK_LBUTTON)) {
 		actionHistory.clear();
-		ResetMapData();
+		if (currentGameLevel == 1) {
+			ResetMapData("Assets/Map/Level1Original.txt");
+		}
+		if (currentGameLevel == 2) {
+			ResetMapData("Assets/Map/Level2Original.txt");
+		}
+		if (currentGameLevel == 3) {
+			ResetMapData("Assets/Map/Level3Original.txt");
+		}
 	}
 }
 

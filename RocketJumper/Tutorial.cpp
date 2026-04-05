@@ -127,8 +127,10 @@ void Tutorial_Initialize()
 	projectileMesh = AssetManager::GetMesh(MESH_QUAD);
 	uiMesh         = AssetManager::GetMesh(MESH_QUAD);
 
-	ImportMapDataFromFile("Assets/Map/Tutorial_Map.txt", true);  // pristine copy
-	ImportMapDataFromFile("Assets/Map/Tutorial_Map.txt", false); // editable copy
+	if (!ImportMapDataFromFile("Assets/Map/Tutorial.txt")) {
+		printf("Could not import file");
+		return;
+	}
 
 	x = BINARY_MAP_WIDTH;
 	y = BINARY_MAP_HEIGHT;
