@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Load.cpp
+\date         April, 01, 2026
+\brief        File with helper functions to load the assets in that file
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "Load.h"
 #include "Draw.h"
 #include "AssetManager.h"

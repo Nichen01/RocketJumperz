@@ -1,7 +1,6 @@
 /* Start Header ************************************************************************/
 /*!
-\file		  MainMenu.h
-\author       Chan Joraye (c.joraye)
+\file		  Tutorial.cpp
 \date         April, 01, 2026
 \brief        File for tutorial level
 
@@ -19,7 +18,6 @@ Technology is prohibited.
 #include "WeaponSprite.h"
 #include "Drops.h"
 #include "InstructionsMenu.h"
-
 
 static s32* map = nullptr;
 static int x = 16;
@@ -360,6 +358,7 @@ void Tutorial_Update()
 		}
 	}
 
+	// Collect health pack
 	objectsquares keyObj;
 	keyObj.xPos = key.worldX;
 	keyObj.yPos = key.worldY;

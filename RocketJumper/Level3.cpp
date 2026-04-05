@@ -1,3 +1,15 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  Level3.cpp
+\date         April, 01, 2026
+\brief        File for level 3
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 
 // External libraries are included in header file
 #include "Level3.h"
@@ -495,6 +507,7 @@ void Level3_Update()
 			door.isOpen = (door.anim.currentFrame != 0);
 	}
 
+	// Collect health pack
 	objectsquares healthObj;
 	healthObj.xPos = hp.worldX;
 	healthObj.yPos = hp.worldY;

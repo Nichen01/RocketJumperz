@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  Draw.cpp
-\author       Chan Joraye (c.joraye)
+\author       Chan Joraye (c.joraye), Ivan Chong (i.chong)
 \date         April, 01, 2026
 \brief        File to render different types of texture eg. Flashing texture, normal texture and the assets from the txt file
 

@@ -1,6 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file		  LevelEditor.h
+\author 	Chan Joraye (c.joraye)
 \date         April, 01, 2026
 \brief        Header file for the Level Editor system. 
 			  Defines core data structures for editor actions and UI buttons, 

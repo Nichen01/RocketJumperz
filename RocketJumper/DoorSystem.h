@@ -3,7 +3,7 @@
 \file		DoorSystem.h
 \author 	Chan Joraye (c.joraye)
 \date   	April, 01, 2026
-\brief		Header file for the doors in the game
+\brief		Header file for the doors in the game & the transition between doors
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

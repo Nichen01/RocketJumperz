@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file		  GameStateManager.cpp
+\date         April, 01, 2026
+\brief        File for managing between different Game States
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "GameStateManager.h"
 
 // Checking where to spawn character
