@@ -63,6 +63,14 @@ struct resetButton {
 	bool isHovered = false;
 };
 
+struct cancelButton {
+	f32 x, y;
+	f32 width, height;
+	f32 scale = 1.0f;
+	f32 targetScale;
+	bool isHovered = false;
+};
+
 void LevelEditor_Load();
 
 void LevelEditor_Initialize();
