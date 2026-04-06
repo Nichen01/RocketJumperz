@@ -480,7 +480,7 @@ void Level1_Update()
 					AEAudioPlay(Error, soundEffects, 1.f, 1.f, 0);
 				}
 				else {
-					int toLevel = (currentGameLevel == door.entranceLevel) ? door.exitLevel : door.entranceLevel;
+					int toLevel = 3;
 
 					// Save current stats as a checkpoint before leaving the level
 					savedAmmo      = movement::bulletCount;
